@@ -5,7 +5,7 @@
 #' @keywords internal
 
 
-load_numapp(numapplic_path = "/data/josh/CenSoc/NUMDEATH/"){
+load_numapp <- function(numapplic_path = "/data/josh/CenSoc/NUMDEATH/") {
 
   setwd(numapplic_path)
   files <- list.files(pattern = ".csv$")
