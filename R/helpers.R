@@ -3,6 +3,7 @@
 #' @param x a string with spaces between words
 #' @return first word from string of words
 #' @keywords internal
+#' @export
 
 get_first_word <- function(x)
 {
@@ -17,6 +18,8 @@ get_first_word <- function(x)
 #' @param key a string that acts as a key that may have punctuation. Note that it retains underscores, which are used in the keys.
 #' @return a string with no punctuation
 #' @keywords internal
+#' @export
+
 
 
 ## function to clean keys

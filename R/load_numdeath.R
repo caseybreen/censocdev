@@ -3,27 +3,47 @@
 #' @param numdeath_path path to the NUMDEATH files
 #' @return NUMDEATH data.frame
 #' @keywords internal
+#' @import data.table
+#' @export
 
 
-create_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
+load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
 
-  setwd(numdeath_path)
-  files <- list.files(pattern = ".csv$")
+  files <- list.files(path = numdeath_path, pattern = ".csv$")
 
-  all_cols_to_keep <- c("ssn", "nh_name_first", "nh_name_last", "sex", "dob", "dod")
+  all_cols_to_keep <- c("ssn", "nh_name_first", "nh_name_last", "sex", "dob", "dod", "zip_residence")
 
-  numdeath_append = rbindlist(lapply(files, fread, select=all_cols_to_keep, colClasses = list(character= 'ssn')))
+  numdeath <- rbindlist(lapply(paste0(numdeath_path, files), fread, select=all_cols_to_keep, colClasses = list(character= 'ssn', 'zip_residence')))
 
-  numdeath_append[,"year_death" := as.numeric(substr(dod, 5, 8))]
-  numdeath_append[,"year_birth" := as.numeric(substr(dob, 5, 8))]
+  cat("Cleaning variables. \n")
 
-  # let's fix this
-  nrow(numdeath_append[grepl(",+", numdeath_append$nh_name_first),])
-  numdeath_append = numdeath_append %>% mutate(nh_name_first=str_replace(nh_name_first,",+", ""))
+  ## A. clean the socsec data
+  ## shorten names by removing blank space at end
+  numdeath[,"lname" := nh_name_last]
+  numdeath[,"fname" := nh_name_first]
+  numdeath[,lname := gsub(pattern = "\\s*$",
+                        replacement = "", x = lname)]
+  numdeath[,fname := gsub(pattern = "\\s*$",
+                        replacement = "", x = fname)]
 
-  # let's fix this
-  nrow(numdeath_append[grepl(",+", numdeath_append$nh_name_last),])
-  numdeath_append = numdeath_append %>% mutate(nh_name_last=str_replace(nh_name_last, ",+", ""))
+  ## now get birth and death year
+  numdeath[,"byear" := as.numeric(substr(dob, 5, 9))]
+  numdeath[,"dyear" := as.numeric(substr(dod, 5, 9))]
 
-  return(numdeath_append)
+  ## birth and death month
+  numdeath[,"bmonth" := as.numeric(substr(dob, 1, 2))]
+  numdeath[,"dmonth" := as.numeric(substr(dod, 1, 2))]
+
+  ## birth and death dat
+  numdeath[,"bday" := as.numeric(substr(dob, 3, 4))]
+  numdeath[,"dday" := as.numeric(substr(dod, 3, 4))]
+
+  ## now get census_age
+  numdeath[,"census_age" := ifelse(bmonth < 4,
+                                 1940 - byear,
+                                 1939 - byear)]
+  df3[, c("dob","dod", "nh_name_last", "nh_name_first" ):=NULL]
+
+
+  return(numdeath)
 }
