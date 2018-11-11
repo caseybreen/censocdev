@@ -7,7 +7,7 @@
 #' @export
 
 
-load_numapp <- function(numapplic_path = "/data/josh/CenSoc/NUMDEATH/") {
+load_numapp <- function(numapplic_path = "/data/josh/CenSoc/NUMIAPPLIC/Records/") {
 
   files <- list.files(path = numapplic_path, pattern = ".csv$")
 
