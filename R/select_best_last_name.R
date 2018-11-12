@@ -1,4 +1,4 @@
-#' Get first word from a string
+#' Select best last name
 #'
 #' @param numapp path to the NUMAPP files
 #' @return numapp data.frame with best last name column
@@ -8,14 +8,13 @@
 
   select_best_last_name <- function(numapp = numapp) {
 
-    numapplication <- numapp[, list(unique(ssn))]
-
-    # Clean & Create lname variable
-
-    numapp[,"lname" := toupper(nh_name_last)]
-
+    # Select variables from Num Application
     numapp <- numapp[, c("ssn", "lname", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
 
+
+    # Create & Clean fname variable
+
+    numapp[,"lname" := toupper(nh_name_last)]
     numapp[,"lname" := get_first_word(lname)]
     numapp <- na.omit(numapp, cols="lname")
     numapp <- numapp[!(grepl("\\?", numapp$lname))]

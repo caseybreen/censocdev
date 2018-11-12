@@ -1,4 +1,4 @@
-#' Select best first name
+#' Select best father last name
 #'
 #' @param numapp path to the NUMAPP files
 #' @return NUMAPP data.frame with best first name column and cycle dates
@@ -8,16 +8,17 @@
 
 select_best_first_name <- function(numapplication = numapp) {
 
-
   # Select variables from Num Application
-  numapp <- numapp[, c("ssn", "fname", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
+  numapp <- numapp[, c("ssn", "father_lname", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
 
-  # Create & Clean fname variable
-  numapp[,"fname" := toupper(nh_name_first)]
-  numapp[,"fname" := get_first_word(fname)]
-  numapp <- na.omit(numapp, cols="fname")
-  numapp <- numapp[!(grepl("\\?", numapp$fname))]
-  numapp <- numapp[!(grepl("ZZZ", numapp$fname))]
+  # Create & Clean father_lname variable
+  numapp[,"father_lname" := toupper(fth_name_last)]
+
+
+  numapp[,"father_lname" := get_first_word(father_lname)]
+  numapp <- na.omit(numapp, cols="father_lname")
+  numapp <- numapp[!(grepl("\\?", numapp$father_lname))]
+  numapp <- numapp[!(grepl("ZZZ", numapp$father_lname))]
 
 
   # Set missing values equal to 0. These will be selected last according to our selection process.
@@ -40,9 +41,9 @@ select_best_first_name <- function(numapplication = numapp) {
       ]$V1
     ]
 
-  numapp[,"fname_year_cycle" := year_cycle]
-  numapp[,"fname_month_cycle" := month_cycle]
-  numapp_last_name <- numapp[, c("ssn", "fname", "fname_year_cycle", "fname_month_cycle"), with=FALSE]
+  numapp[,"father_lname_year_cycle" := year_cycle]
+  numapp[,"father_lname_month_cycle" := month_cycle]
+  numapp_last_name <- numapp[, c("ssn", "father_lname", "father_lname_year_cycle", "father_lname_month_cycle"), with=FALSE]
 
   return(numapp_last_name)
 
