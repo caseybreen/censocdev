@@ -4,7 +4,7 @@
 \alias{load_numapp}
 \title{Get first word from a string}
 \usage{
-load_numapp(numapplic_path = "/data/josh/CenSoc/NUMDEATH/")
+load_numapp(numapplic_path = "/data/josh/CenSoc/NUMIAPPLIC/Records/")
 }
 \arguments{
 \item{numapp_path}{path to the NUMAPP files}
