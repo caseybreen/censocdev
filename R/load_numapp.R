@@ -22,10 +22,10 @@ load_numapp <- function(numapplic_path = "/data/josh/CenSoc/NUMIAPPLIC/Records/"
   numapplic_append = rbindlist(lapply(paste0(numapplic_path, files), fread, select=all_cols_to_keep, colClasses = list(character= 'ssn')))
 
   numapplic_append[,"year_cycle" := as.numeric(substr(cycle_date, 1, 4))]
-  numapplic_append[,"month_cylce" := as.numeric(substr(cycle_date, 5, 6))]
+  numapplic_append[,"month_cycle" := as.numeric(substr(cycle_date, 5, 6))]
   numapplic_append[,"year_birth" := as.numeric(substr(dob, 5, 8))]
 
-  numapplic_append <- numapplic_append[(grepl("ZZZZZZZZZ", numapplic_append$ssn))]
+  numapplic_append <- numapplic_append[!(grepl("ZZZZZZZZZ", numapplic_append$ssn))]
 
 
   return(numapplic_append)
