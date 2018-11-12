@@ -11,7 +11,7 @@ load_numapp <- function(numapplic_path = "/data/josh/CenSoc/NUMIAPPLIC/Records/"
 
   files <- list.files(path = numapplic_path, pattern = ".csv$")
 
-  all_cols_to_keep <- c("ssn", "citizenship_code", "entry_code", "cycle_date", "dob", "sex", "race",
+  all_cols_to_keep <- c("ssn", "citizenship_code", "entry_code", "cycle_date", "dob", "zip_residence", "sex", "race",
                         "pob_state_country", "pob_foreign_ind", "dob_change_ind", "prior_dob",
                         "nh_name_first", "nh_name_middle", "nh_name_last", "nh_name_suffix",
                         "mth_name_first", "mth_name_middle", "mth_name_last", "mth_name_suffix",
