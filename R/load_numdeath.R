@@ -42,7 +42,7 @@ load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
   numdeath[,"census_age" := ifelse(bmonth < 4,
                                  1940 - byear,
                                  1939 - byear)]
-  df3[, c("dob","dod", "nh_name_last", "nh_name_first" ):=NULL]
+  numdeath[, c("dob","dod", "nh_name_last", "nh_name_first" ):=NULL]
 
 
   return(numdeath)
