@@ -1,49 +1,54 @@
 #' Select best first name
 #'
 #' @param numapp path to the NUMAPP files
-#' @return NUMAPP data.frame with best first name column and cycle dates
+#' @return NUMAPP data.frame with best first name column for each unique ssn (40870456) and cycle dates
 #' @keywords internal
 #' @import data.table
 #' @export
 
-select_best_first_name <- function(numapplication = numapp) {
+select_best_first_name <- function(numapp = numapp) {
 
+  ## Create Fname Variable
+  applications <- nrow(numapp)
+  numapp[,"fname" := toupper(nh_name_first)]
+  numapp[,"fname" := get_first_word(fname)]
 
   # Select variables from Num Application
   numapp <- numapp[, c("ssn", "fname", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
 
-  # Create & Clean fname variable
-  numapp[,"fname" := toupper(nh_name_first)]
-  numapp[,"fname" := get_first_word(fname)]
+  ## Remove applications with NA value for fname
   numapp <- na.omit(numapp, cols="fname")
+  removed_na <- applications - nrow(numapp)
+  cat(removed_na, "removed with NA value for fname", "\n")
+
+  ## Remove applications with non-alphanumeric value for fname
+  applications <- nrow(numapp)
   numapp <- numapp[!(grepl("\\?", numapp$fname))]
+  removed_na <- applications - nrow(numapp)
+  cat(removed_na, "removed with non-alphanumeric values for fname", "\n")
+
+  ## Remove applications with ZZZ values for fname
+  applications <- nrow(numapp)
   numapp <- numapp[!(grepl("ZZZ", numapp$fname))]
+  removed_na <- as.integer(applications - nrow(numapp))
+  cat(removed_na, "removed with non-alphanumeric values for fname", "\n")
 
+  ## Number of different first names per SSN
+  numapp[, number_of_distinct_names:=uniqueN(fname), by = ssn]
 
-  # Set missing values equal to 0. These will be selected last according to our selection process.
-  for (col in c("year_cycle", "month_cycle")) numapp[is.na(get(col)), (col) := 0]
+  ## Create flag (0 or 1 dichotomous var) for more than one first name.
+  numapp[, fname_multiple_flag:=(ifelse(number_of_distinct_names > 1, 1, 0))]
 
-  # Maybe should convert this to century months in the future?
-  numapp[,"cycle_year_month" := year_cycle + (month_cycle/12)]
+  ## Select Longest First name (e.g. select "WILLIAM" over "BILL")
+  numapp <- numapp[numapp[, .I[which.max(nchar(fname))], by = ssn]$V1]
 
-
-  # For each SSN we want to select one row using the following rule:
-  # If there is a year > 2000, select the row with minimum year above 2000.
-  # If there not a year > 2000, select the row with the maximum year.
-  numapp <- numapp[
-    numapp[
-      ,
-      if(any(cycle_year_month > 1940))
-        .I[which.min(1940 - cycle_year_month)] else
-          .I[which.max(cycle_year_month)],
-      by=ssn
-      ]$V1
-    ]
-
+  ## Create fname year and cycle date vars
   numapp[,"fname_year_cycle" := year_cycle]
   numapp[,"fname_month_cycle" := month_cycle]
-  numapp_last_name <- numapp[, c("ssn", "fname", "fname_year_cycle", "fname_month_cycle"), with=FALSE]
 
-  return(numapp_last_name)
+  ## Create data.table with specific data.table features
+  numapp_first_name <- numapp[, c("ssn", "fname", "fname_year_cycle", "fname_month_cycle", "fname_multiple_flag"), with=FALSE]
+
+  return(numapp_first_name)
 
 }

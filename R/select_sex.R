@@ -6,41 +6,43 @@
 #' @import data.table
 #' @export
 
-select_sex <- function(numapplication = numapp) {
+select_sex <- function(numapp = numapp) {
 
 
   numapp <- numapp[, c("ssn", "sex", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
 
-  # Clean & Create father_lname variable
-  numapp[numapp==''|numapp==' ']<-NA
+  ## Clean & Create father_lname variable
+  numapp[numapp$sex == 0]<-NA
   numapp <- na.omit(numapp, cols="sex")
-  numapp <- numapp[!(grepl("\\?", numapp$sex))]
 
-  # Set missing values equal to 0. These will be selected last according to our selection process.
+  ## Remove applications with NA value for fname
+  applications <- nrow(numapp)
+  numapp <- na.omit(numapp, cols="sex")
+  removed_na <- applications - nrow(numapp)
+  cat(removed_na, "removed with 0 value (no information) for sex", "\n")
+
+  ## Set missing values equal to 0. These will be selected last according to our selection process.
   for (col in c("year_cycle", "month_cycle")) numapp[is.na(get(col)), (col) := 0]
 
-  # Maybe should convert this to century months in the future?
+  ## Maybe should convert this to century months in the future?
   numapp[,"cycle_year_month" := year_cycle + (month_cycle/12)]
 
+  ## Number of different sexes per SSN
+  numapp[, number_of_distinct_sexes:=uniqueN(sex), by = ssn]
 
-  # For each SSN we want to select one row using the following rule:
-  # The modal value of sex
-  # If more than one mode, select the first value of sex.
+  ## Create flag (0 or 1 dichotomous var) for more than one first name.
+  numapp[, fname_multiple_flag:=(ifelse(number_of_distinct_sexes > 1, 1, 0))]
 
-  Mode <- function(x) {
-    ux <- unique(x)
-    ux[which.max(tabulate(match(x, ux)))]
-  }
+  ## Select most recent sex
+  Numapp <- numapp[numapp[, .I[cycle_year_month == max(cycle_year_month)], by=ssn]$V1]
 
-  numapp <- numapp[numapp[, .I[sex==Mode(sex)], by=ssn]$V1]
-  setkey(numapp, ssn, cycle_date)
-  numapp_test <- numapp[J(unique(ssn)), mult = "first"]
-
-
+  ## Select most recent sex
   numapp[,"sex_year_cycle" := year_cycle]
   numapp[,"sex_month_cycle" := month_cycle]
-  numapp_last_name <- numapp[, c("ssn", "sex", "sex_year_cycle", "sex_month_cycle"), with=FALSE]
 
-  return(numapp_last_name)
+
+  numapp_sex <- numapp[, c("ssn", "sex", "sex_year_cycle", "sex_month_cycle", ), with=FALSE]
+
+  return(numapp_sex)
 
 }

@@ -12,6 +12,8 @@
     numapp <- numapp[, c("ssn", "lname", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
 
 
+
+
     # Create & Clean fname variable
 
     numapp[,"lname" := toupper(nh_name_last)]

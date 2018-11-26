@@ -12,7 +12,8 @@ select_race <- function(numapplication = numapp) {
   numapp <- numapp[, c("ssn", "race", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
 
   # Clean & Create father_lname variable
-  numapp[numapp==''|numapp==' ']<-NA
+  numapp[numapp==''|numapp==' '] <- NA
+  numapp[numapp==0] <- NA
   numapp <- na.omit(numapp, cols="race")
   numapp <- numapp[!(grepl("\\?", numapp$race))]
 
@@ -23,14 +24,17 @@ select_race <- function(numapplication = numapp) {
   numapp[,"cycle_year_month" := year_cycle + (month_cycle/12)]
 
 
+  test <- numapp[, .(number_of_distinct_orders = uniqueN(race)), by = ssn]
+
   # For each SSN we want to select one row using the following rule:
   # The modal value of race
   # If more than one mode, select the first value of race.
 
-  Mode <- function(x) {
-    ux <- unique(x)
-    ux[which.max(tabulate(match(x, ux)))]
-  }
+  # Mode <- function(x) {
+  #   ux <- unique(x)
+  #   ux[which.max(tabulate(match(x, ux)))]
+  # }
+
   numapp <- numapp[numapp[, .I[race==Mode(race)], by=ssn]$V1]
   setkey(numapp, ssn, cycle_date)
   numapp <- numapp[J(unique(ssn)), mult = "first"]
@@ -43,3 +47,8 @@ select_race <- function(numapplication = numapp) {
   return(numapp_race)
 
 }
+
+
+
+
+
