@@ -11,20 +11,18 @@ select_race <- function(numapplication = numapp) {
 
   numapp <- numapp[, c("ssn", "race", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
 
-  # Clean & Create father_lname variable
-  numapp[numapp==''|numapp==' '] <- NA
-  numapp[numapp==0] <- NA
+  ## Remove applications with 0 (no information) for sex
+  applications <- nrow(numapp)
+  numapp[race==0] <- NA
   numapp <- na.omit(numapp, cols="race")
-  numapp <- numapp[!(grepl("\\?", numapp$race))]
+  removed_na <- applications - nrow(numapp)
+  cat(removed_na, "removed with 0 value (no information) or NA for race", "\n")
 
   # Set missing values equal to 0. These will be selected last according to our selection process.
   for (col in c("year_cycle", "month_cycle")) numapp[is.na(get(col)), (col) := 0]
 
   # Maybe should convert this to century months in the future?
   numapp[,"cycle_year_month" := year_cycle + (month_cycle/12)]
-
-
-  test <- numapp[, .(number_of_distinct_orders = uniqueN(race)), by = ssn]
 
   # For each SSN we want to select one row using the following rule:
   # The modal value of race
@@ -35,14 +33,23 @@ select_race <- function(numapplication = numapp) {
   #   ux[which.max(tabulate(match(x, ux)))]
   # }
 
-  numapp <- numapp[numapp[, .I[race==Mode(race)], by=ssn]$V1]
-  setkey(numapp, ssn, cycle_date)
-  numapp <- numapp[J(unique(ssn)), mult = "first"]
 
+  ## Number of different sexes per SSN
+  numapp[, number_of_distinct_races:=uniqueN(race), by = ssn]
+
+  ## Create flag (0 or 1 dichotomous var) for more than one first name.
+  numapp[, race_multiple_flag:=(ifelse(number_of_distinct_races > 1, 1, 0))]
+
+  ## Select most recent race
+  numapp <- numapp[numapp[, .I[which.max(cycle_year_month)], by=ssn]$V1]
+
+  ## Recode originally missing years back to NA.
+  numapp[year_cycle == 0, year_cycle := NA]
+  numapp[month_cycle == 0, month_cycle := NA]
 
   numapp[,"race_year_cycle" := year_cycle]
   numapp[,"race_month_cycle" := month_cycle]
-  numapp_race <- numapp[, c("ssn", "race", "race_year_cycle", "race_month_cycle"), with=FALSE]
+  numapp_race <- numapp[, c("ssn", "race", "race_year_cycle", "race_month_cycle", "race_multiple_flag"), with=FALSE]
 
   return(numapp_race)
 

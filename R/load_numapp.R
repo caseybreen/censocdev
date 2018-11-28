@@ -26,7 +26,7 @@ load_numapp <- function(numapplic_path = "/data/josh/CenSoc/NUMIAPPLIC/Records/"
   numapplic_append[,"year_birth" := as.numeric(substr(dob, 5, 8))]
 
   numapplic_append <- numapplic_append[!(grepl("ZZZZZZZZZ", numapplic_append$ssn))]
-
+  numapp[numapp==''|numapp==' ']<-NA
 
   return(numapplic_append)
 

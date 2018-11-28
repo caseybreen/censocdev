@@ -31,7 +31,7 @@ select_best_first_name <- function(numapp = numapp) {
   applications <- nrow(numapp)
   numapp <- numapp[!(grepl("ZZZ", numapp$fname))]
   removed_na <- as.integer(applications - nrow(numapp))
-  cat(removed_na, "removed with non-alphanumeric values for fname", "\n")
+  cat(removed_na, "removed with ZZZ values for fname", "\n")
 
   ## Number of different first names per SSN
   numapp[, number_of_distinct_names:=uniqueN(fname), by = ssn]
@@ -42,9 +42,16 @@ select_best_first_name <- function(numapp = numapp) {
   ## Select Longest First name (e.g. select "WILLIAM" over "BILL")
   numapp <- numapp[numapp[, .I[which.max(nchar(fname))], by = ssn]$V1]
 
+  ## Recode originally missing years back to NA.
+  numapp[year_cycle == 0, year_cycle := NA]
+  numapp[month_cycle == 0, month_cycle := NA]
+
+
   ## Create fname year and cycle date vars
   numapp[,"fname_year_cycle" := year_cycle]
   numapp[,"fname_month_cycle" := month_cycle]
+
+
 
   ## Create data.table with specific data.table features
   numapp_first_name <- numapp[, c("ssn", "fname", "fname_year_cycle", "fname_month_cycle", "fname_multiple_flag"), with=FALSE]
