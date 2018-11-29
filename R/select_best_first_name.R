@@ -6,11 +6,6 @@
 #' @import data.table
 #' @export
 #'
-#commons name/standarized the names
-#library(data.table)
-#application_path = "/nobackup/90days/fmenares/censoc/numapplic_appended.csv"
-#numapp = fread(application_path, colClasses = list(character= 'ssn'))
-
 select_best_first_name <- function(numapp = numapp) {
 
   applications <- nrow(numapp)
@@ -24,8 +19,6 @@ select_best_first_name <- function(numapp = numapp) {
   numapp <- numapp[ , .(ssn, fname, fname_cmonth, fname_cyear)]
   ## Keeping only differnts pairs of ssn and first names.
   numapp = numapp[!duplicated(numapp, by=c("ssn","fname"))]
-  removed_na <- applications - nrow(numapp)
-  cat(removed_na, "removed with duplicates ssn and fname", "\n")
 
   ## Remove applications with NA value for fname
   applications <- nrow(numapp)
@@ -68,13 +61,11 @@ select_best_first_name <- function(numapp = numapp) {
   app_fname_dupli = app_fname_dupli[longest_fname==nchar_fname, ]
 
   app_fname_dupli[, cyear_month := fname_cyear * 100 +  fname_cmonth]
-  #Duplicates with NAs
+
+    #Duplicates with NAs
   app_fname_dupli[, cycle_na:= is.na(cyear_month)]
   nrow(app_fname_dupli[ cycle_na==TRUE,])
-  #223,463
-  #keeping only one NA per record, the earliest.
-  app_fname_dupli = app_fname_dupli[!(cycle_na==TRUE & ssn_n != 1),]
-  #223,463 deleted
+  #223,463 it will be random for them based on recency.
 
   ##Recency
   app_fname_dupli[, ssn_n := order(fname_cyear, fname_cmonth), by  = c("ssn")]
