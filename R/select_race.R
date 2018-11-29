@@ -17,7 +17,7 @@ select_race <- function(numapplication = numapp) {
   ## Keeping only duplicates with equal ssn but different race
   numapp = numapp[!duplicated(numapp, by=c("ssn","race"))]
 
-  #Identifying 0 as NA
+  #Identifying NA as 0
   numapp[, race := as.numeric(race)]
   numapp[is.na(race), race := 0]
 
@@ -28,20 +28,17 @@ select_race <- function(numapplication = numapp) {
   #removed_na <- applications - nrow(numapp)
   #cat(removed_na, "removed with 0 value (no information) or NA for race", "\n")
 
-  ## Remove applications with non-alphanumeric value for fname
+  ## Remove applications with non-alphanumeric value for race
   applications <- nrow(numapp)
   numapp <- numapp[!(grepl("\\?", numapp$race))]
   removed_na <- applications - nrow(numapp)
-  cat(removed_na, "removed with non-alphanumeric values for fname", "\n")
+  cat(removed_na, "removed with non-alphanumeric values for race", "\n")
 
   ## Remove applications with ZZZ values for fname
   applications <- nrow(numapp)
   numapp <- numapp[!(grepl("ZZZ", numapp$race))]
   removed_na <- as.integer(applications - nrow(numapp))
-  cat(removed_na, "removed with non-alphanumeric values for fname", "\n")
-
-  # Set missing values equal to 0. These will be selected last according to our selection process.
-  #for (col in c("race_cyear", "race_cmonth")) numapp[is.na(get(col)), (col) := 0]
+  cat(removed_na, "removed with non-alphanumeric values for race", "\n")
 
   # Maybe should convert this to century months in the future?
   #numapp[,"cycle_year_month" := year_cycle + (month_cycle/12)]
@@ -51,10 +48,10 @@ select_race <- function(numapplication = numapp) {
   # If more than one mode, select the first value of race.
 
   # mode function.
-  getmode <- function(v) {
-    uniqv <- unique(v)
-    uniqv[which.max(tabulate(match(v, uniqv)))]
-  }
+  #getmode <- function(v) {
+   # uniqv <- unique(v)
+  #  uniqv[which.max(tabulate(match(v, uniqv)))]
+  #}
 
   ## Number of different races per SSN
   numapp[, number_of_distinct_races:=uniqueN(race), by = ssn]
@@ -68,23 +65,23 @@ select_race <- function(numapplication = numapp) {
   #keep a frame only with uniques
   app_race_unique = numapp[race_multiple_flag==0, ]
 
-  ## Keep the mode of the race.
+  #keeping only duplicates among race distinct than 0 and duplicates at 0
+  #for all the records.
   app_race_dupli[, race_min:= .(min(race)), by=c("ssn") ]
   app_race_dupli[, race_max:= .(max(race)), by=c("ssn") ]
-  #keeping only duplicates among race distinct than 0, this means
-  #keeping only duplicates at 0 for all the records.
   app_race_dupli=app_race_dupli[race > 0 | race_max == 0, ]
   #6,221,017
-  table(app_race_dupli$race)
+  #table(app_race_dupli$race)
   #0       1       2       3       4       5       6       9
   #1136 4126165  882923  397017  158329  569361   84215    1871
 
     ## Mode
-  app_race_dupli[, race_mode:= .(getmode(race)), by=c("ssn") ]
-  app_race_dupli = app_race_dupli[race_mode== race,]
+  #app_race_dupli[, race_mode:= .(getmode(race)), by=c("ssn") ]
+  #app_race_dupli = app_race_dupli[race_mode== race,]
 
   ## Select most recent race
-  #numapp <- numapp[numapp[, .I[which.max(cycle_year_month)], by=ssn]$V1]
+  app_fname_dupli[, cyear_month := race_cyear * 100 +  race_cmonth]
+  numapp <- numapp[numapp[, .I[which.max(cyear_month)], by=ssn]$V1]
 
   ## Recode originally missing years back to NA.
   #numapp[year_cycle == 0, year_cycle := NA]
