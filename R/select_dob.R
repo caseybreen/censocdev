@@ -20,7 +20,7 @@ select_dob <- function(numapp = numapp) {
 
   ## Remove applications with NA value
   applications <- nrow(numapp)
-  numapp <- na.omit(numapp, cols="fname")
+  numapp <- na.omit(numapp, cols="dob")
   removed_na <- applications - nrow(numapp)
   cat(removed_na, "removed with NA value for dob", "\n")
 
@@ -52,9 +52,9 @@ select_dob <- function(numapp = numapp) {
   #2,512,336
 
   #Duplicates with NAs
-  app_fname_dupli[, cyear_month := fname_cyear * 100 +  fname_cmonth]
-  app_fname_dupli[, cycle_na:= is.na(cyear_month)]
-  nrow(app_fname_dupli[ cycle_na==TRUE,])
+  app_dob_dupli[, cyear_month := dob_cyear * 100 +  dob_cmonth]
+  app_dob_dupli[, cycle_na:= is.na(cyear_month)]
+  nrow(app_dob_dupli[ cycle_na==TRUE,])
   #223,463 it will be random for them based on recency.
 
   ##Recency
