@@ -25,19 +25,19 @@ load_numapp <- function(numapplic_path = "/data/josh/CenSoc/NUMIAPPLIC/Records/"
 
   ## Finished reading in columns
 
-  cat("Finished appending numapp files /n")
+  cat("Finished appending numapp files", "\n")
 
   ## There are 398 cases where dob is only 7 characters because it is missing a leading 0.
   ## Here, we'll add a leading 0 to all dob values that are 7 characters in length.
 
-  numdeath[, dob := ifelse(nchar(dob) == 8, dob, paste0("0", dob))]
+  numapplic_append[, dob := ifelse(nchar(dob) == 8, dob, paste0("0", dob))]
 
   ## Create year_cycle, month_cycle, and year_birth variables
 
   numapplic_append[,"year_cycle" := as.numeric(substr(cycle_date, 1, 4))]
   numapplic_append[,"month_cycle" := as.numeric(substr(cycle_date, 5, 6))]
 
-  cat("Finished creating year_cycle and month_year variables /n")
+  cat("Finished creating year_cycle and month_year variables \n")
 
   numapplic_append <- numapplic_append[!(grepl("ZZZZZZZZZ", numapplic_append$ssn))]
   numapplic_append[numapplic_append==''|numapplic_append==' ']<-NA

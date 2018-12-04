@@ -1,5 +1,3 @@
-#' Get first word from a string
-#'
 #' @param numdeath_path path to the NUMDEATH files
 #' @return NUMDEATH data.frame
 #' @keywords internal
@@ -52,4 +50,3 @@ load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
 
   return(numdeath)
 }
-

@@ -1,4 +1,4 @@
-#' Get first word from a string
+#' This script appends geography variables onto the numdeath files
 #'
 #' @param numdeath_path path to the NUMDEATH files
 #' @return NUMDEATH data.frame
@@ -24,7 +24,7 @@ load_numdeath_geo <- function(numdeath, ssn_state_codes = "/home/ipums/casey-ipu
   numdeath <- merge(numdeath, ssn_state_codes, on = key, all.x = TRUE)
   numdeath[,ssn_3:=NULL]
 
-  cat("State from ZIP codes complete")
+  cat("State from ZIP codes complete \n")
 
   ## create zip codes
   numdeath[,"zip_code_5" := as.character(substr(zip_residence, 1, 5))]
@@ -40,7 +40,7 @@ load_numdeath_geo <- function(numdeath, ssn_state_codes = "/home/ipums/casey-ipu
   ## merge on unique keys
   numdeath <- merge(numdeath, zip_code, on = zip_code_5, all.x = TRUE)
 
-  cat("City and State from ZIP codes complete\n")
+  cat("City and State from ZIP codes complete \n")
 
 
   return(numdeath)
