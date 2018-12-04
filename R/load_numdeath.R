@@ -44,9 +44,9 @@ load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
   numdeath[,"dday" := as.numeric(substr(dod, 3, 4))]
 
   ## now get census_age
-  numdeath[,"census_age" := ifelse(bmonth < 4,
-                                   1940 - byear,
-                                   1939 - byear)]
+  numdeath[,"census_age" := ifelse(bmonth_death_file < 4,
+                                   1940 - bday_death_file,
+                                   1939 - bday_death_file)]
   numdeath[, c("dob","dod", "nh_name_last", "nh_name_first" ):=NULL]
 
 
