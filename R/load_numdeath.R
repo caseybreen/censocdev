@@ -1,4 +1,3 @@
-Corrected Numdeath Code
 #' Get first word from a string
 #'
 #' @param numdeath_path path to the NUMDEATH files
