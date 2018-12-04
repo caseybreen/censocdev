@@ -78,5 +78,5 @@ select_best_first_name <- function(numapp = numapp) {
   numapp = rbind(app_fname_unique,app_fname_dupli)
   rm(app_fname_dupli)
   rm(app_fname_unique)
-  return(numapp_first_name)
+  return(numapp)
 }
