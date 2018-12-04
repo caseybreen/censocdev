@@ -32,15 +32,15 @@ load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
   numdeath[, dob := ifelse(nchar(dob) == 8, dob, paste0("0", dob))]
 
   ## now get birth and death year
-  numdeath[,"byear" := as.numeric(substr(dob, 5, 8))]
+  numdeath[,"byear_death_file" := as.numeric(substr(dob, 5, 8))]
   numdeath[,"dyear" := as.numeric(substr(dod, 5, 8))]
 
   ## birth and death month
-  numdeath[,"bmonth" := as.numeric(substr(dob, 1, 2))]
+  numdeath[,"bmonth_death_file" := as.numeric(substr(dob, 1, 2))]
   numdeath[,"dmonth" := as.numeric(substr(dod, 1, 2))]
 
   ## birth and death dat
-  numdeath[,"bday" := as.numeric(substr(dob, 3, 4))]
+  numdeath[,"bday_death_file" := as.numeric(substr(dob, 3, 4))]
   numdeath[,"dday" := as.numeric(substr(dod, 3, 4))]
 
   ## now get census_age
