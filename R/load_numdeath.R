@@ -1,3 +1,4 @@
+Corrected Numdeath Code
 #' Get first word from a string
 #'
 #' @param numdeath_path path to the NUMDEATH files
@@ -13,7 +14,7 @@ load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
 
   all_cols_to_keep <- c("ssn", "nh_name_first", "nh_name_last", "sex", "dob", "dod", "zip_residence")
 
-  numdeath <- rbindlist(lapply(paste0(numdeath_path, files), fread, select=all_cols_to_keep, colClasses = list(character= 'ssn', 'zip_residence')))
+  numdeath <- rbindlist(lapply(paste0(numdeath_path, files), fread, select=all_cols_to_keep, colClasses = list(character= 'ssn', 'zip_residence', 'dob', 'dod')))
 
   cat("Cleaning variables. \n")
 
@@ -22,13 +23,18 @@ load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
   numdeath[,"lname" := nh_name_last]
   numdeath[,"fname" := nh_name_first]
   numdeath[,lname := gsub(pattern = "\\s*$",
-                        replacement = "", x = lname)]
+                          replacement = "", x = lname)]
   numdeath[,fname := gsub(pattern = "\\s*$",
-                        replacement = "", x = fname)]
+                          replacement = "", x = fname)]
+
+  ##In 162 cases, dob is 7 characters long instead of 8. In all 162 cases, the leading 0 has been ommitted.
+  ## For these 162 cases, we will add a leading o.
+
+  numdeath[, dob := ifelse(nchar(dob) == 8, dob, paste0("0", dob))]
 
   ## now get birth and death year
-  numdeath[,"byear" := as.numeric(substr(dob, 5, 9))]
-  numdeath[,"dyear" := as.numeric(substr(dod, 5, 9))]
+  numdeath[,"byear" := as.numeric(substr(dob, 5, 8))]
+  numdeath[,"dyear" := as.numeric(substr(dod, 5, 8))]
 
   ## birth and death month
   numdeath[,"bmonth" := as.numeric(substr(dob, 1, 2))]
@@ -40,10 +46,11 @@ load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
 
   ## now get census_age
   numdeath[,"census_age" := ifelse(bmonth < 4,
-                                 1940 - byear,
-                                 1939 - byear)]
+                                   1940 - byear,
+                                   1939 - byear)]
   numdeath[, c("dob","dod", "nh_name_last", "nh_name_first" ):=NULL]
 
 
   return(numdeath)
 }
+
