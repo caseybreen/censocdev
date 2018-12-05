@@ -40,6 +40,10 @@ select_dob <- function(numapp = numapp) {
   ## Number of different dob per SSN
   numapp[, number_of_distinct_dob:=uniqueN(dob), by = ssn]
 
+  ## Recode numapp to 0
+  numdeath[ , dob:= (ifelse(dday=="0", NA, dob)) ]
+
+
   ## Create flag (0 or 1 dichotomous var) for more than one dob.
   numapp[, dob_multiple_flag:=(ifelse(number_of_distinct_dob > 1, 1, 0))]
 
@@ -68,5 +72,8 @@ select_dob <- function(numapp = numapp) {
   numapp[, "bmonth" := as.numeric(substr(dob, 1, 2))]
   numapp[, "bday" := as.numeric(substr(dob, 3, 3))]
   numapp[, "byear" := as.numeric(substr(dob, 5, 8))]
+
+
+
   return(numapp_dob)
 }
