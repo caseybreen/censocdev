@@ -6,6 +6,7 @@
 #' @return a census dataframe with match key and unique IPUMS identifier
 #' @import data.table
 #' @keywords internal
+#' @export
 
 load_census <- function(census_file,
                         cols_to_keep = NULL){
