@@ -9,8 +9,7 @@
 merge_numapp_numdeath <- function(numapp = numapp, numdeath = numdeath) {
 
   numapp <- numapp
-  numdeath <- numdeath
-
+  numdeath <- numdeath[, c("ssn", "zip_residence", "dyear", "dmonth"), with = FALSE]
   ss5 <- merge(numdeath, numapp, by = "ssn")
 
   ss5[,"census_age" := ifelse(bmonth < 4,

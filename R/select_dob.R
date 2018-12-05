@@ -15,6 +15,7 @@ select_dob <- function(numapp = numapp) {
 
   # Select variables from Num Application
   numapp <- numapp[ , .(ssn, dob, dob_cmonth, dob_cyear)]
+
   ## Keeping only differnts pairs of ssn and first names.
   numapp = numapp[!duplicated(numapp, by=c("ssn","dob"))]
 
@@ -46,10 +47,6 @@ select_dob <- function(numapp = numapp) {
   app_dob_dupli = numapp[dob_multiple_flag==1, ]
   ## Keep a frame only with uniques
   app_dob_unique = numapp[dob_multiple_flag==0, ]
-
-  #number of unique records among the duplicates
-  #nrow(app_dob_dupli[ssn_n == 1, ])
-  #2,512,336
 
   #Duplicates with NAs
   app_dob_dupli[, cyear_month := dob_cyear * 100 +  dob_cmonth]
