@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 #'
-select_best_first_name <- function(numapp = numapp, numdeath = numdeath) {
+merge_numapp_numdeath <- function(numapp = numapp, numdeath = numdeath) {
 
   numapp <- numapp
   numdeath <- numdeath
