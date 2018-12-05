@@ -70,12 +70,20 @@ select_dob <- function(numapp = numapp) {
   app_dob_unique = app_dob_unique[, .(ssn, dob, dob_cyear, dob_cmonth, dob_multiple_flag)]
   numapp_dob = rbind(app_dob_unique,app_dob_dupli)
 
-  ## Create byear, byear, and bday variables.
+  ## Create byear, bmonth, and bday variables.
   numapp_dob[, "bmonth" := as.numeric(substr(dob, 1, 2))]
-  numapp_dob[, "bday" := as.numeric(substr(dob, 3, 3))]
+
+  ## 5 cases where bmonth is 0; replace with NA
+  numapp_dob[ , bmonth:= (ifelse(bmonth=="0", NA, bmonth)) ]
+
+  numapp_dob[, "bday" := as.numeric(substr(dob, 3, 4))]
+
+  ## 34 cases where bmonth is 0; replace with NA
+  numapp_dob[ , bday:= (ifelse(bday=="0", NA, bday)) ]
+
   numapp_dob[, "byear" := as.numeric(substr(dob, 5, 8))]
 
-
+  numapp_dob <- numapp_dob[, .(ssn, byear, bmonth, bday, dob_cyear, dob_cmonth, dob_multiple_flag)]
 
   return(numapp_dob)
 }
