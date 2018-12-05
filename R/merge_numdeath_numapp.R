@@ -17,9 +17,7 @@ merge_numapp_numdeath <- function(numapp = numapp, numdeath = numdeath) {
                                1940 - byear,
                                1939 - byear)]
 
-  ss5[,"linking_key" := paste(lname, fname, census_age, BPL, sep = "_")]
-
-
+  ss5[,"linking_key" := paste(lname, fname, census_age, ipums_code, sep = "_")]
 
   return(ss5)
 }
