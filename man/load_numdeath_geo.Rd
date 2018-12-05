@@ -6,7 +6,8 @@
 \usage{
 load_numdeath_geo(numdeath,
   ssn_state_codes = "/home/ipums/casey-ipums/censoc/data/ssn_state_codes.csv",
-  zip_code_states = "/home/ipums/casey-ipums/zip_code_states.csv")
+  zip_code_states = "/home/ipums/casey-ipums/zip_code_states.csv",
+  state_fip_codes = "/90days/casey/censoc_data/numdeath/numdeath_geo/state_fips.csv")
 }
 \arguments{
 \item{numdeath_path}{path to the NUMDEATH files}

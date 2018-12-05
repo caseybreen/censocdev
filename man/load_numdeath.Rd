@@ -2,7 +2,7 @@
 % Please edit documentation in R/load_numdeath.R
 \name{load_numdeath}
 \alias{load_numdeath}
-\title{Get first word from a string}
+\title{Load numdeath file}
 \usage{
 load_numdeath(numdeath_path = "/data/josh/CenSoc/NUMDEATH/")
 }
@@ -13,6 +13,6 @@ load_numdeath(numdeath_path = "/data/josh/CenSoc/NUMDEATH/")
 NUMDEATH data.frame
 }
 \description{
-Get first word from a string
+Load numdeath file
 }
 \keyword{internal}

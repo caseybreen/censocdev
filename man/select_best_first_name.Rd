@@ -2,17 +2,17 @@
 % Please edit documentation in R/select_best_first_name.R
 \name{select_best_first_name}
 \alias{select_best_first_name}
-\title{Get first word from a string}
+\title{Select best first name}
 \usage{
-select_best_first_name(numapplication = numapp)
+select_best_first_name(numapp = numapp)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}
 }
 \value{
-NUMAPP data.frame with best first name column and cycle dates
+NUMAPP data.frame with best first name column for each unique ssn (40870456) and cycle dates
 }
 \description{
-Get first word from a string
+Select best first name
 }
 \keyword{internal}
