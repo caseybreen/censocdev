@@ -51,9 +51,13 @@ load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
   numdeath[ , sex_death_file:= (ifelse(sex==0, NA, sex)) ]
   cat(recoded_0, "sex values recoded from 0 to NA. \n")
 
-  recoded_0 = nrow(numdeath[bday==0,])
-  numdeath[ , bday:= (ifelse(bday==0, NA, bday)) ]
+  recoded_0 = nrow(numdeath[dday==0,])
+  numdeath[ , dday:= (ifelse(dday==0, NA, dday)) ]
   cat(recoded_0, "dday values recoded from 0 to NA. \n")
+
+  recoded_0 = nrow(numdeath[bday_death_file==0,])
+  numdeath[ , bday_death_file:= (ifelse(bday_death_file==0, NA, bday_death_file)) ]
+  cat(recoded_0, "bday values recoded from 0 to NA. \n")
 
   return(numdeath)
 }
