@@ -59,6 +59,8 @@
         ]$V1
       ]
 
+    ## Create cycle date variables
+
     numapp[,"lname_year_cycle" := year_cycle]
     numapp[,"lname_month_cycle" := month_cycle]
     numapp_last_name <- numapp[, c("ssn", "lname", "lname_year_cycle", "lname_month_cycle", "lname_multiple_flag"), with=FALSE]
