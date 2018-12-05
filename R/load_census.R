@@ -36,7 +36,7 @@ load_census <- function(census_file,
 
   # create key
   census[,"linking_key" := paste(lname, fname, census_age, BPL, sep = "_")]
-  census[,"linking_key" := clean_key(tmp_key),]
+  census[,"linking_key" := clean_key(linking_key),]
 
   return(census)
 

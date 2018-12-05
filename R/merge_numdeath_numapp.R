@@ -9,7 +9,7 @@
 merge_numapp_numdeath <- function(numapp = numapp, numdeath = numdeath) {
 
   numapp <- numapp
-  numdeath <- numdeath[, c("ssn", "zip_residence", "dyear", "dmonth"), with = FALSE]
+  numdeath <- numdeath[, c("ssn", "zip_residence", "dyear", "dmonth", "dstate", "socstate", "dcity", "state"), with = FALSE]
   ss5 <- merge(numdeath, numapp, by = "ssn")
 
   ss5[,"census_age" := ifelse(bmonth < 4,
@@ -17,6 +17,8 @@ merge_numapp_numdeath <- function(numapp = numapp, numdeath = numdeath) {
                                1939 - byear)]
 
   ss5[,"linking_key" := paste(lname, fname, census_age, ipums_code, sep = "_")]
+
+  ss5[,"linking_key2" := paste(father_lname, fname, census_age, ipums_code, sep = "_")]
 
   return(ss5)
 }

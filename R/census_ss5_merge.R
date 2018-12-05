@@ -15,14 +15,10 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
 
   ## Remove duplicate linking keys
   ss5 <- ss5[ss5[, .I[.N > 1L], by=linking_key]$V1]
-  census <- census[census[, .I[.N > 1L], by=linking_key]$V1]
+  census_key1 <- census[census[, .I[.N > 1L], by=linking_key_1]$V1]
 
   ## Read in linking keys
   wcensoc <- merge(census, ss5, by = "linking_key")
-
-
-
-
   return(wcensoc)
 }
 
