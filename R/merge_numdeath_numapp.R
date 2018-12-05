@@ -11,7 +11,7 @@ merge_numapp_numdeath <- function(numapp = numapp, numdeath = numdeath) {
   numapp <- numapp
   numdeath <- numdeath
 
-  merge(numdeath, numapp, by = "ssn")
+  ss5 <- merge(numdeath, numapp, by = "ssn")
 
   return(ss5)
 }
