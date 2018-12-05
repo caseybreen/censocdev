@@ -41,6 +41,9 @@ select_best_father_last_name <- function(numapplication = numapp) {
   ## Select Longest First name (e.g. select "WILLIAM" over "BILL")
   numapp <- numapp[numapp[, .I[nchar(father_lname) == max(nchar(father_lname))], by = ssn]$V1]
 
+  ## Maybe should convert this to century months in the future?
+  numapp[,"cycle_year_month" := year_cycle + (month_cycle/12)]
+
   ## Select most recent if there was a tie for longest name
   numapp <- numapp[numapp[, .I[which.max(cycle_year_month)], by=ssn]$V1]
 
