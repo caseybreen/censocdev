@@ -39,7 +39,11 @@ select_best_father_last_name <- function(numapplication = numapp) {
   numapp[, father_lname_multiple_flag:=(ifelse(number_of_distinct_names > 1, 1, 0))]
 
   ## Select Longest First name (e.g. select "WILLIAM" over "BILL")
-  numapp <- numapp[numapp[, .I[which.max(nchar(father_lname))], by = ssn]$V1]
+  numapp <- numapp[numapp[, .I[nchar(father_lname) == max(nchar(father_lname))], by = ssn]$V1]
+
+  ## Select most recent if there was a tie for longest name
+  numapp <- numapp[numapp[, .I[which.max(cycle_year_month)], by=ssn]$V1]
+
 
   ## Recode originally missing years back to NA.
   numapp[year_cycle == 0, year_cycle := NA]

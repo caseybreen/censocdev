@@ -67,8 +67,6 @@ select_dob <- function(numapp = numapp) {
 
   app_dob_dupli = app_dob_dupli[, .(ssn, dob, dob_cyear, dob_cmonth, dob_multiple_flag)]
   app_dob_unique = app_dob_unique[, .(ssn, dob, dob_cyear, dob_cmonth, dob_multiple_flag)]
-  numapp = rbind(app_dob_unique,app_dob_dupli)
-  rm(app_dob_dupli)
-  rm(app_dob_unique)
+  numapp_dob = rbind(app_dob_unique,app_dob_dupli)
   return(numapp_dob)
 }
