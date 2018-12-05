@@ -9,13 +9,12 @@
 
 load_numdeath_geo <- function(numdeath, ssn_state_codes = "/home/ipums/casey-ipums/censoc/data/ssn_state_codes.csv",
                               zip_code_states = "/home/ipums/casey-ipums/zip_code_states.csv",
-                              state_fip_codes = "/90days/casey/censoc_data/numdeath/numdeath_geo/state_fips.csv") {
+                              state_fip_codes = "/nobackup/90days/andreamg/state_fips_ipums.csv") {
 
   numdeath <- numdeath
 
   ## read in state social security codes
   ssn_state_codes <- fread(ssn_state_codes)
-  ssn_state_codes[,socstate:=tolower(socstate)]
 
   ## Read in zip code dataset
   zip_code <- fread(zip_code_states, colClasses = list(character= 'zip_code_5'))
@@ -39,8 +38,6 @@ load_numdeath_geo <- function(numdeath, ssn_state_codes = "/home/ipums/casey-ipu
   ## create zip codes
   numdeath[,"zip_code_5" := as.character(substr(zip_residence, 1, 5))]
 
-  ## read in zip code dataset
-  zip_code <- fread(zip_code_states, colClasses = list(character= 'zip_code_5'))
 
   ## set merge keys
   setkey(zip_code, zip_code_5)
@@ -50,6 +47,16 @@ load_numdeath_geo <- function(numdeath, ssn_state_codes = "/home/ipums/casey-ipu
   numdeath <- merge(numdeath, zip_code, on = zip_code_5, all.x = TRUE)
 
   cat("City and State from ZIP codes complete\n")
+
+  ## set merge keys
+  setkey(state_fips, state_label)
+  setkey(numdeath, socstate)
+
+  ## merge on unique keys
+  numdeath <- merge(numdeath, state_fips, by.x="socstate",by.y="state_label", all.x = TRUE)
+
+  cat("State from FIP codes complete\n")
+
 
   return(numdeath)
 
