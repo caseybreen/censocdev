@@ -14,20 +14,20 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
   ss5 <- ss5
 
   ## Remove duplicates for both SS5 married key and maiden name key
-  ss5_married <- ss5[ss5[, .I[.N > 1L], by=linking_key_married]$V1]
+  ss5_married_unique_keys <- ss5[ss5[, .I[.N > 1L], by=linking_key_married]$V1]
 
-  ss5_maiden <- ss5[ss5[, .I[.N > 1L], by=linking_key_maiden]$V1]
+  ss5_maiden_unique_keys <- ss5[ss5[, .I[.N > 1L], by=linking_key_maiden]$V1]
 
   ## Select Linking keys for census
-  census <- census[census[, .I[.N > 1L], by=linking_key]$V1]
+  census_unique_keys <- census[census[, .I[.N > 1L], by=linking_key]$V1]
 
   ## Read in linking keys
-  wcensoc_married <- merge(census, ss5_married, by.x = "linking_key", by.y = "linking_key_married")
+  wcensoc_married <- merge(census_unique_keys, ss5_married_unique_keys, by.x = "linking_key", by.y = "linking_key_married")
 
   ## Create flag
   wcensoc_married[, "maiden_name_flag" := 0]
 
-  wcensoc_maiden <-  merge(census, ss5_maiden, by.x = "linking_key", by.y = "linking_key_maiden")
+  wcensoc_maiden <-  merge(census_unique_keys, ss5_maiden_unique_keys, by.x = "linking_key", by.y = "linking_key_maiden")
 
   wcensoc_maiden[, "maiden_name_flag" := 1]
 
