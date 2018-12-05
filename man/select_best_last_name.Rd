@@ -2,9 +2,9 @@
 % Please edit documentation in R/select_best_last_name.R
 \name{select_best_last_name}
 \alias{select_best_last_name}
-\title{Get first word from a string}
+\title{Select best last name}
 \usage{
-select_best_last_name(numapp = numapp)
+select_best_last_name(numapplication = numapp)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}
@@ -13,6 +13,6 @@ select_best_last_name(numapp = numapp)
 numapp data.frame with best last name column
 }
 \description{
-Get first word from a string
+Select best last name
 }
 \keyword{internal}

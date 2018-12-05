@@ -1,3 +1,5 @@
+#' Load numdeath file
+#'
 #' @param numdeath_path path to the NUMDEATH files
 #' @return NUMDEATH data.frame
 #' @keywords internal

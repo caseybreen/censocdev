@@ -20,6 +20,9 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
   ## Read in linking keys
   wcensoc <- merge(census, ss5, by = "linking_key")
 
+
+
+
   return(wcensoc)
 }
 
