@@ -35,7 +35,13 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
   ## flag for merged with maiden name
   wcensoc_maiden[, "maiden_name_flag" := 1]
 
-  wcensoc <- rbind(wcensoc_married, wcensoc_maiden[wcensoc_maiden$ssn %in% wcensoc_married$ssn])
+  ## Create wcensoc file by taking all records from the merge on the married key and appending any additional records
+  ## from the merge on the maiden name key not already in the married merge.
+
+  ## Additional matches found using maiden name
+  additional_matches_found_maiden_name <- wcensoc_maiden[!wcensoc_maiden$ssn %in% wcensoc_married$ssn]
+
+  wcensoc <- rbind(wcensoc_married, additional_matches_found_maiden_name, fill = TRUE)
 
   return(wcensoc)
 }
