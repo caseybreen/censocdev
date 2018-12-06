@@ -7,8 +7,8 @@
 #' @export
 
 
-load_numdeath_geo <- function(numdeath, ssn_state_codes = "/home/ipums/casey-ipums/censoc/data/ssn_state_codes.csv",
-                              zip_code_states = "/home/ipums/casey-ipums/zip_code_states.csv",
+load_numdeath_geo <- function(numdeath, ssn_state_codes = "/nobackup/90days/andreamg/ssn_state_codes.csv",
+                              zip_code_states = "/nobackup/90days/andreamg/zip_code_states.csv",
                               state_fip_codes = "/nobackup/90days/andreamg/state_fips_ipums.csv") {
 
   numdeath <- numdeath
@@ -58,7 +58,6 @@ load_numdeath_geo <- function(numdeath, ssn_state_codes = "/home/ipums/casey-ipu
   setnames(numdeath, old="ipums_state", new="dstate")
 
   cat("State from FIP codes complete\n")
-
 
   return(numdeath)
 
