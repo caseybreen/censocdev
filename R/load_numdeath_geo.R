@@ -50,12 +50,12 @@ load_numdeath_geo <- function(numdeath, ssn_state_codes = "/home/ipums/casey-ipu
 
   ## merge on unique keys
   numdeath <- merge(numdeath, state_fips, by.x="socstate",by.y="state_label", all.x = TRUE)
-  numdeath <- numdeath[, !names(numdeath) %in% c("socstate")]
-  setnames(numdeath, c("ipums_state", "socstate"))
+  numdeath <- numdeath[, -c("socstate", "state_code")]
+  setnames(numdeath, old="ipums_state", new="socstate")
 
-  numdeath <- merge(numdeath, state_fips, by.x="dstate.x",by.y="state_code", all.x = TRUE)
-  numdeath <- numdeath[, !names(numdeath) %in% c("dstate.x")]
-  setnames(numdeath, c("ipums_state", "dstate"))
+  numdeath <- merge(numdeath, state_fips, by.x="dstate",by.y="state_code", all.x = TRUE)
+  numdeath <- numdeath[, -c("dstate", "state_label")]
+  setnames(numdeath, old="ipums_state", new="dstate")
 
   cat("State from FIP codes complete\n")
 
