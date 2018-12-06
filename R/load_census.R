@@ -24,10 +24,10 @@ load_census <- function(census_file,
 
   # clean variables
   census[,"fname" := enc2native(NAMEFRST)]
-  census[,"fname" := str_to_upper(fname)]
+  census[,"fname" := toupper(fname)]
   census[,"fname" := get_first_word(fname)]
   census[,"lname" := enc2native(NAMELAST)]
-  census[,"lname" := str_to_upper(lname)]
+  census[,"lname" := toupper(lname)]
   census[,"census_age" := as.numeric(AGE)]
 
   # remove those with no name info
