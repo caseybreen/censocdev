@@ -6,10 +6,10 @@
 #' @import data.table
 #' @export
 #'
-merge_numapp_numdeath <- function(numapp = numapp, numdeath = numdeath) {
+merge_numapp_numdeath <- function(numapp_condensed = numapp, numdeath = numdeath) {
 
   numapp <- numapp
-  numdeath2 <- numdeath[, c("ssn", "zip_residence", "dyear", "dmonth", "dstate", "socstate", "dcity"), with = FALSE]
+  numdeath2 <- numdeath[, c("ssn", "zip_residence", "dyear", "dmonth", "byear_death_file", "bmonth_death_file", "dstate", "socstate"), with = FALSE]
   ss5 <- merge(numdeath2, numapp, by = "ssn")
 
   ss5[,"census_age" := ifelse(bmonth < 4,
