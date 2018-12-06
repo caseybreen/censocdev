@@ -13,7 +13,7 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
   census <- census
   ss5 <- ss5
 
-  # omit rows where either 'x' or 'y' have missing values
+  ## omit rows where either 'bpl' or 'census_age' have missing values
   ss5 <- na.omit(ss5, cols=c("bpl", "census_age"))
 
   ## Remove duplicates for both SS5 married key and maiden name key
