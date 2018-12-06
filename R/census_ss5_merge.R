@@ -20,17 +20,19 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
   ss5_married_unique_keys <- ss5[ss5[, .I[.N == 1L], by=linking_key_married]$V1]
   ss5_maiden_unique_keys <- ss5[ss5[, .I[.N == 1L], by=linking_key_maiden]$V1]
 
-  ## Select Linking keys for census
+  ## Remove duplicates for census
   census_unique_keys <- census[census[, .I[.N == 1L], by=linking_key]$V1]
 
-  ## Read in linking keys
+  ## Merge on married name key
   wcensoc_married <- merge(census_unique_keys, ss5_married_unique_keys, by.x = "linking_key", by.y = "linking_key_married")
 
-  ## Create flag
+  ## flag for merged with maiden name
   wcensoc_married[, "maiden_name_flag" := 0]
 
+  ## Merge on married name key
   wcensoc_maiden <-  merge(census_unique_keys, ss5_maiden_unique_keys, by.x = "linking_key", by.y = "linking_key_maiden")
 
+  ## flag for merged with maiden name
   wcensoc_maiden[, "maiden_name_flag" := 1]
 
   wcensoc <- rbind(wcensoc_married, wcensoc_married)
