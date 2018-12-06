@@ -35,7 +35,7 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
   ## flag for merged with maiden name
   wcensoc_maiden[, "maiden_name_flag" := 1]
 
-  wcensoc <- rbind(wcensoc_married, wcensoc_married)
+  wcensoc <- rbind(wcensoc_married, wcensoc_maiden[wcensoc_maiden$ssn %in% wcensoc_married$ssn])
 
   return(wcensoc)
 }

@@ -25,9 +25,9 @@ load_census <- function(census_file,
   # clean variables
   census[,"fname" := enc2native(NAMEFRST)]
   census[,"fname" := toupper(fname)]
-  census[,"fname" := get_first_word(fname)]
+  census[,"fname_census" := get_first_word(fname)]
   census[,"lname" := enc2native(NAMELAST)]
-  census[,"lname" := toupper(lname)]
+  census[,"lname_census" := toupper(lname)]
   census[,"census_age" := as.numeric(AGE)]
 
   # remove those with no name info
@@ -35,7 +35,7 @@ load_census <- function(census_file,
   census <- census[!(grepl("\\?", census$fname)|grepl("\\?", census$lname)|census$lname==""),]
 
   # create key
-  census[,"linking_key" := paste(lname, fname, census_age, BPL, sep = "_")]
+  census[,"linking_key" := paste(lname_census, fname_census, census_age, BPL, sep = "_")]
   census[,"linking_key" := clean_key(linking_key),]
 
   return(census)
