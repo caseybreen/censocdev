@@ -1,0 +1,65 @@
+#' Load numdeath file
+#'
+#' @param numdeath_path path to the NUMDEATH files
+#' @return NUMDEATH data.frame
+#' @keywords internal
+#' @import data.table
+#' @export
+
+
+load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
+
+  files <- list.files(path = numdeath_path, pattern = ".csv$")
+
+  all_cols_to_keep <- c("ssn", "nh_name_first", "nh_name_last", "sex", "dob", "dod", "zip_residence")
+
+  numdeath <- rbindlist(lapply(paste0(numdeath_path, files), fread, select=all_cols_to_keep, colClasses = list(character= 'ssn', 'zip_residence', 'dob', 'dod')))
+
+  cat("Cleaning variables. \n")
+
+  ## A. clean the socsec data
+  ## shorten names by removing blank space at end
+  numdeath[,"lname" := nh_name_last]
+  numdeath[,"fname" := nh_name_first]
+  numdeath[,lname := gsub(pattern = "\\s*$",
+                          replacement = "", x = lname)]
+  numdeath[,fname := gsub(pattern = "\\s*$",
+                          replacement = "", x = fname)]
+
+  ##In 162 cases, dob is 7 characters long instead of 8. In all 162 cases, the leading 0 has been ommitted.
+  ## For these 162 cases, we will add a leading o.
+
+  numdeath[, dob := ifelse(nchar(dob) == 8, dob, paste0("0", dob))]
+
+  ## now get birth and death year
+  numdeath[,"byear_death_file" := as.numeric(substr(dob, 5, 8))]
+  numdeath[,"dyear" := as.numeric(substr(dod, 5, 8))]
+
+  ## birth and death month
+  numdeath[,"bmonth_death_file" := as.numeric(substr(dob, 1, 2))]
+  numdeath[,"dmonth" := as.numeric(substr(dod, 1, 2))]
+
+  ## birth and death dat
+  numdeath[,"bday_death_file" := as.numeric(substr(dob, 3, 4))]
+  numdeath[,"dday" := as.numeric(substr(dod, 3, 4))]
+
+  ## now get census_age
+  numdeath[,"census_age" := ifelse(bmonth_death_file < 4,
+                                   1940 - byear_death_file,
+                                   1939 - byear_death_file)]
+  numdeath[, c("dob","dod", "nh_name_last", "nh_name_first" ):=NULL]
+
+  recoded_0 = nrow(numdeath[sex==0,])
+  numdeath[ , sex:= (ifelse(sex==0, NA, sex)) ]
+  cat(recoded_0, "sex values recoded from 0 to NA. \n")
+
+  recoded_0 = nrow(numdeath[dday==0,])
+  numdeath[ , dday:= (ifelse(dday==0, NA, dday)) ]
+  cat(recoded_0, "dday values recoded from 0 to NA. \n")
+
+  recoded_0 = nrow(numdeath[bday_death_file==0,])
+  numdeath[ , bday_death_file:= (ifelse(bday_death_file==0, NA, bday_death_file)) ]
+  cat(recoded_0, "bday values recoded from 0 to NA. \n")
+
+  return(numdeath)
+}
