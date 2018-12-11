@@ -13,15 +13,35 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
   census <- census
   ss5 <- ss5
 
-  ## Remove duplicate linking keys
-  ss5 <- ss5[ss5[, .I[.N > 1L], by=linking_key]$V1]
-  census <- census[census[, .I[.N > 1L], by=linking_key]$V1]
+  ## omit rows where either 'bpl' or 'census_age' have missing values
+  ss5 <- na.omit(ss5, cols=c("bpl", "census_age"))
 
-  ## Read in linking keys
-  wcensoc <- merge(census, ss5, by = "linking_key")
+  ## Remove duplicates for both SS5 married key and maiden name key
+  ss5_married_unique_keys <- ss5[ss5[, .I[.N == 1L], by=linking_key_married]$V1]
+  ss5_maiden_unique_keys <- ss5[ss5[, .I[.N == 1L], by=linking_key_maiden]$V1]
 
+  ## Remove duplicates for census
+  census_unique_keys <- census[census[, .I[.N == 1L], by=linking_key]$V1]
 
+  ## Merge on married name key
+  wcensoc_married <- merge(census_unique_keys, ss5_married_unique_keys, by.x = "linking_key", by.y = "linking_key_married")
 
+  ## flag for merged with maiden name
+  wcensoc_married[, "maiden_name_flag" := 0]
+
+  ## Merge on married name key
+  wcensoc_maiden <-  merge(census_unique_keys, ss5_maiden_unique_keys, by.x = "linking_key", by.y = "linking_key_maiden")
+
+  ## flag for merged with maiden name
+  wcensoc_maiden[, "maiden_name_flag" := 1]
+
+  ## Create wcensoc file by taking all records from the merge on the married key and appending any additional records
+  ## from the merge on the maiden name key not already in the married merge.
+
+  ## Additional matches found using maiden name
+  additional_matches_found_maiden_name <- wcensoc_maiden[!wcensoc_maiden$ssn %in% wcensoc_married$ssn]
+
+  wcensoc <- rbind(wcensoc_married, additional_matches_found_maiden_name, fill = TRUE)
 
   return(wcensoc)
 }

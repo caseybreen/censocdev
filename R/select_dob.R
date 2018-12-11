@@ -40,6 +40,10 @@ select_dob <- function(numapp = numapp) {
   ## Number of different dob per SSN
   numapp[, number_of_distinct_dob:=uniqueN(dob), by = ssn]
 
+  ## Recode dob values of 0 to NA
+  numapp[ , dob:= (ifelse(dob=="0", NA, dob)) ]
+
+
   ## Create flag (0 or 1 dichotomous var) for more than one dob.
   numapp[, dob_multiple_flag:=(ifelse(number_of_distinct_dob > 1, 1, 0))]
 
@@ -65,8 +69,21 @@ select_dob <- function(numapp = numapp) {
   app_dob_dupli = app_dob_dupli[, .(ssn, dob, dob_cyear, dob_cmonth, dob_multiple_flag)]
   app_dob_unique = app_dob_unique[, .(ssn, dob, dob_cyear, dob_cmonth, dob_multiple_flag)]
   numapp_dob = rbind(app_dob_unique,app_dob_dupli)
-  numapp[, "bmonth" := as.numeric(substr(dob, 1, 2))]
-  numapp[, "bday" := as.numeric(substr(dob, 3, 3))]
-  numapp[, "byear" := as.numeric(substr(dob, 5, 8))]
+
+  ## Create byear, bmonth, and bday variables.
+  numapp_dob[, "bmonth" := as.numeric(substr(dob, 1, 2))]
+
+  ## 5 cases where bmonth is 0; replace with NA
+  numapp_dob[ , bmonth:= (ifelse(bmonth=="0", NA, bmonth)) ]
+
+  numapp_dob[, "bday" := as.numeric(substr(dob, 3, 4))]
+
+  ## 34 cases where bmonth is 0; replace with NA
+  numapp_dob[ , bday:= (ifelse(bday=="0", NA, bday)) ]
+
+  numapp_dob[, "byear" := as.numeric(substr(dob, 5, 8))]
+
+  numapp_dob <- numapp_dob[, .(ssn, byear, bmonth, bday, dob_cyear, dob_cmonth, dob_multiple_flag)]
+
   return(numapp_dob)
 }
