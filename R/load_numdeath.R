@@ -61,5 +61,7 @@ load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
   numdeath[ , bday_death_file:= (ifelse(bday_death_file==0, NA, bday_death_file)) ]
   cat(recoded_0, "bday values recoded from 0 to NA. \n")
 
+  numdeath[numdeath==''|numdeath==' ']<-NA
+
   return(numdeath)
 }
