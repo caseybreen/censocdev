@@ -59,6 +59,8 @@ load_numdeath_geo <- function(numdeath, ssn_state_codes = "/nobackup/90days/andr
 
   cat("State from FIP codes complete\n")
 
+  numdeath[,zip_code_5 := NULL]
+
   return(numdeath)
 
 }
