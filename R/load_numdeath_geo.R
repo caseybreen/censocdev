@@ -38,7 +38,6 @@ load_numdeath_geo <- function(numdeath, ssn_state_codes = "/nobackup/90days/andr
   ## create zip codes
   numdeath[,"zip_code_5" := as.character(substr(zip_residence, 1, 5))]
 
-
   ## set merge keys
   setkey(zip_code, zip_code_5)
   setkey(numdeath, zip_code_5)
