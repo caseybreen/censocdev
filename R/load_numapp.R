@@ -44,6 +44,7 @@ load_numapp <- function(numapplic_path = "/data/josh/CenSoc/NUMIAPPLIC/Records/"
 
   cat("Finished removing all values with an ssn of ZZZZZZZZ (confidential) and recoding blanks to NA")
 
+
   return(numapplic_append)
 
 }
