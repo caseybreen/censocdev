@@ -1,8 +1,8 @@
 ---
-title: "Building the Women's CenSoc File"
+title: "Building the Womens CenSoc File"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Building the Women's CenSoc File}
+  %\VignetteIndexEntry{Building the Womens CenSoc File}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -12,13 +12,13 @@ This document will briefly outline steps to build the women's CenSoc file. All s
 
 
 ## Library Packages
-```{r}
+```{r, eval = F}
 library(data.table)
 library(wcensoc)
 ```
 
 ## Create and Clean SS-5 Death Files
-```{r}
+```{r, eval = F}
 ## Run script to clean SS-5 Death Files
 ss5_death <- load_numdeath()
 
@@ -27,7 +27,7 @@ ss5_death <- load_numdeath_geo(numdeath = ss5_death)
 ```
 
 ## Create, Clean, and Condense SS-5 Application File
-```{r}
+```{r, eval = F}
 ss5_application <- load_numapp()
 
 ## Selects the "best" sex, race, dob, etc. from the ss5 application file.
@@ -36,19 +36,19 @@ ss5_application <- condense_numapp(numapp = ss5_application)
 ```
 
 ## Merge the SS-5 Application File with the SS-5 Death File
-```{r}
+```{r, eval = F}
 ss5 <- merge_numapp_numdeath(numapp_condensed = ss5_application, numdeath = ss5_death)
 ```
 
 ## Load Census File
 
-```{r}
+```{r, eval = F}
 census <- load_census(census_file = "../../IPUMS/1940/CSV/P.csv")
 ```
 
-##
+## Merge SS-5 and Census Files on linking keys
 
-```{r}
+```{r, eval = F}
 wcensoc <- census_ss5_merge(ss5 = ss5, census = census)
 ```
 

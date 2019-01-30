@@ -16,7 +16,6 @@ condense_numapp <- function(numapp = numapp) {
   cat("finished selecting Sex \n")
 
   ##Select Race
-
   race <- select_race(numapp)
   cat("finished selecting Race \n")
 
@@ -32,11 +31,13 @@ condense_numapp <- function(numapp = numapp) {
   best_father_last_name <- select_best_father_last_name(numapp)
   cat("finished selecting father last name \n")
 
-  #bpl <- select_best_birth_place(numapp)
+  ##Select Best Father Last Name
+  bpl <- select_birthplace(numapp)
+  cat("finished selecting best birthplace last name \n")
 
   ##Select Best Father Last Name
   dob <- select_dob(numapp)
-  cat("finished selecting father last name \n")
+  cat("finished selecting best dob last name \n")
 
   ## Select unique SSN Numbers
   unique_ssn <- numapp[,"ssn", with=FALSE]
