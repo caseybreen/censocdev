@@ -123,7 +123,7 @@ select_birthplace <- function(numapp = numapp,
   numapp_birthplace <- numapp_birthplace[is.na(bpl), ipums_code:=NA]
   numapp_birthplace <- numapp_birthplace[is.na(bpl), label:=NA]
   numapp_birthplace <-numapp_birthplace[ , .(ssn, bpl, bpl_year, bpl_month, bpl_multiple_flag, bpl_change_flag,foreign.x,ipums_code,label)]
-  setnames(numapp_birthplace, old = "foreign.x", new="foreign")
+  numapp_birthplace <-numapp_birthplace[ , .(ssn, bpl = ipums_code, bpl_cyear = bpl_year, bpl_cmonth = bpl_month, bpl_flag = bpl_multiple_flag, foreign = foreign.x)]
 
   return(numapp_birthplace)
 
