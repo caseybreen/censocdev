@@ -18,9 +18,12 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
 
   ## Create SS5 dataset with unique married (last name) keys (remove rows w dups)
   ss5_married_unique_keys <- ss5[ss5[, .I[.N == 1L], by=linking_key_married]$V1]
+  ss5_married_unique_keys_women <- ss5_married_unique_keys[sex == 2]
+  ss5_married_unique_keys_men <- ss5_married_unique_keys[sex == 1]
 
   ## Create SS5 dataset with unique maiden (father's last name) keys (remove rows w dups)
   ss5_maiden_unique_keys <- ss5[ss5[, .I[.N == 1L], by=linking_key_maiden]$V1]
+  ss5_maiden_unique_keys <- ss5_maiden_unique_keys[sex == 2]
 
   ## Create Census dataset with unique key (remove rows w dups)
   census_unique_keys <- census[census[, .I[.N == 1L], by=linking_key]$V1]
@@ -31,7 +34,7 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
   census_women_ever_married <- census_unique_keys[MARST != 6 & SEX == 2]
 
   ## Merge women ever-married at the time of the 1940 census with SS-5 on married keys
-  wcensoc_married <- merge(census_women_ever_married, ss5_married_unique_keys, by.x = "linking_key", by.y = "linking_key_married")
+  wcensoc_married <- merge(census_women_ever_married, ss5_married_unique_keys_women, by.x = "linking_key", by.y = "linking_key_married")
 
   ## flag for merged with maiden name
   wcensoc_married[, "maiden_name_flag" := 0]
@@ -43,7 +46,7 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
   wcensoc_maiden[, "maiden_name_flag" := 1]
 
   ## Merge men on maiden name key
-  wcensoc_men <-  merge(census_men, ss5_maiden_unique_keys, by.x = "linking_key", by.y = "linking_key_maiden")
+  wcensoc_men <-  merge(census_men, ss5_married_unique_keys_men, by.x = "linking_key", by.y = "linking_key_maiden")
 
   ## flag for merged with maiden name
   wcensoc_married[, "maiden_name_flag" := 0]
