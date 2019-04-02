@@ -1,0 +1,233 @@
+---
+title: "CenSoc Middle Name Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CenSoc Middle Name Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+# Library Packages
+```{r}
+suppressPackageStartupMessages(library(data.table))
+suppressPackageStartupMessages(library(tidyverse))
+```
+
+## Read Censoc "Male and Female" Sample
+```{r}
+wcensoc <- fread("wcensoc_middle_names.csv")
+## Forgot to drop births when constructing file 
+wcensoc <- wcensoc[byear < 1940]
+wcensoc <- wcensoc[dyear > 1940]
+
+
+## Select variables of interest
+wcensoc_names <- wcensoc %>%
+  select(lname.x, NAMEFRST, mname, SEX, MARST, dyear, byear)
+```
+
+
+## Helper Functions 
+```{r}
+get_second_word <- function(x)
+{
+  x.split <- strsplit(x, split = " ")
+  x1.list <- lapply(x.split,`[`, 2) # returns NA if no name
+  x1 <- unlist(x1.list)
+  return(x1)
+}
+
+clean_key <- function(key){
+  return(gsub(" +|(?!_)[[:punct:]]","", key, perl = T))
+}
+```
+
+## Select and clean first inital from middle name and last name 
+```{r}
+## Select First letter of middle name (census)
+wcensoc_names$middle_name_census <- get_second_word(wcensoc_names$NAMEFRST)
+wcensoc_names$middle_name_census <- clean_key(wcensoc_names$middle_name_census)
+wcensoc_names$middle_name_census <- substring(wcensoc_names$middle_name_census, 1, 1)
+
+## Select First letter of middle name (ss5)
+wcensoc_names$middle_name_ss5 <- substring(wcensoc_names$mname, 1, 1)
+```
+
+## Select individuals with both a middle initial in SS-5 and middle initial in Census
+
+```{r}
+wcensoc_names_full <- wcensoc_names %>% 
+  filter( !is.na(middle_name_census)) %>% 
+  filter( middle_name_census != "") %>% 
+  filter( !is.na(middle_name_ss5)) %>% 
+  filter( middle_name_ss5 != "") %>% 
+  mutate( middle_name_match = case_when(
+    middle_name_census == middle_name_ss5 ~ 1,
+    middle_name_census != middle_name_ss5 ~ 0
+  )
+  )
+```
+
+## Middle name Match Rates
+```{r}
+wcensoc_middle_name_match_rate <- wcensoc_names_full %>% 
+  mutate(age_at_death = dyear - byear) %>% 
+  mutate(Year = dyear, Age = age_at_death ) %>% 
+  group_by(Year, Age) %>%
+  filter(Age < 111) %>%
+  summarize(middle_name_match_rate = mean(middle_name_match), count = n())
+
+middle_name <- lexis(data = wcensoc_middle_name_match_rate, fill_column = middle_name_match_rate, 
+                    breaks = c(-1, .6, .65, .7, .75, .8, .85, .9, .95, 5),
+                     labels = c("0 to 60%",
+                                "60 to 65%",
+                                "65 to 70%",
+                                "70 to 75%",
+                                "75 to 80%",
+                                "80 to 85%",
+                                "85 to 90%",
+                                "90 to 95%",
+                                "95 to 100%"
+                     )) + ggtitle("Middle Name Match Rate")
+
+```
+
+```{r}
+wcensoc_lexis_data_men <- wcensoc_names_full %>% 
+  filter(SEX == 1) %>% 
+  mutate(age_at_death = dyear - byear) %>% 
+  mutate(Year = dyear, Age = age_at_death ) %>% 
+  group_by(Year, Age) %>%
+  filter(Age < 111) %>%
+  summarize(middle_name_match_rate = mean(middle_name_match), count = n())
+
+middle_name_men <- lexis(data = wcensoc_lexis_data_men, fill_column = middle_name_match_rate,
+                      breaks = c(-1, .6, .65, .7, .75, .8, .85, .9, .95, 5),
+                     labels = c("0 to 60%",
+                                "60 to 65%",
+                                "65 to 70%",
+                                "70 to 75%",
+                                "75 to 80%",
+                                "80 to 85%",
+                                "85 to 90%",
+                                "90 to 95%",
+                                "95 to 100%"
+                     )) + ggtitle("Men: Middle Name Match Rate")
+```
+
+```{r}
+wcensoc_lexis_data_women <- wcensoc_names_full %>% 
+  filter(SEX == 2) %>% 
+  mutate(age_at_death = dyear - byear) %>% 
+  mutate(Year = dyear, Age = age_at_death ) %>% 
+  group_by(Year, Age) %>%
+  filter(Age < 111) %>%
+  summarize(middle_name_match_rate = mean(middle_name_match), count = n())
+
+middle_name_women <- lexis(data = wcensoc_lexis_data_women, fill_column = middle_name_match_rate, 
+                     breaks = c(-1, .6, .65, .7, .75, .8, .85, .9, .95, 5),
+                     labels = c("0 to 60%",
+                                "60 to 65%",
+                                "65 to 70%",
+                                "70 to 75%",
+                                "75 to 80%",
+                                "80 to 85%",
+                                "85 to 90%",
+                                "90 to 95%",
+                                "95 to 100%"
+                     ))
+```
+
+```{r}
+wcensoc_lexis_data_women_ever_married <- wcensoc_names_full %>% 
+  filter(SEX == 2 & MARST !=6) %>% 
+  mutate(age_at_death = dyear - byear) %>% 
+  mutate(Year = dyear, Age = age_at_death ) %>% 
+  group_by(Year, Age) %>%
+  filter(Age < 111) %>%
+  summarize(middle_name_match_rate = mean(middle_name_match), count = n())
+
+middle_name_women_ever_married <- lexis(data = wcensoc_lexis_data_women_ever_married, fill_column = middle_name_match_rate, 
+                      breaks = c(-1, .6, .65, .7, .75, .8, .85, .9, .95, 5),
+                     labels = c("0 to 60%",
+                                "60 to 65%",
+                                "65 to 70%",
+                                "70 to 75%",
+                                "75 to 80%",
+                                "80 to 85%",
+                                "85 to 90%",
+                                "90 to 95%",
+                                "95 to 100%"
+                     )) + ggtitle("Ever-Married Women: Middle Name Match Rate")
+```
+
+
+```{r}
+wcensoc_lexis_data_women_never_married <- wcensoc_names_full %>% 
+  filter(SEX == 2 & MARST ==6) %>% 
+  mutate(age_at_death = dyear - byear) %>% 
+  mutate(Year = dyear, Age = age_at_death ) %>% 
+  group_by(Year, Age) %>%
+  filter(Age < 111) %>%
+  summarize(middle_name_match_rate = mean(middle_name_match), count = n())
+
+middle_name_women_never_married <- lexis(data = wcensoc_lexis_data_women_never_married, fill_column = middle_name_match_rate, 
+                      breaks = c(-1, .6, .65, .7, .75, .8, .85, .9, .95, 5),
+                     labels = c("0 to 60%",
+                                "60 to 65%",
+                                "65 to 70%",
+                                "70 to 75%",
+                                "75 to 80%",
+                                "80 to 85%",
+                                "85 to 90%",
+                                "90 to 95%",
+                                "95 to 100%"
+                     )) + ggtitle("Never-Married Women: Middle Name Match Rate")
+```
+
+```{r}
+margin <- theme(plot.margin = unit(c(1,1,1,1), "cm"))
+
+middle_name_match <- arrangeGrob(middle_name + margin, middle_name_men + margin, middle_name_women_ever_married + margin, middle_name_women_never_married + margin, nrow=2)
+
+ggsave(file="censoc/middle_name_match.pdf", middle_name_match, width = 20, height = 20)
+```
+
+## Middle name Match Rates by Sex and Marital Status
+
+```{r}
+knitr::kable(wcensoc_names_full %>% 
+  mutate(ever_married = case_when(
+    MARST == 6 ~ 0,
+    MARST != 6 ~ 1
+  )) %>% 
+  group_by(SEX, ever_married) %>%
+  summarize(middle_name_match_rate = mean(middle_name_match), count = n()))
+
+
+```
+
+## Randomly Permute Middle names and compare
+```{r}
+
+## Randomly Permute Middle Names for Census
+wcensoc_names_full_test <-  transform(wcensoc_names_full, middle_name_census = sample(middle_name_census) )
+
+wcensoc_names_full_test <- wcensoc_names_full_test %>% 
+  filter(!is.na(middle_name_census)) %>% 
+  filter(middle_name_census != "") %>% 
+  filter(!is.na(middle_name_ss5)) %>% 
+  filter(middle_name_ss5 != "") %>% 
+  mutate(middle_name_match = case_when(
+    middle_name_census == middle_name_ss5 ~ 1,
+    middle_name_census != middle_name_ss5 ~ 0
+  ))
+
+wcensoc_names_full_test %>% 
+  group_by(SEX) %>%
+  summarize(middle_name_match_rate = mean(middle_name_match), count = n())
+```
+
+We see a match rate of ~ 7% if all our matches were bad matches (made at random).
+
+
