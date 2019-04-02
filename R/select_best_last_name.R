@@ -47,8 +47,8 @@
 
 
     ## For each SSN we want to select one row using the following rule:
-    ## If there is a year > 2000, select the row with minimum year above 2000.
-    ## If there not a year > 2000, select the row with the maximum year.
+    ## If there is a year > 1940, select the row with minimum year above 1940
+    ## If there not a year > 1940, select the row with the maximum year.
     numapp <- numapp[
       numapp[
         ,

@@ -13,7 +13,7 @@ load_census <- function(census_file,
 
   # Select Columns
 
-  all_cols_to_keep <- c("SERIALP", "PERNUM", "STATEFIP", "AGE", "SEX", "NAMELAST", "NAMEFRST", "BPL", "RACE", "MARST")
+  all_cols_to_keep <- c("SERIALP", "PERNUM", "STATEFIP", "AGE", "SEX", "NAMELAST", "NAMEFRST", "NAMEMIDDLE", "BPL", "RACE", "MARST")
   if(!is.null(cols_to_keep)){
     all_cols_to_keep <- c(all_cols_to_keep, cols_to_keep)
   }

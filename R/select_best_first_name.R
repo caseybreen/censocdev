@@ -62,7 +62,7 @@ select_best_first_name <- function(numapp = numapp) {
 
   app_fname_dupli[, cyear_month := fname_cyear * 100 +  fname_cmonth]
 
-    #Duplicates with NAs
+  #Duplicates with NAs
   app_fname_dupli[, cycle_na:= is.na(cyear_month)]
   nrow(app_fname_dupli[ cycle_na==TRUE,])
   #223,463 it will be random for them based on recency.

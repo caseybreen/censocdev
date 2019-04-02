@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 #'
-merge_numapp_numdeath <- function(numapp_condensed = numapp, numdeath = numdeath) {
+merge_numapp_numdeath <- function(numapp = numapp, numdeath = numdeath) {
 
   numapp <- numapp
   numdeath <- numdeath[, c("ssn", "zip_residence", "dyear", "dmonth", "byear_death_file", "bmonth_death_file", "dstate", "socstate"), with = FALSE]

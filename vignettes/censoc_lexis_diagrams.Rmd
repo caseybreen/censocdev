@@ -1,0 +1,354 @@
+---
+title: "Create CenSoc Lexis Diagrams"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Create CenSoc Lexis Diagrams}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+```{r}
+library(data.table)
+library(tidyverse)
+library(HMDHFDplus)
+library(wcensoc)
+library(gridExtra)
+```
+
+## Get SSDM Deaths 
+```{r}
+socsec_files = c("/data/josh/CenSoc/ssdm/ssdm1",
+                     "/data/josh/CenSoc/ssdm/ssdm2",
+                     "/data/josh/CenSoc/ssdm/ssdm3")
+
+
+load_socsec_deaths <- function(socsec_files){
+  socsec_list<- list()
+  for(i in 1:length(socsec_files)){
+    socsec_file <- socsec_files[i]
+    cat(paste0("Reading in file ", i, ".\n"))
+    tt <- read_fwf(socsec_file,
+                   fwf_widths(c(1,9, 20, 4, 15, 15, 1, 8, 8),
+                              col_names = c("mode", "ssn", "lname",
+                                            "name_suffix", "fname", "mname",
+                                            "vorpcode", "dod", "dob")))
+    assign(paste0("socsec",i) , as.data.table(tt))
+    socsec_list[[i]] <-eval(parse(text = paste0("socsec",i)))
+    rm(tt)
+  }
+  
+  socsec <- rbindlist(socsec_list)
+  rm(socsec_list, socsec1, socsec2, socsec3)
+  
+  cat("Cleaning variables. \n")
+  
+  ## now get birth and death year
+  socsec[,"byear" := as.numeric(substr(dob, 5, 9))]
+  socsec[,"dyear" := as.numeric(substr(dod, 5, 9))]
+  ## birth and death month
+  socsec[,"bmonth" := as.numeric(substr(dob, 1, 2))]
+  socsec[,"dmonth" := as.numeric(substr(dod, 1, 2))]
+  ## birth and death dat
+  socsec[,"bday" := as.numeric(substr(dob, 3, 4))]
+  socsec[,"dday" := as.numeric(substr(dod, 3, 4))]
+  
+  return(socsec)
+}
+
+socsec <- load_socsec_deaths(socsec_files)
+
+
+ssdm_death_counts <- socsec %>%
+  mutate(age_at_death = dyear - byear) %>% 
+  group_by(dyear, age_at_death) %>%
+  tally() %>% 
+  mutate(linking_key = paste(dyear, age_at_death, sep = "_"))
+```
+
+## Get SS5-Deaths
+```{r}
+numdeath <- fread("/data/josh/CenSoc/ss5_data/merged_application_death/ss5_merged_with_numdeath.csv")
+ss5_death_counts <- numdeath %>%
+  mutate(age_at_death = dyear - byear_death_file) %>% 
+  group_by(dyear, age_at_death) %>%
+  tally() %>% 
+  mutate(linking_key = paste(dyear, age_at_death, sep = "_"))
+```
+
+## Get HMD Deaths 
+```{r}
+us_deaths <- readHMDweb(CNTRY = "USA", item = "Deaths_1x1", username ="caseybreen@berkeley.edu", password = "Bobbob12321") %>% 
+  mutate(linking_key = paste(Year, Age, sep = "_" ))
+```
+
+## Read Get CenSoc Male Sample Deaths
+```{r}
+censoc_male_sample <- fread("/90days/casey/censoc_id_date_v2.csv")
+
+censoc_male_deaths <- censoc_male_sample %>%
+  mutate(age_at_death = dyear - byear) %>% 
+  group_by(dyear, age_at_death) %>%
+  tally() %>% 
+  mutate(linking_key = paste(dyear, age_at_death, sep = "_"))
+```
+
+## Get CenSoc Female and Male Sample deaths
+```{r}
+censoc_female_and_male_sample <- fread("/home/ipums/casey-ipums/censoc_female_and_male_sample_matched_with_census.csv")
+
+censoc_female_and_male_deaths <- censoc_female_and_male_sample %>%
+  filter(dyear > 1939) %>% 
+  mutate(age_at_death = dyear - byear) %>% 
+  group_by(dyear, age_at_death) %>%
+  tally() %>% 
+  mutate(linking_key = paste(dyear, age_at_death, sep = "_"))
+```
+
+## SS-5 Death Coverage 
+```{r}
+ss5_hmd_coverage <- us_deaths %>% 
+  inner_join(ss5_death_counts, by = "linking_key") %>%
+  mutate(proportion_matched = n/Total) %>%
+  filter(!is.na(proportion_matched))
+
+censoc_female_male_hmd_coverage <- us_deaths %>% 
+  inner_join(censoc_female_and_male_deaths, by = "linking_key") %>%
+  mutate(proportion_matched = n/Total) %>%
+  filter(!is.na(proportion_matched)) 
+
+censoc_female_male_ss5_coverage <- ss5_death_counts %>%
+  filter(age_at_death <110) %>% 
+  inner_join(censoc_female_and_male_deaths, by = "linking_key") %>%
+  mutate(proportion_matched = n.y/n.x) %>%
+  filter(!is.na(proportion_matched)) %>% 
+  mutate(Year = dyear.x, Age = age_at_death.x)
+
+ss5_hmd_lexis <- lexis(data = ss5_hmd_coverage, fill_column = proportion_matched) +
+  ggtitle("SS-5 / HMD")
+
+censoc_female_male_hmd_lexis <- lexis(data = censoc_female_male_hmd_coverage, 
+                                      fill_column = proportion_matched,
+                                      breaks = c(0, .05, .1, .15, .2, .25, .3, .35, 5),
+                                      labels <- c("0 to 5%", 
+                                                  "5 to 10%",
+                                                  "10 to 15%",
+                                                  "15 to 20%",
+                                                  "20 to 25%",
+                                                  "25 to 30%",
+                                                  "30 to 35%",
+                                                  ">35% Death Coverage"
+                                      )) + ggtitle("CenSoc Female and Male Sample / HMD")
+
+censoc_female_male_ss5_lexis <- lexis(data = censoc_female_male_ss5_coverage, 
+                                      fill_column = proportion_matched,
+                                      breaks = c(0, .05, .1, .15, .2, .25, .3, .35, 5),
+                                      labels <- c("0 to 5%", 
+                                                  "5 to 10%",
+                                                  "10 to 15%",
+                                                  "15 to 20%",
+                                                  "20 to 25%",
+                                                  "25 to 30%",
+                                                  "30 to 35%",
+                                                  ">35% Death Coverage"
+                                      )) + ggtitle("CenSoc Female and Male Sample / SS-5")
+
+ss5_lexis_diagrams <- arrangeGrob(ss5_hmd_lexis, censoc_female_male_hmd_lexis, censoc_female_male_ss5_lexis, nrow=1)
+
+ggsave(file="lexis/censoc_female_male_lexis.pdf", ss5_lexis_diagrams, width = 20, height = 10)
+```
+
+## SS-5 Men
+```{r}
+ss5_hmd_coverage_male <- numdeath %>%
+  mutate(age_at_death = dyear - byear_death_file) %>% 
+  group_by(dyear, age_at_death, sex) %>%
+  tally() %>% 
+  mutate(linking_key = paste(dyear, age_at_death, sep = "_")) %>% 
+  filter(sex == 1) %>% 
+  inner_join(us_deaths, by = "linking_key") %>%
+  mutate(proportion_matched = n/Male) %>%
+  filter(!is.na(proportion_matched))
+
+censoc_female_and_male_sample_deaths_male <- censoc_female_and_male_sample %>%
+  filter(dyear > 1939) %>% 
+  mutate(age_at_death = dyear - byear) %>% 
+  group_by(dyear, age_at_death, SEX) %>%
+  tally() %>% 
+  mutate(linking_key = paste(dyear, age_at_death, sep = "_")) %>% 
+  filter(SEX == 1)
+
+censoc_female_male_hmd_coverage_male <- censoc_female_and_male_sample_deaths_male %>% 
+  inner_join(us_deaths, by = "linking_key") %>%
+  mutate(proportion_matched = n/Male) %>%
+  filter(!is.na(proportion_matched)) 
+
+censoc_female_male_ss5_coverage_male <- numdeath %>%
+  mutate(age_at_death = dyear - byear_death_file) %>% 
+  group_by(dyear, age_at_death, sex) %>%
+  tally() %>% 
+  mutate(linking_key = paste(dyear, age_at_death, sep = "_")) %>% 
+  filter(sex == 1) %>%
+  filter(age_at_death <110) %>% 
+  inner_join(censoc_female_and_male_sample_deaths_male, by = "linking_key") %>%
+  mutate(proportion_matched = n.y/n.x) %>%
+  filter(!is.na(proportion_matched)) %>% 
+  mutate(Year = dyear.x, Age = age_at_death.x)
+
+ss5_hmd_male_lexis <- lexis(data = ss5_hmd_coverage_male, fill_column = proportion_matched) +
+  ggtitle("Males: SS-5 / HMD ")
+
+censoc_female_male_hmd_male_lexis <- lexis(data = censoc_female_male_hmd_coverage_male, 
+                                           fill_column = proportion_matched,
+                                           breaks = c(0, .05, .1, .15, .2, .25, .3, .35, 5),
+                                           labels <- c("0 to 5%", 
+                                                       "5 to 10%",
+                                                       "10 to 15%",
+                                                       "15 to 20%",
+                                                       "20 to 25%",
+                                                       "25 to 30%",
+                                                       "30 to 35%",
+                                                       ">35% Death Coverage"
+                                           )) + 
+  ggtitle("Males: CenSoc Female and Male Sample / HMD") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+censoc_female_male_ss5_male_lexis <- lexis(data = censoc_female_male_ss5_coverage_male, 
+                                           fill_column = proportion_matched,
+                                           breaks = c(0, .05, .1, .15, .2, .25, .3, .35, 5),
+                                           labels <- c("0 to 5%", 
+                                                       "5 to 10%",
+                                                       "10 to 15%",
+                                                       "15 to 20%",
+                                                       "20 to 25%",
+                                                       "25 to 30%",
+                                                       "30 to 35%",
+                                                       ">35% Death Coverage"
+                                           )) +
+  ggtitle("Males: CenSoc Female and Male Sample / SS-5") 
+
+ss5_lexis_males_diagrams <- arrangeGrob(ss5_hmd_male_lexis, censoc_female_male_hmd_male_lexis, censoc_female_male_ss5_male_lexis, nrow=1)
+
+ggsave(file="lexis/censoc_female_male_lexis_male_only.pdf", ss5_lexis_males_diagrams, width = 20, height = 10)
+```
+
+## SS-5 Women
+```{r}
+ss5_hmd_coverage_female <- numdeath %>%
+  mutate(age_at_death = dyear - byear_death_file) %>% 
+  group_by(dyear, age_at_death, sex) %>%
+  tally() %>% 
+  mutate(linking_key = paste(dyear, age_at_death, sep = "_")) %>% 
+  filter(sex == 2) %>% 
+  inner_join(us_deaths, by = "linking_key") %>%
+  mutate(proportion_matched = n/Female) %>%
+  filter(!is.na(proportion_matched))
+
+censoc_female_and_male_sample_deaths_female <- censoc_female_and_male_sample %>%
+  filter(dyear > 1939) %>% 
+  mutate(age_at_death = dyear - byear) %>% 
+  group_by(dyear, age_at_death, SEX) %>%
+  tally() %>% 
+  mutate(linking_key = paste(dyear, age_at_death, sep = "_")) %>% 
+  filter(SEX == 2)
+
+censoc_female_male_hmd_coverage_female <- censoc_female_and_male_sample_deaths_female %>% 
+  inner_join(us_deaths, by = "linking_key") %>%
+  mutate(proportion_matched = n/Female) %>%
+  filter(!is.na(proportion_matched)) 
+
+censoc_female_male_ss5_coverage_female <- numdeath %>%
+  mutate(age_at_death = dyear - byear_death_file) %>% 
+  group_by(dyear, age_at_death, sex) %>%
+  tally() %>% 
+  mutate(linking_key = paste(dyear, age_at_death, sep = "_")) %>% 
+  filter(sex == 2) %>%
+  filter(age_at_death <110) %>% 
+  inner_join(censoc_female_male_hmd_coverage_female, by = "linking_key") %>%
+  mutate(proportion_matched = n.y/n.x) %>%
+  filter(!is.na(proportion_matched)) %>% 
+  mutate(Year = dyear.x, Age = age_at_death.x)
+
+ss5_hmd_female_lexis <- lexis(data = ss5_hmd_coverage_female, fill_column = proportion_matched) +
+  ggtitle("Females: SS-5 / HMD")
+
+censoc_female_male_hmd_female_lexis <- lexis(data = censoc_female_male_hmd_coverage_female, 
+                                      fill_column = proportion_matched,
+                                      breaks = c(0, .05, .1, .15, .2, .25, .3, .35, 5),
+                                      labels <- c("0 to 5%", 
+                                                  "5 to 10%",
+                                                  "10 to 15%",
+                                                  "15 to 20%",
+                                                  "20 to 25%",
+                                                  "25 to 30%",
+                                                  "30 to 35%",
+                                                  ">35% Death Coverage"
+                                      )) + ggtitle("Females: CenSoc Female and Male Sample / HMD")
+
+censoc_female_male_ss5_female_lexis <- lexis(data = censoc_female_male_ss5_coverage_female, 
+                                      fill_column = proportion_matched,
+                                      breaks = c(0, .05, .1, .15, .2, .25, .3, .35, 5),
+                                      labels <- c("0 to 5%", 
+                                                  "5 to 10%",
+                                                  "10 to 15%",
+                                                  "15 to 20%",
+                                                  "20 to 25%",
+                                                  "25 to 30%",
+                                                  "30 to 35%",
+                                                  ">35% Death Coverage"
+                                      )) + ggtitle("Females: CenSoc Female and Male Sample / SS-5")
+
+ss5_lexis_females_diagrams <- arrangeGrob(ss5_hmd_female_lexis, censoc_female_male_hmd_female_lexis, censoc_female_male_ss5_female_lexis, nrow=1)
+
+ggsave(file="lexis/censoc_female_male_lexis_female_only.pdf", ss5_lexis_females_diagrams, width = 20, height = 10)
+```
+
+## SSDM Death Coverage Lexis Diagrams
+```{r}
+ssdm_coverage <- us_deaths %>% 
+  inner_join(ssdm_death_counts, by = "linking_key") %>%
+  mutate(proportion_matched = n/Total) %>%
+  filter(!is.na(proportion_matched))
+
+censoc_male_hmd_coverage <- us_deaths %>% 
+  inner_join(censoc_male_deaths, by = "linking_key") %>%
+  mutate(proportion_matched = n/Total) %>%
+  filter(!is.na(proportion_matched))
+
+censoc_male_ssdm_coverage <- ssdm_death_counts %>% 
+  filter(age_at_death < 110) %>% 
+  inner_join(censoc_male_deaths, by = "linking_key") %>%
+  mutate(proportion_matched = n.y/n.x) %>%
+  filter(!is.na(proportion_matched)) %>% 
+  mutate(Year = dyear.x, Age = age_at_death.x)
+
+ssdm_hmd_lexis <- lexis(data = ssdm_coverage, fill_column = proportion_matched) +
+  ggtitle("SSDM / HMD") 
+
+censoc_male_hmd_lexis <- lexis(data = censoc_male_hmd_coverage, fill_column = proportion_matched,
+                               breaks = c(0, .05, .1, .15, .2, .25, .3, .35, 5),
+                               labels <- c("0 to 5%", 
+                                           "5 to 10%",
+                                           "10 to 15%",
+                                           "15 to 20%",
+                                           "20 to 25%",
+                                           "25 to 30%",
+                                           "30 to 35%",
+                                           ">35% Death Coverage"
+                               )) + ggtitle("CenSoc Male Sample / HMD")
+
+censoc_male_ssdm_lexis <- lexis(data = censoc_male_ssdm_coverage, fill_column = proportion_matched,
+                                breaks = c(0, .05, .1, .15, .2, .25, .3, .35, 5),
+                                labels <- c("0 to 5%", 
+                                            "5 to 10%",
+                                            "10 to 15%",
+                                            "15 to 20%",
+                                            "20 to 25%",
+                                            "25 to 30%",
+                                            "30 to 35%",
+                                            ">35% Death Coverage"
+                                )) + ggtitle("CenSoc Male Sample / SSDM")
+
+g <- arrangeGrob(ssdm_hmd_lexis, censoc_male_hmd_lexis, censoc_male_ssdm_lexis, nrow=1)
+
+ggsave(file="lexis/censoc_male_lexis.pdf", g, width = 20, height = 10) #saves g
+```
+
