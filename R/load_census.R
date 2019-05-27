@@ -19,7 +19,7 @@ load_census <- function(census_file,
   }
 
   # read in census file, only keeping desired columns
-  census <- fread(census_file, select = all_cols_to_keep)
+  census <- fread(census_file)
   census <- as.data.table(census)
 
   # clean variables

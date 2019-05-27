@@ -16,13 +16,10 @@ suppressPackageStartupMessages(library(tidyverse))
 ## Read Censoc "Male and Female" Sample
 ```{r}
 wcensoc <- fread("wcensoc_middle_names.csv")
-## Forgot to drop births when constructing file 
-wcensoc <- wcensoc[byear < 1940]
-wcensoc <- wcensoc[dyear > 1940]
 
 
 ## Select variables of interest
-wcensoc_names <- wcensoc %>%
+wcensoc_names <- wcensoc_1930_cleaned %>%
   select(lname.x, NAMEFRST, mname, SEX, MARST, dyear, byear)
 ```
 
@@ -67,6 +64,21 @@ wcensoc_names_full <- wcensoc_names %>%
   )
   )
 ```
+
+
+## Middle name Match Rates by Sex and Marital Status
+
+```{r}
+wcensoc_names_full %>% 
+  mutate(ever_married = case_when(
+    MARST == 6 ~ 0,
+    MARST != 6 ~ 1
+  )) %>% 
+  #group_by(SEX, ever_married) %>%
+  summarize(middle_name_match_rate = mean(middle_name_match), count = n())
+
+```
+
 
 ## Middle name Match Rates
 ```{r}
@@ -193,19 +205,7 @@ middle_name_match <- arrangeGrob(middle_name + margin, middle_name_men + margin,
 ggsave(file="censoc/middle_name_match.pdf", middle_name_match, width = 20, height = 20)
 ```
 
-## Middle name Match Rates by Sex and Marital Status
 
-```{r}
-knitr::kable(wcensoc_names_full %>% 
-  mutate(ever_married = case_when(
-    MARST == 6 ~ 0,
-    MARST != 6 ~ 1
-  )) %>% 
-  group_by(SEX, ever_married) %>%
-  summarize(middle_name_match_rate = mean(middle_name_match), count = n()))
-
-
-```
 
 ## Randomly Permute Middle names and compare
 ```{r}

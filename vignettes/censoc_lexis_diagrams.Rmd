@@ -82,7 +82,7 @@ us_deaths <- readHMDweb(CNTRY = "USA", item = "Deaths_1x1", username ="caseybree
 
 ## Read Get CenSoc Male Sample Deaths
 ```{r}
-censoc_male_sample <- fread("/90days/casey/censoc_id_date_v2.csv")
+censoc_male_sample <- fread("../../censoc_male_sample_matched_with_census.csv")
 
 censoc_male_deaths <- censoc_male_sample %>%
   mutate(age_at_death = dyear - byear) %>% 
@@ -93,10 +93,9 @@ censoc_male_deaths <- censoc_male_sample %>%
 
 ## Get CenSoc Female and Male Sample deaths
 ```{r}
-censoc_female_and_male_sample <- fread("/home/ipums/casey-ipums/censoc_female_and_male_sample_matched_with_census.csv")
+censoc_female_and_male_sample <- fread("/home/ipums/casey-ipums/censoc_male_and_female_sample_matched_with_census_1940.csv")
 
 censoc_female_and_male_deaths <- censoc_female_and_male_sample %>%
-  filter(dyear > 1939) %>% 
   mutate(age_at_death = dyear - byear) %>% 
   group_by(dyear, age_at_death) %>%
   tally() %>% 
@@ -127,8 +126,10 @@ ss5_hmd_lexis <- lexis(data = ss5_hmd_coverage, fill_column = proportion_matched
 
 censoc_female_male_hmd_lexis <- lexis(data = censoc_female_male_hmd_coverage, 
                                       fill_column = proportion_matched,
-                                      breaks = c(0, .05, .1, .15, .2, .25, .3, .35, 5),
-                                      labels <- c("0 to 5%", 
+                                      breaks = c(0, 0.001, 0.01, .05, .1, .15, .2, .25, .3, .35, 5),
+                                      labels <- c("0 to .1%",
+                                                  ".1 to 1%",
+                                                  "1 to 5%",
                                                   "5 to 10%",
                                                   "10 to 15%",
                                                   "15 to 20%",
@@ -324,15 +325,14 @@ ssdm_hmd_lexis <- lexis(data = ssdm_coverage, fill_column = proportion_matched) 
   ggtitle("SSDM / HMD") 
 
 censoc_male_hmd_lexis <- lexis(data = censoc_male_hmd_coverage, fill_column = proportion_matched,
-                               breaks = c(0, .05, .1, .15, .2, .25, .3, .35, 5),
-                               labels <- c("0 to 5%", 
+                               breaks = c(0, 0.01, .05, .1, .15, .2, .25, 1),
+                               labels <- c("0 to 1%",
+                                           "1 to 5%", 
                                            "5 to 10%",
                                            "10 to 15%",
                                            "15 to 20%",
                                            "20 to 25%",
-                                           "25 to 30%",
-                                           "30 to 35%",
-                                           ">35% Death Coverage"
+                                           ">25% Death Coverage"
                                )) + ggtitle("CenSoc Male Sample / HMD")
 
 censoc_male_ssdm_lexis <- lexis(data = censoc_male_ssdm_coverage, fill_column = proportion_matched,
