@@ -5,9 +5,9 @@
 \title{Get first word from a string}
 \usage{
 load_numdeath_geo(numdeath,
-  ssn_state_codes = "/home/ipums/casey-ipums/censoc/data/ssn_state_codes.csv",
-  zip_code_states = "/home/ipums/casey-ipums/zip_code_states.csv",
-  state_fip_codes = "/90days/casey/censoc_data/numdeath/numdeath_geo/state_fips.csv")
+  ssn_state_codes = "/nobackup/90days/andreamg/ssn_state_codes.csv",
+  zip_code_states = "/nobackup/90days/andreamg/zip_code_states.csv",
+  state_fip_codes = "/nobackup/90days/andreamg/state_fips_ipums.csv")
 }
 \arguments{
 \item{numdeath_path}{path to the NUMDEATH files}

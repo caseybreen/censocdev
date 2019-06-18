@@ -7,11 +7,25 @@
 #' @export
 #'
 #'
-census_ss5_merge <- function(ss5 = ss5, census = census){
+census_ss5_merge <- function(ss5 = ss5, census = census, census_year = 1940){
 
   ## Define census and SS5
   census <- census
   ss5 <- ss5
+  
+  ss5[,"census_age" := ifelse(bmonth < 4,
+                              census_year - byear,
+                              census_year-1 - byear)]
+  
+  ## filter out people born after census year
+  ss5 <- ss5[census_age >= 0]
+  
+  ## Create two sets of linking keys (married name = lname, maiden name = father_lname)
+  ss5[,"linking_key_married" := paste(lname, fname, census_age, bpl, sep = "_")]
+  ss5[,"linking_key_married" := clean_key(linking_key_married),]
+  
+  ss5[,"linking_key_maiden" := paste(father_lname, fname, census_age, bpl, sep = "_")]
+  ss5[,"linking_key_maiden" := clean_key(linking_key_maiden),]
 
   ## omit rows where either 'bpl' or 'census_age' have missing values
   ss5 <- na.omit(ss5, cols=c("bpl", "census_age"))
@@ -34,22 +48,25 @@ census_ss5_merge <- function(ss5 = ss5, census = census){
   census_women_ever_married <- census_unique_keys[MARST != 6 & SEX == 2]
 
   ## Merge women ever-married at the time of the 1940 census with SS-5 on married keys
-  wcensoc_married <- merge(census_women_ever_married, ss5_married_unique_keys_women, by.x = "linking_key", by.y = "linking_key_married")
+  ss5_married_unique_keys_women[, "linking_key" :=  linking_key_married]
+  wcensoc_married <- merge(census_women_ever_married, ss5_married_unique_keys_women, by = "linking_key")
 
   ## flag for merged with maiden name
   wcensoc_married[, "maiden_name_flag" := 0]
 
   ## Merge women never-married at the time of the 1940 census with SS-5 maiden key
-  wcensoc_maiden <-  merge(census_women_never_married, ss5_maiden_unique_keys, by.x = "linking_key", by.y = "linking_key_maiden")
+  ss5_maiden_unique_keys[, "linking_key" :=  linking_key_maiden]
+  wcensoc_maiden <-  merge(census_women_never_married, ss5_maiden_unique_keys, by = "linking_key")
 
   ## flag for merged with maiden name
   wcensoc_maiden[, "maiden_name_flag" := 1]
 
   ## Merge men on maiden name key
-  wcensoc_men <-  merge(census_men, ss5_married_unique_keys_men, by.x = "linking_key", by.y = "linking_key_maiden")
+  ss5_married_unique_keys_men[, "linking_key" := linking_key_married]
+  wcensoc_men <-  merge(census_men, ss5_married_unique_keys_men, by = "linking_key")
 
   ## flag for merged with maiden name
-  wcensoc_married[, "maiden_name_flag" := 0]
+  ## wcensoc_men[, "maiden_name_flag" := 1]
 
   ## Create wcensoc file by taking all records from the merge on the married key and appending any additional records
   ## from the merge on the maiden name key not already in the married merge.

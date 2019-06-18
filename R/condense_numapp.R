@@ -44,7 +44,7 @@ condense_numapp <- function(numapp = numapp) {
   unique_ssn <- unique(unique_ssn, by = "ssn")
 
   ## Combine "Best" fname, lname, etc. into one data.frame
-  numapp_condensed = Reduce(function(...) merge(..., all = TRUE), list(unique_ssn, sex, race, best_first_name, best_last_name, best_father_last_name, dob, bpl))
+  numapp_condensed <-  Reduce(function(...) merge(..., all = TRUE), list(unique_ssn, sex, race, best_first_name, best_last_name, best_father_last_name, dob, bpl))
 
   ## Recode any blanks to NA
   numapp[numapp == ''| numapp == ' '] <- NA

@@ -4,9 +4,10 @@
 \alias{select_birthplace}
 \title{Select place of birth}
 \usage{
-select_birthplace(numapplication = numapp,
-  ssn_state_codes = "/home/ipums/andrea-ipums/CenSoc/NUMI_GCBRTHST.txt",
-  ssn_country_codes = "/home/ipums/andrea-ipums/CenSoc/nara_bpl.csv")
+select_birthplace(numapp = numapp,
+  nara_ipums_labels = "/nobackup/90days/andreamg/nara_ipums_labels.csv",
+  nara_ipums_state_labels = "/nobackup/90days/andreamg/nara_ipums_state_labels.csv",
+  nara_ipums_country_labels = "/nobackup/90days/andreamg/nara_ipums_country_labels.csv")
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}
