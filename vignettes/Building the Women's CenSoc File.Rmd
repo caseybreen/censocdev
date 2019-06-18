@@ -40,10 +40,10 @@ ss5_application <- condense_numapp(numapp = ss5_application)
 ## Merge the SS-5 Application File with the SS-5 Death File
 ```{r, eval = F}
 # read in ss5_applications and ss5_deaths
-# ss5_death <- fread("/data/josh/CenSoc/ss5_data/numdeath/numdeath_to_match_condensed.csv", colClasses = list(character= 'ssn'))
-# ss5_application <- fread("/data/josh/CenSoc/ss5_data/condensed_numapp/numapp_condensed.csv")
+ ss5_death <- fread("/data/josh/CenSoc/ss5_data/numdeath/numdeath_to_match_condensed.csv", colClasses = list(character= 'ssn'))
+ ss5_application <- fread("/data/josh/CenSoc/ss5_data/condensed_numapp/numapp_condensed.csv")
 
-ss5 <- merge_numapp_numdeath(numapp = ss5_application, numdeath = ss5_death, census_year = 1930)
+ss5 <- merge_numapp_numdeath(numapp = ss5_application, numdeath = ss5_death, census_year = 1920)
 
 ## Or just read in the numapp_numdeath file: 
 ss5 <- fread("/data/josh/CenSoc/ss5_data/merged_application_death/ss5_merged_with_numdeath_1930.csv", colClasses = list(character= 'ssn'))
@@ -52,20 +52,82 @@ ss5 <- fread("/data/josh/CenSoc/ss5_data/merged_application_death/ss5_merged_wit
 ## Load Census File
 
 ```{r, eval = F}
-# census <- load_census(census_file = "../../IPUMS/1930/CSV/P.csv")
 
 ## Load census with HISTID
-census_2019 <- load_census(census_file = "../../../ipums/casey-ipums/IPUMS2019/1930/TSV/P.tsv")
+census_2019 <- load_census(census_file = "/home/ipums/casey-ipums/IPUMS2019/1920/TSV/P.tsv")
 ```
 
 ## Merge SS-5 and Census Files on linking keys: 1930
 ```{r, eval = F}
 wcensoc_1940 <- census_ss5_merge(ss5 = ss5, census = census_2019)
 
-wcensoc_1940_cleaned <- clean_wcensoc(wcensoc_1940, census_year = 1940)
+wcensoc_1940_cleaned <- clean_wcensoc(wcensoc_1940, census_year = 1920)
 
 fwrite(wcensoc_1940_cleaned, "../../ipums/casey-ipums/censoc_male_and_female_sample_matched_with_census_1930.csv")
 ```
 
+
+## 1920 numdeath
+```{r}
+load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
+
+  files <- list.files(path = numdeath_path, pattern = ".csv$")
+
+  all_cols_to_keep <- c("ssn", "nh_name_first", "nh_name_last", "sex", "dob", "dod", "zip_residence")
+
+  numdeath <- rbindlist(lapply(paste0(numdeath_path, files), fread, select=all_cols_to_keep, colClasses = list(character= 'ssn', 'zip_residence', 'dob', 'dod')))
+
+  cat("Cleaning variables. \n")
+
+  ## A. clean the socsec data
+  ## shorten names by removing blank space at end
+  numdeath[,"lname" := nh_name_last]
+  numdeath[,"fname" := nh_name_first]
+  numdeath[,lname := gsub(pattern = "\\s*$",
+                          replacement = "", x = lname)]
+  numdeath[,fname := gsub(pattern = "\\s*$",
+                          replacement = "", x = fname)]
+
+  ##In 162 cases, dob is 7 characters long instead of 8. In all 162 cases, the leading 0 has been ommitted.
+  ## For these 162 cases, we will add a leading o.
+
+  numdeath[, dob := ifelse(nchar(dob) == 8, dob, paste0("0", dob))]
+
+  ## now get birth and death year
+  numdeath[,"byear_death_file" := as.numeric(substr(dob, 5, 8))]
+  numdeath[,"dyear" := as.numeric(substr(dod, 5, 8))]
+
+  ## birth and death month
+  numdeath[,"bmonth_death_file" := as.numeric(substr(dob, 1, 2))]
+  numdeath[,"dmonth" := as.numeric(substr(dod, 1, 2))]
+
+  ## birth and death dat
+  numdeath[,"bday_death_file" := as.numeric(substr(dob, 3, 4))]
+  numdeath[,"dday" := as.numeric(substr(dod, 3, 4))]
+
+  ## now get census_age
+  numdeath[,"census_age" := ifelse(bmonth_death_file < 4,
+                                   1920 - byear_death_file,
+                                   1919 - byear_death_file)]
+  numdeath[, c("dob","dod", "nh_name_last", "nh_name_first" ):=NULL]
+
+  recoded_0 = nrow(numdeath[sex==0,])
+  numdeath[ , sex:= (ifelse(sex==0, NA, sex)) ]
+  cat(recoded_0, "sex values recoded from 0 to NA. \n")
+
+  recoded_0 = nrow(numdeath[dday==0,])
+  numdeath[ , dday:= (ifelse(dday==0, NA, dday)) ]
+  cat(recoded_0, "dday values recoded from 0 to NA. \n")
+
+  recoded_0 = nrow(numdeath[bday_death_file==0,])
+  numdeath[ , bday_death_file:= (ifelse(bday_death_file==0, NA, bday_death_file)) ]
+  cat(recoded_0, "bday values recoded from 0 to NA. \n")
+
+  numdeath[numdeath==''|numdeath==' ']<-NA
+
+  return(numdeath)
+}
+
+```
 
 

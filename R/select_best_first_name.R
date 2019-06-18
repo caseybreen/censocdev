@@ -50,10 +50,6 @@ select_best_first_name <- function(numapp = numapp) {
   #keep a frame only with uniques
   app_fname_unique = numapp[fname_multiple_flag==0, ]
 
-  #number of unique records among the duplicates
-  #nrow(app_fname_dupli[ssn_n == 1, ])
-  #2,512,336
-
   ## Select Longest First name (e.g. select "WILLIAM" over "BILL")
   #numapp <- numapp[numapp[, .I[which.max(nchar(fname))], by = ssn]$V1]
   app_fname_dupli[, nchar_fname := nchar(fname), by  = c("ssn")]

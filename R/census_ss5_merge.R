@@ -7,11 +7,25 @@
 #' @export
 #'
 #'
-census_ss5_merge <- function(ss5 = ss5, census = census){
+census_ss5_merge <- function(ss5 = ss5, census = census, census_year = 1940){
 
   ## Define census and SS5
   census <- census
   ss5 <- ss5
+  
+  ss5[,"census_age" := ifelse(bmonth < 4,
+                              census_year - byear,
+                              census_year-1 - byear)]
+  
+  ## filter out people born after census year
+  ss5 <- ss5[census_age >= 0]
+  
+  ## Create two sets of linking keys (married name = lname, maiden name = father_lname)
+  ss5[,"linking_key_married" := paste(lname, fname, census_age, bpl, sep = "_")]
+  ss5[,"linking_key_married" := clean_key(linking_key_married),]
+  
+  ss5[,"linking_key_maiden" := paste(father_lname, fname, census_age, bpl, sep = "_")]
+  ss5[,"linking_key_maiden" := clean_key(linking_key_maiden),]
 
   ## omit rows where either 'bpl' or 'census_age' have missing values
   ss5 <- na.omit(ss5, cols=c("bpl", "census_age"))

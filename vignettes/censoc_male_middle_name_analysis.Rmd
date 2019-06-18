@@ -15,12 +15,16 @@ suppressPackageStartupMessages(library(tidyverse))
 
 ## Read Censoc "Male and Female" Sample
 ```{r}
-wcensoc <- fread("wcensoc_middle_names.csv")
+wcensoc <- fread("../../censoc_male_and_female_sample_matched_with_census_1930.csv")
 
 
 ## Select variables of interest
-wcensoc_names <- wcensoc_1930_cleaned %>%
-  select(lname.x, NAMEFRST, mname, SEX, MARST, dyear, byear)
+wcensoc_names <- male_female_1930 %>%
+  select(NAMEFRST, mname, SEX, MARST, dyear, byear)
+
+
+test <- census %>% sample_n(100) %>% 
+  select(HISTID, NAMEFRST)
 ```
 
 
@@ -74,7 +78,7 @@ wcensoc_names_full %>%
     MARST == 6 ~ 0,
     MARST != 6 ~ 1
   )) %>% 
-  #group_by(SEX, ever_married) %>%
+ #group_by(SEX) %>%
   summarize(middle_name_match_rate = mean(middle_name_match), count = n())
 
 ```
