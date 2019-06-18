@@ -1,0 +1,602 @@
+---
+title: "Condensed SS-5 Application Documentation"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+| Page  | Variable     | Label|
+|--:|:-------------|:---------------------------------------------|
+|  2 |ssn           |Social Security Number                        |
+|  3 |fname         |First Name                                    |
+|  4 |lname         |Last Name                                     |
+|  5 |father_lname   |Father's Last Name                            |
+|  6 |sex           |Sex                                           |
+|  7 |race          |Race                                          |
+|  8 |bpl           |Place of Birth                                |
+|  9 |byear         |Year of Birth                                 |
+|  10 |bmonth       |Month of Birth                                |
+|  11 |fname_cyear  |Cycle year of application from which first name was selected|
+|  11 |fname_cmonth |Cycle month of application from which first name was selected|
+|  11|fname_flag  |Flag for multiple distinct first names across applications|
+|  12|lname_cyear|Cycle year of application from which last name was selected|
+|  12|lname_cmonth|Cycle month of application from which last name was selected|
+|  12|lname_flag |Flag for multiple distinct last names across applications|
+|  13|father_lname_cyear|Cycle year of application from which father's last name was selected|
+|  13|father_lname_cmonth|Cycle month of application from which father's last name was selected|
+|  13|father_lname_flag |Flag for multiple distinct father's last names across applications|
+|  14|sex_cyear|Cycle year of application from which sex was selected|
+|  14|sex_cmonth|Cycle month of application from which sex was selected|
+|  14|sex_flag |Flag for multiple distinct values for sex across applications|
+|  15|race_cyear|Cycle year of application from which race was selected|
+|  15|race_cmonth|Cycle month of application from which race was selected|
+|  15|race_flag |Flag for multiple distinct values for race across applications|
+|  16|bpl_cyear|Cycle year of application from which bithplace was selected|
+|  16|bpl_cmonth|Cycle month of application from which bithplace was selected|
+|  16|bpl_flag |Flag for multiple distinct birthplaces across applications|
+|  17|dob_cyear|Cycle year of application from which date of birth was selected|
+|  17|dob_cmonth|Cycle month of application from which date of birth was selected|
+|  17|dob_flag |Flag for multiple distinct dates of birth across applications|
+|  18|bpl_cyear|Cycle year of application from which place of birth was selected|
+|  18|bpl_cmonth|Cycle month of application from which place of birth was selected|
+|  18|bpl_flag |Flag for multiple distinct places of birth across applications|
+|  18 |bpl_foreign_flag  |Flag for birthplace outside the United States   |
+
+
+**Overview:** The "condensed" SS-5 application file takes the information contained in the the ~72 million record SS-5 Application (individuals often have multiple SS-5 applications) and condenses it ~40 million records (one record per person). 
+
+\newpage 
+
+**\huge{ssn}**
+\normalsize
+\vspace{12pt}
+
+Label: Social Security Number
+
+Description: ssn is 9-character value corresponding to Social Security number as recorded in the Social Security Application file. This variable uniquely identifies all records in the SS5 dataset. 
+
+
+\newpage 
+
+
+**\huge{fname}**
+\normalsize
+\vspace{12pt}
+
+Label: First Name
+
+Description: fname is a character variable reporting the first name of an individual.
+
+Selection Method: For individuals with discrepant first names across applications, the longest first name was selected. If there were multiple longest first names, the first name was selected from the most recent application.   
+
+\newpage 
+
+**\huge{lname}**
+\normalsize
+\vspace{12pt}
+
+Label: Last Name
+
+Description: lname is a character variable reporting the last name of an individual.
+
+Selection Method: For individuals with discrepant last names across applications, the last name from the earliest post-1940 application was selected. If there was no record after 1940, the last name from the most recent application was selected. 
+
+\newpage 
+
+**\huge{father\_lname}**
+\normalsize
+\vspace{12pt}
+
+Label: Father's Last Name
+
+Description: father_lname is a character variable reporting the last name of an individual.
+
+Selection Method: For individuals with discrepant father's last names across applications, the longest father's last name was selected. If there were multiple longest father's last names, the father's last name from the most recent application was selected. 
+
+
+\newpage 
+
+**\huge{sex}**
+\normalsize
+\vspace{12pt}
+
+Label: sex
+
+Description: sex
+
+Selection Method: For individuals with discrepant sexes across applications, the most recent sex was selected. 
+
+```{r, eval = F, echo = F}
+knitr::kable(numapp %>%
+    group_by(sex) %>%
+     summarise (n = n()) %>%
+     mutate(freq = signif(n*100 / sum(n), 3)))
+```
+
+|sex | Label |        n|    freq|
+|:---|-------|--------:|-------:|
+|1   |  Women| 22503248| 55.1%|
+|2   |  Men  | 18329958| 44.8%|
+|NA  |       |   37250 |  0.0911%|
+
+
+\newpage 
+
+**\huge{race}**
+\normalsize
+\vspace{12pt}
+
+Label: race
+
+Description: race
+
+Selection Method: For individuals with discrepant races across applications, the most recent race was selected. 
+
+
+```{r, eval = F, echo = F}
+knitr::kable(numapp %>%
+     group_by(race) %>%
+     summarise (n = n()) %>%
+     mutate(freq = signif(n*100 / sum(n), 3)))
+
+```
+
+|race | label   |        n|     freq|
+|:----|----:|--------:|--------:|
+|1    | White  | 33000813| 80.7%|
+|2    | Black   |  4729641| 11.6%|
+|3    | Other   |   544753|  1.33%|
+|4    | Asian   |   314419|  0.769%|
+|5    | Hispanic   |   797698|  1.95%|
+|6    | North American native |    89706|  0.219%|
+|NA   |    |  1393426|  3.41%|
+
+\newpage 
+
+
+**\huge{bpl}**
+\normalsize
+\vspace{12pt}
+
+Label: Birthplace
+
+Description: bpl is a numeric variable reporting the place in which an individual was born. The numeric codes match the **detailed** IPUMS-USA Birthplcae codes. For more detail, please see: https://usa.ipums.org/usa-action/variables/BPL 
+
+Selection Method: For individuals with discrepant birthplaces across applications, the birthplace from the most recent application was selected. 
+
+Tabulation of top 75 birthplaces: 
+
+```{r, echo = F, eval = F}
+bpl_cdes <- inner_join(birthplaces, ipums_labels, by = c("bpl" = "Value"))
+t1 <- bpl_cdes %>% filter(row_number() < 38)
+t2 <- bpl_cdes %>% filter(row_number() >= 38)
+
+knitr::kable(list(t1, t2))
+```
+|   bpl|       n|  freq|Label          |   bpl|      n|   freq|Label                |
+|-----:|-------:|-----:|:--------------|-----:|------:|------:|:--------------------|
+|  3600| 2950984| 7.220|New York       | 45310| 250392| 0.6130|West Germany         |
+|  4200| 2803836| 6.860|Pennsylvania   |  2300| 238299| 0.5830|Maine                |
+|  1700| 1971174| 4.820|Illinois       | 45500| 220167| 0.5390|Poland               |
+|  4800| 1864137| 4.560|Texas          |  4100| 209563| 0.5130|Oregon               |
+|  3900| 1738157| 4.250|Ohio           |  3800| 195503| 0.4780|North Dakota         |
+|  2600| 1280330| 3.130|Michigan       |  4600| 179681| 0.4400|South Dakota         |
+|  3700| 1201255| 2.940|North Carolina | 25000| 177465| 0.4340|Cuba                 |
+|   600| 1162526| 2.840|California     |  4400| 172823| 0.4230|Rhode Island         |
+|  1300| 1128119| 2.760|Georgia        |  4900| 172306| 0.4220|Utah                 |
+|  2900| 1121855| 2.740|Missouri       |  3500| 159529| 0.3900|New Mexico           |
+|  2500| 1060666| 2.600|Massachusetts  |   400| 147463| 0.3610|Arizona              |
+|   100| 1013542| 2.480|Alabama        |  1100| 138636| 0.3390|District of Columbia |
+|  2100| 1006253| 2.460|Kentucky       |  3000| 133884| 0.3280|Montana              |
+|  4700|  980916| 2.400|Tennessee      | 41400| 127690| 0.3120|Ireland              |
+|  1800|  964362| 2.360|Indiana        |  1600| 127426| 0.3120|Idaho                |
+|  3400|  915344| 2.240|New Jersey     | 51500| 121955| 0.2980|Philippines          |
+|  5100|  911641| 2.230|Virginia       |  3300| 117393| 0.2870|New Hampshire        |
+|  5500|  806304| 1.970|Wisconsin      |  5000| 103969| 0.2540|Vermont              |
+|  2200|  785252| 1.920|Louisiana      |  1500|  92656| 0.2270|Hawaii               |
+|  2800|  782218| 1.910|Mississippi    | 45000|  78594| 0.1920|Austria              |
+|  1900|  727247| 1.780|Iowa           |  1000|  75015| 0.1840|Delaware             |
+|  4000|  699000| 1.710|Oklahoma       | 45400|  70056| 0.1710|Hungary              |
+|   500|  685978| 1.680|Arkansas       | 43300|  61933| 0.1520|Greece               |
+|  4500|  669227| 1.640|South Carolina |  5600|  59321| 0.1450|Wyoming              |
+|  2700|  635357| 1.550|Minnesota      | 50000|  58433| 0.1430|China                |
+|  5400|  609637| 1.490|West Virginia  | 40500|  57954| 0.1420|Sweden               |
+|  2000|  549420| 1.340|Kansas         | 45200|  51018| 0.1250|Czechoslovakia       |
+|  2400|  503147| 1.230|Maryland       | 43600|  48242| 0.1180|Portugal             |
+|  1200|  488473| 1.200|Florida        | 45700|  47694| 0.1170|Yugoslavia           |
+| 11000|  485640| 1.190|Puerto Rico    | 50040|  47550| 0.1160|Taiwan               |
+|   900|  401943| 0.983|Connecticut    | 26030|  42408| 0.1040|Jamaica              |
+| 20000|  378306| 0.926|Mexico         | 40400|  42372| 0.1040|Norway               |
+|  3100|  376028| 0.920|Nebraska       | 50220|  40267| 0.0985|South Korea          |
+| 43400|  331088| 0.810|Italy          | 50100|  38081| 0.0932|Japan                |
+|  5300|  328066| 0.803|Washington     | 52100|  36436| 0.0891|India                |
+| 15000|  325727| 0.797|Canada         | 26010|  34992| 0.0856|Dominican Republic   |
+|   800|  289852| 0.709|Colorado       | 42100|  32293| 0.0790|France               |
+
+\newpage 
+
+**\huge{byear}**
+\normalsize
+\vspace{12pt}
+
+Label: Birth year
+
+Description: byear is a numeric variable reporting the year in which an individual was born.  
+
+Selection Method: For individuals with discrepant dates of birth across applications, date of birth was seleted from the most recent application. 
+
+\vspace{75pt}
+\begin{center}
+ \large{By Year: Count of Births}
+\end{center}
+![](/users/casey/Documents/censoc/documentation/numapp_byear.png)
+```{r, echo = F, eval = F}
+numapp %>%
+    group_by(byear) %>%
+    summarise(n = n()) %>%
+    
+    ggplot(aes(x = byear, y = n)) + 
+    geom_line() + xlab("year") + ylab("count")
+```
+
+
+\newpage 
+
+**\huge{bmonth}**
+\normalsize
+\vspace{12pt}
+
+Label: Birth Month
+
+Description: bmonth is a numeric variable reporting the month in which an individual is born.  
+
+Selection Method: For individuals with discrepant dates of birth across applications, date of birth was seleted from the most recent application. 
+
+```{r, eval = F, echo = F}
+knitr::kable(numapp %>%
+     group_by(race) %>%
+     summarise (n = n()) %>%
+     mutate(freq = signif(n*100 / sum(n), 3)))
+
+```
+
+| bmonth| label         |       n|  freq|
+|------:|----------|-------:|-----:|
+|      1|  January        |3447437| 8.440|
+|      2|  February        |3252483| 7.960|
+|      3|  March        |3601923| 8.810|
+|      4|  April        |3296272| 8.070|
+|      5|  May        |3365819| 8.240|
+|      6|  June        |3271685| 8.010|
+|      7|  July        |3472388| 8.500|
+|      8|  August        |3595292| 8.800|
+|      9|  September       |3518115| 8.610|
+|     10|  October       |3427690| 8.390|
+|     11|  November       |3189933| 7.800|
+|     12|  December	        |3361655| 8.230|
+|     NA|          |  69765| 0.171|
+
+\newpage 
+
+**\huge{fnamemonth}**
+\normalsize
+\vspace{12pt}
+
+Label: Month of application from which name was selected
+
+Description: fname_cycle_month is a numeric variable reporting the year in which an application was selected. 
+
+\newpage 
+
+**\huge{Supplementary fname Variables}**
+\normalsize
+\vspace{20pt}
+
+**\LARGE{fname\_cyear}**
+\normalsize
+\vspace{12pt}
+
+Label: Year of application from which first name was selected
+\vspace{12pt}
+
+**\LARGE{fname\_cmonth}**
+\normalsize
+\vspace{12pt}
+
+Label: Month of application from which first name was selected
+
+\vspace{12pt}
+
+**\LARGE{fname\_flag}**
+\normalsize
+\vspace{12pt}
+
+Label: Flag for discrepant first names across applications
+
+```{r, eval = F, echo = F}
+knitr::kable(numapp_condensed %>%
+                  group_by(fname_multiple_flag) %>%
+                  summarise (n = n()) %>%
+                  mutate(freq = signif(n*100 / sum(n), 3)) %>%
+                  mutate(Label = c("No Multiples", "Multiple First Names", "No Available First Name")))
+```
+
+| fname_multiple_flag|Label                   |        n|   freq|
+|-------------------:|:-----------------------|--------:|------:|
+|                   0|Consistent First Name   | 38372155| 93.9%|
+|                   1|Multiple First Names    |  2495217|  6.11%|
+|                  NA|No Available First Name |    3085|  0.00755%|
+\vspace{12pt}
+
+\newpage 
+
+**\huge{Supplementary lname Variables}**
+\normalsize
+\vspace{20pt}
+
+**\LARGE{lname\_year}**
+\normalsize
+\vspace{12pt}
+
+Label: Year of application from which last name was selected
+\vspace{12pt}
+
+**\LARGE{lname\_month}**
+\normalsize
+\vspace{12pt}
+
+Label: Month of application from which last name was selected
+
+\vspace{12pt}
+
+**\LARGE{lname\_flag}**
+\normalsize
+\vspace{12pt}
+
+Label: Flag for discrepant last names across applications
+
+```{r, eval = F, echo = F}
+knitr::kable(numapp_condensed %>%
+                  group_by(lname_multiple_flag) %>%
+                  summarise (n = n()) %>%
+                  mutate(freq = signif(n*100 / sum(n), 3)) %>%
+                  mutate(Label = c("No Multiples", "Multiple First Names", "No Available First Name")))
+```
+| lname_multiple_flag|Label                   |        n|     freq|
+|-------------------:|:-----------------------|--------:|--------:|
+|                   0|Consistent Last Name            | 30460181| 74.5%|
+|                   1|Multiple Last Names    | 10409987| 25.5%|
+|                  NA|Unkown |     289|  0.00339%|
+
+\vspace{12pt}
+
+\newpage 
+
+
+**\huge{Supplementary lnamefather Variables}**
+\normalsize
+\vspace{20pt}
+
+**\LARGE{lnamefather\_cyear}**
+\normalsize
+\vspace{12pt}
+
+Label: Year of application from which father's last name was selected
+\vspace{12pt}
+
+**\LARGE{lnamefather\_cmonth}**
+\normalsize
+\vspace{12pt}
+
+Label: Month of application from which father's last name was selected
+
+\vspace{12pt}
+
+**\LARGE{lnamefather\_flag}**
+\normalsize
+\vspace{12pt}
+
+Label: Flag for discrepant father's last names across applications
+
+\vspace{12pt}
+
+```{r, eval = F, echo = F}
+knitr::kable(numapp_condensed %>%
+                  group_by(father_lname_multiple_flag) %>%
+                  summarise (n = n()) %>%
+                  mutate(freq = signif(n*100 / sum(n), 3)) %>%
+                  mutate(Label = c("Consistent Father's Last Name", "Multiple Father's Last Name", "Unkown")))
+```
+
+| father_lname_multiple_flag|Label                         |        n|   freq|
+|--------------------------:|:-----------------------------|--------:|------:|
+|                          0|Consistent Father's Last Name   | 38643248| 94.60%|
+|                          1|Multiple Father's Last Name   |  1686272|  4.13%|
+|                         NA|Unkown|   540937|  1.32%|
+
+\newpage 
+
+**\huge{Supplementary Sex Variables}**
+\normalsize
+\vspace{20pt}
+
+**\LARGE{sex\_cyear}**
+\normalsize
+\vspace{12pt}
+
+Label: Year of application from which sex was selected
+\vspace{12pt}
+
+**\LARGE{sex\_cmonth}**
+\normalsize
+\vspace{12pt}
+
+Label: Month of application from which sex was selected
+
+\vspace{12pt}
+
+**\LARGE{sex\_flag}**
+\normalsize
+\vspace{12pt}
+
+Label: Flag for discrepant sexes across applications
+
+\vspace{12pt}
+
+```{r, eval = F, echo = F}
+knitr::kable(numapp_condensed %>%
+                  group_by(sex_multiple_flag) %>%
+                  summarise (n = n()) %>%
+                  mutate(freq = signif(n*100 / sum(n), 3)) %>%
+                  mutate(Label = c("Consistent Race", "Multiple Races", "No Available Race Information")))
+```
+
+| sex_multiple_flag|Label                         |        n|    freq|
+|-----------------:|:-----------------------------|--------:|-------:|
+|                 0|Consistent Sex               | 40656313| 99.5%|
+|                 1|Multiple Sexes                |   176893|  0.433%|
+|                NA|Unknown |    37251|  0.0911%|
+
+\newpage 
+
+
+**\huge{Supplementary Race Variables}**
+\normalsize
+\vspace{20pt}
+
+**\LARGE{race\_year}**
+\normalsize
+\vspace{12pt}
+
+Label: Year of application from which race was selected
+\vspace{12pt}
+
+**\LARGE{race\_cmonth}**
+\normalsize
+\vspace{12pt}
+
+Label: Month of application from which race was selected
+
+\vspace{12pt}
+
+**\LARGE{race\_flag}**
+\normalsize
+\vspace{12pt}
+
+Label: Flag for discrepant values of race across applications
+
+\vspace{12pt}
+
+```{r, eval = F, echo = F}
+knitr::kable(numapp_condensed %>%
+                  group_by(race_multiple_flag) %>%
+                  summarise (n = n()) %>%
+                  mutate(freq = signif(n*100 / sum(n), 3)) %>%
+                  mutate(Label = c("Consistent Race", "Multiple Races", "No Available Race Information")))
+```
+
+| race_multiple_flag|Label                   |        n|  freq|
+|------------------:|:-----------------------|--------:|-----:|
+|                  0|Consistent Race            | 38620009| 94.50%|
+|                  1|Multiple Races    |   857021|  2.10%|
+|                 NA|Unkown |  1393426|  3.41%|
+
+\newpage 
+
+
+**\huge{Supplementary Date of Birth Variables}**
+\normalsize
+\vspace{20pt}
+
+**\LARGE{dob\_cyear}**
+\normalsize
+\vspace{12pt}
+
+Label: Year of application from which byear and bmonth were selected
+\vspace{12pt}
+
+**\LARGE{dob\_cmonth}**
+\normalsize
+\vspace{12pt}
+
+Label: Month of application from which byear and bmonth were selected
+
+\vspace{12pt}
+
+**\LARGE{dob\_flag}**
+\normalsize
+\vspace{12pt}
+
+Label: Flag for discrepant dates of birth across applications
+
+\vspace{12pt}
+
+```{r, eval = F, echo = F}
+knitr::kable(numapp_condensed %>%
+                  group_by(dob_multiple_flag) %>%
+                  summarise (n = n()) %>%
+                  mutate(freq = signif(n*100 / sum(n), 3)) %>%
+                  mutate(Label = c("dob", "dob", "dob")))
+```
+
+| dob_multiple_flag|Label                         |        n|     freq|
+|-----------------:|:-----------------------------|--------:|--------:|
+|                 0|Consistent Date of Births               | 37308273| 91.3%   |
+|                 1|Multiple Dates of Birth                |  3562183| 8.71%   |
+|                NA|No Available Date of Birth Information |      1| 0.00056%  |
+
+
+\newpage 
+
+
+**\huge{Supplementary Birth Place Variables}**
+\normalsize
+\vspace{20pt}
+
+**\LARGE{bpl\_cyear}**
+\normalsize
+\vspace{12pt}
+
+Label: Year of application from which bpl selected
+\vspace{12pt}
+
+**\LARGE{bpl\_cmonth}**
+\normalsize
+\vspace{12pt}
+
+Label: Month of application from which bpl was selected
+
+\vspace{12pt}
+
+**\LARGE{bpl\_flag}**
+\normalsize
+\vspace{12pt}
+
+Label: Flag for discrepant birthplaces across applications
+
+\vspace{12pt}
+
+```{r, eval = F, echo = F}
+knitr::kable(numapp_condensed %>%
+                  group_by(dob_multiple_flag) %>%
+                  summarise (n = n()) %>%
+                  mutate(freq = signif(n*100 / sum(n), 3)) %>%
+                  mutate(Label = c("dob", "dob", "dob")))
+```
+
+| bpl_multiple_flag| Label   |        n| freq|
+|-----------------:|--:|--------:|----:|
+|                 0| Consistent place of Birth| 37316163| 91.3%|
+|                 1| Multiple places of Birth |3554294|  8.7%|
+
+**\LARGE{bpl\_foreign\_flag}**
+\normalsize
+\vspace{12pt}
+
+Label: Flag for birthplaces outside of united states
+
+| bpl_foreign_born| Label|        n|  freq|
+|-------:|--:|--------:|-----:|
+|       0|Born in the US|  36997428| 90.50|
+|       1|Born outside the US |  3873029|  9.48|
+
