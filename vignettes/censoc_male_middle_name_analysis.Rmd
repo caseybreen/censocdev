@@ -19,12 +19,9 @@ wcensoc <- fread("../../censoc_male_and_female_sample_matched_with_census_1930.c
 
 
 ## Select variables of interest
-wcensoc_names <- male_female_1930 %>%
+wcensoc_names <- female %>%
   select(NAMEFRST, mname, SEX, MARST, dyear, byear)
 
-
-test <- census %>% sample_n(100) %>% 
-  select(HISTID, NAMEFRST)
 ```
 
 
@@ -78,7 +75,7 @@ wcensoc_names_full %>%
     MARST == 6 ~ 0,
     MARST != 6 ~ 1
   )) %>% 
- #group_by(SEX) %>%
+ group_by(SEX) %>%
   summarize(middle_name_match_rate = mean(middle_name_match), count = n())
 
 ```
