@@ -8,7 +8,7 @@
 #' @keywords internal
 #' @export
 
-load_census <- function(census_file,
+load_census_numident_match <- function(census_file,
                         cols_to_keep = NULL){
 
   # Select Columns
