@@ -15,10 +15,10 @@ merge_numapp_numdeath <- function(numapp = numapp, numdeath = numdeath, census_y
   ss5[,"census_age" := ifelse(bmonth < 4,
                               census_year - byear,
                               census_year-1 - byear)]
-  
+
   ## filter out people born after census year
   ss5 <- ss5[census_age >= 0]
-  
+
 
     ## Create two sets of linking keys (married name = lname, maiden name = father_lname)
   ss5[,"linking_key_married" := paste(lname, fname, census_age, bpl, sep = "_")]
