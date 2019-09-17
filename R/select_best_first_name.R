@@ -6,10 +6,10 @@
 #' @import data.table
 #' @export
 
-select_best_first_name <- function(numapplication = numapp) {
+select_best_first_name <- function(numapp = numapp) {
   
   ## Select variables from Num Application
-  numapp <- numapplication[, c("ssn", "nh_name_first", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
+  numapp <- numapp[, c("ssn", "nh_name_first", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
   
   ## Create & Clean fname variable
   numapp[,"fname" := toupper(nh_name_first)]

@@ -13,21 +13,21 @@ load_census_numident_match <- function(census_file,
 
   # Select Columns
 
-  all_cols_to_keep <- c("SERIALP", "PERNUM", "STATEFIP", "AGE", "SEX", "NAMELAST", "NAMEFRST", "NAMEMIDDLE", "BPL", "RACE", "MARST")
+  all_cols_to_keep <- c("STATEFIP", "AGE", "SEX", "NAMELAST", "NAMEFRST", "BPL", "RACE", "MARST", "HISTID")
   if(!is.null(cols_to_keep)){
     all_cols_to_keep <- c(all_cols_to_keep, cols_to_keep)
   }
 
   # read in census file, only keeping desired columns
-  census <- fread(census_file)
+  census <- fread(census_file, select = all_cols_to_keep)
   census <- as.data.table(census)
 
   # clean variables
   census[,"fname" := enc2native(NAMEFRST)]
   census[,"fname" := toupper(fname)]
-  census[,"fname_census" := get_first_word(fname)]
+  census[,"fname" := get_first_word(fname)]
   census[,"lname" := enc2native(NAMELAST)]
-  census[,"lname_census" := toupper(lname)]
+  census[,"lname" := toupper(lname)]
   census[,"census_age" := as.numeric(AGE)]
 
   # remove those with no name info

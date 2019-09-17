@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 
-select_best_father_last_name <- function(numapplication = numapp) {
+select_best_father_last_name <- function(numapp = numapp) {
 
   # Select variables from Num Application
   numapp <- numapp[, c("ssn", "fth_name_last", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]

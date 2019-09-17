@@ -1,0 +1,54 @@
+---
+title: "Clean Numident Data"
+output: html_notebook
+---
+
+# Overview 
+This document steps to build the women's CenSoc file. All source code can be found at: github.com/caseybreen/wcensoc/
+
+
+## Library Packages
+```{r, eval = F}
+library(data.table)
+library(wcensoc)
+```
+
+The Numident files contain three main
+
+## Create and Clean SS-5 Death Files
+```{r, eval = F}
+## Run script to clean SS-5 Death Files
+ss5_death <- load_numdeath()
+
+## Run Script to add geography onto SS-5 Death Files   
+ss5_death <- load_numdeath_geo(numdeath = ss5_death)
+```
+
+## Create, Clean, and Condense SS-5 Application File
+```{r, eval = F}
+ss5_application <- load_numapp()
+
+## Selects the "best" sex, race, dob, etc. from the ss5 application file.
+## This takes a very long time to run (~ 8 hours)
+ss5_application <- condense_numapp(numapp = ss5_application)
+```
+
+## Merge the SS-5 Application File with the SS-5 Death File
+```{r, eval = F}
+# read in ss5_applications and ss5_deaths
+ ss5_death <- fread("/data/josh/CenSoc/ss5_data/numdeath/numdeath_to_match_condensed.csv", colClasses = list(character= 'ssn'))
+ ss5_application <- fread("/data/josh/CenSoc/ss5_data/condensed_numapp/numapp_condensed.csv")
+
+ss5 <- merge_numapp_numdeath(numapp = ss5_application, numdeath = ss5_death, census_year = 1920)
+
+## Or just read in the numapp_numdeath file: 
+ss5 <- fread("/data/josh/CenSoc/ss5_data/merged_application_death/ss5_merged_with_numdeath_1930.csv", colClasses = list(character= 'ssn'))
+```
+
+## Load Census File
+
+```{r, eval = F}
+
+## Load census with HISTID
+census_2019 <- load_census(census_file = "/home/ipums/casey-ipums/IPUMS2019/1920/TSV/P.tsv")
+```

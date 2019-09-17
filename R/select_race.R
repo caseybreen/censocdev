@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 
-select_race <- function(numapplication = numapp) {
+select_race <- function(numapp = numapp) {
 
 
   numapp <- numapp[, c("ssn", "race", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
