@@ -4,7 +4,7 @@
 \alias{select_race}
 \title{Select race}
 \usage{
-select_race(numapplication = numapp)
+select_race(numapp = numapp)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}

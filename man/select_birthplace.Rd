@@ -5,15 +5,13 @@
 \title{Select place of birth}
 \usage{
 select_birthplace(numapp = numapp,
-  nara_ipums_labels = "/nobackup/90days/andreamg/nara_ipums_labels.csv",
-  nara_ipums_state_labels = "/nobackup/90days/andreamg/nara_ipums_state_labels.csv",
-  nara_ipums_country_labels = "/nobackup/90days/andreamg/nara_ipums_country_labels.csv")
+  crosswalk = "/censoc/data/crosswalks/bpl_crosswalk.csv")
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}
 }
 \value{
-NUMAPP data.frame with best first name column and cycle dates
+NUMAPP data.frame with best bpl column and cycle dates
 }
 \description{
 Select place of birth

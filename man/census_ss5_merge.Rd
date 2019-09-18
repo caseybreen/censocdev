@@ -4,7 +4,7 @@
 \alias{census_ss5_merge}
 \title{Merge SS5 and Census}
 \usage{
-census_ss5_merge(ss5 = ss5, census = census)
+census_ss5_merge(ss5 = ss5, census = census, census_year = 1940)
 }
 \arguments{
 \item{ss5}{full ss5 (merged application and death file)}
