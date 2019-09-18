@@ -18,11 +18,11 @@ census_2019 <- load_census(census_file = "/home/ipums/casey-ipums/IPUMS2019/1920
 
 ## Merge SS-5 and Census Files on linking keys: 1930
 ```{r, eval = F}
-wcensoc_1940 <- census_ss5_merge(ss5 = ss5, census = census_2019)
+censoc_all_gender <- census_ss5_merge(ss5 = ss5, census = census_2019)
 
-wcensoc_1940_cleaned <- clean_wcensoc(wcensoc_1940, census_year = 1920)
+censoc_all_gender <- clean_wcensoc(censoc_all_gender, census_year = 1940)
 
-fwrite(wcensoc_1940_cleaned, "../../ipums/casey-ipums/censoc_male_and_female_sample_matched_with_census_1930.csv")
+fwrite(censoc_all_gender, "../../ipums/casey-ipums/censoc_male_and_female_sample_matched_with_census_1930.csv")
 ```
 
 
