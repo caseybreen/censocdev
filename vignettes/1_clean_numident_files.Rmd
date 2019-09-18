@@ -45,10 +45,3 @@ ss5 <- merge_numapp_numdeath(numapp = ss5_application, numdeath = ss5_death, cen
 ss5 <- fread("/data/josh/CenSoc/ss5_data/merged_application_death/ss5_merged_with_numdeath_1930.csv", colClasses = list(character= 'ssn'))
 ```
 
-## Load Census File
-
-```{r, eval = F}
-
-## Load census with HISTID
-census_2019 <- load_census(census_file = "/home/ipums/casey-ipums/IPUMS2019/1920/TSV/P.tsv")
-```
