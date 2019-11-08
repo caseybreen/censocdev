@@ -4,7 +4,7 @@
 \alias{select_best_father_last_name}
 \title{Select best father last name}
 \usage{
-select_best_father_last_name(numapplication = numapp)
+select_best_father_last_name(numapp = numapp)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}

@@ -59,13 +59,12 @@ censoc_male_sample_weighted <- censoc_male %>%
   select(-linking_key, -age_at_death)
 ```
 
-
 Histogram of the distribution of our weights for CenSoc Male Sample: 
 ```{r}
 qplot(censoc_male_weights$perwt, geom = "histogram")
 ```
-## Create CenSoc Female & Male Sample Weights
 
+## Create CenSoc Female & Male Sample Weights
 First, we should decide which years to include in the dataset. I decided it was best to only include 1988-2002. 
 ```{r}
 ## Create Linking Key for CenSoc Female & Male Sample

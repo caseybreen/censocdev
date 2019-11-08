@@ -10,7 +10,7 @@ select_best_first_name(numapp = numapp)
 \item{numapp}{path to the NUMAPP files}
 }
 \value{
-NUMAPP data.frame with best first name column for each unique ssn (40870456) and cycle dates
+numapp data.frame with best first name column
 }
 \description{
 Select best first name

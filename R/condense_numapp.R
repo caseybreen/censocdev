@@ -22,6 +22,10 @@ condense_numapp <- function(numapp = numapp) {
   ##Select Best First Name
   best_first_name <- select_best_first_name(numapp)
   cat("finished selecting first name \n")
+  
+  ##Select Middle Name
+  best_middle_name <- select_best_middle_name(numapp)
+  cat("finished selecting best middle name \n")
 
   ##Select Best Last Name
   best_last_name <- select_best_last_name(numapp)
@@ -31,20 +35,21 @@ condense_numapp <- function(numapp = numapp) {
   best_father_last_name <- select_best_father_last_name(numapp)
   cat("finished selecting father last name \n")
 
-  ##Select Best Father Last Name
+  ##Select Best Birth Place
   bpl <- select_birthplace(numapp)
   cat("finished selecting best birthplace last name \n")
 
-  ##Select Best Father Last Name
+  ##Select Best Date of Birth
   dob <- select_dob(numapp)
   cat("finished selecting best dob last name \n")
+  
 
   ## Select unique SSN Numbers
   unique_ssn <- numapp[,"ssn", with=FALSE]
   unique_ssn <- unique(unique_ssn, by = "ssn")
 
   ## Combine "Best" fname, lname, etc. into one data.frame
-  numapp_condensed = Reduce(function(...) merge(..., all = TRUE), list(unique_ssn, sex, race, best_first_name, best_last_name, best_father_last_name, dob, bpl))
+  numapp_condensed <-  Reduce(function(...) merge(..., all = TRUE), list(unique_ssn, sex, race, best_first_name, best_middle_name, best_last_name, best_father_last_name, dob, bpl))
 
   ## Recode any blanks to NA
   numapp[numapp == ''| numapp == ' '] <- NA

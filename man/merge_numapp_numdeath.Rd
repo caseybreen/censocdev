@@ -4,8 +4,7 @@
 \alias{merge_numapp_numdeath}
 \title{Merge Application and Death Files}
 \usage{
-merge_numapp_numdeath(numapp = numapp, numdeath = numdeath,
-  census_year = 1940)
+merge_numapp_numdeath(numapp = numapp, numdeath = numdeath)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}
