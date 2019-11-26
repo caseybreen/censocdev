@@ -56,7 +56,6 @@ load_socsec_deaths <- function(socsec_files){
 
 socsec <- load_socsec_deaths(socsec_files)
 
-
 ssdm_death_counts <- socsec %>%
   mutate(age_at_death = dyear - byear) %>% 
   group_by(dyear, age_at_death) %>%
@@ -370,11 +369,5 @@ censoc_male_ssdm_lexis <- lexis(data = censoc_male_ssdm_coverage, fill_column = 
 g <- arrangeGrob(ssdm_hmd_lexis, censoc_male_hmd_lexis, censoc_male_ssdm_lexis, nrow=1)
 
 ggsave(file="lexis/censoc_male_lexis.pdf", g, width = 20, height = 10) #saves g
-```
-
-
-
-```{r}
-
 ```
 

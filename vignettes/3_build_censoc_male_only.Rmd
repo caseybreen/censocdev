@@ -1,0 +1,187 @@
+---
+title: "3 Creat CenSoc Male-Only Sample"
+output: html_notebook
+---
+
+### Set up  
+- Create a new local project
+    - New project from version control
+    - Clone censoc from Github:  https://github.com/MJAlexander/censoc
+- Update path names. 
+
+This contains original code written by Monica Alexander (monica.alexander@utoronto.ca). 
+    
+### Load Packages
+
+```{r}
+library(censoc)
+library(tidyverse)
+library(data.table)
+```
+
+### State Match
+
+```{r, eval = FALSE}
+# keep a log
+
+update_file <- "//home/ipums/casey-ipums/censoc/make_censoc/progress.txt"
+
+matched_data_folder <- "//home/ipums/casey-ipums/censoc/make_censoc/states/"
+
+# load in the socsec files
+
+socsec_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
+                     "/home/ipums/josh-ipums/progs/ssdm/ssdm2",
+                     "/home/ipums/josh-ipums/progs/ssdm/ssdm3")
+
+socsec <- load_socsec_deaths(socsec_files)
+sink(update_file)
+cat("Socsec has been read in. \n")
+
+# get the list of state census files
+
+state_file_list <- list.files("/home/ipums/casey-ipums/IPUMS/1940/CSV/")
+state_fips <- as.numeric(gsub("\\D", "", state_file_list))
+state_fips <- state_fips[!is.na(state_fips)]
+state_file_list <- paste0("/home/ipums/casey-ipums/IPUMS/1940/CSV/", state_file_list[grepl("state", state_file_list)])
+
+cols_to_keep <- c("URBAN", "OWNERSHP", "RENT", "RACE", "MARST", "BPL", "HISPAN",
+                  "EMPSTAT", "OCCSCORE", "INCWAGE","INCNONWG",
+                  "EDUC",
+                  "MBPL", "FBPL", "OCC")
+
+# loop over each state file, do the match, and save the matched output
+
+for(i in 1:length(state_file_list)){
+  cat(paste("Reading in census file", i, "\n"))
+  census <- try(load_census(census_file = state_file_list[i], cols_to_keep = cols_to_keep))
+  if(class(census)=="try-error"){
+    cat(paste("File", i, "is empty \n"))
+  }
+  else{
+    cat(paste("Matching census file", i, "\n"))
+    censoc <- create_censoc(census, socsec)
+    cat(paste("Writing file", i, "\n"))
+    write_csv(censoc, paste0(matched_data_folder, state_fips[i], "_matched.csv"))
+  }
+}
+
+rm(socsec)
+
+sink()
+
+```
+
+- Several warnings messages (1 per state): the condition has length > 1 and only the first element will be used
+
+### National match
+```{r, eval = FALSE}
+# state censoc files
+files  <- paste0("~/censoc/make_censoc/states//",list.files(path = "~/censoc/make_censoc/states//", pattern = '\\.csv') )
+
+# national censoc
+all_censoc_unique <- create_national_censoc(files)
+
+# for BFDW2018
+cols_to_keep <- c("URBAN", "OWNERSHP", "RENT", "RACE", "MARST", "BPL", "HISPAN",
+                  "EMPSTAT", "OCCSCORE", "INCWAGE","INCNONWG",
+                  "EDUC",
+                  "MBPL", "FBPL", "OCC", "NAMELAST", "NAMEFRST", "lname.y", "fname.y", "mname")
+
+bfdw <- all_censoc_unique[, c("SERIAL40", "SERIAL", "NUMPREC40", "PERNUM", "STATEFIP",  "census_age.x", "byear", "dyear", "bmonth", "dmonth", cols_to_keep)]
+bfdw <- bfdw %>% rename(census_age = census_age.x)
+write_csv(bfdw, path  = "~/censoc/make_censoc/censoc_bfdw.csv")
+
+# save dataset with less variables
+dr <- bfdw[, c("SERIAL", "PERNUM", "STATEFIP",  "census_age", "byear", "dyear", "bmonth", "dmonth")]
+write_csv(dr, "~/censoc/make_censoc/national_matched_states_red.csv")
+
+```
+
+
+This is new code written by Casey Breen. It dedupes keys at the national level, instead of the state level. 
+
+## 1940 Match 
+```{r}
+socsec_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
+                     "/home/ipums/josh-ipums/progs/ssdm/ssdm2",
+                     "/home/ipums/josh-ipums/progs/ssdm/ssdm3")
+
+socsec <- load_socsec_deaths(socsec_files)
+census <- load_census(census_file = "/home/ipums/casey-ipums/IPUMS2019/1920/TSV/P.tsv")
+censoc <- create_censoc(census, socsec)
+
+```
+
+## 1930 Match 
+```{r}
+## Load SocSec Files
+socsec_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
+                     "/home/ipums/josh-ipums/progs/ssdm/ssdm2",
+                     "/home/ipums/josh-ipums/progs/ssdm/ssdm3")
+
+## Read in load socsec deaths function below (adapted for 1930 census)
+socsec <- load_socsec_deaths_1920(socsec_files)
+census <- load_census(census_file = "/home/ipums/casey-ipums/IPUMS2019/1920/TSV/P.tsv")
+censoc <- create_censoc(census, socsec)
+
+load_socsec_deaths_1920 <- function(socsec_files){
+
+  socsec_list<- list()
+  for(i in 1:length(socsec_files)){
+    socsec_file <- socsec_files[i]
+    cat(paste0("Reading in file ", i, ".\n"))
+    tt <- read_fwf(socsec_file,
+                          fwf_widths(c(1,9, 20, 4, 15, 15, 1, 8, 8),
+                                     col_names = c("mode", "ssn", "lname",
+                                                   "name_suffix", "fname", "mname",
+                                                   "vorpcode", "dod", "dob")))
+    assign(paste0("socsec",i) , as.data.table(tt))
+    socsec_list[[i]] <-eval(parse(text = paste0("socsec",i)))
+    rm(tt)
+  }
+
+  socsec <- rbindlist(socsec_list)
+  rm(socsec_list, socsec1, socsec2, socsec3)
+
+  cat("Cleaning variables. \n")
+  ## A. clean the socsec data
+  ## shorten names by removing blank space at end
+  socsec[,"lname_orginal_socsec" := lname]
+  socsec[,"fname_orginal_socsec" := fname]
+  socsec[,lname := gsub(pattern = "\\s*$",
+                        replacement = "", x = lname)]
+  socsec[,fname := gsub(pattern = "\\s*$",
+                        replacement = "", x = fname)]
+  ## now get birth and death year
+  socsec[,"byear" := as.numeric(substr(dob, 5, 9))]
+  socsec[,"dyear" := as.numeric(substr(dod, 5, 9))]
+  ## birth and death month
+  socsec[,"bmonth" := as.numeric(substr(dob, 1, 2))]
+  socsec[,"dmonth" := as.numeric(substr(dod, 1, 2))]
+  ## birth and death dat
+  socsec[,"bday" := as.numeric(substr(dob, 3, 4))]
+  socsec[,"dday" := as.numeric(substr(dod, 3, 4))]
+  ## now get census_age
+  socsec[,"census_age" := ifelse(bmonth < 4,
+                                 1920 - byear,
+                                 1919 - byear)]
+
+  ## filter to only include those with age info, that were born in 1940, and died after 1975.
+  socsec <- socsec[socsec$census_age!=1920&socsec$census_age!=1919,]
+  socsec <- socsec[socsec$census_age>=0,]
+  socsec <- socsec[socsec$dyear>=1975,]
+
+  cat("Creating keys. \n")
+  # create key
+  socsec[,"tmp_key" := paste(lname, fname, census_age, sep = "_")]
+  socsec[,"clean_key" := clean_key(tmp_key),]
+  socsec[,"n_clean_key" := .N, by = clean_key]
+
+  socsec <- socsec[,!"tmp_key"]
+  return(socsec)
+
+}
+```
+
+

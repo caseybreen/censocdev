@@ -1,14 +1,14 @@
 ---
-title: "2_censoc_all_gender_sample"
+title: "2 censoc all gender sample"
 output: html_notebook
 ---
 
-First, we will read in the numdeath and the numapp files. 
+First, we will read in the numdeath matched with numapp file.  
 ```{r}
 ss5 <- fread("/data/josh/CenSoc/ss5_data/merged_application_death/ss5_merged_with_numdeath_1940.csv", colClasses = list(character= 'ssn'))
 ```
 
-Read in the census decade. 
+Read in the census file. 
 
 ```{r, eval = F}
 
