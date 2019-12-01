@@ -22,7 +22,7 @@ condense_numapp <- function(numapp = numapp) {
   ##Select Best First Name
   best_first_name <- select_best_first_name(numapp)
   cat("finished selecting first name \n")
-  
+
   ##Select Middle Name
   best_middle_name <- select_best_middle_name(numapp)
   cat("finished selecting best middle name \n")
@@ -42,7 +42,6 @@ condense_numapp <- function(numapp = numapp) {
   ##Select Best Date of Birth
   dob <- select_dob(numapp)
   cat("finished selecting best dob last name \n")
-  
 
   ## Select unique SSN Numbers
   unique_ssn <- numapp[,"ssn", with=FALSE]
