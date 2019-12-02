@@ -8,7 +8,6 @@
 
 select_race <- function(numapp = numapp) {
 
-
   numapp <- numapp[, c("ssn", "race", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
 
   ## Remove applications with 0 (no information) for sex
