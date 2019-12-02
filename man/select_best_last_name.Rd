@@ -3,7 +3,6 @@
 %   R/select_best_last_name_v2.R
 \name{select_best_last_name}
 \alias{select_best_last_name}
-\alias{select_best_last_name}
 \title{Select best last name}
 \usage{
 select_best_last_name(numapp = numapp)
@@ -11,8 +10,6 @@ select_best_last_name(numapp = numapp)
 select_best_last_name(numapp = numapp)
 }
 \arguments{
-\item{numapp}{path to the NUMAPP files}
-
 \item{numapp}{path to the NUMAPP files}
 }
 \value{

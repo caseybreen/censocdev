@@ -4,10 +4,12 @@
 \alias{load_numdeath_geo}
 \title{Get first word from a string}
 \usage{
-load_numdeath_geo(numdeath,
+load_numdeath_geo(
+  numdeath,
   ssn_state_codes = "/nobackup/90days/andreamg/ssn_state_codes.csv",
   zip_code_states = "/nobackup/90days/andreamg/zip_code_states.csv",
-  state_fip_codes = "/nobackup/90days/andreamg/state_fips_ipums.csv")
+  state_fip_codes = "/nobackup/90days/andreamg/state_fips_ipums.csv"
+)
 }
 \arguments{
 \item{numdeath_path}{path to the NUMDEATH files}
