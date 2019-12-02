@@ -39,8 +39,6 @@ load_numapp_2 <- function(numapp.file.path = "/censoc/data/numident/numident_fil
   ## rename columns
   numapp <- select(numapp, variable.names)
 
-  return(numapp)
-
   ## Finished reading in columns
 
   cat("Finished appending numapp files", "\n")
@@ -57,7 +55,7 @@ load_numapp_2 <- function(numapp.file.path = "/censoc/data/numident/numident_fil
 
   cat("Finished creating year_cycle and month_year variables \n")
 
-  numapp <- numapp[!(grepl("ZZZZZZZZZ", numapp$NUMI_SSN))]
+  numapp <- numapp[!(grepl("ZZZZZZZZZ", numapp$ssn))]
   numapp[numapp==''|numapp==' ']<-NA
 
   cat("Finished removing all values with an ssn of ZZZZZZZZ (confidential) and recoding blanks to NA")

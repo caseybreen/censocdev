@@ -6,40 +6,43 @@
 #' @import data.table
 #' @export
 
-select_best_father_last_name <- function(numapp = numapp) {
+select_longest_last_name <- function(numapp = numapp, variable = "father_fname") {
+
+  ## select vars
+  select.vars <- c("ssn", "cycle_date", "year_cycle", "month_cycle", variable)
 
   # Select variables from Num Application
-  numapp <- numapp[, c("ssn", "fth_name_last", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
+  numapp <- numapp[, select.vars, with=FALSE]
 
-  # Create & Clean father_lname variable
-  numapp[,"father_lname" := toupper(fth_name_last)]
+  # Create & Clean variable
+  numapp[,"name" := toupper(variable)]
 
   ## Remove applications with NA value for father_lname
   applications <- nrow(numapp)
-  numapp <- na.omit(numapp, cols="father_lname")
+  numapp <- na.omit(numapp, cols="name")
   removed_na <- applications - nrow(numapp)
-  cat(removed_na, "removed with NA value for father_lname", "\n")
+  cat(removed_na, "removed with NA value for name", "\n")
 
-  ## Remove applications with non-alphanumeric value for father_lname
+  ## Remove applications with non-alphanumeric value for name
   applications <- nrow(numapp)
-  numapp <- numapp[!(grepl("\\?", numapp$father_lname))]
+  numapp <- numapp[!(grepl("\\?", numapp$name))]
   removed_na <- applications - nrow(numapp)
-  cat(removed_na, "removed with non-alphanumeric values for father_lname", "\n")
+  cat(removed_na, "removed with non-alphanumeric values for name", "\n")
 
-  ## Remove applications with ZZZ values for father_lname
+  ## Remove applications with ZZZ values for name
   applications <- nrow(numapp)
-  numapp <- numapp[!(grepl("ZZZ", numapp$father_lname))]
+  numapp <- numapp[!(grepl("ZZZ", numapp$name))]
   removed_na <- as.integer(applications - nrow(numapp))
-  cat(removed_na, "removed with ZZZ values for father_lname", "\n")
+  cat(removed_na, "removed with ZZZ values for name", "\n")
 
   ## Number of different first names per SSN
-  numapp[, number_of_distinct_names:=uniqueN(father_lname), by = ssn]
+  numapp[, number_of_distinct_names:=uniqueN(name), by = ssn]
 
   ## Create flag (0 or 1 dichotomous var) for more than one first name.
-  numapp[, father_lname_multiple_flag:=(ifelse(number_of_distinct_names > 1, 1, 0))]
+  numapp[, paste0(variable, "_multiple_flag") := (ifelse(number_of_distinct_names > 1, 1, 0))]
 
   ## Select Longest First name (e.g. select "WILLIAM" over "BILL")
-  numapp <- numapp[numapp[, .I[nchar(father_lname) == max(nchar(father_lname))], by = ssn]$V1]
+  numapp <- numapp[numapp[, .I[nchar(name) == max(nchar(name))], by = ssn]$V1]
 
   ## Maybe should convert this to century months in the future?
   numapp[,"cycle_year_month" := year_cycle + (month_cycle/12)]
@@ -53,11 +56,11 @@ select_best_father_last_name <- function(numapp = numapp) {
   numapp[month_cycle == 0, month_cycle := NA]
 
   ## Create father_lname year and cycle date vars
-  numapp[,"father_lname_year_cycle" := year_cycle]
-  numapp[,"father_lname_month_cycle" := month_cycle]
+  numapp[,paste0(variable, "_year_cycle") := year_cycle]
+  numapp[,paste0(variable, "_month_cycle") := month_cycle]
 
   ## Create data.table with specific data.table features
-  numapp_father_last_name <- numapp[, c("ssn", "father_lname", "father_lname_year_cycle", "father_lname_month_cycle", "father_lname_multiple_flag"), with=FALSE]
+  numapp_father_last_name <- numapp[, c("ssn", variable, paste0(variable, "_year_cycle"), paste0(variable, "_month_cycle"), paste0(variable, "_multiple_flag")), with=FALSE]
 
   return(numapp_father_last_name)
 
