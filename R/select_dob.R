@@ -74,12 +74,12 @@ select_dob <- function(numapp = numapp) {
   numapp_dob[, "bmonth" := as.numeric(substr(dob, 1, 2))]
 
   ## 5 cases where bmonth is 0; replace with NA
-  numapp_dob[ , bmonth:= (ifelse(bmonth=="0", NA, bmonth)) ]
+  numapp_dob[, bmonth:= (ifelse(bmonth=="0", NA, bmonth)) ]
 
   numapp_dob[, "bday" := as.numeric(substr(dob, 3, 4))]
 
   ## 34 cases where bmonth is 0; replace with NA
-  numapp_dob[ , bday:= (ifelse(bday=="0", NA, bday)) ]
+  numapp_dob[, bday:= (ifelse(bday=="0", NA, bday))]
 
   numapp_dob[, "byear" := as.numeric(substr(dob, 5, 8))]
 

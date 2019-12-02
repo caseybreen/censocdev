@@ -47,7 +47,6 @@ select_best_father_last_name <- function(numapp = numapp) {
 
   ## Select most recent if there was a tie for longest name
   numapp <- numapp[numapp[, .I[which.max(cycle_year_month)], by=ssn]$V1]
-  
 
   ## Recode originally missing years back to NA.
   numapp[year_cycle == 0, year_cycle := NA]
