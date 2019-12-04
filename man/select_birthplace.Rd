@@ -5,7 +5,7 @@
 \title{Select place of birth}
 \usage{
 select_birthplace(
-  numapp = numapp,
+  data = numapp,
   crosswalk = "/censoc/data/crosswalks/bpl_crosswalk.csv"
 )
 }

@@ -4,10 +4,10 @@
 \alias{select_best_first_name}
 \title{Select best first name}
 \usage{
-select_best_first_name(numapp = numapp)
+select_best_first_name(data = numapp)
 }
 \arguments{
-\item{numapp}{path to the NUMAPP files}
+\item{data}{path to the NUMAPP files}
 }
 \value{
 numapp data.frame with best first name column

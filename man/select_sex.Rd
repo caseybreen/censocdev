@@ -4,7 +4,7 @@
 \alias{select_sex}
 \title{Select sex}
 \usage{
-select_sex(numapp = numapp)
+select_sex(data = numapp)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}

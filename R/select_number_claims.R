@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 
-select_number_of_apps <- function(data = claims) {
+select_number_claims <- function(data = claims) {
 
   ## Select variables from Num Application
   data <- data[, c("ssn"), with=FALSE]
@@ -30,7 +30,7 @@ select_number_of_apps <- function(data = claims) {
   cat(removed_na, "removed with ZZZ values for ssn", "\n")
 
   ## Number of different social security apps per SSN
-  data[,number_of_apps := .N, by=ssn]
+  data[,number_of_claims := .N, by=ssn]
   data <- unique(data)
 
 

@@ -28,7 +28,7 @@ unify_numident <- function(application, deaths, claim) {
     left_join(claims) %>%
     mutate(sex = coalesce(sex.x, sex.y)) %>%
     mutate(bpl = coalesce(bpl.x, bpl.y)) %>%
-    mutate(father_lname = coalesce(father_lname.x, father_lname.y) %>%
+    mutate(father_lname = coalesce(father_lname.x, father_lname.y)) %>%
     select(-c(sex.x, sex.y, bpl.x, bpl.y, father_lname.x, father_lname.y))
 
   return(numident)

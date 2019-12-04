@@ -2,7 +2,7 @@
 % Please edit documentation in R/load_numapp_2.R
 \name{load_numapp_2}
 \alias{load_numapp_2}
-\title{Get first word from a string}
+\title{Load Application Files}
 \usage{
 load_numapp_2(
  
@@ -16,6 +16,6 @@ load_numapp_2(
 NUMAPP data.frame
 }
 \description{
-Get first word from a string
+Load Application Files
 }
 \keyword{internal}

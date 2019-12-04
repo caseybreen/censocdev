@@ -4,7 +4,7 @@
 \alias{select_dob}
 \title{Select best dob}
 \usage{
-select_dob(numapp = numapp)
+select_dob(data = numapp)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}

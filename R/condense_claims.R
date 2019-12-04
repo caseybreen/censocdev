@@ -58,7 +58,7 @@ condense_claims <- function(claims = claims) {
 
   ##Select Best Date of Birth
   number_claims <- select_number_claims(claims)
-  cat("finished selecting best dob last name \n")
+  cat("finished selecting number of claims \n")
 
   ## Select unique SSN Numbers
   unique_ssn <- claims[,"ssn", with=FALSE]

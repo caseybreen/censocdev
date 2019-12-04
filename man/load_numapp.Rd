@@ -2,7 +2,7 @@
 % Please edit documentation in R/load_numapp.R
 \name{load_numapp}
 \alias{load_numapp}
-\title{Get first word from a string}
+\title{Load application Files}
 \usage{
 load_numapp(numapplic_path = "/data/josh/CenSoc/NUMIAPPLIC/Records/")
 }
@@ -13,6 +13,6 @@ load_numapp(numapplic_path = "/data/josh/CenSoc/NUMIAPPLIC/Records/")
 NUMAPP data.frame
 }
 \description{
-Get first word from a string
+Load application Files
 }
 \keyword{internal}
