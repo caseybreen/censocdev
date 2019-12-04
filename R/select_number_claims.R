@@ -33,7 +33,6 @@ select_number_claims <- function(data = claims) {
   data[,number_of_claims := .N, by=ssn]
   data <- unique(data)
 
-
   ## Create df with specific data.table features
   data.df <- data[, c("ssn", "number_of_claims"), with=FALSE]
 

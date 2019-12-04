@@ -65,7 +65,7 @@ condense_claims <- function(claims = claims) {
   unique_ssn <- unique(unique_ssn, by = "ssn")
 
   ## Combine "Best" fname, lname, etc. into one data.frame
-  claims <-  Reduce(function(...) merge(..., all = TRUE), list(unique_ssn, sex,
+  claims_c <-  Reduce(function(...) merge(..., all = TRUE), list(unique_ssn, sex,
                                                                best_first_name, best_middle_name, best_last_name,
                                                                best_father_first_name, best_father_middle_name, best_father_last_name,
                                                                best_mother_first_name, best_mother_middle_name, best_mother_last_name,

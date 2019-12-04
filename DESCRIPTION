@@ -6,8 +6,10 @@ Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-Imports: 
-        data.table
+Depends:
+  R (>= 3.4.4),
+  dplyr (>= 0.7.4),
+  data.table (>= 1.1)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
