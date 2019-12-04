@@ -6,51 +6,51 @@
 #' @import data.table
 #' @export
 #'
-select_dob <- function(numapp = numapp) {
+select_dob <- function(data = numapp) {
 
-  applications <- nrow(numapp)
+  applications <- nrow(data)
 
-  numapp[, "dob_cyear" := as.numeric(substr(cycle_date, 1, 4))]
-  numapp[, "dob_cmonth" := as.numeric(substr(cycle_date, 5, 6))]
+  data[, "dob_cyear" := as.numeric(substr(cycle_date, 1, 4))]
+  data[, "dob_cmonth" := as.numeric(substr(cycle_date, 5, 6))]
 
   # Select variables from Num Application
-  numapp <- numapp[ , .(ssn, dob, dob_cmonth, dob_cyear)]
+  data <- data[ , .(ssn, dob, dob_cmonth, dob_cyear)]
 
   ## Keeping only differnts pairs of ssn and first names.
-  numapp = numapp[!duplicated(numapp, by=c("ssn","dob"))]
+  data = data[!duplicated(data, by=c("ssn","dob"))]
 
   ## Remove applications with NA value
-  applications <- nrow(numapp)
-  numapp <- na.omit(numapp, cols="dob")
-  removed_na <- applications - nrow(numapp)
+  applications <- nrow(data)
+  data <- na.omit(data, cols="dob")
+  removed_na <- applications - nrow(data)
   cat(removed_na, "removed with NA value for dob", "\n")
 
   ## Remove applications with non-alphanumeric value
-  applications <- nrow(numapp)
-  numapp <- numapp[!(grepl("\\?", numapp$dob))]
-  removed_na <- applications - nrow(numapp)
+  applications <- nrow(data)
+  data <- data[!(grepl("\\?", data$dob))]
+  removed_na <- applications - nrow(data)
   cat(removed_na, "removed with non-alphanumeric values", "\n")
 
   ## Remove applications with ZZZ values
-  applications <- nrow(numapp)
-  numapp <- numapp[!(grepl("ZZZ", numapp$dob))]
-  removed_na <- as.integer(applications - nrow(numapp))
+  applications <- nrow(data)
+  data <- data[!(grepl("ZZZ", data$dob))]
+  removed_na <- as.integer(applications - nrow(data))
   cat(removed_na, "removed with non-alphanumeric values", "\n")
 
   ## Number of different dob per SSN
-  numapp[, number_of_distinct_dob:=uniqueN(dob), by = ssn]
+  data[, number_of_distinct_dob:=uniqueN(dob), by = ssn]
 
   ## Recode dob values of 0 to NA
-  numapp[ , dob:= (ifelse(dob=="0", NA, dob)) ]
+  data[ , dob:= (ifelse(dob=="0", NA, dob)) ]
 
 
   ## Create flag (0 or 1 dichotomous var) for more than one dob.
-  numapp[, dob_multiple_flag:=(ifelse(number_of_distinct_dob > 1, 1, 0))]
+  data[, dob_multiple_flag:=(ifelse(number_of_distinct_dob > 1, 1, 0))]
 
   ## Keep a frame only with duplicates.
-  app_dob_dupli = numapp[dob_multiple_flag==1, ]
+  app_dob_dupli = data[dob_multiple_flag==1, ]
   ## Keep a frame only with uniques
-  app_dob_unique = numapp[dob_multiple_flag==0, ]
+  app_dob_unique = data[dob_multiple_flag==0, ]
 
   #Duplicates with NAs
   app_dob_dupli[, cyear_month := dob_cyear * 100 +  dob_cmonth]

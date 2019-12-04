@@ -1,4 +1,4 @@
-#' Get first word from a string
+#' Load application Files
 #'
 #' @param numapp_path path to the NUMAPP files
 #' @return NUMAPP data.frame

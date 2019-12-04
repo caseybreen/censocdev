@@ -1,12 +1,12 @@
-#' Calculate total number of applications per individual
+#' Calculate total number of claims per individual
 #'
-#' @param numapp path to the NUMAPP files
+#' @param numapp path to the claims files
 #' @return NUMAPP data.frame with number of applications by ssn
 #' @keywords internal
 #' @import data.table
 #' @export
 
-select_number_of_apps <- function(data = numapp) {
+select_number_of_apps <- function(data = claims) {
 
   ## Select variables from Num Application
   data <- data[, c("ssn"), with=FALSE]
@@ -35,7 +35,7 @@ select_number_of_apps <- function(data = numapp) {
 
 
   ## Create df with specific data.table features
-  data.df <- data[, c("ssn", "number_of_apps"), with=FALSE]
+  data.df <- data[, c("ssn", "number_of_claims"), with=FALSE]
 
   return(data.df)
 

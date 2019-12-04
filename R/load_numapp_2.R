@@ -1,4 +1,4 @@
-#' Get first word from a string
+#' Load Application Files
 #'
 #' @param numapp_path path to the NUMAPP files
 #' @return NUMAPP data.frame
@@ -56,7 +56,7 @@ load_numapp_2 <- function(numapp.file.path = "/censoc/data/numident/numident_fil
   cat("Finished creating year_cycle and month_year variables \n")
 
   numapp <- numapp[!(grepl("ZZZZZZZZZ", numapp$ssn))]
-  numapp[numapp==''|numapp==' ']<-NA
+  numapp[numapp==''|numapp==' '] <- NA
 
   cat("Finished removing all values with an ssn of ZZZZZZZZ (confidential) and recoding blanks to NA")
 

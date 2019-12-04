@@ -9,7 +9,7 @@
 
 load_numdeath_2 <- function(numdeath.file.path = "/censoc/data/numident/numident_files_with_original_varnames/numident_death_records_complete.csv") {
 
-  all_cols_to_keep <- c("NUMI_SSN", "NUMI_NH_NAME_FIRST_DTH_1", "NUMI_NH_NAME_LAST_DTH_1", "NUMI_SEX_DTH_1", "NUMI_DOB_DTH_1", "NUMI_DOD_DTH_1", "NUMI_ZIP_RESIDENCE_1")
+  all_cols_to_keep <- c("NUMI_SSN", "NUMI_NH_NAME_FIRST_DTH_1", "NUMI_NH_NAME_MIDDLE_DTH_1", "NUMI_NH_NAME_LAST_DTH_1", "NUMI_SEX_DTH_1", "NUMI_DOB_DTH_1", "NUMI_DOD_DTH_1", "NUMI_ZIP_RESIDENCE_1")
 
   numdeath <- fread(file = numdeath.file.path, select = all_cols_to_keep, colClasses = list(character= 'NUMI_SSN', 'NUMI_ZIP_RESIDENCE_1', 'NUMI_DOB_DTH_1', 'NUMI_DOD_DTH_1'))
 
@@ -19,10 +19,13 @@ load_numdeath_2 <- function(numdeath.file.path = "/censoc/data/numident/numident
   ## shorten names by removing blank space at end
   numdeath[,"lname" := NUMI_NH_NAME_LAST_DTH_1]
   numdeath[,"fname" := NUMI_NH_NAME_FIRST_DTH_1]
+  numdeath[,"mname" := NUMI_NH_NAME_MIDDLE_DTH_1]
   numdeath[,lname := gsub(pattern = "\\s*$",
                           replacement = "", x = lname)]
   numdeath[,fname := gsub(pattern = "\\s*$",
                           replacement = "", x = fname)]
+  numdeath[,mname := gsub(pattern = "\\s*$",
+                          replacement = "", x = mname)]
 
   ##In 162 cases, NUMI_DOB is 7 characters long instead of 8. In all 162 cases, the leading 0 has been ommitted.
   ## For these 162 cases, we will add a leading o.
