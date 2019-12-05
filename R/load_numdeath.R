@@ -1,4 +1,4 @@
-#' Load numdeath file
+#' Load numdeath file 2.0
 #'
 #' @param numdeath_path path to the NUMDEATH files
 #' @return NUMDEATH data.frame
@@ -7,55 +7,65 @@
 #' @export
 
 
-load_numdeath <- function(numdeath_path = "/data/josh/CenSoc/NUMDEATH/") {
+load_numdeath <- function(numdeath.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/numident_death_records_complete.csv") {
 
-  files <- list.files(path = numdeath_path, pattern = ".csv$")
+  all_cols_to_keep <- c("NUMI_SSN", "NUMI_NH_NAME_FIRST_DTH_1", "NUMI_NH_NAME_MIDDLE_DTH_1", "NUMI_NH_NAME_LAST_DTH_1", "NUMI_SEX_DTH_1", "NUMI_DOB_DTH_1", "NUMI_DOD_DTH_1", "NUMI_ZIP_RESIDENCE_1")
 
-  all_cols_to_keep <- c("ssn", "nh_name_first", "nh_name_last", "sex", "dob", "dod", "zip_residence")
-
-  numdeath <- rbindlist(lapply(paste0(numdeath_path, files), fread, select=all_cols_to_keep, colClasses = list(character= 'ssn', 'zip_residence', 'dob', 'dod')))
+  numdeath <- fread(file = numdeath.file.path, select = all_cols_to_keep, colClasses = list(character= 'NUMI_SSN', 'NUMI_ZIP_RESIDENCE_1', 'NUMI_DOB_DTH_1', 'NUMI_DOD_DTH_1'))
 
   cat("Cleaning variables. \n")
 
   ## A. clean the socsec data
   ## shorten names by removing blank space at end
-  numdeath[,"lname" := nh_name_last]
-  numdeath[,"fname" := nh_name_first]
+  numdeath[,"lname" := NUMI_NH_NAME_LAST_DTH_1]
+  numdeath[,"fname" := NUMI_NH_NAME_FIRST_DTH_1]
+  numdeath[,"mname" := NUMI_NH_NAME_MIDDLE_DTH_1]
   numdeath[,lname := gsub(pattern = "\\s*$",
                           replacement = "", x = lname)]
   numdeath[,fname := gsub(pattern = "\\s*$",
                           replacement = "", x = fname)]
+  numdeath[,mname := gsub(pattern = "\\s*$",
+                          replacement = "", x = mname)]
 
-  ##In 162 cases, dob is 7 characters long instead of 8. In all 162 cases, the leading 0 has been ommitted.
+  ##In 162 cases, NUMI_DOB is 7 characters long instead of 8. In all 162 cases, the leading 0 has been ommitted.
   ## For these 162 cases, we will add a leading o.
 
-  numdeath[, dob := ifelse(nchar(dob) == 8, dob, paste0("0", dob))]
+  numdeath[, NUMI_DOB_DTH_1 := ifelse(nchar(NUMI_DOB_DTH_1) == 8, NUMI_DOB_DTH_1, paste0("0", NUMI_DOB_DTH_1))]
 
   ## now get birth and death year
-  numdeath[,"byear_death_file" := as.numeric(substr(dob, 5, 8))]
-  numdeath[,"dyear" := as.numeric(substr(dod, 5, 8))]
+  numdeath[,"byear" := as.numeric(substr(NUMI_DOB_DTH_1, 5, 8))]
+  numdeath[,"dyear" := as.numeric(substr(NUMI_DOD_DTH_1, 5, 8))]
 
   ## birth and death month
-  numdeath[,"bmonth_death_file" := as.numeric(substr(dob, 1, 2))]
-  numdeath[,"dmonth" := as.numeric(substr(dod, 1, 2))]
+  numdeath[,"bmonth" := as.numeric(substr(NUMI_DOB_DTH_1, 1, 2))]
+  numdeath[,"dmonth" := as.numeric(substr(NUMI_DOD_DTH_1, 1, 2))]
 
-  ## birth and death dat
-  numdeath[,"bday_death_file" := as.numeric(substr(dob, 3, 4))]
-  numdeath[,"dday" := as.numeric(substr(dod, 3, 4))]
+  ## birth and death day
+  numdeath[,"bday" := as.numeric(substr(NUMI_DOB_DTH_1, 3, 4))]
+  numdeath[,"dday" := as.numeric(substr(NUMI_DOD_DTH_1, 3, 4))]
 
-  numdeath[, c("dob","dod", "nh_name_last", "nh_name_first" ):=NULL]
+  ## rename SSN variables
+  numdeath[, "ssn" := NUMI_SSN]
 
-  recoded_0 = nrow(numdeath[sex==0,])
-  numdeath[ , sex:= (ifelse(sex==0, NA, sex)) ]
+  ## rename some of the variable names
+  numdeath[,sex := NUMI_SEX_DTH_1]
+  numdeath[,zip_residence := NUMI_ZIP_RESIDENCE_1]
+
+  recoded_0 <-  nrow(numdeath[NUMI_SEX_DTH_1==0,])
+  numdeath[ , NUMI_SEX_DTH_1:= (ifelse(NUMI_SEX_DTH_1==0, NA, NUMI_SEX_DTH_1)) ]
   cat(recoded_0, "sex values recoded from 0 to NA. \n")
 
-  recoded_0 = nrow(numdeath[dday==0,])
+  recoded_0 <-  nrow(numdeath[dday==0,])
   numdeath[ , dday:= (ifelse(dday==0, NA, dday)) ]
   cat(recoded_0, "dday values recoded from 0 to NA. \n")
 
-  recoded_0 = nrow(numdeath[bday_death_file==0,])
-  numdeath[ , bday_death_file:= (ifelse(bday_death_file==0, NA, bday_death_file)) ]
+  recoded_0 <-  nrow(numdeath[bday==0,])
+  numdeath[ , bday:= (ifelse(bday==0, NA, bday)) ]
   cat(recoded_0, "bday values recoded from 0 to NA. \n")
+
+  numdeath[, c("NUMI_DOB_DTH_1","NUMI_DOD_DTH_1", "NUMI_NH_NAME_FIRST_DTH_1",
+               "NUMI_NH_NAME_LAST_DTH_1", "NUMI_SSN", "NUMI_SEX_DTH_1", "NUMI_ZIP_RESIDENCE_1",
+               "NUMI_NH_NAME_MIDDLE_DTH_1"):=NULL]
 
   numdeath[numdeath==''|numdeath==' ']<-NA
 
