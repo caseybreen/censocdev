@@ -47,13 +47,13 @@ load_numdeath <- function(numdeath.file.path = "/censoc/data/numident/1_numident
   ## rename SSN variables
   numdeath[, "ssn" := NUMI_SSN]
 
-  ## rename some of the variable names
-  numdeath[,sex := NUMI_SEX_DTH_1]
-  numdeath[,zip_residence := NUMI_ZIP_RESIDENCE_1]
-
   recoded_0 <-  nrow(numdeath[NUMI_SEX_DTH_1==0,])
   numdeath[ , NUMI_SEX_DTH_1:= (ifelse(NUMI_SEX_DTH_1==0, NA, NUMI_SEX_DTH_1)) ]
   cat(recoded_0, "sex values recoded from 0 to NA. \n")
+
+  ## rename some of the variable names
+  numdeath[,sex := NUMI_SEX_DTH_1]
+  numdeath[,zip_residence := NUMI_ZIP_RESIDENCE_1]
 
   recoded_0 <-  nrow(numdeath[dday==0,])
   numdeath[ , dday:= (ifelse(dday==0, NA, dday)) ]

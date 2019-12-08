@@ -8,28 +8,28 @@
 #'
 unify_numident <- function(claim_condensed, deaths, application_condensed) {
 
-  ## Read in death file
+  ## select vars from death file
   deaths <- deaths %>%
-    select(ssn, sex, zip_residence, lname, mname, fname, byear, dyear,
+    select(ssn, sex, zip_residence, lname, mname, fname, byear, dyear, socstate,
            bmonth, dmonth, bday, dday) %>%
     mutate(ssn = as.numeric(ssn))
 
-  ## Read in application file (condensed)
-  application_condensed <- application_condensed %>%
+  ## select vars from application file
+  application <- application_condensed %>%
     select(ssn, bpl, earliest_cycle_year, earliest_cycle_month,
            mother_fname, mother_mname, mother_lname,
-           father_fname, father_mname, father_lname, number_of_apps,
+           father_fname, father_mname, father_lname, number_apps = number_of_apps,
            race, sex, race_change = race_multiple_flag) %>%
     mutate(ssn = as.numeric(ssn))
 
-  ## Read in claims file (condensed)
+  ## select vars from claims files (condensed)
 
-  claim_condensed <- claim_condensed %>%
-    select(sex, ssn, bpl, mother_fname, mother_mname, mother_lname, father_fname, father_mname, father_lname) %>%
+  claim <- claim_condensed %>%
+    select(sex, ssn, bpl, mother_fname, mother_mname, mother_lname, father_fname, father_mname, father_lname, number_claims = number_of_claims) %>%
     mutate(ssn = as.numeric(ssn))
 
   numident <- deaths %>%
-    left_join(application_condensed, by = "ssn")
+    left_join(application, by = "ssn")
 
   ## Replace any values of NA for sex with respective values from application files.
   ## Coalese function documentation: https://dplyr.tidyverse.org/reference/coalesce.html
@@ -41,7 +41,7 @@ unify_numident <- function(claim_condensed, deaths, application_condensed) {
   ## Replace any values of NA for sex, bpl, parents' names with respective values from claims files.
 
   numident <- numident %>%
-    left_join(claim_condensed, by = "ssn") %>%
+    left_join(claim, by = "ssn") %>%
     mutate(sex = coalesce(sex.x, sex.y)) %>%
     mutate(bpl = coalesce(bpl.x, bpl.y)) %>%
     mutate(father_fname = coalesce(father_fname.x, father_fname.y)) %>%
@@ -59,18 +59,28 @@ unify_numident <- function(claim_condensed, deaths, application_condensed) {
               mother_mname.x, mother_mname.y,
               mother_lname.x, mother_lname.y))
 
-  ## Calculate age at first social security application
 
-  numident <- numident %>%
-    mutate(age_first_application = case_when(
-      bmonth >= earliest_cycle_month ~ earliest_cycle_year - byear,
-      TRUE ~ earliest_cycle_year - byear - 1
-    ))
+  ## Calculate age at first social security application
+  setDT(numident)
+  numident[,"age_first_application" := ifelse(bmonth >= earliest_cycle_month,
+                                 earliest_cycle_year - byear - 1,
+                                 earliest_cycle_year - byear)]
+
+  ## Recode NA for number_claims and num_apps to 0
+
+  numident[ , number_claims:= (ifelse(is.na(number_claims), 0, number_claims)) ]
+  numident[ , number_apps:= (ifelse(is.na(number_apps), 0, number_apps)) ]
+
 
   ## Calculate age at Death
-
   numident <- numident %>%
     calculate_age_at_death()
+
+
+  ## Recode blanks to NAs
+  numident[numident==''|numident ==' '] <- NA
+
+
 
   return(numident)
 }

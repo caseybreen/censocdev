@@ -45,19 +45,19 @@ calculate_age_at_death <- function(data) {
   ## * dmonth > bmonth
   ## * dmonth == bmonth & dday >= bday
   data[dmonth_hat > bmonth_hat,
-    age_at_death := dyear - byear]
+    death_age := dyear - byear]
   data[dmonth_hat == bmonth_hat & dday_hat >= bday_hat,
-    age_at_death := dyear - byear]
+       death_age := dyear - byear]
   ## (2) birthday after death day --> dyear - byear - 1
   ## * dmonth < bmonth
   ## * dmonth == bmonth & dday < bday
   data[dmonth_hat < bmonth_hat,
-    age_at_death := dyear - byear - 1]
+       death_age := dyear - byear - 1]
   data[dmonth_hat == bmonth_hat & dday_hat < bday_hat,
-    age_at_death := dyear - byear -1]
+       death_age := dyear - byear -1]
 
   data <- data %>%
-    select(dmonth_hat, bmonth_hat, dday_hat, bday_hat)
+    select(-c(dmonth_hat, bmonth_hat, dday_hat, bday_hat))
 
   return(data)
 }
