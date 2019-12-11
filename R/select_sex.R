@@ -8,7 +8,6 @@
 
 select_sex <- function(data = numapp) {
 
-
   data <- data[, c("ssn", "sex", "cycle_date", "year_cycle", "month_cycle"), with=FALSE]
 
   ## Remove applications with 0 (no information) for sex
@@ -34,17 +33,13 @@ select_sex <- function(data = numapp) {
   ## Select most recent sex
   data <- data[data[, .I[which.max(cycle_year_month)], by=ssn]$V1]
 
-
   ## Select most recent sex
   data[,"sex_year_cycle" := year_cycle]
   data[,"sex_month_cycle" := month_cycle]
 
-
-  ## Recode originally missing years back to NA.
+  ## Recode originally missing years back to NA
   data[year_cycle == 0, year_cycle := NA]
   data[month_cycle == 0, month_cycle := NA]
-
-
 
   data.df <- data[, c("ssn", "sex", "sex_year_cycle", "sex_month_cycle", "sex_multiple_flag" ), with=FALSE]
 
