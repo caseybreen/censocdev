@@ -52,7 +52,7 @@ load_numclaims <- function(numclaim.file.path = "/censoc/data/numident/numident_
   cat("Finished creating year_cycle and month_year variables \n")
 
   numclaim <- numclaim[!(grepl("ZZZZZZZZZ", numclaim$ssn))]
-  numclaim[numclaim == ''| numclaim == ' ' | numclaim == "UNKNOWN"] <- NA
+  numclaim[numclaim == ''| numclaim == ' ' | numclaim == "UNKNOWN" | numclaim == "UN"] <- NA
 
   cat("Finished removing all values with an ssn of ZZZZZZZZ (confidential) and recoding blanks to NA")
 
