@@ -4,7 +4,7 @@
 \alias{unify_numident}
 \title{Unify Numident Files}
 \usage{
-unify_numident(application, deaths, claim)
+unify_numident(claim_condensed, deaths, application_condensed)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}

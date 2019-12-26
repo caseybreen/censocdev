@@ -2,9 +2,12 @@
 % Please edit documentation in R/load_numdeath.R
 \name{load_numdeath}
 \alias{load_numdeath}
-\title{Load numdeath file}
+\title{Load numdeath file 2.0}
 \usage{
-load_numdeath(numdeath_path = "/data/josh/CenSoc/NUMDEATH/")
+load_numdeath(
+ 
+    numdeath.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/numident_death_records_complete.csv"
+)
 }
 \arguments{
 \item{numdeath_path}{path to the NUMDEATH files}
@@ -13,6 +16,6 @@ load_numdeath(numdeath_path = "/data/josh/CenSoc/NUMDEATH/")
 NUMDEATH data.frame
 }
 \description{
-Load numdeath file
+Load numdeath file 2.0
 }
 \keyword{internal}
