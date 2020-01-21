@@ -11,9 +11,8 @@ ss5 <- fread("/data/josh/CenSoc/ss5_data/merged_application_death/ss5_merged_wit
 Read in the census file. 
 
 ```{r, eval = F}
-
 ## Load census with HISTID
-census_2019 <- load_census(census_file = "/home/ipums/casey-ipums/IPUMS2019/1920/TSV/P.tsv")
+census_2019 <- load_census_numident_match(census_file = "/home/ipums/casey-ipums/IPUMS2019/1920/TSV/P.tsv")
 ```
 
 ## Merge SS-5 and Census Files on linking keys: 1930
