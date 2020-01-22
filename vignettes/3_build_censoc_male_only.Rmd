@@ -95,7 +95,6 @@ write_csv(bfdw, path  = "~/censoc/make_censoc/censoc_bfdw.csv")
 # save dataset with less variables
 dr <- bfdw[, c("SERIAL", "PERNUM", "STATEFIP",  "census_age", "byear", "dyear", "bmonth", "dmonth")]
 write_csv(dr, "~/censoc/make_censoc/national_matched_states_red.csv")
-
 ```
 
 

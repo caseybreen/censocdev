@@ -6,12 +6,12 @@
 #' @import data.table
 #' @export
 
-
-load_numdeath <- function(numdeath.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/numident_death_records_complete.csv") {
+clean_deaths <- function(numdeath.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/numident_death_records_complete.csv",
+                         ssn_state_crosswalk_path = "/censoc/data/crosswalks/ssn_to_state_crosswalk.csv") {
 
   all_cols_to_keep <- c("NUMI_SSN", "NUMI_NH_NAME_FIRST_DTH_1", "NUMI_NH_NAME_MIDDLE_DTH_1", "NUMI_NH_NAME_LAST_DTH_1", "NUMI_SEX_DTH_1", "NUMI_DOB_DTH_1", "NUMI_DOD_DTH_1", "NUMI_ZIP_RESIDENCE_1")
 
-  numdeath <- fread(file = numdeath.file.path, select = all_cols_to_keep, colClasses = list(character= 'NUMI_SSN', 'NUMI_ZIP_RESIDENCE_1', 'NUMI_DOB_DTH_1', 'NUMI_DOD_DTH_1'))
+  numdeath <- fread(file = numdeath.file.path, na.strings="", select = all_cols_to_keep, colClasses = list(character= 'NUMI_SSN', 'NUMI_ZIP_RESIDENCE_1', 'NUMI_DOB_DTH_1', 'NUMI_DOD_DTH_1'))
 
   cat("Cleaning variables. \n")
 
@@ -67,7 +67,18 @@ load_numdeath <- function(numdeath.file.path = "/censoc/data/numident/1_numident
                "NUMI_NH_NAME_LAST_DTH_1", "NUMI_SSN", "NUMI_SEX_DTH_1", "NUMI_ZIP_RESIDENCE_1",
                "NUMI_NH_NAME_MIDDLE_DTH_1"):=NULL]
 
-  numdeath[numdeath==''|numdeath==' ']<-NA
+  ## Geography Social Security Number
+
+  ssn_state_crosswalk <- fread(ssn_state_crosswalk_path)
+
+  numdeath[,"ssn_3" := as.numeric(substr(ssn, 1, 3))]
+
+  ## merge and drop unnecessary columns
+  numdeath <- numdeath %>%
+    left_join(ssn_state_crosswalk, by = "ssn_3") %>%
+    select(-ssn_3, -label)
+
+  numdeath[numdeath == '' | numdeath == ' '] <- NA
 
   return(numdeath)
 }

@@ -8,18 +8,18 @@
 
 select_longest_name <- function(data = numapp, name) {
 
-  ## select vars
-  select.vars <- c("ssn", "cycle_date", "year_cycle", "month_cycle", name)
 
   # Select variables from Num Application
-  data <- data[, select.vars, with=FALSE]
+  # !! operator unquotes the name variable
+  data <- data %>%
+    select(ssn, cycle_date, year_cycle, month_cycle, name = !!name)
 
   # Create & Clean variable
-  data[,"name" := toupper(name)]
+  data[,name := toupper(name)]
 
   ## Remove applications with NA value for name
   applications <- nrow(data)
-  data <- na.omit(data, cols = name)
+  data <- na.omit(data, cols = "name")
   removed_na <- applications - nrow(data)
   cat(removed_na, "removed with NA value for name", "\n")
 
@@ -35,10 +35,10 @@ select_longest_name <- function(data = numapp, name) {
   removed_na <- as.integer(applications - nrow(data))
   cat(removed_na, "removed with ZZZ values for name", "\n")
 
-  ## Number of different first names per SSN
-  data[, number_of_distinct_names:=uniqueN(name), by = ssn]
+  ## Number of different names per SSN
+  data[, number_of_distinct_names := uniqueN(name), by = ssn]
 
-  ## Create flag (0 or 1 dichotomous var) for more than one first name.
+  ## Create flag (0 or 1 dichotomous var) for more than one name.
   data[, paste0(name, "_multiple_flag") := (ifelse(number_of_distinct_names > 1, 1, 0))]
 
   ## Select Longest First name (e.g. select "WILLIAM" over "BILL")
@@ -60,7 +60,8 @@ select_longest_name <- function(data = numapp, name) {
   data[,paste0(name, "_month_cycle") := month_cycle]
 
   ## Create data.table with specific data.table features
-  name.df <- data[, c("ssn", name, paste0(name, "_year_cycle"), paste0(name, "_month_cycle"), paste0(name, "_multiple_flag")), with=FALSE]
+  name.df <- data %>%
+    select(ssn, !!name := name, paste0(name, "_year_cycle"), paste0(name, "_month_cycle"), paste0(name, "_multiple_flag"))
 
   return(name.df)
 

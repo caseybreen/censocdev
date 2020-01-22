@@ -66,7 +66,7 @@ unify_numident <- function(claim_condensed, deaths, application_condensed) {
                                  earliest_cycle_year - byear - 1,
                                  earliest_cycle_year - byear)]
 
-  ## Recode NA for number_claims and num_apps to 0
+  ## Recode NA for number_claims and number_apps to 0
 
   numident[ , number_claims:= (ifelse(is.na(number_claims), 0, number_claims)) ]
   numident[ , number_apps:= (ifelse(is.na(number_apps), 0, number_apps)) ]
@@ -79,8 +79,6 @@ unify_numident <- function(claim_condensed, deaths, application_condensed) {
 
   ## Recode blanks to NAs
   numident[numident==''|numident ==' '] <- NA
-
-
 
   return(numident)
 }
