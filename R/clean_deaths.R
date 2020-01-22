@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 
-clean_deaths <- function(numdeath.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/numident_death_records_complete.csv",
+clean_deaths <- function(numdeath.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/deaths_original.csv",
                          ssn_state_crosswalk_path = "/censoc/data/crosswalks/ssn_to_state_crosswalk.csv") {
 
   all_cols_to_keep <- c("NUMI_SSN", "NUMI_NH_NAME_FIRST_DTH_1", "NUMI_NH_NAME_MIDDLE_DTH_1", "NUMI_NH_NAME_LAST_DTH_1", "NUMI_SEX_DTH_1", "NUMI_DOB_DTH_1", "NUMI_DOD_DTH_1", "NUMI_ZIP_RESIDENCE_1")

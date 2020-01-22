@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 #'
-unify_numident <- function(claim_condensed, deaths, application_condensed) {
+unify_numident <- function(claims_condensed, deaths, apps_condensed) {
 
   ## select vars from death file
   deaths <- deaths %>%

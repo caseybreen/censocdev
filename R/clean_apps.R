@@ -7,7 +7,7 @@
 #' @export
 
 
-clean_apps <- function(numapp.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/numident_applications_complete.csv") {
+clean_apps <- function(numapp.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/applications_original.csv") {
 
   columns.to.keep <- c("NUMI_SSN", "NUMI_CITIZENSHIP_CODE", "NUMI_CYCLE_DATE", "NUMI_ENTRY_CODE", "NUMI_DOB", "NUMI_SEX",
                        "NUMI_RACE", "NUMI_POB_STATE_COUNTRY", "NUMI_POB_FOREIGN_IND", "NUMI_NH_NAME_FIRST",

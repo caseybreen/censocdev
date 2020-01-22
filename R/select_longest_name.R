@@ -21,19 +21,19 @@ select_longest_name <- function(data = numapp, name) {
   applications <- nrow(data)
   data <- na.omit(data, cols = "name")
   removed_na <- applications - nrow(data)
-  cat(removed_na, "removed with NA value for name", "\n")
+  cat(removed_na, "removed with NA value for ", name, "\n")
 
   ## Remove applications with non-alphanumeric value for name
   applications <- nrow(data)
   data <- data[!(grepl("\\?", data$name))]
   removed_na <- applications - nrow(data)
-  cat(removed_na, "removed with non-alphanumeric values for name", "\n")
+  cat(removed_na, "removed with non-alphanumeric values for ", name, "\n")
 
   ## Remove applications with ZZZ values for name
   applications <- nrow(data)
   data <- data[!(grepl("ZZZ", data$name))]
   removed_na <- as.integer(applications - nrow(data))
-  cat(removed_na, "removed with ZZZ values for name", "\n")
+  cat(removed_na, "removed with ZZZ values for ", name,  "\n")
 
   ## Number of different names per SSN
   data[, number_of_distinct_names := uniqueN(name), by = ssn]
