@@ -6,7 +6,7 @@
 This function will weight the numident file up to HMD lexis triangles
 Restrict data to deaths from 1988 - 2005 with age_at_death between}
 \usage{
-create_weights_complete(numident)
+create_weights_complete(file)
 }
 \arguments{
 \item{data}{data.frame with birth and death info}

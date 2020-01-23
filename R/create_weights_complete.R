@@ -9,12 +9,12 @@
 #' @export
 #'
 
-create_weights_complete <- function(numident) {
+create_weights_complete <- function(file) {
 
   hmd_deaths <-  readHMDweb(CNTRY = "USA", item = "Deaths_lexis", username ="caseybreen@berkeley.edu", password = "censoc") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
-  high_coverage_complete_sample <- numident %>%
+  high_coverage_complete_sample <- file %>%
     filter(dyear %in% c(1988:2005)) %>%
     filter(byear %in% c(1900:1940)) %>%
     filter(death_age %in% c(65:100)) %>%
@@ -54,11 +54,11 @@ create_weights_complete <- function(numident) {
   weights.df <-  weights.df %>%
     select(ssn, cweight)
 
-  numident <- numident %>%
+  file <- file %>%
     left_join(weights.df, by = "ssn")
 
 
-  return(numident)
+  return(file)
 
 }
 
