@@ -1,0 +1,37 @@
+---
+title: "2 censoc all gender sample"
+output: html_notebook
+---
+
+This notebook will read in the Berkeley Unified Mortality Database (BUNMD) and the 1940 Census (this can be switched). The code constructs linking keys, dedupes the keys, and then performs a direct match on the linking keys.  
+
+First, we will read in the numdeath matched with numapp file.  
+```{r}
+bunmd <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv", colClasses = list(character= 'ssn'))
+```
+
+Read in the census file. 
+```{r, eval = F}
+## Load census with HISTID
+census_2019 <- load_census_numident_match(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
+```
+
+## Merge SS-5 and Census Files on linking keys: 1940
+```{r, eval = F}
+censoc_all_gender <- census_bunmd_merge(bunmd = bunmd, census = census_2019)
+
+censoc_all_gender <- clean_wcensoc(censoc_all_gender, census_year = 1940)
+```
+
+Select the variables for the public release — this will likely change 
+```{r}
+censoc_all_gender <- censoc_all_gender %>% 
+  select(HISTID, census_age, byear, bmonth, dyear, dmonth, socstate, race, zip_residence)
+
+fwrite(censoc_all_gender, "/censoc/data/numident/5_numident_census_match/censoc_all_gender_sample.csv")
+```
+
+
+
+
+

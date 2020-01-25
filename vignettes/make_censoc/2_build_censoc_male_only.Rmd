@@ -9,7 +9,7 @@ output: html_notebook
     - Clone censoc from Github:  https://github.com/MJAlexander/censoc
 - Update path names. 
 
-This contains original code written by Monica Alexander (monica.alexander@utoronto.ca). 
+This code was originally written by Monica Alexander (monica.alexander@utoronto.ca). 
     
 ### Load Packages
 
