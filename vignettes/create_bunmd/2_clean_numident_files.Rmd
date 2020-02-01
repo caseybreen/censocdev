@@ -1,0 +1,44 @@
+---
+title: "Clean Numapplication Files"
+output: html_notebook
+---
+
+In this notebook, we take the Numident files with the three .csv files (apps, claims, deaths) with the original NARA variable names and take several steps to clean and harmonize te data:
+
+1. Rename variable names
+2. Recode values to NA ("0", "", " ", "unk", "un", "unknown" were all recoded to 0). 
+3. Add a "socstate" variable for the death records, reporting the state in which the Social Security number was issued 
+4. Remove all masked records (e.g. zzzz records)
+
+Clean and write out death files 
+
+
+```{r}
+deaths <- clean_deaths(numdeath.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/deaths_original.csv",
+                       ssn_state_crosswalk_path = "/censoc/data/crosswalks/ssn_to_state_crosswalk.csv")
+
+## write out cleaned death records
+fwrite(deaths, "/censoc/data/numident/2_numident_files_cleaned/deaths_cleaned.csv")
+```
+
+Clean and write out application files 
+
+- one fread table gives an ominous warning — but this can be ignored. 
+TODO suppress / change code to avoid warning
+```{r}
+apps <- clean_apps(numapp.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/applications_original.csv")
+
+## write out cleaned application files
+fwrite(apps, "/censoc/data/numident/2_numident_files_cleaned/apps_cleaned.csv")
+```
+
+Clean and write out claims files 
+
+- one fread table gives an ominous warning — but this can be ignored. 
+TODO suppress / change code to avoid warning
+```{r}
+claims <- clean_claims(numclaim.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv")
+
+## write out cleaned claims files
+fwrite(claims, "/censoc/data/numident/2_numident_files_cleaned/claims_cleaned.csv")
+```

@@ -1,0 +1,49 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Background: In 2013, the Social Security Administration transferred a set of Numident records to the
+National Archives (NARA). In 2019, we obtained the NARA Numident records, along with
+their accompanying documentation. The NARA Numident records are a subset of the records
+in the complete Numident. The NARA Numident records contain three types of entries:
+applications, claims, and deaths. NARA delivered each set of entries seperately as a set 20
+fixed-width .txt files (3 x 20 = 60 files in total).
+
+For each of the three entry types, the below code reads in the 20 fixed-width .txt files using column
+position specified in the record layout documents. The code appends the 20 files into a single
+file. The result is three files, one for the applications, claims, and deaths. 
+
+Column positions and variable names were obtained from the NARA documentation website: https://aad.archives.gov/aad/popup-tech-info.jsp?s=5057
+
+The below functions read in all variables with the colun position and variables names specified in the NARA record layout documents.The PDF files were first converted into a spreadsheet in order facilitate writing the code to read in the fixed-width files: 
+/bcourses/documentation/numident_documentation/numident_file_layouts_to_create_r_code.csv
+
+Variable names are consistent with the original "field names" with two exceptions: 
+
+1) All dashes were replaced with underscores (e.g. "-" were replaced with "_")
+2) The seven variables titled "FILLER" were renamed ("Filler_1, Filler_2, ... , Filler_7)".
+
+```{r}
+## read in fixed-width death records
+deaths <- read_death_fwf(path = "/data/josh/CenSoc/NUMDEATH/")
+
+## write out death records
+fwrite(x = deaths, file = "/censoc/data/numident/1_numident_files_with_original_varnames/deaths_original.csv")
+
+## read in fixed-width appliation records
+apps <- read_app_fwf(path = "/data/josh/CenSoc/NUMIAPPLIC/Records/")
+
+## write out application records
+fwrite(apps, "/censoc/data/numident/1_numident_files_with_original_varnames/applications_original.csv")
+
+## read in claims fixed-width application records 
+claims <- read_claim_fwf(path = "/data/josh/CenSoc/NUMICLAIM/Records/")
+
+## write out application records
+fwrite(claims, "/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv")
+
+
+```
+
+

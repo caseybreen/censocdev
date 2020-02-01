@@ -1,0 +1,31 @@
+---
+title: "Condense Numident Entries"
+output: html_notebook
+---
+
+In this notebook, we take cleaned application files and claims files "condenses" them to select the best record per person.
+
+Background: One person may have multiple applications or claims entries. As the BUNMD file will ultimately contain one record per person, this code selects the "best" value for sex, race, etc. across entries using a set of decision rules.  ()
+
+We only need to "condense" the application and claims files — each person only has one death record. 
+
+These functions takes a long time to run. These functions contains call on many different functions, each designed to select the "best" value among many for a given variable. Sometimes it is easiest to select only certain records. 
+
+```{r}
+## read in cleaned app file
+apps <- fread("/censoc/data/numident/2_numident_files_cleaned/apps_cleaned.csv", na.strings = "")
+
+apps_condensed <- wcensoc::condense_numapp(numapp = apps)
+
+fwrite(apps_condensed, "/censoc/data/numident/3_numident_files_cleaned_and_condensed/apps_condensed.csv")
+```
+
+```{r}
+## read in cleaned claims file
+claims <- fread("/censoc/data/numident/2_numident_files_cleaned/claims_cleaned.csv", na.strings = "")
+
+claims_condensed <- wcensoc::condense_claims(claims = claims)
+
+fwrite(claims_condensed, "/censoc/data/numident/3_numident_files_cleaned_and_condensed/claims_condensed.csv")
+```
+
