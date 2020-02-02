@@ -19,8 +19,21 @@ socsec_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
 socsec <- load_socsec_deaths(socsec_files)
 census <- load_census(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
 censoc <- create_censoc(census, socsec)
-
-fwrite("/censoc/data/")
 ```
 
+Calculate age at death variables 
+```{r}
+censoc <- calculate_age_at_death(censoc)
+```
+
+Optional: add household variables from census
+```{r}
+household_census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv")
+censoc <- add_household_variables(censoc = censoc, household_census = household_census)
+```
+
+Write out CenSoc file 
+```{r}
+fwrite(censoc, "/censoc/data/censoc_linked_with_census/1940/censoc_men_sample_matched_with_census_1940.csv")
+```
 
