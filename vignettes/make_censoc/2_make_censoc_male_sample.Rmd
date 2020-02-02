@@ -1,0 +1,26 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+### Load Packages
+```{r}
+library(censoc)
+library(tidyverse)
+library(data.table)
+```
+
+Read in Social Security Death Master file, census file, and create censoc file 
+```{r}
+socsec_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
+                     "/home/ipums/josh-ipums/progs/ssdm/ssdm2",
+                     "/home/ipums/josh-ipums/progs/ssdm/ssdm3")
+
+socsec <- load_socsec_deaths(socsec_files)
+census <- load_census(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
+censoc <- create_censoc(census, socsec)
+
+fwrite("/censoc/data/")
+```
+
+

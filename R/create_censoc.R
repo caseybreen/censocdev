@@ -10,9 +10,13 @@
 create_censoc <- function(census,
                           socsec){
 
-  # remvove dupes
+  # remove dupes
   socsec_uniq <- socsec[n_clean_key == 1,]
   census_uniq <- census[n_clean_key == 1,]
+
+  # remove "n_clean_key" variable
+  socsec_uniq[, n_clean_key := NULL]
+  census_uniq[, n_clean_key := NULL]
 
   # get dupes in each dataset
   socsec_nonuniq_keys <- socsec[n_clean_key > 1,clean_key]
@@ -28,6 +32,7 @@ create_censoc <- function(census,
 
   # merge on unique keys
   censoc <- merge(census_uniq, socsec_uniq, on = clean_key)
+
 
   return(censoc)
 }
