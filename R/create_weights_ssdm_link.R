@@ -16,7 +16,7 @@ create_weights_ssdm_link <- function(file) {
 
   counts <- file %>%
     # filter(dyear %in% c(1988:2005)) %>%
-    filter(death_age %in% c(65:100)) %>%
+    filter(death_age %in% c(55:100)) %>%
     filter(byear %in% c(1900:1940)) %>%
     group_by(death_age, dyear, byear) %>%
     tally() %>%

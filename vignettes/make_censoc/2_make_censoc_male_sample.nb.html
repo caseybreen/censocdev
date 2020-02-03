@@ -1777,28 +1777,26 @@ Found and resolved improper quoting out-of-sample. First healed line 3505065: &l
 <p>Calculate age at death variables</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2Vuc29jIDwtIGNhbGN1bGF0ZV9hZ2VfYXRfZGVhdGgoY2Vuc29jKVxuYGBgIn0= -->
+<pre class="r"><code>censoc &lt;- calculate_age_at_death(censoc)</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Optional: add household variables from census</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaG91c2Vob2xkX2NlbnN1cyA8LSBmcmVhZChcIi9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9ILnRzdlwiKVxuY2Vuc29jIDwtIGFkZF9ob3VzZWhvbGRfdmFyaWFibGVzKGNlbnNvYyA9IGNlbnNvYywgaG91c2Vob2xkX2NlbnN1cyA9IGhvdXNlaG9sZF9jZW5zdXMpXG5gYGAifQ== -->
+<pre class="r"><code>household_census &lt;- fread(&quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv&quot;)
+censoc &lt;- add_household_variables(censoc = censoc, household_census = household_census)</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Write out CenSoc file</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZndyaXRlKGNlbnNvYywgXCIvY2Vuc29jL2RhdGEvY2Vuc29jX2xpbmtlZF93aXRoX2NlbnN1cy8xOTQwL2NlbnNvY19tZW5fc2FtcGxlX21hdGNoZWRfd2l0aF9jZW5zdXNfMTk0MC5jc3ZcIilcblxuYGBgIn0= -->
-<pre class="r"><code>fwrite(censoc, &quot;/censoc/data/censoc_linked_with_census/1940/censoc_men_sample_matched_with_census_1940.csv&quot;)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZndyaXRlKGNlbnNvYywgXCIvY2Vuc29jL2RhdGEvY2Vuc29jX2xpbmtlZF93aXRoX2NlbnN1cy8xOTQwL2NlbnNvY19tZW5fc2FtcGxlX21hdGNoZWRfd2l0aF9jZW5zdXNfMTk0MC5jc3ZcIilcbmBgYCJ9 -->
+<pre class="r"><code>fwrite(censoc, &quot;/censoc/data/censoc_linked_with_census/1940/censoc_men_sample_matched_with_census_1940.csv&quot;)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5Xcml0dGVuIDAuMCUgb2YgNjMyNjY1NiByb3dzIGluIDIgc2VjcyB1c2luZyAxMiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMCUuIEVUQSAxMTQ4NiBzZWNzLiAgICAgIFxuV3JpdHRlbiAyNi43JSBvZiA2MzI2NjU2IHJvd3MgaW4gMyBzZWNzIHVzaW5nIDEyIHRocmVhZHMuIG1heEJ1ZmZVc2VkPTEyJS4gRVRBIDkgc2Vjcy4gICAgICBcbldyaXR0ZW4gNTQuMCUgb2YgNjMyNjY1NiByb3dzIGluIDQgc2VjcyB1c2luZyAxMiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMiUuIEVUQSAzIHNlY3MuICAgICAgXG5Xcml0dGVuIDgwLjclIG9mIDYzMjY2NTYgcm93cyBpbiA1IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgMSBzZWNzLiAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIn0= -->
-<pre><code>
-Written 0.0% of 6326656 rows in 2 secs using 12 threads. maxBuffUsed=10%. ETA 11486 secs.      
-Written 26.7% of 6326656 rows in 3 secs using 12 threads. maxBuffUsed=12%. ETA 9 secs.      
-Written 54.0% of 6326656 rows in 4 secs using 12 threads. maxBuffUsed=12%. ETA 3 secs.      
-Written 80.7% of 6326656 rows in 5 secs using 12 threads. maxBuffUsed=12%. ETA 1 secs.      
-                                                                                                                                     </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
