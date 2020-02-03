@@ -51,6 +51,7 @@ load_socsec_deaths <- function(socsec_files){
   socsec <- socsec[socsec$census_age!=1940&socsec$census_age!=1939,]
   socsec <- socsec[socsec$census_age>=0,]
   socsec <- socsec[socsec$dyear>=1975,]
+  socsec <- socsec[socsec$dyear <= 2005,]
 
   cat("Creating keys. \n")
   # create key
