@@ -15,9 +15,6 @@ create_weights_dmf_link <- function(file) {
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   counts <- file %>%
-    # filter(dyear %in% c(1988:2005)) %>%
-    filter(death_age %in% c(55:105)) %>%
-    filter(byear %in% c(1900:1940)) %>%
     group_by(death_age, dyear, byear) %>%
     tally() %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
@@ -30,7 +27,6 @@ create_weights_dmf_link <- function(file) {
     summarize(inclusion_prob = mean(proportion_matched), Male = mean(Male))
 
   death_weights_for_link <- death_weights %>%
-    filter(byear %in% c(1900:1940)) %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
     ungroup(dyear, death_age) %>%
     select(inclusion_prob, linking_key) %>%
