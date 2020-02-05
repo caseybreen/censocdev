@@ -9,14 +9,14 @@
 #' @export
 #'
 
-create_weights_ssdm_link <- function(file) {
+create_weights_dmf_link <- function(file) {
 
   hmd_deaths <-  readHMDweb(CNTRY = "USA", item = "Deaths_lexis", username = "caseybreen@berkeley.edu", password = "censoc") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   counts <- file %>%
     # filter(dyear %in% c(1988:2005)) %>%
-    filter(death_age %in% c(55:100)) %>%
+    filter(death_age %in% c(55:105)) %>%
     filter(byear %in% c(1900:1940)) %>%
     group_by(death_age, dyear, byear) %>%
     tally() %>%
