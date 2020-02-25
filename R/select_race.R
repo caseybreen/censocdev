@@ -1,7 +1,7 @@
 #' Select race
 #'
 #' @param numapp path to the NUMAPP files
-#' @return NUMAPP data.frame with best first name column and cycle dates
+#' @return data.frame with first and last race
 #' @keywords internal
 #' @import data.table
 #' @export

@@ -5,7 +5,7 @@ output: html_notebook
 
 In this notebook, we take cleaned application files and claims files "condenses" them to select the best record per person.
 
-Background: One person may have multiple applications or claims entries. As the BUNMD file will ultimately contain one record per person, this code selects the "best" value for sex, race, etc. across entries using a set of decision rules.  ()
+Background: One person may have multiple applications or claims entries. As the BUNMD file will ultimately contain one record per person, this code selects the "best" value for sex, race, etc. across entries using a set of decision rules. 
 
 We only need to "condense" the application and claims files — each person only has one death record. 
 
