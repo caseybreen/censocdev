@@ -4,7 +4,8 @@
 \alias{census_bunmd_merge}
 \title{Merge bunmd and Census}
 \usage{
-census_bunmd_merge(bunmd = bunmd, census = census, census_year = 1940)
+census_bunmd_merge(bunmd = bunmd, census = census,
+  census_year = 1940)
 }
 \arguments{
 \item{bunmd}{full bunmd (merged application and death file)}
