@@ -15,9 +15,13 @@ condense_numapp <- function(numapp = numapp) {
   sex <- select_sex(numapp)
   cat("finished selecting Sex \n")
 
-  ##Select Race
-  race <- select_race(numapp)
-  cat("finished selecting Race \n")
+  ##Select Race First
+  race_first <- select_race_first(numapp)
+  cat("finished selecting First Race \n")
+
+  ##Select Race Last
+  race_last <- select_race_last(numapp)
+  cat("finished selecting Last Race \n")
 
   ##Select Best First Name
   best_first_name <- select_longest_name(data = numapp, name = "fname")
@@ -76,7 +80,7 @@ condense_numapp <- function(numapp = numapp) {
   unique_ssn <- unique(unique_ssn, by = "ssn")
 
   ## Combine "Best" fname, lname, etc. into one data.frame
-  numapp_condensed <-  Reduce(function(...) merge(..., all = TRUE), list(unique_ssn, sex, race,
+  numapp_condensed <-  Reduce(function(...) merge(..., all = TRUE), list(unique_ssn, sex, race_first, race_last,
                                                                          best_first_name, best_middle_name, best_last_name,
                                                                          best_father_first_name, best_father_middle_name, best_father_last_name,
                                                                          best_mother_first_name, best_mother_middle_name, best_mother_last_name,

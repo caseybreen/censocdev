@@ -9,7 +9,7 @@
 #' @export
 #'
 
-create_weights <- function(file) {
+create_weights_bunmd <- function(file) {
 
   hmd_deaths <-  readHMDweb(CNTRY = "USA", item = "Deaths_lexis", username ="caseybreen@berkeley.edu", password = "censoc") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
@@ -18,7 +18,7 @@ create_weights <- function(file) {
     filter(dyear %in% c(1988:2005)) %>%
     filter(death_age %in% c(65:100)) %>%
     filter(byear %in% c(1900:1940)) %>%
-    filter(!is.na(sex)) %>%
+    filter(!is.na()) %>%
     group_by(death_age, dyear, byear, sex) %>%
     tally() %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%

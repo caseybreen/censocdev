@@ -13,6 +13,7 @@ select_race_last <- function(data = numapp) {
   ## Remove applications with 0 (no information) for sex
   applications <- nrow(data)
   data[race==0] <- NA
+  data[race == 9, race := NA]
   data <- na.omit(data, cols="race")
   removed_na <- applications - nrow(data)
   cat(removed_na, "removed with 0 value (no information) or NA for race", "\n")
@@ -24,10 +25,10 @@ select_race_last <- function(data = numapp) {
   data[,"cycle_year_month" := year_cycle + (month_cycle/12)]
 
   ## Number of different sexes per SSN
-  data[, number_of_distinct_races:=uniqueN(race), by = ssn]
+  data[, number_of_distinct_races := length(unique(race)), by = ssn]
 
   ## Create flag (0 or 1 dichotomous var) for more than one first name.
-  data[, race_multiple_flag:=(ifelse(number_of_distinct_races > 1, 1, 0))]
+  data[, race_multiple_flag := (ifelse(number_of_distinct_races > 1, 1, 0))]
 
   cat(removed_na, "Finished creating flag for multiple first names", "\n")
 
@@ -37,14 +38,13 @@ select_race_last <- function(data = numapp) {
   ## Recode originally missing years back to NA.
   data[year_cycle == 0, year_cycle := NA]
   data[month_cycle == 0, month_cycle := NA]
-  data[race == 9, race := NA]
-  data[race_last := race]
+  data[,race_last := race]
 
 
   ## Recode originally missing years back to NA.
-  data[,"race_last_year" := year_cycle]
-  data[,"race_last_month" := month_cycle]
-  data.df <- data[, c("ssn", "race", "race_last_year", "race_last_month", "race_multiple_flag"), with=FALSE]
+  data[,"race_last_cyear" := year_cycle]
+  data[,"race_last_cmonth" := month_cycle]
+  data.df <- data[, c("ssn", "race_last", "race_last_cyear", "race_last_cmonth", "race_multiple_flag"), with=FALSE]
 
   return(data.df)
 

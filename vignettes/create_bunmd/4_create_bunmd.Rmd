@@ -21,7 +21,7 @@ deaths <- fread("/censoc/data/numident/3_numident_files_cleaned_and_condensed/de
 apps <- fread("/censoc/data/numident/3_numident_files_cleaned_and_condensed/apps_condensed.csv")
 
 ## combine records into one file
-bunmd <- unify_numident(claims_condensed = claims, apps_condensed = apps, deaths = deaths)
+bunmd <- create_bunmd(claims_condensed = claims, apps_condensed = apps, deaths = deaths)
 
 ## construct weights for BUNMD 
 bunmd <- create_weights(file = bunmd)

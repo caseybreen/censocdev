@@ -4,8 +4,10 @@
 \alias{clean_claims}
 \title{Load claims file}
 \usage{
-
-  clean_claims(numclaim.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv")
+clean_claims(
+ 
+    numclaim.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv"
+)
 }
 \arguments{
 \item{numapp_path}{path to the NUMAPP files}

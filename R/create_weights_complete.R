@@ -19,7 +19,7 @@ create_weights_complete <- function(file) {
     filter(byear %in% c(1900:1940)) %>%
     filter(death_age %in% c(65:100)) %>%
     filter(!is.na(sex)) %>%
-    filter(!is.na(race)) %>%
+    filter(!is.na(race_last)) %>%
     filter(!is.na(bpl))
 
 
