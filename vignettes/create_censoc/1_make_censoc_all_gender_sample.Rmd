@@ -1,0 +1,55 @@
+---
+title: "2 censoc all gender sample"
+output: html_notebook
+---
+
+This notebook will read in the Berkeley Unified Mortality Database (BUNMD) and the 1940 Census (this can be switched). The code constructs linking keys, dedupes the keys, and then performs a direct match on the linking keys.  
+
+First, we will read in the numdeath matched with numapp file.  
+```{r}
+bunmd <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv", colClasses = list(character= 'ssn'))
+```
+
+Read in the census file. 
+```{r, eval = F}
+## Load census with HISTID
+census.1940 <- load_census_numident_match(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
+```
+
+Merge Numident and Census Files on linking keys: 1940
+```{r, eval = F}
+setDT(bunmd)
+setDT(census.1940)
+
+## censoc numident
+censoc.numident <- census_bunmd_merge(bunmd = bunmd, census = census.1940, census_year = 1940)
+
+## censoc numident
+censoc.numident <- clean_wcensoc(censoc.numident, census_year = 1940) 
+
+## Restrict to matches only in high coverage years
+censoc.numident.select <- censoc.numident %>% 
+  filter(dyear %in% c(1988:2005)) %>% 
+  select(-weight, -cweight)
+  
+
+## calculate age at death
+censoc.numident.select <- calculate_age_at_death(censoc.numident.select)
+
+## calculate weights 
+censoc.numident.select <- create_weights_censoc_numident(censoc.numident.select)
+```
+
+
+Select the variables for the public release — this will likely change 
+```{r}
+censoc.numident.select <- censoc.numident.select %>% 
+  select(histid = HISTID, byear, bmonth, dyear ,dmonth, death_age, sex, race_first, race_first_cyear, race_first_cmonth,race_last, race_last_cyear, race_last_cmonth, bpl, zip_residence, socstate, age_first_application, weight)
+
+fwrite(censoc.numident.select, "/censoc/data/censoc_files_for_website/censoc_numident_v1.csv")
+```
+
+
+
+
+

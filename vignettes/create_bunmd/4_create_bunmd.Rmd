@@ -10,6 +10,7 @@ The function `unify_numident` combines the information from the deaths, applicat
 The functions "create_weights" create post-stratification weights to the HMD for the BUNMD Sample 1 and Sample 2. 
 
 ```{r}
+library(wcensoc)
 library(HMDHFDplus)
 ```
 
@@ -24,8 +25,8 @@ apps <- fread("/censoc/data/numident/3_numident_files_cleaned_and_condensed/apps
 bunmd <- create_bunmd(claims_condensed = claims, apps_condensed = apps, deaths = deaths)
 
 ## construct weights for BUNMD 
-bunmd <- create_weights(file = bunmd)
-bunmd <- create_weights_complete(file = bunmd)
+bunmd <- create_weights_bunmd(file = bunmd)
+bunmd <- create_weights_bunmd_complete(file = bunmd)
 
 ## write out BUNMD 
 fwrite(bunmd, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv")

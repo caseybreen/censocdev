@@ -18,6 +18,15 @@ census_bunmd_merge <- function(bunmd = bunmd, census = census, census_year = 194
   ## filter out people born after census year
   bunmd <- bunmd[census_age >= 0]
 
+  ## filter out names that are only one character
+
+  bunmd <- bunmd %>%
+    filter(nchar(lname) > 1) %>%
+    filter(nchar(fname) > 1)
+
+  ## set bunmd as data.table
+  setDT(bunmd)
+
   ## omit rows where either 'bpl' or 'census_age' have missing values
   bunmd <- na.omit(bunmd, cols=c("bpl", "census_age"))
 

@@ -19,7 +19,7 @@ create_bunmd <- function(claims_condensed, deaths, apps_condensed) {
     select(ssn, bpl, earliest_cycle_year, earliest_cycle_month,
            mother_fname, mother_mname, mother_lname,
            father_fname, father_mname, father_lname, number_apps = number_of_apps,
-           race_first, race_last, race_last_cyear = race_last_year, race_first_cyear = race_first_year, race_last_cmonth = race_last_month, race_first_cmonth = race_first_month, sex, race_change = race_multiple_flag) %>%
+           race_first, race_last, race_last_cyear, race_first_cyear, race_last_cmonth, race_first_cmonth, sex, race_change = race_multiple_flag) %>%
     mutate(ssn = as.numeric(ssn))
 
   ## select vars from claims files (condensed)

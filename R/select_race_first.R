@@ -28,9 +28,9 @@ select_race_first <- function(data = numapp) {
   data[,number_of_apps := .N, by=ssn]
 
   ## Restrict to persons who have multiple applications
-  data <- data[number_of_apps > 1]
+  ##data <- data[number_of_apps > 1]
 
-  ## Select most first race for persons with two or more apps
+  ## Select most first race for persons
   data <- data[data[, .I[which.min(cycle_year_month)], by=ssn]$V1]
 
   ## Recode originally missing years back to NA.

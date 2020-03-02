@@ -9,16 +9,13 @@
 #' @export
 #'
 
-create_weights_bunmd <- function(file) {
+create_weights_censoc_numident <- function(file) {
 
   hmd_deaths <-  readHMDweb(CNTRY = "USA", item = "Deaths_lexis", username ="caseybreen@berkeley.edu", password = "censoc") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   numdeath_aggregate_counts <- file %>%
-    filter(dyear %in% c(1988:2005)) %>%
-    filter(death_age %in% c(65:100)) %>%
-    filter(byear %in% c(1900:1940)) %>%
-    filter(!is.na()) %>%
+   #filter(byear %in% c(1900:1940)) %>%
     group_by(death_age, dyear, byear, sex) %>%
     tally() %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
@@ -33,7 +30,7 @@ create_weights_bunmd <- function(file) {
     summarize(inclusion_prob = mean(proportion_matched), Male = mean(Male), Female = mean(Female), Total = mean(Total))
 
   death_weights_for_link <-  death_weights %>%
-    filter(byear %in% c(1900:1940)) %>%
+   # filter(byear %in% c(1900:1940)) %>%
     mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_")) %>%
     ungroup(dyear, death_age, sex) %>%
     select(inclusion_prob, linking_key) %>%

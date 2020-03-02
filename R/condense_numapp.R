@@ -86,7 +86,6 @@ condense_numapp <- function(numapp = numapp) {
                                                                          best_mother_first_name, best_mother_middle_name, best_mother_last_name,
                                                                          dob, bpl, earliest_app, number_of_apps))
 
-
   return(numapp_condensed)
 
 }
