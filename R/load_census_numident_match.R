@@ -12,7 +12,7 @@ load_census_numident_match <- function(census_file,
 
   # Select Columns
 
-  all_cols_to_keep <- c("STATEFIP", "AGE", "SEX", "NAMELAST", "NAMEFRST", "BPL", "RACE", "MARST", "HISTID")
+  all_cols_to_keep <- c("AGE", "SEX", "NAMELAST", "NAMEFRST", "BPL", "RACE", "MARST", "HISTID")
   if(!is.null(cols_to_keep)){
     all_cols_to_keep <- c(all_cols_to_keep, cols_to_keep)
   }

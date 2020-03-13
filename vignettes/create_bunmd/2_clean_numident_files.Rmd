@@ -19,6 +19,7 @@ deaths <- clean_deaths(numdeath.file.path = "/censoc/data/numident/1_numident_fi
 
 ## write out cleaned death records
 fwrite(deaths, "/censoc/data/numident/2_numident_files_cleaned/deaths_cleaned.csv")
+fwrite(deaths, "/censoc/data/numident/3_numident_files_cleaned_and_condensed/deaths_cleaned.csv")
 ```
 
 Clean and write out application files 

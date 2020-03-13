@@ -15,7 +15,8 @@ create_weights_censoc_numident <- function(file) {
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   numdeath_aggregate_counts <- file %>%
-   #filter(byear %in% c(1900:1940)) %>%
+   filter(byear %in% c(1895:1920)) %>%
+    filter(death_age %in% c(65:100)) %>%
     group_by(death_age, dyear, byear, sex) %>%
     tally() %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
@@ -43,7 +44,6 @@ create_weights_censoc_numident <- function(file) {
   file <- file %>%
     left_join(death_weights_for_link, by = "linking_key") %>%
     select(-linking_key)
-
 
   return(file)
 

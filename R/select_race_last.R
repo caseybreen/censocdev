@@ -13,7 +13,7 @@ select_race_last <- function(data = numapp) {
   ## Remove applications with 0 (no information) for sex
   applications <- nrow(data)
   data[race==0] <- NA
-  data[race == 9, race := NA]
+  data[race == 9, race := NA] ## this also denotes missing?
   data <- na.omit(data, cols="race")
   removed_na <- applications - nrow(data)
   cat(removed_na, "removed with 0 value (no information) or NA for race", "\n")
@@ -44,7 +44,7 @@ select_race_last <- function(data = numapp) {
   ## Recode originally missing years back to NA.
   data[,"race_last_cyear" := year_cycle]
   data[,"race_last_cmonth" := month_cycle]
-  data.df <- data[, c("ssn", "race_last", "race_last_cyear", "race_last_cmonth", "race_multiple_flag"), with=FALSE]
+  data.df <- data[, c("ssn", "race_last", "race_last_cyear", "race_last_cmonth"), with=FALSE]
 
   return(data.df)
 

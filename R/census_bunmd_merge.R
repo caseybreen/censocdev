@@ -6,7 +6,6 @@
 #' @import data.table
 #' @export
 #'
-#'
 census_bunmd_merge <- function(bunmd = bunmd, census = census, census_year = 1940){
 
 
