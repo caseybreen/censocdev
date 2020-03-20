@@ -1762,22 +1762,20 @@ library(HMDHFDplus)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgcmVhZCBpbiBjbGVhbmVkIGFuZCBcImNvbmRlbnNlZFwiIG51bWlkZW50IGZpbGVzXG5jbGFpbXMgPC0gZnJlYWQoXCIvY2Vuc29jL2RhdGEvbnVtaWRlbnQvM19udW1pZGVudF9maWxlc19jbGVhbmVkX2FuZF9jb25kZW5zZWQvY2xhaW1zX2NvbmRlbnNlZC5jc3ZcIilcbmRlYXRocyA8LSBmcmVhZChcIi9jZW5zb2MvZGF0YS9udW1pZGVudC8zX251bWlkZW50X2ZpbGVzX2NsZWFuZWRfYW5kX2NvbmRlbnNlZC9kZWF0aHMuY3N2XCIpXG5hcHBzIDwtIGZyZWFkKFwiL2NlbnNvYy9kYXRhL251bWlkZW50LzNfbnVtaWRlbnRfZmlsZXNfY2xlYW5lZF9hbmRfY29uZGVuc2VkL2FwcHNfY29uZGVuc2VkLmNzdlwiKVxuXG4jIyBjb21iaW5lIHJlY29yZHMgaW50byBvbmUgZmlsZVxuYnVubWQgPC0gY3JlYXRlX2J1bm1kKGNsYWltc19jb25kZW5zZWQgPSBjbGFpbXMsIGFwcHNfY29uZGVuc2VkID0gYXBwcywgZGVhdGhzID0gZGVhdGhzKVxuXG4jIyBjb25zdHJ1Y3Qgd2VpZ2h0cyBmb3IgQlVOTUQgXG5idW5tZCA8LSBjcmVhdGVfd2VpZ2h0c19idW5tZChmaWxlID0gYnVubWQpXG5idW5tZCA8LSBjcmVhdGVfd2VpZ2h0c19idW5tZF9jb21wbGV0ZShmaWxlID0gYnVubWQpXG5cbiMjIHdyaXRlIG91dCBCVU5NRCBcbmZ3cml0ZShidW5tZCwgXCIvY2Vuc29jL2RhdGEvbnVtaWRlbnQvNF9iZXJrZWxleV91bmlmaWVkX21vcnRhbGl0eV9kYXRhYmFzZS9idW5tZC5jc3ZcIilcbmBgYCJ9 -->
-<pre class="r"><code>## read in cleaned and &quot;condensed&quot; numident files
-claims &lt;- fread(&quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/claims_condensed.csv&quot;)
-deaths &lt;- fread(&quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/deaths.csv&quot;)
-apps &lt;- fread(&quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/apps_condensed.csv&quot;)
-
-## combine records into one file
-bunmd &lt;- create_bunmd(claims_condensed = claims, apps_condensed = apps, deaths = deaths)
-
-## construct weights for BUNMD 
-bunmd &lt;- create_weights_bunmd(file = bunmd)
-bunmd &lt;- create_weights_bunmd_complete(file = bunmd)
-
-## write out BUNMD 
-fwrite(bunmd, &quot;/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgd3JpdGUgb3V0IEJVTk1EIFxuZndyaXRlKGJ1bm1kLCBcIi9jZW5zb2MvZGF0YS9udW1pZGVudC80X2JlcmtlbGV5X3VuaWZpZWRfbW9ydGFsaXR5X2RhdGFiYXNlL2J1bm1kLmNzdlwiKVxuXG5gYGAifQ== -->
+<pre class="r"><code>## write out BUNMD 
+fwrite(bunmd, &quot;/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv&quot;)
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Xcml0dGVuIDAuMSUgb2YgNDk0NTkyOTMgcm93cyBpbiA1IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgODkxMSBzZWNzLiAgICAgIFxuV3JpdHRlbiAyMS4zJSBvZiA0OTQ1OTI5MyByb3dzIGluIDYgc2VjcyB1c2luZyAxMiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMyUuIEVUQSAyNSBzZWNzLiAgICAgIFxuV3JpdHRlbiA0My4wJSBvZiA0OTQ1OTI5MyByb3dzIGluIDcgc2VjcyB1c2luZyAxMiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMyUuIEVUQSAxMCBzZWNzLiAgICAgIFxuV3JpdHRlbiA2NS42JSBvZiA0OTQ1OTI5MyByb3dzIGluIDggc2VjcyB1c2luZyAxMiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMyUuIEVUQSA0IHNlY3MuICAgICAgXG5Xcml0dGVuIDg5LjQlIG9mIDQ5NDU5MjkzIHJvd3MgaW4gOSBzZWNzIHVzaW5nIDEyIHRocmVhZHMuIG1heEJ1ZmZVc2VkPTEzJS4gRVRBIDEgc2Vjcy4gICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiJ9 -->
+<pre><code>
+Written 0.1% of 49459293 rows in 5 secs using 12 threads. maxBuffUsed=12%. ETA 8911 secs.      
+Written 21.3% of 49459293 rows in 6 secs using 12 threads. maxBuffUsed=13%. ETA 25 secs.      
+Written 43.0% of 49459293 rows in 7 secs using 12 threads. maxBuffUsed=13%. ETA 10 secs.      
+Written 65.6% of 49459293 rows in 8 secs using 12 threads. maxBuffUsed=13%. ETA 4 secs.      
+Written 89.4% of 49459293 rows in 9 secs using 12 threads. maxBuffUsed=13%. ETA 1 secs.      
+                                                                                                                                     </code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Recap of the decision rules we used to create the BUNMD:</p>

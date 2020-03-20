@@ -17,7 +17,7 @@ socsec_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
                      "/home/ipums/josh-ipums/progs/ssdm/ssdm3")
 
 socsec <- load_socsec_deaths(socsec_files)
-census <- load_census(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
+census <- load_census_dmf_match(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
 censoc.dmf <- create_censoc(census, socsec)
 ```
 

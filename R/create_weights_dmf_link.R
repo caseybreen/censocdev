@@ -15,6 +15,7 @@ create_weights_dmf_link <- function(file) {
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   counts <- file %>%
+    filter(byear %in% c(1895:1920)) %>%
     group_by(death_age, dyear, byear) %>%
     tally() %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%

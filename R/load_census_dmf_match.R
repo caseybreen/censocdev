@@ -8,7 +8,7 @@
 #' @import tidyverse
 #' @export
 
-load_census <- function(census_file,
+load_census_dmf_match <- function(census_file,
                         males_only = TRUE){
 
 
