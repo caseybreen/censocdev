@@ -5,19 +5,25 @@ output: html_notebook
 
 ### Load Packages
 ```{r}
-library(censoc)
+library(censocdev)
 library(tidyverse)
 library(data.table)
+library(HMDHFDplus)
 ```
 
 Read in Social Security Death Master file, census file, and create censoc file 
 ```{r}
+## Read in DMF (SSDM) files
 socsec_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
                      "/home/ipums/josh-ipums/progs/ssdm/ssdm2",
                      "/home/ipums/josh-ipums/progs/ssdm/ssdm3")
-
 socsec <- load_socsec_deaths(socsec_files)
+
+
+## Read in 1940 Census files
 census <- load_census_dmf_match(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
+
+## Create CenSoc File
 censoc.dmf <- create_censoc(census, socsec)
 ```
 
@@ -31,7 +37,7 @@ Calculate weights
 censoc.dmf <- create_weights_dmf_link(censoc.dmf)
 ```
 
-Optional: add household variables from census
+Optional: add household variables from censusrm(census)
 ```{r}
 household_census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv")
 censoc.dmf <- add_household_variables(censoc.dmf = censoc.dmf, household_census = household_census)
@@ -53,6 +59,5 @@ Write out CenSoc with all variables
 censoc.dmf.web <- censoc.dmf %>% 
   select(HISTID, STATEFIP, census_age, byear, bmonth, bday, dyear, dmonth, dday, death_age, weight)
 
-fwrite(censoc.dmf.web, "/censoc/data/censoc_files_for_website/censoc_dmf_v1.csv")
 ```
 

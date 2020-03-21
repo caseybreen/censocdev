@@ -4,14 +4,14 @@
 \alias{load_census_dmf_match}
 \title{Load a census file}
 \usage{
-load_census_dmf_match(census_file, males_only = TRUE)
+load_census_dmf_match(census_file, cols_to_keep = NULL, males_only = TRUE)
 }
 \arguments{
 \item{census_file}{string indicating location of file.}
 
-\item{males_only}{whether to just keep males. Default is \code{TRUE}.}
-
 \item{cols_to_keep}{vector indicating colname names of variables to keep. Default is just what is needed for match: first name, last name, age, sex, serial number, person number.}
+
+\item{males_only}{whether to just keep males. Default is \code{TRUE}.}
 }
 \value{
 a census dataframe with match key and unique IPUMS identifier
