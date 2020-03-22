@@ -12,6 +12,9 @@ library(HMDHFDplus)
 ```
 
 Read in Social Security Death Master file, census file, and create censoc file 
+
+
+One caveat here is that n_clean_keys is the total number of unique keys for both men and women! even if the total being returned in only for men. 
 ```{r}
 ## Read in DMF (SSDM) files
 socsec_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",

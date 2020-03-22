@@ -20,10 +20,6 @@ load_census_dmf_match <- function(census_file,
   # read in census file, only keeping desired columns
   census <- fread(census_file, select = all_cols_to_keep)
 
-  if(males_only==TRUE){
-    census <- census[census$SEX == 1,]
-  }
-
 
   # clean variables
   census[,"fname" := enc2native(NAMEFRST)]
@@ -48,6 +44,9 @@ load_census_dmf_match <- function(census_file,
   census[, c("fname", "lname", "census_age") := NULL]
 
 
+  if(males_only==TRUE){
+    census <- census[census$SEX == 1,]
+  }
 
   return(census)
 

@@ -1753,44 +1753,9 @@ summary {
 <h3>Load Packages</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjZW5zb2NkZXYpXG5gYGAifQ== -->
-<pre class="r"><code>library(censocdev)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBkcGx5clxuUmVnaXN0ZXJlZCBTMyBtZXRob2Qgb3ZlcndyaXR0ZW4gYnkgJ2RwbHlyJzpcbiAgbWV0aG9kICAgICAgICAgICBmcm9tXG4gIHByaW50LnJvd3dpc2VfZGYgICAgIFxuXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYZHBseXLigJlcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnN0YXRz4oCZOlxuXG4gICAgZmlsdGVyLCBsYWdcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOmJhc2XigJk6XG5cbiAgICBpbnRlcnNlY3QsIHNldGRpZmYsIHNldGVxdWFsLCB1bmlvblxuXG5Mb2FkaW5nIHJlcXVpcmVkIHBhY2thZ2U6IGRhdGEudGFibGVcblJlZ2lzdGVyZWQgUzMgbWV0aG9kIG92ZXJ3cml0dGVuIGJ5ICdkYXRhLnRhYmxlJzpcbiAgbWV0aG9kICAgICAgICAgICBmcm9tXG4gIHByaW50LmRhdGEudGFibGUgICAgIFxuZGF0YS50YWJsZSAxLjEyLjggdXNpbmcgMTIgdGhyZWFkcyAoc2VlID9nZXREVHRocmVhZHMpLiAgTGF0ZXN0IG5ld3M6IHItZGF0YXRhYmxlLmNvbVxuXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYZGF0YS50YWJsZeKAmVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6ZHBseXLigJk6XG5cbiAgICBiZXR3ZWVuLCBmaXJzdCwgbGFzdFxuXG5SZWdpc3RlcmVkIFMzIG1ldGhvZHMgb3ZlcndyaXR0ZW4gYnkgJ2RicGx5cic6XG4gIG1ldGhvZCAgICAgICAgIGZyb21cbiAgcHJpbnQudGJsX2xhenkgICAgIFxuICBwcmludC50Ymxfc3FsICAgICAgXG4ifQ== -->
-<pre><code>Loading required package: dplyr
-Registered S3 method overwritten by 'dplyr':
-  method           from
-  print.rowwise_df     
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-Loading required package: data.table
-Registered S3 method overwritten by 'data.table':
-  method           from
-  print.data.table     
-data.table 1.12.8 using 12 threads (see ?getDTthreads).  Latest news: r-datatable.com
-
-Attaching package: ‘data.table’
-
-The following objects are masked from ‘package:dplyr’:
-
-    between, first, last
-
-Registered S3 methods overwritten by 'dbplyr':
-  method         from
-  print.tbl_lazy     
-  print.tbl_sql      </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5gYGAifQ== -->
-<pre class="r"><code>library(tidyverse)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjZW5zb2NkZXYpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmBgYCJ9 -->
+<pre class="r"><code>library(censocdev)
+library(tidyverse)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiXHUwMDFiWzMwbeKUgOKUgCBcdTAwMWJbMW1BdHRhY2hpbmcgcGFja2FnZXNcdTAwMWJbMjJtIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2UgMS4zLjAg4pSA4pSAXHUwMDFiWzM5bVxuXHUwMDFiWzMwbVx1MDAxYlszMm3inJNcdTAwMWJbMzBtIFx1MDAxYlszNG1nZ3Bsb3QyXHUwMDFiWzMwbSAzLjMuMCAgICAgXHUwMDFiWzMybeKck1x1MDAxYlszMG0gXHUwMDFiWzM0bXB1cnJyICBcdTAwMWJbMzBtIDAuMy4zXG5cdTAwMWJbMzJt4pyTXHUwMDFiWzMwbSBcdTAwMWJbMzRtdGliYmxlIFx1MDAxYlszMG0gMi4xLjMgICAgIFx1MDAxYlszMm3inJNcdTAwMWJbMzBtIFx1MDAxYlszNG1zdHJpbmdyXHUwMDFiWzMwbSAxLjQuMFxuXHUwMDFiWzMybeKck1x1MDAxYlszMG0gXHUwMDFiWzM0bXRpZHlyICBcdTAwMWJbMzBtIDEuMC4yICAgICBcdTAwMWJbMzJt4pyTXHUwMDFiWzMwbSBcdTAwMWJbMzRtZm9yY2F0c1x1MDAxYlszMG0gMC41LjBcblx1MDAxYlszMm3inJNcdTAwMWJbMzBtIFx1MDAxYlszNG1yZWFkciAgXHUwMDFiWzMwbSAxLjMuMSAgICAgXHUwMDFiWzM5bVxuXHUwMDFiWzMwbeKUgOKUgCBcdTAwMWJbMW1Db25mbGljdHNcdTAwMWJbMjJtIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2VfY29uZmxpY3RzKCkg4pSA4pSAXG5cdTAwMWJbMzFteFx1MDAxYlszMG0gXHUwMDFiWzM0bWRhdGEudGFibGVcdTAwMWJbMzBtOjpcdTAwMWJbMzJtYmV0d2VlbigpXHUwMDFiWzMwbSBtYXNrcyBcdTAwMWJbMzRtZHBseXJcdTAwMWJbMzBtOjpiZXR3ZWVuKClcblx1MDAxYlszMW14XHUwMDFiWzMwbSBcdTAwMWJbMzRtZHBseXJcdTAwMWJbMzBtOjpcdTAwMWJbMzJtZmlsdGVyKClcdTAwMWJbMzBtICAgICAgIG1hc2tzIFx1MDAxYlszNG1zdGF0c1x1MDAxYlszMG06OmZpbHRlcigpXG5cdTAwMWJbMzFteFx1MDAxYlszMG0gXHUwMDFiWzM0bWRhdGEudGFibGVcdTAwMWJbMzBtOjpcdTAwMWJbMzJtZmlyc3QoKVx1MDAxYlszMG0gICBtYXNrcyBcdTAwMWJbMzRtZHBseXJcdTAwMWJbMzBtOjpmaXJzdCgpXG5cdTAwMWJbMzFteFx1MDAxYlszMG0gXHUwMDFiWzM0bWRwbHlyXHUwMDFiWzMwbTo6XHUwMDFiWzMybWxhZygpXHUwMDFiWzMwbSAgICAgICAgICBtYXNrcyBcdTAwMWJbMzRtc3RhdHNcdTAwMWJbMzBtOjpsYWcoKVxuXHUwMDFiWzMxbXhcdTAwMWJbMzBtIFx1MDAxYlszNG1kYXRhLnRhYmxlXHUwMDFiWzMwbTo6XHUwMDFiWzMybWxhc3QoKVx1MDAxYlszMG0gICAgbWFza3MgXHUwMDFiWzM0bWRwbHlyXHUwMDFiWzMwbTo6bGFzdCgpXG5cdTAwMWJbMzFteFx1MDAxYlszMG0gXHUwMDFiWzM0bXB1cnJyXHUwMDFiWzMwbTo6XHUwMDFiWzMybXRyYW5zcG9zZSgpXHUwMDFiWzMwbSAgICBtYXNrcyBcdTAwMWJbMzRtZGF0YS50YWJsZVx1MDAxYlszMG06OnRyYW5zcG9zZSgpXHUwMDFiWzM5bVxuIn0= -->
 <pre><code>[30m── [1mAttaching packages[22m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──[39m
@@ -1813,18 +1778,23 @@ library(HMDHFDplus)</code></pre>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Read in Social Security Death Master file, census file, and create censoc file</p>
+<p>One caveat here is that n_clean_keys is the total number of unique keys for both men and women! even if the total being returned in only for men.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgUmVhZCBpbiAxOTQwIENlbnN1cyBmaWxlc1xuY2Vuc3VzMiA8LSBsb2FkX2NlbnN1c19kbWZfbWF0Y2goY2Vuc3VzX2ZpbGUgPSBcIi9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9QLnRzdlwiKVxuXG5gYGAifQ== -->
-<pre class="r"><code>## Read in 1940 Census files
-census2 &lt;- load_census_dmf_match(census_file = &quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv&quot;)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgUmVhZCBpbiBETUYgKFNTRE0pIGZpbGVzXG5zb2NzZWNfZmlsZXMgPSBjKFwiL2hvbWUvaXB1bXMvam9zaC1pcHVtcy9wcm9ncy9zc2RtL3NzZG0xXCIsXG4gICAgICAgICAgICAgICAgICAgICBcIi9ob21lL2lwdW1zL2pvc2gtaXB1bXMvcHJvZ3Mvc3NkbS9zc2RtMlwiLFxuICAgICAgICAgICAgICAgICAgICAgXCIvaG9tZS9pcHVtcy9qb3NoLWlwdW1zL3Byb2dzL3NzZG0vc3NkbTNcIilcbnNvY3NlYyA8LSBsb2FkX3NvY3NlY19kZWF0aHMoc29jc2VjX2ZpbGVzKVxuXG5cbiMjIFJlYWQgaW4gMTk0MCBDZW5zdXMgZmlsZXNcbmNlbnN1cyA8LSBsb2FkX2NlbnN1c19kbWZfbWF0Y2goY2Vuc3VzX2ZpbGUgPSBcIi9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9QLnRzdlwiKVxuXG4jIyBDcmVhdGUgQ2VuU29jIEZpbGVcbmNlbnNvYy5kbWYgPC0gY3JlYXRlX2NlbnNvYyhjZW5zdXMsIHNvY3NlYylcbmBgYCJ9 -->
+<pre class="r"><code>## Read in DMF (SSDM) files
+socsec_files = c(&quot;/home/ipums/josh-ipums/progs/ssdm/ssdm1&quot;,
+                     &quot;/home/ipums/josh-ipums/progs/ssdm/ssdm2&quot;,
+                     &quot;/home/ipums/josh-ipums/progs/ssdm/ssdm3&quot;)
+socsec &lt;- load_socsec_deaths(socsec_files)
+
+
+## Read in 1940 Census files
+census &lt;- load_census_dmf_match(census_file = &quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv&quot;)
+
+## Create CenSoc File
+censoc.dmf &lt;- create_censoc(census, socsec)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoifC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfFxufD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09fFxuRm91bmQgYW5kIHJlc29sdmVkIGltcHJvcGVyIHF1b3Rpbmcgb3V0LW9mLXNhbXBsZS4gRmlyc3QgaGVhbGVkIGxpbmUgMzUwNTA2NTogPDxQXHQxOTQwXHQwMlx0MDA4ODE1ODRcdDAwMDFcdDAwMDBcdDAwXHQwXHQwXHQwMFx0MFx0MFx0MDJcdDFcdDAyXHQwXHQwXHQwMVx0OTlcdDk5XHQwXHQwMTAxXHQwMjZcdDFcdDIwMFx0MVx0MFx0MDBcdDFcdDAwNTAwXHQwXHQwXHQwMDBcdDAwMDBcdDFcdDFcdDA5MFx0MTFcdDJcdDgyMFx0MDlcdDAwXHQ5OTdcdDI0XHQyMVx0Mlx0MzJcdDNcdDAwMDE3MFx0MVx0OTk5OVx0MFx0MFx0MFx0MFx0MFx0M1x0MFx0MFx0MFx0NFx0MFx0MFx0M1x0MFx0MFx0MFx0MDc1XHQwXHQwMDBcdDk5OTlcdDk5OTlcdDk5OTlcdFwiQVwiIExBQk9SRVIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFx0MVx0MFx0MFx0MFx0MDIzXHQwMFx0MDk5OFx0MDAwMDAwMDAwMFx0MDAwMDAwMDEwMFx0MTkxNFx0MDk5OFx0ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFx0ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXHRBTkRFUlNPTiAgICAgICAgXHRGUkFOSyAgICAgICAgICAgXHQ5ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFx0QVJLQU5TQVMgICAgICAgICAgICAgICAgPj4uIElmIHRoZSBmaWVsZHMgYXJlIG5vdCBxdW90ZWQgKGUuZy4gZmllbGQgc2VwYXJhdG9yIGRvZXMgbm90IGFwcGVhciB3aXRoaW4gYW55IGZpZWxkKSwgdHJ5IHF1b3RlPVwiXCIgdG8gYXZvaWQgdGhpcyB3YXJuaW5nLlxuIn0= -->
-<pre><code>|--------------------------------------------------|
-|==================================================|
-Found and resolved improper quoting out-of-sample. First healed line 3505065: &lt;&lt;P   1940    02  00881584    0001    0000    00  0   0   00  0   0   02  1   02  0   0   01  99  99  0   0101    026 1   200 1   0   00  1   00500   0   0   000 0000    1   1   090 11  2   820 09  00  997 24  21  2   32  3   000170  1   9999    0   0   0   0   0   3   0   0   0   4   0   0   3   0   0   0   075 0   000 9999    9999    9999    &quot;A&quot; LABORER                                             1   0   0   0   023 00  0998    0000000000  0000000100  1914    0998                                                                                ANDERSON            FRANK               9                                               ARKANSAS                &gt;&gt;. If the fields are not quoted (e.g. field separator does not appear within any field), try quote=&quot;&quot; to avoid this warning.</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Calculate age at death variables</p>
@@ -1838,18 +1808,17 @@ Found and resolved improper quoting out-of-sample. First healed line 3505065: &l
 <p>Calculate weights</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2Vuc29jLmRtZiA8LSBjcmVhdGVfd2VpZ2h0c19kbWZfbGluayhjZW5zb2MuZG1mKVxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r censoc.dmf &lt;- create_weights_dmf_link(censoc.dmf)</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2Vuc29jLmRtZiA8LSBjcmVhdGVfd2VpZ2h0c19kbWZfbGluayhjZW5zb2MuZG1mKVxuYGBgIn0= -->
+<pre class="r"><code>censoc.dmf &lt;- create_weights_dmf_link(censoc.dmf)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Optional: add household variables from censusrm(census)</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaG91c2Vob2xkX2NlbnN1cyA8LSBmcmVhZChcXC9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9ILnRzdlxcKVxuY2Vuc29jLmRtZiA8LSBhZGRfaG91c2Vob2xkX3ZhcmlhYmxlcyhjZW5zb2MuZG1mID0gY2Vuc29jLmRtZiwgaG91c2Vob2xkX2NlbnN1cyA9IGhvdXNlaG9sZF9jZW5zdXMpXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r household_census &lt;- fread(/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv) censoc.dmf &lt;- add_household_variables(censoc.dmf = censoc.dmf, household_census = household_census)</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaG91c2Vob2xkX2NlbnN1cyA8LSBmcmVhZChcIi9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9ILnRzdlwiKVxuY2Vuc29jLmRtZiA8LSBhZGRfaG91c2Vob2xkX3ZhcmlhYmxlcyhjZW5zb2MuZG1mID0gY2Vuc29jLmRtZiwgaG91c2Vob2xkX2NlbnN1cyA9IGhvdXNlaG9sZF9jZW5zdXMpXG5gYGAifQ== -->
+<pre class="r"><code>household_census &lt;- fread(&quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv&quot;)
+censoc.dmf &lt;- add_household_variables(censoc.dmf = censoc.dmf, household_census = household_census)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1865,25 +1834,25 @@ Found and resolved improper quoting out-of-sample. First healed line 3505065: &l
 <p>Write out CenSoc file with all variables</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZndyaXRlKGNlbnNvYy5kbWYsIFxcL2NlbnNvYy9kYXRhL2NlbnNvY19saW5rZWRfd2l0aF9jZW5zdXMvMTk0MC9jZW5zb2NfZG1mX3YxLmNzdlxcKVxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r fwrite(censoc.dmf, /censoc/data/censoc_linked_with_census/1940/censoc_dmf_v1.csv)</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZndyaXRlKGNlbnNvYy5kbWYsIFwiL2NlbnNvYy9kYXRhL2NlbnNvY19saW5rZWRfd2l0aF9jZW5zdXMvMTk0MC9jZW5zb2NfZG1mX3YxLmNzdlwiKVxuYGBgIn0= -->
+<pre class="r"><code>fwrite(censoc.dmf, &quot;/censoc/data/censoc_linked_with_census/1940/censoc_dmf_v1.csv&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Write out CenSoc with all variables</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2Vuc29jLmRtZi53ZWIgPC0gY2Vuc29jLmRtZiAlPiUgXG4gIHNlbGVjdChISVNUSUQsIFNUQVRFRklQLCBjZW5zdXNfYWdlLCBieWVhciwgYm1vbnRoLCBiZGF5LCBkeWVhciwgZG1vbnRoLCBkZGF5LCBkZWF0aF9hZ2UsIHdlaWdodClcblxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r censoc.dmf.web &lt;- censoc.dmf %&gt;% select(HISTID, STATEFIP, census_age, byear, bmonth, bday, dyear, dmonth, dday, death_age, weight)</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2Vuc29jLmRtZi53ZWIgPC0gY2Vuc29jLmRtZiAlPiUgXG4gIHNlbGVjdChISVNUSUQsIFNUQVRFRklQLCBjZW5zdXNfYWdlLCBieWVhciwgYm1vbnRoLCBiZGF5LCBkeWVhciwgZG1vbnRoLCBkZGF5LCBkZWF0aF9hZ2UsIHdlaWdodClcblxuYGBgIn0= -->
+<pre class="r"><code>censoc.dmf.web &lt;- censoc.dmf %&gt;% 
+  select(HISTID, STATEFIP, census_age, byear, bmonth, bday, dyear, dmonth, dday, death_age, weight)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyMjIExvYWQgUGFja2FnZXMKYGBge3J9CmxpYnJhcnkoY2Vuc29jZGV2KQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShkYXRhLnRhYmxlKQpsaWJyYXJ5KEhNREhGRHBsdXMpCmBgYAoKUmVhZCBpbiBTb2NpYWwgU2VjdXJpdHkgRGVhdGggTWFzdGVyIGZpbGUsIGNlbnN1cyBmaWxlLCBhbmQgY3JlYXRlIGNlbnNvYyBmaWxlIApgYGB7cn0KIyMgUmVhZCBpbiBETUYgKFNTRE0pIGZpbGVzCnNvY3NlY19maWxlcyA9IGMoIi9ob21lL2lwdW1zL2pvc2gtaXB1bXMvcHJvZ3Mvc3NkbS9zc2RtMSIsCiAgICAgICAgICAgICAgICAgICAgICIvaG9tZS9pcHVtcy9qb3NoLWlwdW1zL3Byb2dzL3NzZG0vc3NkbTIiLAogICAgICAgICAgICAgICAgICAgICAiL2hvbWUvaXB1bXMvam9zaC1pcHVtcy9wcm9ncy9zc2RtL3NzZG0zIikKc29jc2VjIDwtIGxvYWRfc29jc2VjX2RlYXRocyhzb2NzZWNfZmlsZXMpCgoKIyMgUmVhZCBpbiAxOTQwIENlbnN1cyBmaWxlcwpjZW5zdXMgPC0gbG9hZF9jZW5zdXNfZG1mX21hdGNoKGNlbnN1c19maWxlID0gIi9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9QLnRzdiIpCgojIyBDcmVhdGUgQ2VuU29jIEZpbGUKY2Vuc29jLmRtZiA8LSBjcmVhdGVfY2Vuc29jKGNlbnN1cywgc29jc2VjKQpgYGAKCkNhbGN1bGF0ZSBhZ2UgYXQgZGVhdGggdmFyaWFibGVzIApgYGB7cn0KY2Vuc29jLmRtZiA8LSBjYWxjdWxhdGVfYWdlX2F0X2RlYXRoKGNlbnNvYy5kbWYpCmBgYAoKQ2FsY3VsYXRlIHdlaWdodHMKYGBge3J9CmNlbnNvYy5kbWYgPC0gY3JlYXRlX3dlaWdodHNfZG1mX2xpbmsoY2Vuc29jLmRtZikKYGBgCgpPcHRpb25hbDogYWRkIGhvdXNlaG9sZCB2YXJpYWJsZXMgZnJvbSBjZW5zdXNybShjZW5zdXMpCmBgYHtyfQpob3VzZWhvbGRfY2Vuc3VzIDwtIGZyZWFkKCIvaG9tZS9pcHVtcy9jYXNleS1pcHVtcy9JUFVNUzIwMTkvMTk0MC9UU1YvSC50c3YiKQpjZW5zb2MuZG1mIDwtIGFkZF9ob3VzZWhvbGRfdmFyaWFibGVzKGNlbnNvYy5kbWYgPSBjZW5zb2MuZG1mLCBob3VzZWhvbGRfY2Vuc3VzID0gaG91c2Vob2xkX2NlbnN1cykKYGBgCgpDbGVhbiBDZW5Tb2MgRmlsZSAtLSB3ZSdsbCBhZGQgc29tZSBzdHVmZiBoZXJlLiAKYGBge3J9CmNlbnNvYy5kbWYgPC0gY2Vuc29jLmRtZiAlPiUgCiAgZmlsdGVyKCFuY2hhcihmbmFtZSkgPD0gMSkKYGBgCgpXcml0ZSBvdXQgQ2VuU29jIGZpbGUgd2l0aCBhbGwgdmFyaWFibGVzCmBgYHtyfQpmd3JpdGUoY2Vuc29jLmRtZiwgIi9jZW5zb2MvZGF0YS9jZW5zb2NfbGlua2VkX3dpdGhfY2Vuc3VzLzE5NDAvY2Vuc29jX2RtZl92MS5jc3YiKQpgYGAKCldyaXRlIG91dCBDZW5Tb2Mgd2l0aCBhbGwgdmFyaWFibGVzCmBgYHtyfQpjZW5zb2MuZG1mLndlYiA8LSBjZW5zb2MuZG1mICU+JSAKICBzZWxlY3QoSElTVElELCBTVEFURUZJUCwgY2Vuc3VzX2FnZSwgYnllYXIsIGJtb250aCwgYmRheSwgZHllYXIsIGRtb250aCwgZGRheSwgZGVhdGhfYWdlLCB3ZWlnaHQpCgpgYGAKCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyMjIExvYWQgUGFja2FnZXMKYGBge3J9CmxpYnJhcnkoY2Vuc29jZGV2KQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShkYXRhLnRhYmxlKQpsaWJyYXJ5KEhNREhGRHBsdXMpCmBgYAoKUmVhZCBpbiBTb2NpYWwgU2VjdXJpdHkgRGVhdGggTWFzdGVyIGZpbGUsIGNlbnN1cyBmaWxlLCBhbmQgY3JlYXRlIGNlbnNvYyBmaWxlIAoKCk9uZSBjYXZlYXQgaGVyZSBpcyB0aGF0IG5fY2xlYW5fa2V5cyBpcyB0aGUgdG90YWwgbnVtYmVyIG9mIHVuaXF1ZSBrZXlzIGZvciBib3RoIG1lbiBhbmQgd29tZW4hIGV2ZW4gaWYgdGhlIHRvdGFsIGJlaW5nIHJldHVybmVkIGluIG9ubHkgZm9yIG1lbi4gCmBgYHtyfQojIyBSZWFkIGluIERNRiAoU1NETSkgZmlsZXMKc29jc2VjX2ZpbGVzID0gYygiL2hvbWUvaXB1bXMvam9zaC1pcHVtcy9wcm9ncy9zc2RtL3NzZG0xIiwKICAgICAgICAgICAgICAgICAgICAgIi9ob21lL2lwdW1zL2pvc2gtaXB1bXMvcHJvZ3Mvc3NkbS9zc2RtMiIsCiAgICAgICAgICAgICAgICAgICAgICIvaG9tZS9pcHVtcy9qb3NoLWlwdW1zL3Byb2dzL3NzZG0vc3NkbTMiKQpzb2NzZWMgPC0gbG9hZF9zb2NzZWNfZGVhdGhzKHNvY3NlY19maWxlcykKCgojIyBSZWFkIGluIDE5NDAgQ2Vuc3VzIGZpbGVzCmNlbnN1cyA8LSBsb2FkX2NlbnN1c19kbWZfbWF0Y2goY2Vuc3VzX2ZpbGUgPSAiL2hvbWUvaXB1bXMvY2FzZXktaXB1bXMvSVBVTVMyMDE5LzE5NDAvVFNWL1AudHN2IikKCiMjIENyZWF0ZSBDZW5Tb2MgRmlsZQpjZW5zb2MuZG1mIDwtIGNyZWF0ZV9jZW5zb2MoY2Vuc3VzLCBzb2NzZWMpCmBgYAoKQ2FsY3VsYXRlIGFnZSBhdCBkZWF0aCB2YXJpYWJsZXMgCmBgYHtyfQpjZW5zb2MuZG1mIDwtIGNhbGN1bGF0ZV9hZ2VfYXRfZGVhdGgoY2Vuc29jLmRtZikKYGBgCgpDYWxjdWxhdGUgd2VpZ2h0cwpgYGB7cn0KY2Vuc29jLmRtZiA8LSBjcmVhdGVfd2VpZ2h0c19kbWZfbGluayhjZW5zb2MuZG1mKQpgYGAKCk9wdGlvbmFsOiBhZGQgaG91c2Vob2xkIHZhcmlhYmxlcyBmcm9tIGNlbnN1c3JtKGNlbnN1cykKYGBge3J9CmhvdXNlaG9sZF9jZW5zdXMgPC0gZnJlYWQoIi9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9ILnRzdiIpCmNlbnNvYy5kbWYgPC0gYWRkX2hvdXNlaG9sZF92YXJpYWJsZXMoY2Vuc29jLmRtZiA9IGNlbnNvYy5kbWYsIGhvdXNlaG9sZF9jZW5zdXMgPSBob3VzZWhvbGRfY2Vuc3VzKQpgYGAKCkNsZWFuIENlblNvYyBGaWxlIC0tIHdlJ2xsIGFkZCBzb21lIHN0dWZmIGhlcmUuIApgYGB7cn0KY2Vuc29jLmRtZiA8LSBjZW5zb2MuZG1mICU+JSAKICBmaWx0ZXIoIW5jaGFyKGZuYW1lKSA8PSAxKQpgYGAKCldyaXRlIG91dCBDZW5Tb2MgZmlsZSB3aXRoIGFsbCB2YXJpYWJsZXMKYGBge3J9CmZ3cml0ZShjZW5zb2MuZG1mLCAiL2NlbnNvYy9kYXRhL2NlbnNvY19saW5rZWRfd2l0aF9jZW5zdXMvMTk0MC9jZW5zb2NfZG1mX3YxLmNzdiIpCmBgYAoKV3JpdGUgb3V0IENlblNvYyB3aXRoIGFsbCB2YXJpYWJsZXMKYGBge3J9CmNlbnNvYy5kbWYud2ViIDwtIGNlbnNvYy5kbWYgJT4lIAogIHNlbGVjdChISVNUSUQsIFNUQVRFRklQLCBjZW5zdXNfYWdlLCBieWVhciwgYm1vbnRoLCBiZGF5LCBkeWVhciwgZG1vbnRoLCBkZGF5LCBkZWF0aF9hZ2UsIHdlaWdodCkKCmBgYAoK</div>
 
 
 
