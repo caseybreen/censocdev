@@ -9,14 +9,14 @@
 #' @export
 #'
 
-create_weights_censoc_numident <- function(file) {
+create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:1939), death_ages = c(65:105)) {
 
   hmd_deaths <-  readHMDweb(CNTRY = "USA", item = "Deaths_lexis", username ="caseybreen@berkeley.edu", password = "censoc") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
-  numdeath_aggregate_counts <- file %>%
-   filter(byear %in% c(1895:1920)) %>%
-    filter(death_age %in% c(65:100)) %>%
+  numdeath_aggregate_counts <- censoc.numident %>%
+   filter(byear %in% cohorts) %>%
+    filter(death_age %in% death_ages) %>%
     group_by(death_age, dyear, byear, sex) %>%
     tally() %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
@@ -38,13 +38,13 @@ create_weights_censoc_numident <- function(file) {
     mutate(weight = 1/inclusion_prob) %>%
     select(-inclusion_prob)
 
-  file <- file %>%
+  censoc.numident <- censoc.numident %>%
     mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_"))
 
-  file <- file %>%
+  censoc.numident <- censoc.numident %>%
     left_join(death_weights_for_link, by = "linking_key") %>%
     select(-linking_key)
 
-  return(file)
+  return(censoc.numident)
 
 }

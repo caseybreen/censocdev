@@ -1,6 +1,6 @@
 #' Create weights
-#' This function will weight the numident file up to HMD lexis triangles
-#' Restrict data to deaths from 1988 - 2005 with age_at_death between
+#' This function will weight the numident censoc.dmf up to HMD lexis triangles
+#' Restrict data to certain cohorts and ages at deaths
 #'
 #' @param data data.frame with birth and death info
 #' @return data.frame
@@ -9,24 +9,31 @@
 #' @export
 #'
 
-create_weights_dmf_link <- function(file) {
+create_weights_censoc_dmf <- function(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:105)) {
 
+  ## download deaths from HMD
   hmd_deaths <-  readHMDweb(CNTRY = "USA", item = "Deaths_lexis", username = "caseybreen@berkeley.edu", password = "censoc") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
-  counts <- file %>%
-    filter(byear %in% c(1895:1920)) %>%
+  ## create censoc-dmf counts
+  ## restrict to certain cohorts, death ages
+
+  counts <- censoc.dmf %>%
+    filter(byear %in% cohorts) %>%
+    filter(death_age %in% death_ages) %>%
     group_by(death_age, dyear, byear) %>%
     tally() %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
     ungroup(dyear, death_age)
 
+  ## join censoc-dmf counts and HMD count
   death_weights <- counts %>%
     inner_join(hmd_deaths, by = "linking_key") %>%
     mutate(proportion_matched = n/Male) %>%
     group_by(dyear, byear, death_age) %>%
     summarize(inclusion_prob = mean(proportion_matched), Male = mean(Male))
 
+  ## divide death weights
   death_weights_for_link <- death_weights %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
     ungroup(dyear, death_age) %>%
@@ -34,13 +41,15 @@ create_weights_dmf_link <- function(file) {
     mutate(weight = 1/inclusion_prob) %>%
     select(-inclusion_prob)
 
-  file <- file %>%
+  ## create linking key
+  censoc.dmf <- censoc.dmf %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_"))
 
-  file <- file %>%
+  ## add weights onto censoc-dmf censoc.dmf
+  censoc.dmf <- censoc.dmf %>%
     left_join(death_weights_for_link, by = "linking_key") %>%
     select(-linking_key)
 
-  return(file)
+  return(censoc.dmf)
 
 }

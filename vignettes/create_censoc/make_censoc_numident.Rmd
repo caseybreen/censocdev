@@ -3,12 +3,11 @@ title: "2 censoc all gender sample"
 output: html_notebook
 ---
 
-This notebook will read in the Berkeley Unified Mortality Database (BUNMD) and the 1940 Census (this can be switched). The code constructs linking keys, dedupes the keys, and then performs a direct match on the linking keys.  
-
-First, we will read in the numdeath matched with numapp file. 
+This notebook will read in the Berkeley Unified Mortality Database (BUNMD) and the 1940 Census. The code constructs linking keys, dedupes the keys, and then performs a direct match on the linking keys.  
 
 ```{r}
 library(censocdev)
+library(HMDHFDplus)
 ```
 
 ```{r}
@@ -41,7 +40,7 @@ censoc.numident.select <- censoc.numident %>%
 censoc.numident.select <- calculate_age_at_death(censoc.numident.select)
 
 ## calculate weights 
-censoc.numident.select <- create_weights_censoc_numident(censoc.numident.select)
+censoc.numident.select <- create_weights_censoc_numident(censoc.numident.select, cohorts = c(1895:1939), death_ages = c(65:105))
 
 ## write out full version matched with censoc 
 fwrite(censoc.numident.select, "/censoc/data/censoc_linked_with_census/1940/censoc_numident_v1.csv")
@@ -49,13 +48,30 @@ fwrite(censoc.numident.select, "/censoc/data/censoc_linked_with_census/1940/cens
 
 Select the variables for the public release — this will likely change 
 ```{r}
-censoc.numident.select <- censoc.numident.select %>% 
-  select(histid = HISTID, byear, bmonth, dyear, dmonth, death_age, sex, race_first, race_first_cyear, race_first_cmonth,race_last, race_last_cyear, race_last_cmonth, bpl, zip_residence, socstate, age_first_application, weight)
+censoc.numident.select <- censoc.numident %>% 
+  select(HISTID, byear, bmonth, dyear, dmonth, death_age, sex, race_first, race_first_cyear, race_first_cmonth,race_last, race_last_cyear, race_last_cmonth, bpl, zip_residence, socstate, age_first_application, weight)
 
 fwrite(censoc.numident.select, "/censoc/data/censoc_files_for_website/censoc_numident_v1.csv")
 ```
 
+add person and total weights
+```{r}
+## Drop census
+census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
 
+## Add person variables
+## drop vars so we won't have doubles
+censoc.numident.all.vars <- censoc.numident %>% 
+  select(-AGE, -SEX, -NAMELAST, -NAMEFRST, -BPL, -RACE, -MARST) %>% 
+  inner_join(census)
 
+## add household variables
+household_census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv")
+setDT(censoc.numident.all.vars)
+censoc.numident.all.vars <- add_household_variables(censoc = censoc.numident.all.vars, household_census = household_census)
+
+## write out file
+fwrite(censoc.numident.all.vars, "/censoc/data/censoc_linked_with_census/1940/censoc_numident_all_vars_v1.csv")
+```
 
 

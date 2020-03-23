@@ -3,7 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-### Load Packages
+Library Packages
 ```{r}
 library(censocdev)
 library(tidyverse)
@@ -37,30 +37,40 @@ censoc.dmf <- calculate_age_at_death(censoc.dmf)
 
 Calculate weights
 ```{r}
-censoc.dmf <- create_weights_dmf_link(censoc.dmf)
+censoc.dmf <- create_weights_censoc_dmf(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:105))
 ```
 
-Optional: add household variables from censusrm(census)
-```{r}
-household_census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv")
-censoc.dmf <- add_household_variables(censoc.dmf = censoc.dmf, household_census = household_census)
-```
-
-Clean CenSoc File -- we'll add some stuff here. 
+Remove matches where first name was only on character 
 ```{r}
 censoc.dmf <- censoc.dmf %>% 
   filter(!nchar(fname) <= 1)
 ```
 
-Write out CenSoc file with all variables
-```{r}
-fwrite(censoc.dmf, "/censoc/data/censoc_linked_with_census/1940/censoc_dmf_v1.csv")
-```
-
-Write out CenSoc with all variables
+Select variables for public release
 ```{r}
 censoc.dmf.web <- censoc.dmf %>% 
-  select(HISTID, STATEFIP, census_age, byear, bmonth, bday, dyear, dmonth, dday, death_age, weight)
-
+  select(HISTID, byear, bmonth, dyear, dmonth, death_age, weight)
 ```
 
+Write out CenSoc with for website. This is the file we will publicly release. As per our agreement with IPUMS, we cannot release day of death or day of birth. 
+```{r}
+fwrite(censoc.dmf.web, "/censoc/data/censoc_files_for_website/censoc_dmf_v1.csv")
+```
+
+Optional: add all person variables and household variables from 1940 census
+```{r}
+census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
+
+censoc.dmf.all.vars <- censoc.dmf %>% 
+  select(-AGE, -SEX, -NAMELAST, -NAMEFRST) %>% 
+  inner_join(census)
+
+household_census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv")
+setDT(censoc.dmf.all.vars)
+censoc.dmf.all.vars <- add_household_variables(censoc = censoc.dmf.all.vars, household_census = household_census)
+```
+
+Write out CenSoc file with all variables
+```{r}
+fwrite(censoc.dmf.all.vars, "/censoc/data/censoc_linked_with_census/1940/censoc_dmf_all_vars_v1.csv")
+```
