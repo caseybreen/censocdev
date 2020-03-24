@@ -10,6 +10,15 @@ In this notebook, we take the Numident files with the three .csv files (apps, cl
 3. Add a "socstate" variable for the death records, reporting the state in which the Social Security number was issued 
 4. Remove all masked records (e.g. zzzz records)
 
+Library Packages
+
+```{r}
+library(censocdev)
+library(tidyverse)
+library(data.table)
+```
+
+
 Clean and write out death files 
 
 

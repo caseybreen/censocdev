@@ -6,8 +6,7 @@
 #' @import data.table
 #' @export
 #'
-census_bunmd_merge <- function(bunmd = bunmd, census = census, census_year = 1940){
-
+create_censoc_numident <- function(bunmd = bunmd, census = census, census_year = 1940){
 
   ## create census age variable
   bunmd[,"census_age" := ifelse(bmonth < 4,
@@ -53,7 +52,6 @@ census_bunmd_merge <- function(bunmd = bunmd, census = census, census_year = 194
   ## Create bunmd dataset with unique married keys for men (remove rows w dupes)
   bunmd_married_unique_keys_men <- bunmd[sex == 1]
   bunmd_married_unique_keys_men <- bunmd_married_unique_keys_men[bunmd_married_unique_keys_men[, .I[.N == 1L], by=linking_key_married]$V1]
-
 
   ## Create bunmd dataset with unique maiden (father's last name) keys (remove rows w dups)
   bunmd_maiden_unique_keys <- bunmd[bunmd[, .I[.N == 1L], by=linking_key_maiden]$V1]

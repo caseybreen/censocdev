@@ -9,17 +9,17 @@
 #' @export
 #'
 
-create_weights_bunmd_complete <- function(file) {
+create_weights_bunmd_complete <- function(bunmd.file, dyears = c(1988:2005), cohorts = c(1895:1920), death_ages = c(65:100)) {
 
-  ## get HMD deaths
-  hmd_deaths <-  readHMDweb(CNTRY = "USA", item = "Deaths_lexis", username ="caseybreen@berkeley.edu", password = "censoc") %>%
+  ## deaths from HMD
+  hmd_deaths <-  fread("/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   ## filter to complete cases
-  high_coverage_complete_sample <- file %>%
-    filter(dyear %in% c(1988:2005)) %>%
-    filter(byear %in% c(1895:1920)) %>%
-    filter(death_age %in% c(65:100)) %>%
+  high_coverage_complete_sample <- bunmd %>%
+    filter(dyear %in% dyear) %>%
+    filter(byear %in% cohorts) %>%
+    filter(death_age %in% death_ages) %>%
     filter(!is.na(sex)) %>%
     filter(!is.na(race_last)) %>%
     filter(!is.na(bpl))
@@ -58,11 +58,11 @@ create_weights_bunmd_complete <- function(file) {
     left_join(death_weights_for_link, by = "linking_key") %>%
     select(ssn, ccweight)
 
-  file <- file %>%
+  bunmd.file <- bunmd.file %>%
     left_join(weights.df, by = "ssn")
 
 
-  return(file)
+  return(bunmd.file)
 
 }
 

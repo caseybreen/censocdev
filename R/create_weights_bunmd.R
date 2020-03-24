@@ -9,17 +9,17 @@
 #' @export
 #'
 
-create_weights_bunmd <- function(file) {
+create_weights_bunmd <- function(file, death_years = c(1988:2005), death_ages = c(65:100), cohorts = c(1895:1940)) {
 
-  ## Get HMD Deaths
-  hmd_deaths <-  readHMDweb(CNTRY = "USA", item = "Deaths_lexis", username ="caseybreen@berkeley.edu", password = "censoc") %>%
+  ## download deaths from HMD
+  hmd_deaths <-  fread("/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   ## Filter cases (not complete count cases)
   numdeath_aggregate_counts <- file %>%
-    filter(dyear %in% c(1988:2005)) %>%
-    filter(death_age %in% c(65:100)) %>%
-    filter(byear %in% c(1895:1920)) %>%
+    filter(dyear %in% death_years) %>%
+    filter(death_age %in% death_ages) %>%
+    filter(byear %in% cohorts) %>%
     filter(!is.na(sex)) %>%
     group_by(death_age, dyear, byear, sex) %>%
     tally() %>%

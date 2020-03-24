@@ -9,7 +9,6 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Casey Breen (caseybreen@berkeley.edu)" />
 
 
 <title>R Notebook</title>
@@ -1745,14 +1744,20 @@ summary {
 
 
 <h1 class="title toc-ignore">R Notebook</h1>
-<h4 class="author">Casey Breen (<a href="mailto:caseybreen@berkeley.edu" class="email">caseybreen@berkeley.edu</a>)</h4>
 
 </div>
 
 
 <!-- rnb-text-begin -->
-<p>Summary: This vignette goes through the steps of create the CenSoc-DMF file from input source data (Social Security Death Master File and 1940 Census). We match men on their first name, last name, and age at census.</p>
-<p>The <code>censocdev</code> package must be installed from GitHub:</p>
+<p>Background: In 2013, the Social Security Administration transferred a set of Numident records to the National Archives (NARA). In 2019, we obtained the NARA Numident records, along with their accompanying documentation. The NARA Numident records are a subset of the records in the complete Numident. The NARA Numident records contain three types of entries: applications, claims, and deaths. NARA delivered each set of entries seperately as a set 20 fixed-width .txt files (3 x 20 = 60 files in total).</p>
+<p>For each of the three entry types, the below code reads in the 20 fixed-width .txt files using column position specified in the record layout documents. The code appends the 20 files into a single file. The result is three files, one for the applications, claims, and deaths.</p>
+<p>Column positions and variable names were obtained from the NARA documentation website: <a href="https://aad.archives.gov/aad/popup-tech-info.jsp?s=5057" class="uri">https://aad.archives.gov/aad/popup-tech-info.jsp?s=5057</a></p>
+<p>The below functions read in all variables with the colun position and variables names specified in the NARA record layout documents.The PDF files were first converted into a spreadsheet in order facilitate writing the code to read in the fixed-width files: /bcourses/documentation/numident_documentation/numident_file_layouts_to_create_r_code.csv</p>
+<p>Variable names are consistent with the original “field names” with two exceptions:</p>
+<ol style="list-style-type: decimal">
+<li>All dashes were replaced with underscores (e.g. “-” were replaced with &quot;_&quot;)</li>
+<li>The seven variables titled “FILLER” were renamed (“Filler_1, Filler_2, … , Filler_7)”.</li>
+</ol>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsaWJyYXJ5KGRldnRvb2xzKSBcbiMgaW5zdGFsbF9naXRodWIoXCJjYXNleWJyZWVuL2NlbnNvY2RldlwiKVxuYGBgIn0= -->
@@ -1764,100 +1769,39 @@ summary {
 <p>Library Packages</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjZW5zb2NkZXYpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkoZGF0YS50YWJsZSlcbmxpYnJhcnkoSE1ESEZEcGx1cylcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjZW5zb2NkZXYpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkoZGF0YS50YWJsZSlcbmBgYCJ9 -->
 <pre class="r"><code>library(censocdev)
 library(tidyverse)
-library(data.table)
-library(HMDHFDplus)</code></pre>
+library(data.table)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Read in Social Security Death Master file, 1940 census file, and create censoc file.</p>
-<p>Note: n_clean_keys variable in the “census” file refers to the total number of unique keys for both men <em>and</em> women.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgUmVhZCBpbiAxOTQwIENlbnN1cyBmaWxlc1xuY2Vuc3VzIDwtIGxvYWRfY2Vuc3VzX2RtZl9tYXRjaChjZW5zdXNfZmlsZSA9IFwiL2hvbWUvaXB1bXMvY2FzZXktaXB1bXMvSVBVTVMyMDE5LzE5NDAvVFNWL1AudHN2XCIpXG5cbmBgYCJ9 -->
-<pre class="r"><code>## Read in 1940 Census files
-census &lt;- load_census_dmf_match(census_file = &quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv&quot;)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoifC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfFxufD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09fFxuRm91bmQgYW5kIHJlc29sdmVkIGltcHJvcGVyIHF1b3Rpbmcgb3V0LW9mLXNhbXBsZS4gRmlyc3QgaGVhbGVkIGxpbmUgMzUwNTA2NTogPDxQXHQxOTQwXHQwMlx0MDA4ODE1ODRcdDAwMDFcdDAwMDBcdDAwXHQwXHQwXHQwMFx0MFx0MFx0MDJcdDFcdDAyXHQwXHQwXHQwMVx0OTlcdDk5XHQwXHQwMTAxXHQwMjZcdDFcdDIwMFx0MVx0MFx0MDBcdDFcdDAwNTAwXHQwXHQwXHQwMDBcdDAwMDBcdDFcdDFcdDA5MFx0MTFcdDJcdDgyMFx0MDlcdDAwXHQ5OTdcdDI0XHQyMVx0Mlx0MzJcdDNcdDAwMDE3MFx0MVx0OTk5OVx0MFx0MFx0MFx0MFx0MFx0M1x0MFx0MFx0MFx0NFx0MFx0MFx0M1x0MFx0MFx0MFx0MDc1XHQwXHQwMDBcdDk5OTlcdDk5OTlcdDk5OTlcdFwiQVwiIExBQk9SRVIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFx0MVx0MFx0MFx0MFx0MDIzXHQwMFx0MDk5OFx0MDAwMDAwMDAwMFx0MDAwMDAwMDEwMFx0MTkxNFx0MDk5OFx0ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFx0ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXHRBTkRFUlNPTiAgICAgICAgXHRGUkFOSyAgICAgICAgICAgXHQ5ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFx0QVJLQU5TQVMgICAgICAgICAgICAgICAgPj4uIElmIHRoZSBmaWVsZHMgYXJlIG5vdCBxdW90ZWQgKGUuZy4gZmllbGQgc2VwYXJhdG9yIGRvZXMgbm90IGFwcGVhciB3aXRoaW4gYW55IGZpZWxkKSwgdHJ5IHF1b3RlPVwiXCIgdG8gYXZvaWQgdGhpcyB3YXJuaW5nLlxuIn0= -->
-<pre><code>|--------------------------------------------------|
-|==================================================|
-Found and resolved improper quoting out-of-sample. First healed line 3505065: &lt;&lt;P   1940    02  00881584    0001    0000    00  0   0   00  0   0   02  1   02  0   0   01  99  99  0   0101    026 1   200 1   0   00  1   00500   0   0   000 0000    1   1   090 11  2   820 09  00  997 24  21  2   32  3   000170  1   9999    0   0   0   0   0   3   0   0   0   4   0   0   3   0   0   0   075 0   000 9999    9999    9999    &quot;A&quot; LABORER                                             1   0   0   0   023 00  0998    0000000000  0000000100  1914    0998                                                                                ANDERSON            FRANK               9                                               ARKANSAS                &gt;&gt;. If the fields are not quoted (e.g. field separator does not appear within any field), try quote=&quot;&quot; to avoid this warning.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgUmVhZCBpbiAxOTQwIENlbnN1cyBmaWxlc1xuY2Vuc3VzIDwtIGxvYWRfY2Vuc3VzX2RtZl9tYXRjaChjZW5zdXNfZmlsZSA9IFwiL2hvbWUvaXB1bXMvY2FzZXktaXB1bXMvSVBVTVMyMDE5LzE5NDAvVFNWL1AudHN2XCIpXG5gYGAifQ== -->
-<pre class="r"><code>## Read in 1940 Census files
-census &lt;- load_census_dmf_match(census_file = &quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoifC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfFxufD09PT09PT1cbiJ9 -->
-<pre><code>|--------------------------------------------------|
-|=======</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<ul>
-<li>Calculate age at death variables</li>
-<li>Calculate weights</li>
-<li>Remove matches where first name was only one character</li>
-</ul>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgQ2FsY3VsYXRlIGFnZSBhdCBkZWF0aFxuY2Vuc29jLmRtZiA8LSBjYWxjdWxhdGVfYWdlX2F0X2RlYXRoKGNlbnNvYy5kbWYpXG5cbiMjIENhbGN1bGF0ZSB3ZWlnaHRzXG5jZW5zb2MuZG1mIDwtIGNyZWF0ZV93ZWlnaHRzX2NlbnNvY19kbWYoY2Vuc29jLmRtZiwgY29ob3J0cyA9IGMoMTg5NToxOTM5KSwgZGVhdGhfYWdlcyA9IGMoNjU6MTAwKSlcblxuIyMgQ2FsY3VsYXRlIERNRlxuY2Vuc29jLmRtZiA8LSBjZW5zb2MuZG1mICU+JSBcbiAgZmlsdGVyKCFuY2hhcihmbmFtZSkgPD0gMSlcbmBgYCJ9 -->
-<pre class="r"><code>## Calculate age at death
-censoc.dmf &lt;- calculate_age_at_death(censoc.dmf)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgcmVhZCBpbiBmaXhlZC13aWR0aCBkZWF0aCByZWNvcmRzXG5kZWF0aHMgPC0gcmVhZF9kZWF0aF9md2YocGF0aCA9IFwiL2RhdGEvam9zaC9DZW5Tb2MvTlVNREVBVEgvXCIpXG5cbiMjIHdyaXRlIG91dCBkZWF0aCByZWNvcmRzXG5md3JpdGUoeCA9IGRlYXRocywgZmlsZSA9IFwiL2NlbnNvYy9kYXRhL251bWlkZW50LzFfbnVtaWRlbnRfZmlsZXNfd2l0aF9vcmlnaW5hbF92YXJuYW1lcy9kZWF0aHNfb3JpZ2luYWwuY3N2XCIpXG5cbiMjIHJlYWQgaW4gZml4ZWQtd2lkdGggYXBwbGlhdGlvbiByZWNvcmRzXG5hcHBzIDwtIHJlYWRfYXBwX2Z3ZihwYXRoID0gXCIvZGF0YS9qb3NoL0NlblNvYy9OVU1JQVBQTElDL1JlY29yZHMvXCIpXG5cbiMjIHdyaXRlIG91dCBhcHBsaWNhdGlvbiByZWNvcmRzXG5md3JpdGUoYXBwcywgXCIvY2Vuc29jL2RhdGEvbnVtaWRlbnQvMV9udW1pZGVudF9maWxlc193aXRoX29yaWdpbmFsX3Zhcm5hbWVzL2FwcGxpY2F0aW9uc19vcmlnaW5hbC5jc3ZcIilcblxuIyMgcmVhZCBpbiBjbGFpbXMgZml4ZWQtd2lkdGggYXBwbGljYXRpb24gcmVjb3JkcyBcbmNsYWltcyA8LSByZWFkX2NsYWltX2Z3ZihwYXRoID0gXCIvZGF0YS9qb3NoL0NlblNvYy9OVU1JQ0xBSU0vUmVjb3Jkcy9cIilcblxuIyMgd3JpdGUgb3V0IGFwcGxpY2F0aW9uIHJlY29yZHNcbmZ3cml0ZShjbGFpbXMsIFwiL2NlbnNvYy9kYXRhL251bWlkZW50LzFfbnVtaWRlbnRfZmlsZXNfd2l0aF9vcmlnaW5hbF92YXJuYW1lcy9jbGFpbXNfb3JpZ2luYWwuY3N2XCIpXG5gYGAifQ== -->
+<pre class="r"><code>## read in fixed-width death records
+deaths &lt;- read_death_fwf(path = &quot;/data/josh/CenSoc/NUMDEATH/&quot;)
 
-## Calculate weights
-censoc.dmf &lt;- create_weights_censoc_dmf(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:100))
+## write out death records
+fwrite(x = deaths, file = &quot;/censoc/data/numident/1_numident_files_with_original_varnames/deaths_original.csv&quot;)
 
-## Calculate DMF
-censoc.dmf &lt;- censoc.dmf %&gt;% 
-  filter(!nchar(fname) &lt;= 1)</code></pre>
+## read in fixed-width appliation records
+apps &lt;- read_app_fwf(path = &quot;/data/josh/CenSoc/NUMIAPPLIC/Records/&quot;)
+
+## write out application records
+fwrite(apps, &quot;/censoc/data/numident/1_numident_files_with_original_varnames/applications_original.csv&quot;)
+
+## read in claims fixed-width application records 
+claims &lt;- read_claim_fwf(path = &quot;/data/josh/CenSoc/NUMICLAIM/Records/&quot;)
+
+## write out application records
+fwrite(claims, &quot;/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Select variables for public release</p>
 <!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2Vuc29jLmRtZi53ZWIgPC0gY2Vuc29jLmRtZiAlPiUgXG4gIHNlbGVjdChISVNUSUQsIGJ5ZWFyLCBibW9udGgsIGR5ZWFyLCBkbW9udGgsIGRlYXRoX2FnZSwgd2VpZ2h0KVxuYGBgIn0= -->
-<pre class="r"><code>censoc.dmf.web &lt;- censoc.dmf %&gt;% 
-  select(HISTID, byear, bmonth, dyear, dmonth, death_age, weight)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Write out CenSoc with for website. This is the file we will publicly release. As per our agreement with IPUMS, we cannot release day of death or day of birth.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmd3JpdGUoY2Vuc29jLmRtZi53ZWIsIFwiL2NlbnNvYy9kYXRhL2NlbnNvY19maWxlc19mb3Jfd2Vic2l0ZS9jZW5zb2NfZG1mX3YxLmNzdlwiKVxuYGBgIn0= -->
-<pre class="r"><code># fwrite(censoc.dmf.web, &quot;/censoc/data/censoc_files_for_website/censoc_dmf_v1.csv&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Optional: add all person variables and household variables from 1940 census</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2Vuc3VzIDwtIGZyZWFkKFwiL2hvbWUvaXB1bXMvY2FzZXktaXB1bXMvSVBVTVMyMDE5LzE5NDAvVFNWL1AudHN2XCIpXG5cbmNlbnNvYy5kbWYuYWxsLnZhcnMgPC0gY2Vuc29jLmRtZiAlPiUgXG4gIHNlbGVjdCgtQUdFLCAtU0VYLCAtTkFNRUxBU1QsIC1OQU1FRlJTVCkgJT4lIFxuICBpbm5lcl9qb2luKGNlbnN1cylcblxuaG91c2Vob2xkX2NlbnN1cyA8LSBmcmVhZChcIi9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9ILnRzdlwiKVxuc2V0RFQoY2Vuc29jLmRtZi5hbGwudmFycylcbmNlbnNvYy5kbWYuYWxsLnZhcnMgPC0gYWRkX2hvdXNlaG9sZF92YXJpYWJsZXMoY2Vuc29jID0gY2Vuc29jLmRtZi5hbGwudmFycywgaG91c2Vob2xkX2NlbnN1cyA9IGhvdXNlaG9sZF9jZW5zdXMpXG5gYGAifQ== -->
-<pre class="r"><code>census &lt;- fread(&quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv&quot;)
 
-censoc.dmf.all.vars &lt;- censoc.dmf %&gt;% 
-  select(-AGE, -SEX, -NAMELAST, -NAMEFRST) %&gt;% 
-  inner_join(census)
-
-household_census &lt;- fread(&quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv&quot;)
-setDT(censoc.dmf.all.vars)
-censoc.dmf.all.vars &lt;- add_household_variables(censoc = censoc.dmf.all.vars, household_census = household_census)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Write out CenSoc file with all variables</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmd3JpdGUoY2Vuc29jLmRtZi5hbGwudmFycywgXCIvY2Vuc29jL2RhdGEvY2Vuc29jX2xpbmtlZF93aXRoX2NlbnN1cy8xOTQwL2NlbnNvY19kbWZfYWxsX3ZhcnNfdjEuY3N2XCIpXG5gYGAifQ== -->
-<pre class="r"><code># fwrite(censoc.dmf.all.vars, &quot;/censoc/data/censoc_linked_with_census/1940/censoc_dmf_all_vars_v1.csv&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCmF1dGhvcjogQ2FzZXkgQnJlZW4gKGNhc2V5YnJlZW5AYmVya2VsZXkuZWR1KQotLS0KClN1bW1hcnk6IFRoaXMgdmlnbmV0dGUgZ29lcyB0aHJvdWdoIHRoZSBzdGVwcyBvZiBjcmVhdGUgdGhlIENlblNvYy1ETUYgZmlsZSBmcm9tIGlucHV0IHNvdXJjZSBkYXRhIChTb2NpYWwgU2VjdXJpdHkgRGVhdGggTWFzdGVyIEZpbGUgYW5kIDE5NDAgQ2Vuc3VzKS4gV2UgbWF0Y2ggbWVuIG9uIHRoZWlyIGZpcnN0IG5hbWUsIGxhc3QgbmFtZSwgYW5kIGFnZSBhdCBjZW5zdXMuIAoKVGhlIGBjZW5zb2NkZXZgIHBhY2thZ2UgbXVzdCBiZSBpbnN0YWxsZWQgZnJvbSBHaXRIdWI6IAoKYGBge3J9CiMgbGlicmFyeShkZXZ0b29scykgCiMgaW5zdGFsbF9naXRodWIoImNhc2V5YnJlZW4vY2Vuc29jZGV2IikKYGBgCgpMaWJyYXJ5IFBhY2thZ2VzCmBgYHtyfQpsaWJyYXJ5KGNlbnNvY2RldikKbGlicmFyeSh0aWR5dmVyc2UpCmxpYnJhcnkoZGF0YS50YWJsZSkKYGBgCgpSZWFkIGluIFNvY2lhbCBTZWN1cml0eSBEZWF0aCBNYXN0ZXIgZmlsZSwgMTk0MCBjZW5zdXMgZmlsZSwgYW5kIGNyZWF0ZSBjZW5zb2MgZmlsZS4gCgpOb3RlOiBuX2NsZWFuX2tleXMgdmFyaWFibGUgaW4gdGhlICJjZW5zdXMiIGZpbGUgcmVmZXJzIHRvIHRoZSB0b3RhbCBudW1iZXIgb2YgdW5pcXVlIGtleXMgZm9yIGJvdGggbWVuICphbmQqIHdvbWVuLiAKYGBge3J9CiMjIFJlYWQgaW4gRE1GIChTU0RNKSBmaWxlcwpzb2NzZWNfZmlsZXMgPSBjKCIvaG9tZS9pcHVtcy9qb3NoLWlwdW1zL3Byb2dzL3NzZG0vc3NkbTEiLAogICAgICAgICAgICAgICAgICAgICAiL2hvbWUvaXB1bXMvam9zaC1pcHVtcy9wcm9ncy9zc2RtL3NzZG0yIiwKICAgICAgICAgICAgICAgICAgICAgIi9ob21lL2lwdW1zL2pvc2gtaXB1bXMvcHJvZ3Mvc3NkbS9zc2RtMyIpCgpzb2NzZWMgPC0gbG9hZF9zb2NzZWNfZGVhdGhzKHNvY3NlY19maWxlcykKCiMjIFJlYWQgaW4gMTk0MCBDZW5zdXMgZmlsZXMKY2Vuc3VzIDwtIGxvYWRfY2Vuc3VzX2RtZl9tYXRjaChjZW5zdXNfZmlsZSA9ICIvaG9tZS9pcHVtcy9jYXNleS1pcHVtcy9JUFVNUzIwMTkvMTk0MC9UU1YvUC50c3YiKQoKIyMgQ3JlYXRlIENlblNvYyBGaWxlCmNlbnNvYy5kbWYgPC0gY3JlYXRlX2NlbnNvY19kbWYoY2Vuc3VzLCBzb2NzZWMpCmBgYAoKCgotIENhbGN1bGF0ZSBhZ2UgYXQgZGVhdGggdmFyaWFibGVzIAotIENhbGN1bGF0ZSB3ZWlnaHRzCi0gUmVtb3ZlIG1hdGNoZXMgd2hlcmUgZmlyc3QgbmFtZSB3YXMgb25seSBvbmUgY2hhcmFjdGVyIApgYGB7cn0KIyMgQ2FsY3VsYXRlIGFnZSBhdCBkZWF0aApjZW5zb2MuZG1mIDwtIGNhbGN1bGF0ZV9hZ2VfYXRfZGVhdGgoY2Vuc29jLmRtZikKCiMjIENhbGN1bGF0ZSB3ZWlnaHRzCmNlbnNvYy5kbWYgPC0gY3JlYXRlX3dlaWdodHNfY2Vuc29jX2RtZihjZW5zb2MuZG1mLCBjb2hvcnRzID0gYygxODk1OjE5MzkpLCBkZWF0aF9hZ2VzID0gYyg2NToxMDApKQoKIyMgQ2FsY3VsYXRlIERNRgpjZW5zb2MuZG1mIDwtIGNlbnNvYy5kbWYgJT4lIAogIGZpbHRlcighbmNoYXIoZm5hbWUpIDw9IDEpCmBgYAoKU2VsZWN0IHZhcmlhYmxlcyBmb3IgcHVibGljIHJlbGVhc2UKYGBge3J9CmNlbnNvYy5kbWYud2ViIDwtIGNlbnNvYy5kbWYgJT4lIAogIHNlbGVjdChISVNUSUQsIGJ5ZWFyLCBibW9udGgsIGR5ZWFyLCBkbW9udGgsIGRlYXRoX2FnZSwgd2VpZ2h0KQpgYGAKCldyaXRlIG91dCBDZW5Tb2Mgd2l0aCBmb3Igd2Vic2l0ZS4gVGhpcyBpcyB0aGUgZmlsZSB3ZSB3aWxsIHB1YmxpY2x5IHJlbGVhc2UuIEFzIHBlciBvdXIgYWdyZWVtZW50IHdpdGggSVBVTVMsIHdlIGNhbm5vdCByZWxlYXNlIGRheSBvZiBkZWF0aCBvciBkYXkgb2YgYmlydGguIApgYGB7cn0KIyBmd3JpdGUoY2Vuc29jLmRtZi53ZWIsICIvY2Vuc29jL2RhdGEvY2Vuc29jX2ZpbGVzX2Zvcl93ZWJzaXRlL2NlbnNvY19kbWZfdjEuY3N2IikKYGBgCgpPcHRpb25hbDogYWRkIGFsbCBwZXJzb24gdmFyaWFibGVzIGFuZCBob3VzZWhvbGQgdmFyaWFibGVzIGZyb20gMTk0MCBjZW5zdXMKYGBge3J9CmNlbnN1cyA8LSBmcmVhZCgiL2hvbWUvaXB1bXMvY2FzZXktaXB1bXMvSVBVTVMyMDE5LzE5NDAvVFNWL1AudHN2IikKCmNlbnNvYy5kbWYuYWxsLnZhcnMgPC0gY2Vuc29jLmRtZiAlPiUgCiAgc2VsZWN0KC1BR0UsIC1TRVgsIC1OQU1FTEFTVCwgLU5BTUVGUlNUKSAlPiUgCiAgaW5uZXJfam9pbihjZW5zdXMpCgpob3VzZWhvbGRfY2Vuc3VzIDwtIGZyZWFkKCIvaG9tZS9pcHVtcy9jYXNleS1pcHVtcy9JUFVNUzIwMTkvMTk0MC9UU1YvSC50c3YiKQpzZXREVChjZW5zb2MuZG1mLmFsbC52YXJzKQpjZW5zb2MuZG1mLmFsbC52YXJzIDwtIGFkZF9ob3VzZWhvbGRfdmFyaWFibGVzKGNlbnNvYyA9IGNlbnNvYy5kbWYuYWxsLnZhcnMsIGhvdXNlaG9sZF9jZW5zdXMgPSBob3VzZWhvbGRfY2Vuc3VzKQpgYGAKCldyaXRlIG91dCBDZW5Tb2MgZmlsZSB3aXRoIGFsbCB2YXJpYWJsZXMKYGBge3J9CiMgZndyaXRlKGNlbnNvYy5kbWYuYWxsLnZhcnMsICIvY2Vuc29jL2RhdGEvY2Vuc29jX2xpbmtlZF93aXRoX2NlbnN1cy8xOTQwL2NlbnNvY19kbWZfYWxsX3ZhcnNfdjEuY3N2IikKYGBgCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKQmFja2dyb3VuZDogSW4gMjAxMywgdGhlIFNvY2lhbCBTZWN1cml0eSBBZG1pbmlzdHJhdGlvbiB0cmFuc2ZlcnJlZCBhIHNldCBvZiBOdW1pZGVudCByZWNvcmRzIHRvIHRoZQpOYXRpb25hbCBBcmNoaXZlcyAoTkFSQSkuIEluIDIwMTksIHdlIG9idGFpbmVkIHRoZSBOQVJBIE51bWlkZW50IHJlY29yZHMsIGFsb25nIHdpdGgKdGhlaXIgYWNjb21wYW55aW5nIGRvY3VtZW50YXRpb24uIFRoZSBOQVJBIE51bWlkZW50IHJlY29yZHMgYXJlIGEgc3Vic2V0IG9mIHRoZSByZWNvcmRzCmluIHRoZSBjb21wbGV0ZSBOdW1pZGVudC4gVGhlIE5BUkEgTnVtaWRlbnQgcmVjb3JkcyBjb250YWluIHRocmVlIHR5cGVzIG9mIGVudHJpZXM6CmFwcGxpY2F0aW9ucywgY2xhaW1zLCBhbmQgZGVhdGhzLiBOQVJBIGRlbGl2ZXJlZCBlYWNoIHNldCBvZiBlbnRyaWVzIHNlcGVyYXRlbHkgYXMgYSBzZXQgMjAKZml4ZWQtd2lkdGggLnR4dCBmaWxlcyAoMyB4IDIwID0gNjAgZmlsZXMgaW4gdG90YWwpLgoKRm9yIGVhY2ggb2YgdGhlIHRocmVlIGVudHJ5IHR5cGVzLCB0aGUgYmVsb3cgY29kZSByZWFkcyBpbiB0aGUgMjAgZml4ZWQtd2lkdGggLnR4dCBmaWxlcyB1c2luZyBjb2x1bW4KcG9zaXRpb24gc3BlY2lmaWVkIGluIHRoZSByZWNvcmQgbGF5b3V0IGRvY3VtZW50cy4gVGhlIGNvZGUgYXBwZW5kcyB0aGUgMjAgZmlsZXMgaW50byBhIHNpbmdsZQpmaWxlLiBUaGUgcmVzdWx0IGlzIHRocmVlIGZpbGVzLCBvbmUgZm9yIHRoZSBhcHBsaWNhdGlvbnMsIGNsYWltcywgYW5kIGRlYXRocy4gCgpDb2x1bW4gcG9zaXRpb25zIGFuZCB2YXJpYWJsZSBuYW1lcyB3ZXJlIG9idGFpbmVkIGZyb20gdGhlIE5BUkEgZG9jdW1lbnRhdGlvbiB3ZWJzaXRlOiBodHRwczovL2FhZC5hcmNoaXZlcy5nb3YvYWFkL3BvcHVwLXRlY2gtaW5mby5qc3A/cz01MDU3CgpUaGUgYmVsb3cgZnVuY3Rpb25zIHJlYWQgaW4gYWxsIHZhcmlhYmxlcyB3aXRoIHRoZSBjb2x1biBwb3NpdGlvbiBhbmQgdmFyaWFibGVzIG5hbWVzIHNwZWNpZmllZCBpbiB0aGUgTkFSQSByZWNvcmQgbGF5b3V0IGRvY3VtZW50cy5UaGUgUERGIGZpbGVzIHdlcmUgZmlyc3QgY29udmVydGVkIGludG8gYSBzcHJlYWRzaGVldCBpbiBvcmRlciBmYWNpbGl0YXRlIHdyaXRpbmcgdGhlIGNvZGUgdG8gcmVhZCBpbiB0aGUgZml4ZWQtd2lkdGggZmlsZXM6IAovYmNvdXJzZXMvZG9jdW1lbnRhdGlvbi9udW1pZGVudF9kb2N1bWVudGF0aW9uL251bWlkZW50X2ZpbGVfbGF5b3V0c190b19jcmVhdGVfcl9jb2RlLmNzdgoKVmFyaWFibGUgbmFtZXMgYXJlIGNvbnNpc3RlbnQgd2l0aCB0aGUgb3JpZ2luYWwgImZpZWxkIG5hbWVzIiB3aXRoIHR3byBleGNlcHRpb25zOiAKCjEpIEFsbCBkYXNoZXMgd2VyZSByZXBsYWNlZCB3aXRoIHVuZGVyc2NvcmVzIChlLmcuICItIiB3ZXJlIHJlcGxhY2VkIHdpdGggIl8iKQoyKSBUaGUgc2V2ZW4gdmFyaWFibGVzIHRpdGxlZCAiRklMTEVSIiB3ZXJlIHJlbmFtZWQgKCJGaWxsZXJfMSwgRmlsbGVyXzIsIC4uLiAsIEZpbGxlcl83KSIuCgoKYGBge3J9CiMgbGlicmFyeShkZXZ0b29scykgCiMgaW5zdGFsbF9naXRodWIoImNhc2V5YnJlZW4vY2Vuc29jZGV2IikKYGBgCgpMaWJyYXJ5IFBhY2thZ2VzCmBgYHtyfQpsaWJyYXJ5KGNlbnNvY2RldikKbGlicmFyeSh0aWR5dmVyc2UpCmxpYnJhcnkoZGF0YS50YWJsZSkKYGBgCgoKYGBge3J9CiMjIHJlYWQgaW4gZml4ZWQtd2lkdGggZGVhdGggcmVjb3JkcwpkZWF0aHMgPC0gcmVhZF9kZWF0aF9md2YocGF0aCA9ICIvZGF0YS9qb3NoL0NlblNvYy9OVU1ERUFUSC8iKQoKIyMgd3JpdGUgb3V0IGRlYXRoIHJlY29yZHMKZndyaXRlKHggPSBkZWF0aHMsIGZpbGUgPSAiL2NlbnNvYy9kYXRhL251bWlkZW50LzFfbnVtaWRlbnRfZmlsZXNfd2l0aF9vcmlnaW5hbF92YXJuYW1lcy9kZWF0aHNfb3JpZ2luYWwuY3N2IikKCiMjIHJlYWQgaW4gZml4ZWQtd2lkdGggYXBwbGlhdGlvbiByZWNvcmRzCmFwcHMgPC0gcmVhZF9hcHBfZndmKHBhdGggPSAiL2RhdGEvam9zaC9DZW5Tb2MvTlVNSUFQUExJQy9SZWNvcmRzLyIpCgojIyB3cml0ZSBvdXQgYXBwbGljYXRpb24gcmVjb3Jkcwpmd3JpdGUoYXBwcywgIi9jZW5zb2MvZGF0YS9udW1pZGVudC8xX251bWlkZW50X2ZpbGVzX3dpdGhfb3JpZ2luYWxfdmFybmFtZXMvYXBwbGljYXRpb25zX29yaWdpbmFsLmNzdiIpCgojIyByZWFkIGluIGNsYWltcyBmaXhlZC13aWR0aCBhcHBsaWNhdGlvbiByZWNvcmRzIApjbGFpbXMgPC0gcmVhZF9jbGFpbV9md2YocGF0aCA9ICIvZGF0YS9qb3NoL0NlblNvYy9OVU1JQ0xBSU0vUmVjb3Jkcy8iKQoKIyMgd3JpdGUgb3V0IGFwcGxpY2F0aW9uIHJlY29yZHMKZndyaXRlKGNsYWltcywgIi9jZW5zb2MvZGF0YS9udW1pZGVudC8xX251bWlkZW50X2ZpbGVzX3dpdGhfb3JpZ2luYWxfdmFybmFtZXMvY2xhaW1zX29yaWdpbmFsLmNzdiIpCmBgYAoKCg==</div>
 
 
 
@@ -1904,7 +1848,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("make_censoc_dmf.Rmd");
+  window.initializeSourceEmbed("1_read_numident_fwf.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

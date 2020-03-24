@@ -7,7 +7,7 @@
 #' @export
 
 
-create_censoc <- function(census,
+create_censoc_dmf <- function(census,
                           socsec){
 
   # remove dupes

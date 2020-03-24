@@ -1,60 +1,78 @@
 ---
-title: "2 censoc all gender sample"
+title: "Make CenSoc-Numident"
 output: html_notebook
+author: Casey Breen
 ---
 
-This notebook will read in the Berkeley Unified Mortality Database (BUNMD) and the 1940 Census. The code constructs linking keys, dedupes the keys, and then performs a direct match on the linking keys.  
+Summary: This notebook will link records in the Berkeley Unified Mortality Database (BUNMD) to the 1940 Census. The BUNMD is a cleaned and harmonized version of the NARA Numident Records. The code constructs linking keys, dedupes the keys, and then performs a direct match on the linking keys.  
 
+If the `censocdev` package hasn't already been installed, install from GitHub: 
+
+```{r}
+# library(devtools) 
+# install_github("caseybreen/censocdev")
+```
+
+Library packages
 ```{r}
 library(censocdev)
-library(HMDHFDplus)
+library(data.table)
+library(tidyverse)
 ```
 
+Read in the Berkeley Unified Numident Mortality Database. This is a harmonized and cleaned version on the NARA Numident files. 
 ```{r}
-bunmd <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv", colClasses = list(character= 'ssn')) 
+bunmd <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv", colClasses = list(character= 'ssn')) %>% 
+  select(-weight, -ccweight)
 ```
 
-Read in the census file. 
+Read in the 1940 Census file. 
 ```{r, eval = F}
 ## Load census with HISTID
 census.1940 <- load_census_numident_match(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
 ```
 
-Merge Numident and Census Files on linking keys: 1940
+Merge Numident and Census Files on linking keys.
+
+TODO put in more info about merge 
+
+- MARST codes: https://usa.ipums.org/usa-action/variables/MARST#codes_section
+
 ```{r, eval = F}
+## Set BUNMD and census as data.
 setDT(bunmd)
 setDT(census.1940)
 
-## censoc numident
-censoc.numident <- census_bunmd_merge(bunmd = bunmd, census = census.1940, census_year = 1940)
+## censoc bunmd merge
+censoc.numident <- create_censoc_numident(bunmd = bunmd, census = census.1940, census_year = 1940)
 
 ## censoc numident
 censoc.numident <- clean_wcensoc(censoc.numident, census_year = 1940) 
 
 ## Restrict to matches only in high coverage years
 censoc.numident.select <- censoc.numident %>% 
-  filter(dyear %in% c(1988:2005)) %>% 
-  select(-weight, -ccweight)
+  filter(dyear %in% c(1988:2005)) 
 
 ## calculate age at death
 censoc.numident.select <- calculate_age_at_death(censoc.numident.select)
 
 ## calculate weights 
 censoc.numident.select <- create_weights_censoc_numident(censoc.numident.select, cohorts = c(1895:1939), death_ages = c(65:105))
-
-## write out full version matched with censoc 
-fwrite(censoc.numident.select, "/censoc/data/censoc_linked_with_census/1940/censoc_numident_v1.csv")
 ```
 
-Select the variables for the public release — this will likely change 
+Select the variables for the public release. We don't include bday and dday variables per our agreement with IPUMS.
 ```{r}
+## select numident 
 censoc.numident.select <- censoc.numident %>% 
-  select(HISTID, byear, bmonth, dyear, dmonth, death_age, sex, race_first, race_first_cyear, race_first_cmonth,race_last, race_last_cyear, race_last_cmonth, bpl, zip_residence, socstate, age_first_application, weight)
+  select(HISTID, byear, bmonth, dyear, dmonth, death_age, sex, race_first, race_first_cyear,
+         race_first_cmonth,race_last, race_last_cyear, race_last_cmonth, bpl, zip_residence,
+         socstate, age_first_application, weight)
 
+## write out public version  
 fwrite(censoc.numident.select, "/censoc/data/censoc_files_for_website/censoc_numident_v1.csv")
 ```
 
-add person and total weights
+Add person and household variables
 ```{r}
 ## Drop census
 census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")

@@ -9,15 +9,14 @@
 #' @export
 #'
 
-create_weights_censoc_dmf <- function(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:105)) {
+create_weights_censoc_dmf <- function(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:100)) {
 
-  ## download deaths from HMD
-  hmd_deaths <-  readHMDweb(CNTRY = "USA", item = "Deaths_lexis", username = "caseybreen@berkeley.edu", password = "censoc") %>%
+  ## deaths from HMD
+  hmd_deaths <-  fread("/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   ## create censoc-dmf counts
   ## restrict to certain cohorts, death ages
-
   counts <- censoc.dmf %>%
     filter(byear %in% cohorts) %>%
     filter(death_age %in% death_ages) %>%

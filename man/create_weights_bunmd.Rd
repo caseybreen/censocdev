@@ -6,7 +6,12 @@
 This function will weight the numident file up to HMD lexis triangles
 Restrict data to deaths from 1988 - 2005 with age_at_death between}
 \usage{
-create_weights_bunmd(file)
+create_weights_bunmd(
+  file,
+  death_years = c(1988:2005),
+  death_ages = c(65:100),
+  cohorts = c(1895:1940)
+)
 }
 \arguments{
 \item{data}{data.frame with birth and death info}

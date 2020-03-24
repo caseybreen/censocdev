@@ -24,6 +24,20 @@ Variable names are consistent with the original "field names" with two exception
 1) All dashes were replaced with underscores (e.g. "-" were replaced with "_")
 2) The seven variables titled "FILLER" were renamed ("Filler_1, Filler_2, ... , Filler_7)".
 
+
+```{r}
+# library(devtools) 
+# install_github("caseybreen/censocdev")
+```
+
+Library Packages
+```{r}
+library(censocdev)
+library(tidyverse)
+library(data.table)
+```
+
+
 ```{r}
 ## read in fixed-width death records
 deaths <- read_death_fwf(path = "/data/josh/CenSoc/NUMDEATH/")
@@ -42,8 +56,6 @@ claims <- read_claim_fwf(path = "/data/josh/CenSoc/NUMICLAIM/Records/")
 
 ## write out application records
 fwrite(claims, "/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv")
-
-
 ```
 
 

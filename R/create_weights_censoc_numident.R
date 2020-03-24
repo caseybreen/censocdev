@@ -9,11 +9,13 @@
 #' @export
 #'
 
-create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:1939), death_ages = c(65:105)) {
+create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:1939), death_ages = c(65:100)) {
 
-  hmd_deaths <-  readHMDweb(CNTRY = "USA", item = "Deaths_lexis", username ="caseybreen@berkeley.edu", password = "censoc") %>%
+  ## Read in death by lexis triangle from HMD
+  hmd_deaths <-  fread("/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
+  ## Calculate counts of deaths in the Numident
   numdeath_aggregate_counts <- censoc.numident %>%
    filter(byear %in% cohorts) %>%
     filter(death_age %in% death_ages) %>%
@@ -22,6 +24,7 @@ create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:193
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
     ungroup(dyear, death_age)
 
+  ## Calculate death weights
   death_weights <- numdeath_aggregate_counts %>%
     inner_join(hmd_deaths, by = "linking_key") %>%
     mutate(proportion_matched = case_when(
@@ -30,17 +33,19 @@ create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:193
     group_by(dyear, byear, sex, death_age) %>%
     summarize(inclusion_prob = mean(proportion_matched), Male = mean(Male), Female = mean(Female), Total = mean(Total))
 
+  ## Calculate weights
   death_weights_for_link <-  death_weights %>%
-   # filter(byear %in% c(1900:1940)) %>%
     mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_")) %>%
     ungroup(dyear, death_age, sex) %>%
     select(inclusion_prob, linking_key) %>%
     mutate(weight = 1/inclusion_prob) %>%
     select(-inclusion_prob)
 
+  ## create key for link
   censoc.numident <- censoc.numident %>%
     mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_"))
 
+  ## add weights to original file
   censoc.numident <- censoc.numident %>%
     left_join(death_weights_for_link, by = "linking_key") %>%
     select(-linking_key)

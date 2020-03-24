@@ -9,7 +9,7 @@ Restrict data to certain cohorts and ages at deaths}
 create_weights_censoc_dmf(
   censoc.dmf,
   cohorts = c(1895:1939),
-  death_ages = c(65:105)
+  death_ages = c(65:100)
 )
 }
 \arguments{
