@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 #'
-create_bunmd <- function(claims_condensed, deaths, apps_condensed) {
+create_bunmd <- function(claims, deaths, apps_condensed) {
 
   ## select vars from death file
   deaths <- deaths %>%
@@ -15,7 +15,7 @@ create_bunmd <- function(claims_condensed, deaths, apps_condensed) {
     mutate(ssn = as.numeric(ssn))
 
   ## select vars from application file
-  application <- apps_condensed %>%
+  applications <- applications %>%
     select(ssn, bpl, earliest_cycle_year, earliest_cycle_month,
            mother_fname, mother_mname, mother_lname,
            father_fname, father_mname, father_lname, number_apps = number_of_apps,
@@ -23,12 +23,12 @@ create_bunmd <- function(claims_condensed, deaths, apps_condensed) {
     mutate(ssn = as.numeric(ssn))
 
   ## select vars from claims files (condensed)
-  claim <- claims_condensed %>%
+  claims <- claims %>%
     select(sex, ssn, bpl, mother_fname, mother_mname, mother_lname, father_fname, father_mname, father_lname, number_claims = number_of_claims) %>%
     mutate(ssn = as.numeric(ssn))
 
   bunmd <- deaths %>%
-    left_join(application, by = "ssn")
+    left_join(applications, by = "ssn")
 
   ## Replace any values of NA for sex with respective values from application files.
   ## Coalese function documentation: https://dplyr.tidyverse.org/reference/coalesce.html
@@ -39,7 +39,7 @@ create_bunmd <- function(claims_condensed, deaths, apps_condensed) {
 
   ## Replace any values of NA for sex, bpl, parents' names with respective values from claims files.
   bunmd <- bunmd %>%
-    left_join(claim, by = "ssn") %>%
+    left_join(claims, by = "ssn") %>%
     mutate(sex = coalesce(sex.x, sex.y)) %>%
     mutate(bpl = coalesce(bpl.x, bpl.y)) %>%
     mutate(father_fname = coalesce(father_fname.x, father_fname.y)) %>%
@@ -59,10 +59,16 @@ create_bunmd <- function(claims_condensed, deaths, apps_condensed) {
 
 
   ## Calculate age at first social security application
+  bunmd <- bunmd %>%
+    mutate(age_first_application = case_when(
+      bmonth >= earliest_cycle_month ~ as.numeric(earliest_cycle_year - byear - 1),
+      TRUE ~ as.numeric(earliest_cycle_year - byear))) %>%
+    mutate(age_first_application = case_when(
+      age_first_application < 0 ~ 0,
+      TRUE ~ age_first_application
+    ))
+
   setDT(bunmd)
-  bunmd[,"age_first_application" := ifelse(bmonth >= earliest_cycle_month,
-                                 earliest_cycle_year - byear - 1,
-                                 earliest_cycle_year - byear)]
 
   ## Recode NA for number_claims and number_apps to 0
   bunmd[ , number_claims:= (ifelse(is.na(number_claims), 0, number_claims)) ]
@@ -78,6 +84,12 @@ create_bunmd <- function(claims_condensed, deaths, apps_condensed) {
   ## drop earliest cycle month/year variables
   bunmd <- bunmd %>%
     select(-earliest_cycle_year, -earliest_cycle_month)
+
+  ## Drop records without age at death < 1 or no information on age of death
+  ## A person has no age at death when they don't have a birth year
+
+  bunmd2 <- bunmd %>%
+    filter(death_age >= 0)
 
   return(bunmd)
 }
