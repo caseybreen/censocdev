@@ -26,7 +26,7 @@ create_censoc_numident <- function(bunmd = bunmd, census = census, census_year =
   setDT(bunmd)
 
   ## omit rows where either 'bpl' or 'census_age' have missing values
-  bunmd <- na.omit(bunmd, cols=c("bpl", "census_age"))
+  bunmd <- na.omit(bunmd, cols=c("bpl", "census_age", "fname", "lname"))
 
   ## clean first name variables
   bunmd[,"fname" := enc2native(fname)]

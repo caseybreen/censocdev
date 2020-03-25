@@ -11,7 +11,6 @@ The functions "create_weights" create post-stratification weights to the HMD for
 
 ```{r}
 library(censocdev)
-library(HMDHFDplus)
 ```
 
 
@@ -22,14 +21,14 @@ deaths <- fread("/censoc/data/numident/3_numident_files_cleaned_and_condensed/de
 applications <- fread("/censoc/data/numident/3_numident_files_cleaned_and_condensed/apps_condensed.csv")
 
 ## combine records into one file
-bunmd <- create_bunmd(claims_condensed = claims, apps_condensed = apps, deaths = deaths)
+bunmd <- create_bunmd(claims = claims, applications = applications, deaths = deaths)
 
 ## construct weights for BUNMD 
-bunmd <- create_weights_bunmd(file = bunmd)
-bunmd <- create_weights_bunmd_complete(file = bunmd)
+bunmd <- create_weights_bunmd(bunmd)
+bunmd <- create_weights_bunmd_complete(bunmd)
 
 ## write out BUNMD 
-#fwrite(bunmd, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv")
+fwrite(bunmd, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv")
 ```
 
 Recap of the decision rules we used to create the BUNMD: 
@@ -39,7 +38,9 @@ their death record, select sex from their most recent application record. If una
 in their death record and their application records, select sex from their most recent
 claim record.
 
-- race: Select the person’s race from their most recent application record.
+- race_first: Select the person’s race_first from their most first application record.
+
+- race_last: Select the person’s race_last from their last recent application record.
 
 - bpl: Select the person’s race from their most recent application record. If unavailable
 in their application records, select from their most recent claim record.

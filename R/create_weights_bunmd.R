@@ -37,7 +37,6 @@ create_weights_bunmd <- function(file, death_years = c(1988:2005), death_ages = 
 
   ## create death weights
   death_weights_for_link <-  death_weights %>%
-    filter(byear %in% c(1895:1920)) %>%
     mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_")) %>%
     ungroup(dyear, death_age, sex) %>%
     select(inclusion_prob, linking_key) %>%

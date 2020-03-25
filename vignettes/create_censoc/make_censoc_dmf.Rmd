@@ -25,20 +25,18 @@ Read in Social Security Death Master file, 1940 census file, and create censoc f
 Note: n_clean_keys variable in the "census" file refers to the total number of unique keys for both men *and* women. 
 ```{r}
 ## Read in DMF (SSDM) files
-socsec_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
+dmf_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
                      "/home/ipums/josh-ipums/progs/ssdm/ssdm2",
                      "/home/ipums/josh-ipums/progs/ssdm/ssdm3")
 
-socsec <- load_socsec_deaths(socsec_files)
+dmf <- load_dmfc_deaths(dmf_files)
 
 ## Read in 1940 Census files
 census <- load_census_dmf_match(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
 
 ## Create CenSoc File
-censoc.dmf <- create_censoc_dmf(census, socsec)
+censoc.dmf <- create_censoc_dmf(census, dmf)
 ```
-
-
 
 - Calculate age at death variables 
 - Calculate weights

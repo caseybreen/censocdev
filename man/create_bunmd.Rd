@@ -4,7 +4,7 @@
 \alias{create_bunmd}
 \title{Unify Numident Files}
 \usage{
-create_bunmd(claims, deaths, apps_condensed)
+create_bunmd(claims, deaths, applications)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}

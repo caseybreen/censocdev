@@ -50,26 +50,26 @@ censoc.numident <- create_censoc_numident(bunmd = bunmd, census = census.1940, c
 censoc.numident <- clean_wcensoc(censoc.numident, census_year = 1940) 
 
 ## Restrict to matches only in high coverage years
-censoc.numident.select <- censoc.numident %>% 
+censoc.numident <- censoc.numident %>% 
   filter(dyear %in% c(1988:2005)) 
 
 ## calculate age at death
-censoc.numident.select <- calculate_age_at_death(censoc.numident.select)
+censoc.numident <- calculate_age_at_death(censoc.numident)
 
 ## calculate weights 
-censoc.numident.select <- create_weights_censoc_numident(censoc.numident.select, cohorts = c(1895:1939), death_ages = c(65:105))
+censoc.numident <- create_weights_censoc_numident(censoc.numident, cohorts = c(1895:1939), death_ages = c(65:100))
 ```
 
 Select the variables for the public release. We don't include bday and dday variables per our agreement with IPUMS.
 ```{r}
 ## select numident 
-censoc.numident.select <- censoc.numident %>% 
+censoc.numident.website <- censoc.numident %>% 
   select(HISTID, byear, bmonth, dyear, dmonth, death_age, sex, race_first, race_first_cyear,
          race_first_cmonth,race_last, race_last_cyear, race_last_cmonth, bpl, zip_residence,
          socstate, age_first_application, weight)
 
 ## write out public version  
-fwrite(censoc.numident.select, "/censoc/data/censoc_files_for_website/censoc_numident_v1.csv")
+fwrite(censoc.numident.website, "/censoc/data/censoc_files_for_website/censoc_numident_v1.csv")
 ```
 
 Add person and household variables

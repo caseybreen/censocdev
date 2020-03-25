@@ -9,7 +9,7 @@ Restrict data to deaths from 1988 - 2005 with age_at_death between}
 create_weights_bunmd_complete(
   bunmd.file,
   dyears = c(1988:2005),
-  cohorts = c(1895:1920),
+  cohorts = c(1895:1940),
   death_ages = c(65:100)
 )
 }

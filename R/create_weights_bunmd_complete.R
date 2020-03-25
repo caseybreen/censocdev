@@ -9,7 +9,7 @@
 #' @export
 #'
 
-create_weights_bunmd_complete <- function(bunmd.file, dyears = c(1988:2005), cohorts = c(1895:1920), death_ages = c(65:100)) {
+create_weights_bunmd_complete <- function(bunmd.file, dyears = c(1988:2005), cohorts = c(1895:1940), death_ages = c(65:100)) {
 
   ## deaths from HMD
   hmd_deaths <-  fread("/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
@@ -42,7 +42,6 @@ create_weights_bunmd_complete <- function(bunmd.file, dyears = c(1988:2005), coh
 
   ## create death weights
   death_weights_for_link <-  death_weights %>%
-    filter(byear %in% c(1895:1940)) %>%
     mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_")) %>%
     ungroup(dyear, death_age, sex) %>%
     select(inclusion_prob, linking_key) %>%
