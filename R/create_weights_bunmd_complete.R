@@ -20,7 +20,7 @@ create_weights_bunmd_complete <- function(bunmd.file, dyears = c(1988:2005), coh
     filter(dyear %in% dyears) %>%
     filter(byear %in% cohorts) %>%
     filter(death_age %in% death_ages) %>%
-    filter(is.na(sex)) %>%
+    filter(!is.na(sex)) %>%
     drop_na(complete_cases_vars)
 
   ## tabulate complete cases
