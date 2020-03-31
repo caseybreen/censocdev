@@ -9,20 +9,18 @@
 #' @export
 #'
 
-create_weights_bunmd_complete <- function(bunmd.file, dyears = c(1988:2005), cohorts = c(1895:1940), death_ages = c(65:100)) {
+create_weights_bunmd_complete <- function(bunmd.file, dyears = c(1988:2005), cohorts = c(1895:1940), death_ages = c(65:100), complete_cases_vars = c("sex", "race_last", "bpl")) {
 
   ## deaths from HMD
   hmd_deaths <-  fread("/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
-  ## filter to complete cases
+  ## filter to complete case
   high_coverage_complete_sample <- bunmd %>%
-    filter(dyear %in% dyear) %>%
+    filter(dyear %in% dyears) %>%
     filter(byear %in% cohorts) %>%
     filter(death_age %in% death_ages) %>%
-    filter(!is.na(sex)) %>%
-    filter(!is.na(race_last)) %>%
-    filter(!is.na(bpl))
+    drop_na(complete_cases_vars)
 
   ## tabulate complete cases
   numdeath_aggregate_counts <- high_coverage_complete_sample %>%
@@ -52,11 +50,12 @@ create_weights_bunmd_complete <- function(bunmd.file, dyears = c(1988:2005), coh
   high_coverage_complete_sample <- high_coverage_complete_sample %>%
     mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_"))
 
-  ## link death weights back to original sample
+  ## link death weights to ssn
   weights.df <- high_coverage_complete_sample %>%
     left_join(death_weights_for_link, by = "linking_key") %>%
     select(ssn, ccweight)
 
+  ## original sample
   bunmd.file <- bunmd.file %>%
     left_join(weights.df, by = "ssn")
 

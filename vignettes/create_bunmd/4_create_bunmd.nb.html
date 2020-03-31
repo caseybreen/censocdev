@@ -1762,17 +1762,48 @@ library(HMDHFDplus)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgY29uc3RydWN0IHdlaWdodHMgZm9yIEJVTk1EIFxuYnVubWQgPC0gY3JlYXRlX3dlaWdodHNfYnVubWQoZmlsZSA9IGJ1bm1kKVxuIyMgY29uc3RydWN0IHdlaWdodHMgZm9yIEJVTk1EIFxuYnVubWQgPC0gY3JlYXRlX3dlaWdodHNfYnVubWQoZmlsZSA9IGJ1bm1kKVxuYnVubWQgPC0gY3JlYXRlX3dlaWdodHNfYnVubWRfY29tcGxldGUoZmlsZSA9IGJ1bm1kKVxuXG5gYGAifQ== -->
-<pre class="r"><code>## construct weights for BUNMD 
-bunmd &lt;- create_weights_bunmd(file = bunmd)
-## construct weights for BUNMD 
-bunmd &lt;- create_weights_bunmd(file = bunmd)
-bunmd &lt;- create_weights_bunmd_complete(file = bunmd)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgcmVhZCBpbiBjbGVhbmVkIGFuZCBcImNvbmRlbnNlZFwiIG51bWlkZW50IGZpbGVzXG5jbGFpbXMgPC0gZnJlYWQoXCIvY2Vuc29jL2RhdGEvbnVtaWRlbnQvM19udW1pZGVudF9maWxlc19jbGVhbmVkX2FuZF9jb25kZW5zZWQvY2xhaW1zX2NvbmRlbnNlZC5jc3ZcIilcbmBgYCJ9 -->
+<pre class="r"><code>## read in cleaned and &quot;condensed&quot; numident files
+claims &lt;- fread(&quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/claims_condensed.csv&quot;)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gY3JlYXRlX3dlaWdodHNfYnVubWRfY29tcGxldGUoZmlsZSA9IGJ1bm1kKSA6IFxuICB1bnVzZWQgYXJndW1lbnQgKGZpbGUgPSBidW5tZClcbiJ9 -->
-<pre><code>Error in create_weights_bunmd_complete(file = bunmd) : 
-  unused argument (file = bunmd)</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoifC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfFxufD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09fFxuIn0= -->
+<pre><code>|--------------------------------------------------|
+|==================================================|</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGVhdGhzIDwtIGZyZWFkKFwiL2NlbnNvYy9kYXRhL251bWlkZW50LzNfbnVtaWRlbnRfZmlsZXNfY2xlYW5lZF9hbmRfY29uZGVuc2VkL2RlYXRocy5jc3ZcIilcbmBgYCJ9 -->
+<pre class="r"><code>deaths &lt;- fread(&quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/deaths.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoifC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfFxufD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09fFxuIn0= -->
+<pre><code>|--------------------------------------------------|
+|==================================================|</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXBwbGljYXRpb25zIDwtIGZyZWFkKFwiL2NlbnNvYy9kYXRhL251bWlkZW50LzNfbnVtaWRlbnRfZmlsZXNfY2xlYW5lZF9hbmRfY29uZGVuc2VkL2FwcHNfY29uZGVuc2VkLmNzdlwiKVxuYGBgIn0= -->
+<pre class="r"><code>applications &lt;- fread(&quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/apps_condensed.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoifC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfFxufD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09fFxuIn0= -->
+<pre><code>|--------------------------------------------------|
+|==================================================|</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgY29tYmluZSByZWNvcmRzIGludG8gb25lIGZpbGVcbmJ1bm1kIDwtIGNyZWF0ZV9idW5tZChjbGFpbXMgPSBjbGFpbXMsIGFwcGxpY2F0aW9ucyA9IGFwcGxpY2F0aW9ucywgZGVhdGhzID0gZGVhdGhzKVxuXG4jIyBjb25zdHJ1Y3Qgd2VpZ2h0cyBmb3IgQlVOTUQgXG5idW5tZCA8LSBjcmVhdGVfd2VpZ2h0c19idW5tZChidW5tZClcbmJ1bm1kIDwtIGNyZWF0ZV93ZWlnaHRzX2J1bm1kX2NvbXBsZXRlKGJ1bm1kKVxuXG4jIyB3cml0ZSBvdXQgQlVOTUQgXG5md3JpdGUoYnVubWQsIFwiL2NlbnNvYy9kYXRhL251bWlkZW50LzRfYmVya2VsZXlfdW5pZmllZF9tb3J0YWxpdHlfZGF0YWJhc2UvYnVubWQuY3N2XCIpXG5gYGAifQ== -->
+<pre class="r"><code>## combine records into one file
+bunmd &lt;- create_bunmd(claims = claims, applications = applications, deaths = deaths)
+
+## construct weights for BUNMD 
+bunmd &lt;- create_weights_bunmd(bunmd)
+bunmd &lt;- create_weights_bunmd_complete(bunmd)
+
+## write out BUNMD 
+fwrite(bunmd, &quot;/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Xcml0dGVuIDAuMCUgb2YgNDkzMzc4Mjcgcm93cyBpbiA2IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTElLiBFVEEgNDQyNjUgc2Vjcy4gICAgICBcbldyaXR0ZW4gMTYuNSUgb2YgNDkzMzc4Mjcgcm93cyBpbiA3IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgMzggc2Vjcy4gICAgICBcbldyaXR0ZW4gMzUuMiUgb2YgNDkzMzc4Mjcgcm93cyBpbiA4IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgMTUgc2Vjcy4gICAgICBcbldyaXR0ZW4gNTQuMSUgb2YgNDkzMzc4Mjcgcm93cyBpbiA5IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgOCBzZWNzLiAgICAgIFxuV3JpdHRlbiA3Mi4wJSBvZiA0OTMzNzgyNyByb3dzIGluIDEwIHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgNCBzZWNzLiAgICAgIFxuV3JpdHRlbiA5MC42JSBvZiA0OTMzNzgyNyByb3dzIGluIDExIHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgMSBzZWNzLiAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIn0= -->
+<pre><code>
+Written 0.0% of 49337827 rows in 6 secs using 12 threads. maxBuffUsed=11%. ETA 44265 secs.      
+Written 16.5% of 49337827 rows in 7 secs using 12 threads. maxBuffUsed=12%. ETA 38 secs.      
+Written 35.2% of 49337827 rows in 8 secs using 12 threads. maxBuffUsed=12%. ETA 15 secs.      
+Written 54.1% of 49337827 rows in 9 secs using 12 threads. maxBuffUsed=12%. ETA 8 secs.      
+Written 72.0% of 49337827 rows in 10 secs using 12 threads. maxBuffUsed=12%. ETA 4 secs.      
+Written 90.6% of 49337827 rows in 11 secs using 12 threads. maxBuffUsed=12%. ETA 1 secs.      
+                                                                                                                                     </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
