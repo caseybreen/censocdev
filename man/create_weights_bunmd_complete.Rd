@@ -11,7 +11,7 @@ create_weights_bunmd_complete(
   dyears = c(1988:2005),
   cohorts = c(1895:1940),
   death_ages = c(65:100),
-  complete_cases_vars = c("sex", "race_last", "bpl")
+  complete_cases_vars = c("race_last", "bpl")
 )
 }
 \arguments{
