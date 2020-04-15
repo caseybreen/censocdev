@@ -6,7 +6,7 @@ author: Casey Breen (caseybreen@berkeley.edu)
 
 Summary: This vignette goes through the steps of create the CenSoc-DMF file from input source data (Social Security Death Master File and 1940 Census). We match men on their first name, last name, and age at census. 
 
-The `censocdev` package must be installed from GitHub: 
+A copy of the `censocdev` package must be cloned from GitHub: 
 
 ```{r}
 # library(devtools) 
