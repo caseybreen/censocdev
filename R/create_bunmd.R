@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 #'
-create_bunmd <- function(claims, deaths, apps_condensed) {
+create_bunmd <- function(claims, deaths, applications) {
 
   ## select vars from death file
   deaths <- deaths %>%
@@ -88,7 +88,7 @@ create_bunmd <- function(claims, deaths, apps_condensed) {
   ## Drop records without age at death < 1 or no information on age of death
   ## A person has no age at death when they don't have a birth year
 
-  bunmd2 <- bunmd %>%
+  bunmd <- bunmd %>%
     filter(death_age >= 0)
 
   return(bunmd)

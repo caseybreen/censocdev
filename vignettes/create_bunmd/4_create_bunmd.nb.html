@@ -1762,18 +1762,47 @@ library(HMDHFDplus)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgd3JpdGUgb3V0IEJVTk1EIFxuZndyaXRlKGJ1bm1kLCBcIi9jZW5zb2MvZGF0YS9udW1pZGVudC80X2JlcmtlbGV5X3VuaWZpZWRfbW9ydGFsaXR5X2RhdGFiYXNlL2J1bm1kLmNzdlwiKVxuXG5gYGAifQ== -->
-<pre class="r"><code>## write out BUNMD 
-fwrite(bunmd, &quot;/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv&quot;)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgcmVhZCBpbiBjbGVhbmVkIGFuZCBcImNvbmRlbnNlZFwiIG51bWlkZW50IGZpbGVzXG5jbGFpbXMgPC0gZnJlYWQoXCIvY2Vuc29jL2RhdGEvbnVtaWRlbnQvM19udW1pZGVudF9maWxlc19jbGVhbmVkX2FuZF9jb25kZW5zZWQvY2xhaW1zX2NvbmRlbnNlZC5jc3ZcIilcbmBgYCJ9 -->
+<pre class="r"><code>## read in cleaned and &quot;condensed&quot; numident files
+claims &lt;- fread(&quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/claims_condensed.csv&quot;)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5Xcml0dGVuIDAuMSUgb2YgNDk0NTkyOTMgcm93cyBpbiA1IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgODkxMSBzZWNzLiAgICAgIFxuV3JpdHRlbiAyMS4zJSBvZiA0OTQ1OTI5MyByb3dzIGluIDYgc2VjcyB1c2luZyAxMiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMyUuIEVUQSAyNSBzZWNzLiAgICAgIFxuV3JpdHRlbiA0My4wJSBvZiA0OTQ1OTI5MyByb3dzIGluIDcgc2VjcyB1c2luZyAxMiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMyUuIEVUQSAxMCBzZWNzLiAgICAgIFxuV3JpdHRlbiA2NS42JSBvZiA0OTQ1OTI5MyByb3dzIGluIDggc2VjcyB1c2luZyAxMiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMyUuIEVUQSA0IHNlY3MuICAgICAgXG5Xcml0dGVuIDg5LjQlIG9mIDQ5NDU5MjkzIHJvd3MgaW4gOSBzZWNzIHVzaW5nIDEyIHRocmVhZHMuIG1heEJ1ZmZVc2VkPTEzJS4gRVRBIDEgc2Vjcy4gICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoifC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfFxufD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09fFxuIn0= -->
+<pre><code>|--------------------------------------------------|
+|==================================================|</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGVhdGhzIDwtIGZyZWFkKFwiL2NlbnNvYy9kYXRhL251bWlkZW50LzNfbnVtaWRlbnRfZmlsZXNfY2xlYW5lZF9hbmRfY29uZGVuc2VkL2RlYXRocy5jc3ZcIilcbmBgYCJ9 -->
+<pre class="r"><code>deaths &lt;- fread(&quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/deaths.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoifC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfFxufD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09fFxuIn0= -->
+<pre><code>|--------------------------------------------------|
+|==================================================|</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXBwbGljYXRpb25zIDwtIGZyZWFkKFwiL2NlbnNvYy9kYXRhL251bWlkZW50LzNfbnVtaWRlbnRfZmlsZXNfY2xlYW5lZF9hbmRfY29uZGVuc2VkL2FwcHNfY29uZGVuc2VkLmNzdlwiKVxuYGBgIn0= -->
+<pre class="r"><code>applications &lt;- fread(&quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/apps_condensed.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoifC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfFxufD09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09fFxuIn0= -->
+<pre><code>|--------------------------------------------------|
+|==================================================|</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgY29tYmluZSByZWNvcmRzIGludG8gb25lIGZpbGVcbmJ1bm1kIDwtIGNyZWF0ZV9idW5tZChjbGFpbXMgPSBjbGFpbXMsIGFwcGxpY2F0aW9ucyA9IGFwcGxpY2F0aW9ucywgZGVhdGhzID0gZGVhdGhzKVxuXG4jIyBjb25zdHJ1Y3Qgd2VpZ2h0cyBmb3IgQlVOTUQgXG5idW5tZCA8LSBjcmVhdGVfd2VpZ2h0c19idW5tZChidW5tZClcbmJ1bm1kIDwtIGNyZWF0ZV93ZWlnaHRzX2J1bm1kX2NvbXBsZXRlKGJ1bm1kKVxuXG4jIyB3cml0ZSBvdXQgQlVOTUQgXG5md3JpdGUoYnVubWQsIFwiL2NlbnNvYy9kYXRhL251bWlkZW50LzRfYmVya2VsZXlfdW5pZmllZF9tb3J0YWxpdHlfZGF0YWJhc2UvYnVubWQuY3N2XCIpXG5gYGAifQ== -->
+<pre class="r"><code>## combine records into one file
+bunmd &lt;- create_bunmd(claims = claims, applications = applications, deaths = deaths)
+
+## construct weights for BUNMD 
+bunmd &lt;- create_weights_bunmd(bunmd)
+bunmd &lt;- create_weights_bunmd_complete(bunmd)
+
+## write out BUNMD 
+fwrite(bunmd, &quot;/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Xcml0dGVuIDAuMCUgb2YgNDkzMzc4Mjcgcm93cyBpbiA2IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTElLiBFVEEgNDQyNjUgc2Vjcy4gICAgICBcbldyaXR0ZW4gMTYuNSUgb2YgNDkzMzc4Mjcgcm93cyBpbiA3IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgMzggc2Vjcy4gICAgICBcbldyaXR0ZW4gMzUuMiUgb2YgNDkzMzc4Mjcgcm93cyBpbiA4IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgMTUgc2Vjcy4gICAgICBcbldyaXR0ZW4gNTQuMSUgb2YgNDkzMzc4Mjcgcm93cyBpbiA5IHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgOCBzZWNzLiAgICAgIFxuV3JpdHRlbiA3Mi4wJSBvZiA0OTMzNzgyNyByb3dzIGluIDEwIHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgNCBzZWNzLiAgICAgIFxuV3JpdHRlbiA5MC42JSBvZiA0OTMzNzgyNyByb3dzIGluIDExIHNlY3MgdXNpbmcgMTIgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTIlLiBFVEEgMSBzZWNzLiAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIn0= -->
 <pre><code>
-Written 0.1% of 49459293 rows in 5 secs using 12 threads. maxBuffUsed=12%. ETA 8911 secs.      
-Written 21.3% of 49459293 rows in 6 secs using 12 threads. maxBuffUsed=13%. ETA 25 secs.      
-Written 43.0% of 49459293 rows in 7 secs using 12 threads. maxBuffUsed=13%. ETA 10 secs.      
-Written 65.6% of 49459293 rows in 8 secs using 12 threads. maxBuffUsed=13%. ETA 4 secs.      
-Written 89.4% of 49459293 rows in 9 secs using 12 threads. maxBuffUsed=13%. ETA 1 secs.      
+Written 0.0% of 49337827 rows in 6 secs using 12 threads. maxBuffUsed=11%. ETA 44265 secs.      
+Written 16.5% of 49337827 rows in 7 secs using 12 threads. maxBuffUsed=12%. ETA 38 secs.      
+Written 35.2% of 49337827 rows in 8 secs using 12 threads. maxBuffUsed=12%. ETA 15 secs.      
+Written 54.1% of 49337827 rows in 9 secs using 12 threads. maxBuffUsed=12%. ETA 8 secs.      
+Written 72.0% of 49337827 rows in 10 secs using 12 threads. maxBuffUsed=12%. ETA 4 secs.      
+Written 90.6% of 49337827 rows in 11 secs using 12 threads. maxBuffUsed=12%. ETA 1 secs.      
                                                                                                                                      </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
@@ -1781,7 +1810,8 @@ Written 89.4% of 49459293 rows in 9 secs using 12 threads. maxBuffUsed=13%. ETA 
 <p>Recap of the decision rules we used to create the BUNMD:</p>
 <ul>
 <li><p>sex: When available, select the person’s sex from their death record. If unavailable in their death record, select sex from their most recent application record. If unavailable in their death record and their application records, select sex from their most recent claim record.</p></li>
-<li><p>race: Select the person’s race from their most recent application record.</p></li>
+<li><p>race_first: Select the person’s race_first from their most first application record.</p></li>
+<li><p>race_last: Select the person’s race_last from their last recent application record.</p></li>
 <li><p>bpl: Select the person’s race from their most recent application record. If unavailable in their application records, select from their most recent claim record.</p></li>
 <li><p>father_fname: Select the person’s father’s first name that is the maximum number of characters across applications.</p></li>
 <li><p>father_mname: Select the person’s father’s middle name that is the maximum number of characters across applications.</p></li>
@@ -1792,7 +1822,7 @@ Written 89.4% of 49459293 rows in 9 secs using 12 threads. maxBuffUsed=13%. ETA 
 </ul>
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ3JlYXRlIEJVTk1EICIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKQ3JlYXRlIHRoZSBCVU5NRCBmaWxlIGZyb20gdGhlIGNsZWFuZWQgYW5kICJjb25kZW5zZWQiIE51bWlkZW50IGZpbGVzLiAKClRoZSBmdW5jdGlvbiBgdW5pZnlfbnVtaWRlbnRgIGNvbWJpbmVzIHRoZSBpbmZvcm1hdGlvbiBmcm9tIHRoZSBkZWF0aHMsIGFwcGxpY2F0aW9ucywgYW5kIGNsYWltcyBmaWxlcyBpbnRvIGEgZmlsZSB3aXRoIG9uZSByZWNvcmQgcGVyIHBlcnNvbjogdGhlIEJlcmtlbGV5IFVuaWZpZWQgTnVtaWRlbnQgTW9ydGFsaXR5IERhdGFiYXNlIChCVU5NRCkuCgpUaGUgZnVuY3Rpb25zICJjcmVhdGVfd2VpZ2h0cyIgY3JlYXRlIHBvc3Qtc3RyYXRpZmljYXRpb24gd2VpZ2h0cyB0byB0aGUgSE1EIGZvciB0aGUgQlVOTUQgU2FtcGxlIDEgYW5kIFNhbXBsZSAyLiAKCmBgYHtyfQpsaWJyYXJ5KGNlbnNvY2RldikKbGlicmFyeShITURIRkRwbHVzKQpgYGAKCgpgYGB7cn0KIyMgcmVhZCBpbiBjbGVhbmVkIGFuZCAiY29uZGVuc2VkIiBudW1pZGVudCBmaWxlcwpjbGFpbXMgPC0gZnJlYWQoIi9jZW5zb2MvZGF0YS9udW1pZGVudC8zX251bWlkZW50X2ZpbGVzX2NsZWFuZWRfYW5kX2NvbmRlbnNlZC9jbGFpbXNfY29uZGVuc2VkLmNzdiIpCmRlYXRocyA8LSBmcmVhZCgiL2NlbnNvYy9kYXRhL251bWlkZW50LzNfbnVtaWRlbnRfZmlsZXNfY2xlYW5lZF9hbmRfY29uZGVuc2VkL2RlYXRocy5jc3YiKQphcHBsaWNhdGlvbnMgPC0gZnJlYWQoIi9jZW5zb2MvZGF0YS9udW1pZGVudC8zX251bWlkZW50X2ZpbGVzX2NsZWFuZWRfYW5kX2NvbmRlbnNlZC9hcHBzX2NvbmRlbnNlZC5jc3YiKQoKIyMgY29tYmluZSByZWNvcmRzIGludG8gb25lIGZpbGUKYnVubWQgPC0gY3JlYXRlX2J1bm1kKGNsYWltc19jb25kZW5zZWQgPSBjbGFpbXMsIGFwcHNfY29uZGVuc2VkID0gYXBwcywgZGVhdGhzID0gZGVhdGhzKQoKIyMgY29uc3RydWN0IHdlaWdodHMgZm9yIEJVTk1EIApidW5tZCA8LSBjcmVhdGVfd2VpZ2h0c19idW5tZChmaWxlID0gYnVubWQpCmJ1bm1kIDwtIGNyZWF0ZV93ZWlnaHRzX2J1bm1kX2NvbXBsZXRlKGZpbGUgPSBidW5tZCkKCiMjIHdyaXRlIG91dCBCVU5NRCAKI2Z3cml0ZShidW5tZCwgIi9jZW5zb2MvZGF0YS9udW1pZGVudC80X2JlcmtlbGV5X3VuaWZpZWRfbW9ydGFsaXR5X2RhdGFiYXNlL2J1bm1kLmNzdiIpCmBgYAoKUmVjYXAgb2YgdGhlIGRlY2lzaW9uIHJ1bGVzIHdlIHVzZWQgdG8gY3JlYXRlIHRoZSBCVU5NRDogCgotIHNleDogV2hlbiBhdmFpbGFibGUsIHNlbGVjdCB0aGUgcGVyc29u4oCZcyBzZXggZnJvbSB0aGVpciBkZWF0aCByZWNvcmQuIElmIHVuYXZhaWxhYmxlIGluCnRoZWlyIGRlYXRoIHJlY29yZCwgc2VsZWN0IHNleCBmcm9tIHRoZWlyIG1vc3QgcmVjZW50IGFwcGxpY2F0aW9uIHJlY29yZC4gSWYgdW5hdmFpbGFibGUKaW4gdGhlaXIgZGVhdGggcmVjb3JkIGFuZCB0aGVpciBhcHBsaWNhdGlvbiByZWNvcmRzLCBzZWxlY3Qgc2V4IGZyb20gdGhlaXIgbW9zdCByZWNlbnQKY2xhaW0gcmVjb3JkLgoKLSByYWNlOiBTZWxlY3QgdGhlIHBlcnNvbuKAmXMgcmFjZSBmcm9tIHRoZWlyIG1vc3QgcmVjZW50IGFwcGxpY2F0aW9uIHJlY29yZC4KCi0gYnBsOiBTZWxlY3QgdGhlIHBlcnNvbuKAmXMgcmFjZSBmcm9tIHRoZWlyIG1vc3QgcmVjZW50IGFwcGxpY2F0aW9uIHJlY29yZC4gSWYgdW5hdmFpbGFibGUKaW4gdGhlaXIgYXBwbGljYXRpb24gcmVjb3Jkcywgc2VsZWN0IGZyb20gdGhlaXIgbW9zdCByZWNlbnQgY2xhaW0gcmVjb3JkLgoKLSBmYXRoZXJfZm5hbWU6IFNlbGVjdCB0aGUgcGVyc29u4oCZcyBmYXRoZXLigJlzIGZpcnN0IG5hbWUgdGhhdCBpcyB0aGUgbWF4aW11bSBudW1iZXIKb2YgY2hhcmFjdGVycyBhY3Jvc3MgYXBwbGljYXRpb25zLgoKLSBmYXRoZXJfbW5hbWU6IFNlbGVjdCB0aGUgcGVyc29u4oCZcyBmYXRoZXLigJlzIG1pZGRsZSBuYW1lIHRoYXQgaXMgdGhlIG1heGltdW0KbnVtYmVyIG9mIGNoYXJhY3RlcnMgYWNyb3NzIGFwcGxpY2F0aW9ucy4KCi0gZmF0aGVyX2xuYW1lOiBTZWxlY3QgdGhlIHBlcnNvbuKAmXMgZmF0aGVy4oCZcyBsYXN0IG5hbWUgdGhhdCBpcyB0aGUgbWF4aW11bSBudW1iZXIgb2YKY2hhcmFjdGVycyBhY3Jvc3MgYXBwbGljYXRpb25zLgoKLSBtb3RoZXJfZm5hbWU6IFNlbGVjdCB0aGUgcGVyc29u4oCZcyBtb3RoZXLigJlzIGZpcnN0IG5hbWUgdGhhdCBpcyB0aGUgbWF4aW11bSBudW1iZXIKb2YgY2hhcmFjdGVycyBhY3Jvc3MgYXBwbGljYXRpb25zLgoKLSBtb3RoZXJfbW5hbWU6IFNlbGVjdCB0aGUgcGVyc29u4oCZcyBtb3RoZXLigJlzIG1pZGRsZSBuYW1lIHRoYXQgaXMgdGhlIG1heGltdW0KbnVtYmVyIG9mIGNoYXJhY3RlcnMgYWNyb3NzIGFwcGxpY2F0aW9ucy4KCi0gbW90aGVyX2xuYW1lOiBTZWxlY3QgdGhlIHBlcnNvbuKAmXMgbW90aGVy4oCZcyBsYXN0IG5hbWUgdGhhdCBpcyB0aGUgbWF4aW11bSBudW1iZXIKb2YgY2hhcmFjdGVycyBhY3Jvc3MgYXBwbGljYXRpb25zLgoKCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ3JlYXRlIEJVTk1EICIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKQ3JlYXRlIHRoZSBCVU5NRCBmaWxlIGZyb20gdGhlIGNsZWFuZWQgYW5kICJjb25kZW5zZWQiIE51bWlkZW50IGZpbGVzLiAKClRoZSBmdW5jdGlvbiBgdW5pZnlfbnVtaWRlbnRgIGNvbWJpbmVzIHRoZSBpbmZvcm1hdGlvbiBmcm9tIHRoZSBkZWF0aHMsIGFwcGxpY2F0aW9ucywgYW5kIGNsYWltcyBmaWxlcyBpbnRvIGEgZmlsZSB3aXRoIG9uZSByZWNvcmQgcGVyIHBlcnNvbjogdGhlIEJlcmtlbGV5IFVuaWZpZWQgTnVtaWRlbnQgTW9ydGFsaXR5IERhdGFiYXNlIChCVU5NRCkuCgpUaGUgZnVuY3Rpb25zICJjcmVhdGVfd2VpZ2h0cyIgY3JlYXRlIHBvc3Qtc3RyYXRpZmljYXRpb24gd2VpZ2h0cyB0byB0aGUgSE1EIGZvciB0aGUgQlVOTUQgU2FtcGxlIDEgYW5kIFNhbXBsZSAyLiAKCmBgYHtyfQpsaWJyYXJ5KGNlbnNvY2RldikKYGBgCgoKYGBge3J9CiMjIHJlYWQgaW4gY2xlYW5lZCBhbmQgImNvbmRlbnNlZCIgbnVtaWRlbnQgZmlsZXMKY2xhaW1zIDwtIGZyZWFkKCIvY2Vuc29jL2RhdGEvbnVtaWRlbnQvM19udW1pZGVudF9maWxlc19jbGVhbmVkX2FuZF9jb25kZW5zZWQvY2xhaW1zX2NvbmRlbnNlZC5jc3YiKQpkZWF0aHMgPC0gZnJlYWQoIi9jZW5zb2MvZGF0YS9udW1pZGVudC8zX251bWlkZW50X2ZpbGVzX2NsZWFuZWRfYW5kX2NvbmRlbnNlZC9kZWF0aHMuY3N2IikKYXBwbGljYXRpb25zIDwtIGZyZWFkKCIvY2Vuc29jL2RhdGEvbnVtaWRlbnQvM19udW1pZGVudF9maWxlc19jbGVhbmVkX2FuZF9jb25kZW5zZWQvYXBwc19jb25kZW5zZWQuY3N2IikKCiMjIGNvbWJpbmUgcmVjb3JkcyBpbnRvIG9uZSBmaWxlCmJ1bm1kIDwtIGNyZWF0ZV9idW5tZChjbGFpbXMgPSBjbGFpbXMsIGFwcGxpY2F0aW9ucyA9IGFwcGxpY2F0aW9ucywgZGVhdGhzID0gZGVhdGhzKQoKIyMgY29uc3RydWN0IHdlaWdodHMgZm9yIEJVTk1EIApidW5tZCA8LSBjcmVhdGVfd2VpZ2h0c19idW5tZChidW5tZCkKYnVubWQgPC0gY3JlYXRlX3dlaWdodHNfYnVubWRfY29tcGxldGUoYnVubWQpCgojIyB3cml0ZSBvdXQgQlVOTUQgCmZ3cml0ZShidW5tZCwgIi9jZW5zb2MvZGF0YS9udW1pZGVudC80X2JlcmtlbGV5X3VuaWZpZWRfbW9ydGFsaXR5X2RhdGFiYXNlL2J1bm1kLmNzdiIpCmBgYAoKUmVjYXAgb2YgdGhlIGRlY2lzaW9uIHJ1bGVzIHdlIHVzZWQgdG8gY3JlYXRlIHRoZSBCVU5NRDogCgotIHNleDogV2hlbiBhdmFpbGFibGUsIHNlbGVjdCB0aGUgcGVyc29u4oCZcyBzZXggZnJvbSB0aGVpciBkZWF0aCByZWNvcmQuIElmIHVuYXZhaWxhYmxlIGluCnRoZWlyIGRlYXRoIHJlY29yZCwgc2VsZWN0IHNleCBmcm9tIHRoZWlyIG1vc3QgcmVjZW50IGFwcGxpY2F0aW9uIHJlY29yZC4gSWYgdW5hdmFpbGFibGUKaW4gdGhlaXIgZGVhdGggcmVjb3JkIGFuZCB0aGVpciBhcHBsaWNhdGlvbiByZWNvcmRzLCBzZWxlY3Qgc2V4IGZyb20gdGhlaXIgbW9zdCByZWNlbnQKY2xhaW0gcmVjb3JkLgoKLSByYWNlX2ZpcnN0OiBTZWxlY3QgdGhlIHBlcnNvbuKAmXMgcmFjZV9maXJzdCBmcm9tIHRoZWlyIG1vc3QgZmlyc3QgYXBwbGljYXRpb24gcmVjb3JkLgoKLSByYWNlX2xhc3Q6IFNlbGVjdCB0aGUgcGVyc29u4oCZcyByYWNlX2xhc3QgZnJvbSB0aGVpciBsYXN0IHJlY2VudCBhcHBsaWNhdGlvbiByZWNvcmQuCgotIGJwbDogU2VsZWN0IHRoZSBwZXJzb27igJlzIHJhY2UgZnJvbSB0aGVpciBtb3N0IHJlY2VudCBhcHBsaWNhdGlvbiByZWNvcmQuIElmIHVuYXZhaWxhYmxlCmluIHRoZWlyIGFwcGxpY2F0aW9uIHJlY29yZHMsIHNlbGVjdCBmcm9tIHRoZWlyIG1vc3QgcmVjZW50IGNsYWltIHJlY29yZC4KCi0gZmF0aGVyX2ZuYW1lOiBTZWxlY3QgdGhlIHBlcnNvbuKAmXMgZmF0aGVy4oCZcyBmaXJzdCBuYW1lIHRoYXQgaXMgdGhlIG1heGltdW0gbnVtYmVyCm9mIGNoYXJhY3RlcnMgYWNyb3NzIGFwcGxpY2F0aW9ucy4KCi0gZmF0aGVyX21uYW1lOiBTZWxlY3QgdGhlIHBlcnNvbuKAmXMgZmF0aGVy4oCZcyBtaWRkbGUgbmFtZSB0aGF0IGlzIHRoZSBtYXhpbXVtCm51bWJlciBvZiBjaGFyYWN0ZXJzIGFjcm9zcyBhcHBsaWNhdGlvbnMuCgotIGZhdGhlcl9sbmFtZTogU2VsZWN0IHRoZSBwZXJzb27igJlzIGZhdGhlcuKAmXMgbGFzdCBuYW1lIHRoYXQgaXMgdGhlIG1heGltdW0gbnVtYmVyIG9mCmNoYXJhY3RlcnMgYWNyb3NzIGFwcGxpY2F0aW9ucy4KCi0gbW90aGVyX2ZuYW1lOiBTZWxlY3QgdGhlIHBlcnNvbuKAmXMgbW90aGVy4oCZcyBmaXJzdCBuYW1lIHRoYXQgaXMgdGhlIG1heGltdW0gbnVtYmVyCm9mIGNoYXJhY3RlcnMgYWNyb3NzIGFwcGxpY2F0aW9ucy4KCi0gbW90aGVyX21uYW1lOiBTZWxlY3QgdGhlIHBlcnNvbuKAmXMgbW90aGVy4oCZcyBtaWRkbGUgbmFtZSB0aGF0IGlzIHRoZSBtYXhpbXVtCm51bWJlciBvZiBjaGFyYWN0ZXJzIGFjcm9zcyBhcHBsaWNhdGlvbnMuCgotIG1vdGhlcl9sbmFtZTogU2VsZWN0IHRoZSBwZXJzb27igJlzIG1vdGhlcuKAmXMgbGFzdCBuYW1lIHRoYXQgaXMgdGhlIG1heGltdW0gbnVtYmVyCm9mIGNoYXJhY3RlcnMgYWNyb3NzIGFwcGxpY2F0aW9ucy4KCgo=</div>
 
 
 
