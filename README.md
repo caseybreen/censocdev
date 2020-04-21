@@ -1,9 +1,9 @@
-# censocdev Package
+## censocdev Package
 
 The censocdev package contains code to create the CenSoc data products. 
 
 
-# Learning More
+## Learning More
 
 Learn more about the CenSoc project at:
 
