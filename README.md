@@ -1,9 +1,6 @@
-## censocdev Package
+## censocdev
 
-The censocdev package contains code to create the CenSoc data products. 
-
-
-## Learning More
+This repository contains the source code to construct the CenSoc data products. 
 
 Learn more about the CenSoc project at:
 
