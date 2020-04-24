@@ -6,11 +6,8 @@
 This function will weight the numident censoc.dmf up to HMD lexis triangles
 Restrict data to certain cohorts and ages at deaths}
 \usage{
-create_weights_censoc_dmf(
-  censoc.dmf,
-  cohorts = c(1895:1939),
-  death_ages = c(65:100)
-)
+create_weights_censoc_dmf(censoc.dmf, cohorts = c(1895:1939),
+  death_ages = c(65:100))
 }
 \arguments{
 \item{data}{data.frame with birth and death info}

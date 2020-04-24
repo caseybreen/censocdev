@@ -10,6 +10,8 @@ select_race_last(data = numapp)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}
+
+\item{numapp}{path to the NUMAPP files}
 }
 \value{
 data.frame with first and last race

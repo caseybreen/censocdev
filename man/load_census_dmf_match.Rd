@@ -4,7 +4,8 @@
 \alias{load_census_dmf_match}
 \title{Load a census file}
 \usage{
-load_census_dmf_match(census_file, cols_to_keep = NULL, males_only = TRUE)
+load_census_dmf_match(census_file, cols_to_keep = NULL,
+  males_only = TRUE)
 }
 \arguments{
 \item{census_file}{string indicating location of file.}

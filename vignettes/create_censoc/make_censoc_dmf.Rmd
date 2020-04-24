@@ -29,7 +29,7 @@ dmf_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
                      "/home/ipums/josh-ipums/progs/ssdm/ssdm2",
                      "/home/ipums/josh-ipums/progs/ssdm/ssdm3")
 
-dmf <- load_dmfc_deaths(dmf_files)
+dmf <- load_dmf_deaths(dmf_files)
 
 ## Read in 1940 Census files
 census <- load_census_dmf_match(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")

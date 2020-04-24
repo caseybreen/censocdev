@@ -4,7 +4,8 @@
 \alias{create_censoc_numident}
 \title{Merge bunmd and Census}
 \usage{
-create_censoc_numident(bunmd = bunmd, census = census, census_year = 1940)
+create_censoc_numident(bunmd = bunmd, census = census,
+  census_year = 1940)
 }
 \arguments{
 \item{bunmd}{full bunmd (merged application and death file)}
