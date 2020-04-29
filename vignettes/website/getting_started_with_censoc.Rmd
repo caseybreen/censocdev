@@ -13,7 +13,7 @@ vignette: >
 ## CenSoc Roadmap 
 
 1. Download CenSoc File
-2. Download 1940 census from IPUMS
+2. Download 1940 census data from IPUMS
 3. Merge CenSoc and census Files on `HISTID` variable
 
 **Note**: The 1940 census file is large (10+ GB) — we recommend having an appropriate workflow for handling large datasets in R before getting started.   

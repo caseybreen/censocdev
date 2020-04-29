@@ -12,7 +12,7 @@
 
 <meta name="author" content="CenSoc Project" />
 
-<meta name="date" content="2020-04-14" />
+<meta name="date" content="2020-04-28" />
 
 <title>Getting Started with CenSoc</title>
 
@@ -303,7 +303,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Getting Started with CenSoc</h1>
 <h4 class="author">CenSoc Project</h4>
-<h4 class="date">2020-04-14</h4>
+<h4 class="date">2020-04-28</h4>
 
 
 
@@ -311,7 +311,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2>CenSoc Roadmap</h2>
 <ol style="list-style-type: decimal">
 <li>Download CenSoc File</li>
-<li>Download 1940 census from IPUMS</li>
+<li>Download 1940 census data from IPUMS</li>
 <li>Merge CenSoc and census Files on <code>HISTID</code> variable</li>
 </ol>
 <p><strong>Note</strong>: The 1940 census file is large (10+ GB) — we recommend having an appropriate workflow for handling large datasets in R before getting started.</p>
@@ -319,11 +319,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="downloading-censoc-file" class="section level2">
 <h2>Downloading CenSoc File</h2>
 <p>Download the CenSoc-DMF or CenSoc-Numident file from: <a href="https://censoc-download.demog.berkeley.edu/">https://censoc-download.demog.berkeley.edu</a></p>
-<p>Whether the CenSoc-DMF or CenSoc-Numident file is a better choice for you analysis will depend on the research question. See the <a href="https://censoc.org/data/">data</a> page for more information.</p>
+<p>Whether the CenSoc-DMF or CenSoc-Numident file is a better choice for your analysis will depend on the research question. See the <a href="https://censoc.org/data/">data</a> page for more information.</p>
 </div>
 <div id="downloading-1940-full-count-census-from-ipums" class="section level2">
 <h2>Downloading 1940 Full-Count Census from IPUMS</h2>
-<p><strong>NOTE:</strong> the size of Full Count Census files is quite large (10+ GB).</p>
 <p>The CenSoc datasets links the 1940 Census to the mortality records.</p>
 <p><a href="https://ipums.org/what-is-ipums">IPUMS</a> provides integrated census and survey data from across the world free of charge to the broader research community. To access the IPUMS-USA data collection, you first need to <a href="https://uma.pop.umn.edu/usa/user/new?return_url=https%3A%2F%2Fusa.ipums.org%2Fusa-action%2Fmenu">register</a>.</p>
 <div id="create-ipums-extract" class="section level3">
@@ -333,7 +332,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h4>Select data sample</h4>
 <p>Select the 1940 Full Count Census:</p>
 <ul>
-<li>Click the ‘SELECT SAMPLES BUTTON’. This will take you to a page with all possible census and ACS data that are available.</li>
+<li>Click the ‘SELECT SAMPLES’ button. This will take you to a page with all possible census and ACS data that are available.</li>
 <li>Uncheck the ‘Default sample from each year’ box</li>
 <li>Click the ‘USA FULL COUNT’ tab</li>
 <li>Check the 1940 100% box</li>
@@ -343,8 +342,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="select-variables-for-analysis" class="section level4">
 <h4>Select Variables for Analysis</h4>
-<p>All extracts will by default include <code>HISTID</code>, the variable used to the census file to the censoc file.</p>
-<p>Choose variables for you analysis. For example, you could select <code>RACE</code>, which is under PERSONAL → RACE, ETHNICITY, AND NATIVITY.</p>
+<p>All extracts will by default include <code>HISTID</code>, the variable used to the census file to the CenSoc file.</p>
+<p>Choose variables for your analysis. For example, you could select <code>RACE</code>, which is under PERSONAL → RACE, ETHNICITY, AND NATIVITY.</p>
 </div>
 <div id="select-cases" class="section level4">
 <h4>Select Cases</h4>
@@ -353,9 +352,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="downloading-the-ipums-extract" class="section level3">
 <h3>Downloading the IPUMS extract</h3>
-<p>To work with IPUMS data in R, it is usually easiest to download the data as a CSV file. To do this, on the EXTRACT REQUEST page, next to ‘DATA FORMAT’ click Change, select ‘Comma delimited (.csv)’ and click the submit button.</p>
+<p>To work with IPUMS data in R, it is usually easiest to download the data as a CSV file. To do this, on the EXTRACT REQUEST page, next to ‘DATA FORMAT’, click Change, select ‘Comma delimited (.csv)’ and click the submit button.</p>
 <p>You can work with other formats in R as well, but CSV is generally the easiest. The only downside is that variable values are numeric codes. The <a href="https://cran.r-project.org/web/packages/ipumsr/vignettes/ipums.html">IPUMSR package</a> helps assign variable labels, value labels, and more.</p>
-<p>Once you are happy with your dataset, click the ‘SUBMIT EXTRACT’ button. Because it is full count data, you will need agree to special usage terms. Click Ok to extract the dataset.</p>
+<p>Once you are happy with your dataset, click the ‘SUBMIT EXTRACT’ button. Because it is full count data, you will need to agree to special usage terms. Click Ok to extract the dataset.</p>
 <p>Given the size of the file, the processing may take several hours. Once the file is ready, you will receive an email from IPUMS with a link to download the resulting dataset. As all IPUMS datasets come compressed, the data needs to be uncompressed before it can be used. For more information on IPUMS extracts, please see <a href="https://usa.ipums.org/usa/data.shtml/">IPUMS-USA</a>.</p>
 </div>
 </div>
