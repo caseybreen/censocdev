@@ -9,7 +9,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-**Summary**: This vignette gives an overview of the CenSoc-DMF Demo dataset and presents two stylized examples of how it can be used to answer a research question. 
+**Summary**: This vignette gives an overview of the CenSoc-DMF Demo dataset and presents two stylized examples of how it can be used to explore mortality disparities. 
 
 The CenSoc-DMF Demo dataset was constructed by (i) linking the CenSoc-DMF dataset to the IPUMS 1940 1% census sample and (ii) selecting a set of 20 mortality covariates from the 1940 census. The smaller size of the file — approximately 1% of the records in the full CenSoc-DMF dataset — makes it easier to work with but precludes the high-resolution mortality research possible with the full CenSoc-DMF dataset. 
 
@@ -22,7 +22,7 @@ Before getting started with the vignette, make sure to:
     - `brooms`
     - `knitr`
     
-The original R notebook (.RMD file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website). 
+The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website). 
 
 ```{r Library packages, warning=FALSE, message=FALSE}
 ## Library Packages
@@ -45,7 +45,7 @@ censoc_demo %>%
   kable()
 ```
 
-**Note**: For the CenSoc-Demo dataset, we converted the IPUMS numeric codes into meaningful character value labels (e.g., “Male” = 1, “Female” = 2). Before using a variable in your analysis, it's a good idea to learn more about the way its coding schema. Check out the "best-in-class" documentation from the IPUMS-USA [website](https://usa.ipums.org/usa/).  
+**Note**: For the CenSoc-Demo dataset, we converted the IPUMS numeric codes into meaningful character value labels (e.g., “Male” = 1, “Female” = 2). Before using a variable in your analysis, it's a good idea to learn more about its coding schema. Check out the terrific documentation from the IPUMS-USA [website](https://usa.ipums.org/usa/).  
 
 ## Examples with OLS Regression
 
@@ -55,25 +55,28 @@ $$ Age\_at\_death = birth\_year\_dummy + covariates\_of\_interest $$
 
 provide estimates of the effect of the covariates on the age of death in the sample, controlling for birth cohort truncation effects. In this example, we work with the cohorts of 1900-1920, so we need to include a fixed effect term for year of birth. 
 
-As the truncated window of deaths excludes the tails of the mortality distribution, any measurement of the average difference between groups will be downwardly biased. When we interpret the coefficients in our OLS regression model, we need to keep in mind that the observed effects likely underestimate the true effects.
+As the truncated window of deaths excludes the tails of the mortality distribution, any measurement of the average difference between groups will be downwardly biased. The coefficients in our OLS regression model will underestimate the size of the true effect. For a more detailed discussion of mortality estimation with truncated data, see the [“The Berkeley Unified Numident Mortality Database"](https://censoc.berkeley.edu/wp-content/uploads/2020/04/bunmd_paper.pdf) working paper. 
 
 ## Mortality Differentials by State
 
-The code below runs an OLS model with year fixed-effects. It then extracts the regression coefficient for each state and plots it using the [*statebins*](https://github.com/hrbrmstr/statebins) package (an alternative to state-level choropleth maps). We use the state of Maine as the reference group for this regression (due to its average effect on mortality). 
+Geographic heterogeneity in levels of health and mortality have been been well-studied. Can we see any state-level variation in life expectancy at age 65 in the CenSoc-DMF Demo dataset? 
+
+The code below runs an OLS model with year fixed-effects. It then extracts the regression coefficient for each state and plots it using the [*statebins*](https://github.com/hrbrmstr/statebins) package, which provides an alternative to state-level choropleth maps. We use the state of Maine and the birth cohort of 1910 as the reference group for this regression, but we could have chosen a different reference group. We restrict this analysis to the birth cohorts of 1900 to 1920 and deaths for persons 65+ (these are the birth cohorts and ages at death for which we have the best death coverage).
 
 ```{r, fig.height = 5.5, fig.width = 5.5, fig.align = "center", warning = F}
 ## Prepare dataset for modeling
-## Restrict to deaths for persons age 65+
 ## Restrict to birth cohorts of 1900-1920
 
 censoc_state_model <- censoc_demo %>%
   filter(byear %in% c(1900:1920)) %>% 
+  filter(dyear >= 65) %>% 
   mutate(byear = as.factor(byear)) %>% 
   mutate(byear = relevel(byear, ref = "1910")) %>% 
   mutate(STATEFIP = as.factor(STATEFIP)) %>% 
   mutate(STATEFIP = relevel(STATEFIP, ref = "Maine")) 
 
 ## Linear model predicting age at death from State and byear 
+## Use both IPUMS and CenSoc weights
 state.lm <- lm(death_age ~ STATEFIP +  byear,
                      data = censoc_state_model,
                      weight = weight*PERWT) 
@@ -101,23 +104,30 @@ mortality_differentials_by_state
 ```
 
 
-The plot shows the Mountain States have a relative mortality advantage and the Southern States to have a relative mortality disadvantage. While these patterns may be real, we should keep in mind disaggregating by state significantly reduces our sample size. This introduces lots of noise and uncertainty into our regression model, which our visualization doesn't account for. 
+The plot shows the Mountain States have a relative mortality advantage and the Southern States to have a relative mortality disadvantage. While these patterns may be real, we should keep in mind disaggregating by state significantly reduces our sample size. This introduces lots of noise and uncertainty into our regression model — which our visualization doesn't capture. 
 
-## Mortality Differentials by Wage Income
+## Mortality Differentials by Relative Wage Income
 
-The association between relative income and mortality in the United States have been well documented. Can we see this association in our CenSoc-DMF Demo dataset? 
+The association between relative income and mortality in the United States has been well-documented. Can we see this association in our CenSoc-DMF Demo dataset? 
 
 To answer this question, we'll use the `INCWAGE` variable. This is an imperfect measure of income, as it was only collected for salary and wage workers. Census enumerators in 1940 were explicitly instructed to "not include earnings of businessmen, farmers, or professional persons who depend upon business profits, sales of crops, or fees for income and who do not work for wages or salaries." (See [instructions to enumeration](https://usa.ipums.org/usa/voliii/inst1940.shtml#584) for more detail). In this analysis, we account for this by only including persons with non-zero wages — other researchers may take a different approach. 
+
+We restrict this analysis to the birth cohorts of 1900 to 1920 and deaths for persons 65+ (these are the birth cohorts and ages at death for which we have the best death coverage).
 
 ```{r mortality differentials by occupation, fig.height = 5.5, fig.width = 5.5, fig.align = "center"}
 
 ## Calculate income deciles
+## Restrict to cohorts of 1900-1920
 censoc_incwage <- censoc_demo %>% 
+  filter(byear %in% c(1900:1920)) %>% 
+  filter(dyear >= 65) %>% 
   filter(INCWAGE > 0 & INCWAGE <= 5001) %>% ## INCWAGE is topcoded at $5001; higher values denote NA/Missing
   mutate(wage_decile = ntile(INCWAGE, 10)) %>% 
+  
   mutate(wage_decile = as.factor(wage_decile))
 
 ## Run linear model 
+## Use both IPUMS and CenSoc weights
 test <- lm(death_age ~  wage_decile +  byear + as.factor(RACE),
                      data = censoc_incwage,
                      weight = weight*PERWT) 
@@ -145,7 +155,7 @@ income_decile_ols_coefficients
 ```
 
 
-The plot shows an association between relative wage income and longevity (the reference group for this plot is the first income decile). When interpreting these mortality differentials, we should keep in mind that they probably understate the true effect.  
+The plot shows an association between relative wage income and longevity. The reference group for this plot is the first income decile. When interpreting these mortality differentials, we should keep in mind that they are calculated from a truncated window of deaths and understate the differences in life expectancy at age 65. 
 
 
 ## Conclusion
