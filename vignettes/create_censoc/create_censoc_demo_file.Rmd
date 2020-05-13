@@ -1,0 +1,125 @@
+---
+title: "Make CenSoc Demo File"
+output: html_notebook
+---
+
+Summary: In this Notebook, I make the CenSoc Demo file. 
+
+Steps to make CenSoc Demo File:
+
+(1) Read in IPUMS 1940 1% Extract (make )
+
+
+Library the Packages for analysis 
+```{r}
+library(data.table)
+library(tidyverse)
+library(ipumsr)
+```
+
+
+Read in the 1 percent file and the crosswalk from IPUMS.
+```{r}
+ipums1pct <- fread("/90days/caseybreen/censoc_1_percent_sample.csv")
+
+xwalk <- fread("/censoc/data/crosswalks/ipums_1_percent_histid_xwalk.csv") 
+```
+
+
+```{r}
+demo_file <- ipums1pct %>% 
+  inner_join(xwalk) 
+```
+
+
+```{r}
+ipums_1940 <- fread("/ipums-repo2019/1940/TSV/P.tsv")
+
+
+ipums_1940_select <- ipums_1940 %>% 
+  select(HISTID, AGE_fc = AGE, SEX_fc = SEX, RACE_fc = RACE)
+```
+
+```{r}
+## check 1940 merge
+demo_file <- demo_file %>% 
+  inner_join(ipums_1940_select, by = "HISTID")
+
+## demo check FC server
+demo_file <- demo_file %>% 
+  mutate(match_flag = case_when(
+    AGE != AGE_fc & SEX != SEX_fc  ~ "mismatch on age and sex",
+    AGE != AGE_fc & SEX ==  SEX_fc ~ "mismatch on age only",
+    AGE == AGE_fc & SEX !=  SEX_fc ~ "mismatch on sex only",
+    AGE == AGE_fc & SEX ==  SEX_fc ~ "match",
+    TRUE ~ "match"
+  )) 
+
+## demo match flag
+demo_file %>% 
+  group_by(match_flag) %>% 
+  summarize(n = n()) %>% 
+  mutate(`freq %` = round(100*n / sum(n), 1))
+```
+
+Attach CenSoc DMF dataset
+
+```{r}
+censoc.dmf <- fread("/censoc/data/censoc_files_for_website/censoc_dmf_v1.csv")
+
+## 56,130 cases
+demo_file_dmf <- demo_file %>% 
+  inner_join(censoc.dmf)
+
+
+## 52,121 cases
+demo_file_dmf <- demo_file_dmf %>% 
+  filter(match_flag == "match")
+```
+
+Assign Meaningful Value Labels
+
+```{r}
+demo_file_dmf
+
+ddi <- ipumsr::read_ipums_ddi("/ipums-repo2019-1/fullcount.ddi.xml")
+
+demo_file_dmf <- ipums_collect(data = demo_file_dmf, ddi = ddi)
+```
+
+
+```{r}
+vars_to_keep <- c("HISTID", "bmonth", "byear", "dmonth", "dyear", "death_age", "weight", "PERWT", "AGE", "SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHP", "RACE", "RENT", "STATEFIP", "URBAN")
+
+vars_convert_to_labels <- c("SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "MARST", "NATIVITY", "OCC", "OWNERSHP", "RACE", "STATEFIP", "URBAN", "INCNONWG")
+
+demo_file_dmf_cleaned <- demo_file_dmf %>% 
+  select(vars_to_keep) %>% 
+  mutate_at(vars_convert_to_labels, as_factor)
+```
+
+
+```{r}
+## check out variables
+glimpse(demo_file_dmf_cleaned)
+```
+
+
+```{r}
+write_csv(demo_file_dmf_cleaned, "/censoc/data/censoc_files_for_website/censoc_demo_v1.csv")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
