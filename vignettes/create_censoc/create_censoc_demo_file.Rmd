@@ -3,11 +3,13 @@ title: "Make CenSoc Demo File"
 output: html_notebook
 ---
 
-Summary: In this Notebook, I make the CenSoc Demo file. 
+Summary: In this Notebook, I make the CenSoc-DMF Demo file. 
 
 Steps to make CenSoc Demo File:
 
-(1) Read in IPUMS 1940 1% Extract (make )
+(1) Read in IPUMS 1940 1% Extract
+(2) Link Crosswalk 
+(2) Link to CenSoc-DMF 
 
 
 Library the Packages for analysis 
@@ -20,32 +22,29 @@ library(ipumsr)
 
 Read in the 1 percent file and the crosswalk from IPUMS.
 ```{r}
+## Read in 1% IPUMS 1940 Census Extract
 ipums1pct <- fread("/90days/caseybreen/censoc_1_percent_sample.csv")
 
+## Read 
 xwalk <- fread("/censoc/data/crosswalks/ipums_1_percent_histid_xwalk.csv") 
-```
 
-
-```{r}
+## Join 1% file and crosswalk
+## This will give HISTID variable
 demo_file <- ipums1pct %>% 
   inner_join(xwalk) 
-```
 
+## Read in full count census to check whether age, sex, etc. match between 1% and full count
+ipums_1940 <- fread("/ipums-repo2019/1940/TSV/P.tsv", select = c("HISTID", "AGE", "SEX", "RACE"))
 
-```{r}
-ipums_1940 <- fread("/ipums-repo2019/1940/TSV/P.tsv")
-
-
+## select vars
 ipums_1940_select <- ipums_1940 %>% 
   select(HISTID, AGE_fc = AGE, SEX_fc = SEX, RACE_fc = RACE)
-```
 
-```{r}
-## check 1940 merge
+## check 1940 1% and full count
 demo_file <- demo_file %>% 
   inner_join(ipums_1940_select, by = "HISTID")
 
-## demo check FC server
+## check whether age, sex, etc. match between 1% and full count
 demo_file <- demo_file %>% 
   mutate(match_flag = case_when(
     AGE != AGE_fc & SEX != SEX_fc  ~ "mismatch on age and sex",
@@ -61,8 +60,8 @@ demo_file %>%
   summarize(n = n()) %>% 
   mutate(`freq %` = round(100*n / sum(n), 1))
 ```
+## Consturct CenSoc-DMF Demo
 
-Attach CenSoc DMF dataset
 
 ```{r}
 censoc.dmf <- fread("/censoc/data/censoc_files_for_website/censoc_dmf_v1.csv")
@@ -75,41 +74,60 @@ demo_file_dmf <- demo_file %>%
 ## 52,121 cases
 demo_file_dmf <- demo_file_dmf %>% 
   filter(match_flag == "match")
-```
 
-Assign Meaningful Value Labels
-
-```{r}
-demo_file_dmf
-
+## read in IPUMS DDI 
 ddi <- ipumsr::read_ipums_ddi("/ipums-repo2019-1/fullcount.ddi.xml")
 
 demo_file_dmf <- ipums_collect(data = demo_file_dmf, ddi = ddi)
-```
 
-
-```{r}
-vars_to_keep <- c("HISTID", "bmonth", "byear", "dmonth", "dyear", "death_age", "weight", "PERWT", "AGE", "SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHP", "RACE", "RENT", "STATEFIP", "URBAN")
+vars_to_keep <- c("HISTID", "bmonth", "byear", "dmonth", "dyear", "death_age", "weight", "PERWT", "AGE", "SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHP", "PERNUM", "RACE", "RENT", "SERIAL", "STATEFIP", "URBAN")
 
 vars_convert_to_labels <- c("SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "MARST", "NATIVITY", "OCC", "OWNERSHP", "RACE", "STATEFIP", "URBAN", "INCNONWG")
 
 demo_file_dmf_cleaned <- demo_file_dmf %>% 
-  select(vars_to_keep) %>% 
-  mutate_at(vars_convert_to_labels, as_factor)
-```
+  select(all_of(vars_to_keep)) %>% 
+  mutate_at(vars_convert_to_labels, as_factor) %>% 
+  rename_all(tolower)
 
-
-```{r}
 ## check out variables
 glimpse(demo_file_dmf_cleaned)
+
+write_csv(demo_file_dmf_cleaned, "/censoc/data/censoc_files_for_website/censoc_dmf_demo_v1.csv")
 ```
 
+
+## Construct CenSoc-Numident Demo
 
 ```{r}
-write_csv(demo_file_dmf_cleaned, "/censoc/data/censoc_files_for_website/censoc_demo_v1.csv")
+censoc.numident <- fread("/censoc/data/censoc_files_for_website/censoc_numident_v1.csv")
+
+## 56,130 cases
+demo_file_numident <- demo_file %>% 
+  inner_join(censoc.numident)
+
+## 52,121 cases
+demo_file_numident <- demo_file_numident %>% 
+  filter(match_flag == "match")
+
+## read in IPUMS DDI 
+ddi <- ipumsr::read_ipums_ddi("/ipums-repo2019-1/fullcount.ddi.xml")
+
+demo_file_numident <- ipums_collect(data = demo_file_numident, ddi = ddi)
+
+vars_to_keep <- c("HISTID", "bmonth", "byear", "dmonth", "dyear", "death_age", "weight", "zip_residence", "PERWT", "AGE", "SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHP", "PERNUM", "RACE", "RENT", "SERIAL", "STATEFIP", "URBAN")
+
+vars_convert_to_labels <- c("SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "MARST", "NATIVITY", "OCC", "OWNERSHP", "RACE", "STATEFIP", "URBAN", "INCNONWG")
+
+demo_file_numident_cleaned <- demo_file_numident %>% 
+  select(all_of(vars_to_keep)) %>% 
+  mutate_at(vars_convert_to_labels, as_factor) %>% 
+  rename_all(tolower)
+
+## check out variables
+glimpse(demo_file_numident_cleaned)
+
+write_csv(demo_file_numident_cleaned, "/censoc/data/censoc_files_for_website/censoc_numident_demo_v1.csv")
 ```
-
-
 
 
 

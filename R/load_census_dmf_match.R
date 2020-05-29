@@ -40,7 +40,7 @@ load_census_dmf_match <- function(census_file,
   census <- census[,!"tmp_key"]
 
   ## remove rows where fname, lname, or census age is missing.
-  socsec <- na.omit(socsec, cols=c("fname", "lname", "census_age"))
+  census <- na.omit(census, cols=c("fname", "lname", "census_age"))
 
   # remove fname, lname, census_age
   census[, c("fname", "lname", "census_age") := NULL]

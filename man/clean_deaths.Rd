@@ -4,9 +4,11 @@
 \alias{clean_deaths}
 \title{Load numdeath file 2.0}
 \usage{
-
-  clean_deaths(numdeath.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/deaths_original.csv",
-  ssn_state_crosswalk_path = "/censoc/data/crosswalks/ssn_to_state_crosswalk.csv")
+clean_deaths(
+ 
+    numdeath.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/deaths_original.csv",
+  ssn_state_crosswalk_path = "/censoc/data/crosswalks/ssn_to_state_crosswalk.csv"
+)
 }
 \arguments{
 \item{numdeath_path}{path to the NUMDEATH files}
