@@ -35,7 +35,7 @@ create_weights_censoc_dmf <- function(censoc.dmf, cohorts = c(1895:1939), death_
   ## divide death weights
   death_weights_for_link <- death_weights %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
-    ungroup(dyear, death_age) %>%
+    ungroup() %>%
     select(inclusion_prob, linking_key) %>%
     mutate(weight = 1/inclusion_prob) %>%
     select(-inclusion_prob)

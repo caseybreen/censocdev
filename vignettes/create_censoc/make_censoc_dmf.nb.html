@@ -1755,19 +1755,18 @@ summary {
 <p>A copy of the <code>censocdev</code> package must be cloned from GitHub:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsaWJyYXJ5KGRldnRvb2xzKSBcbiMgaW5zdGFsbF9naXRodWIoXCJjYXNleWJyZWVuL2NlbnNvY2RldlwiKVxuYGBgIn0= -->
-<pre class="r"><code># library(devtools) 
-# install_github(&quot;caseybreen/censocdev&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBsaWJyYXJ5KGRldnRvb2xzKSBcbiMgaW5zdGFsbF9naXRodWIoXFxjYXNleWJyZWVuL2NlbnNvY2RldlxcKVxuYGBgXG5gYGAifQ== -->
+<p><code>r</code>r # library(devtools) # install_github(/censocdev)</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Library Packages</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjZW5zb2NkZXYpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkoZGF0YS50YWJsZSlcbmBgYCJ9 -->
-<pre class="r"><code>library(censocdev)
-library(tidyverse)
-library(data.table)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGlicmFyeShjZW5zb2NkZXYpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkoZGF0YS50YWJsZSlcbmBgYFxuYGBgIn0= -->
+<p><code>r</code>r library(censocdev) library(tidyverse) library(data.table)</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1775,19 +1774,17 @@ library(data.table)</code></pre>
 <p>Note: n_clean_keys variable in the “census” file refers to the total number of unique keys for both men <em>and</em> women.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgUmVhZCBpbiBETUYgKFNTRE0pIGZpbGVzXG5kbWZfZmlsZXMgPSBjKFwiL2hvbWUvaXB1bXMvam9zaC1pcHVtcy9wcm9ncy9zc2RtL3NzZG0xXCIsXG4gICAgICAgICAgICAgICAgICAgICBcIi9ob21lL2lwdW1zL2pvc2gtaXB1bXMvcHJvZ3Mvc3NkbS9zc2RtMlwiLFxuICAgICAgICAgICAgICAgICAgICAgXCIvaG9tZS9pcHVtcy9qb3NoLWlwdW1zL3Byb2dzL3NzZG0vc3NkbTNcIilcblxuZG1mIDwtIGxvYWRfZG1mX2RlYXRocyhkbWZfZmlsZXMpXG5cbiMjIFJlYWQgaW4gMTk0MCBDZW5zdXMgZmlsZXNcbmNlbnN1cyA8LSBsb2FkX2NlbnN1c19kbWZfbWF0Y2goY2Vuc3VzX2ZpbGUgPSBcIi9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9QLnRzdlwiKVxuXG4jIyBDcmVhdGUgQ2VuU29jIEZpbGVcbmNlbnNvYy5kbWYgPC0gY3JlYXRlX2NlbnNvY19kbWYoY2Vuc3VzLCBkbWYpXG5gYGAifQ== -->
-<pre class="r"><code>## Read in DMF (SSDM) files
-dmf_files = c(&quot;/home/ipums/josh-ipums/progs/ssdm/ssdm1&quot;,
-                     &quot;/home/ipums/josh-ipums/progs/ssdm/ssdm2&quot;,
-                     &quot;/home/ipums/josh-ipums/progs/ssdm/ssdm3&quot;)
-
-dmf &lt;- load_dmf_deaths(dmf_files)
-
-## Read in 1940 Census files
-census &lt;- load_census_dmf_match(census_file = &quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv&quot;)
-
-## Create CenSoc File
-censoc.dmf &lt;- create_censoc_dmf(census, dmf)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyMgUmVhZCBpbiBETUYgKFNTRE0pIGZpbGVzXG5kbWZfZmlsZXMgPSBjKFxcL2hvbWUvaXB1bXMvam9zaC1pcHVtcy9wcm9ncy9zc2RtL3NzZG0xXFwsXG4gICAgICAgICAgICAgICAgICAgICBcXC9ob21lL2lwdW1zL2pvc2gtaXB1bXMvcHJvZ3Mvc3NkbS9zc2RtMlxcLFxuICAgICAgICAgICAgICAgICAgICAgXFwvaG9tZS9pcHVtcy9qb3NoLWlwdW1zL3Byb2dzL3NzZG0vc3NkbTNcXClcblxuZG1mIDwtIGxvYWRfZG1mX2RlYXRocyhkbWZfZmlsZXMpXG5cbiMjIFJlYWQgaW4gMTk0MCBDZW5zdXMgZmlsZXNcbmNlbnN1cyA8LSBsb2FkX2NlbnN1c19kbWZfbWF0Y2goY2Vuc3VzX2ZpbGUgPSBcXC9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9QLnRzdlxcKVxuXG4jIyBDcmVhdGUgQ2VuU29jIEZpbGVcbmNlbnNvYy5kbWYgPC0gY3JlYXRlX2NlbnNvY19kbWYoY2Vuc3VzLCBkbWYpXG5gYGBcbmBgYCJ9 -->
+<p><code>r</code>r ## Read in DMF (SSDM) files dmf_files = c(/home/ipums/josh-ipums/progs/ssdm/ssdm1, /home/ipums/josh-ipums/progs/ssdm/ssdm2, /home/ipums/josh-ipums/progs/ssdm/ssdm3)</p>
+<p>dmf &lt;- load_dmf_deaths(dmf_files)</p>
+<div id="read-in-1940-census-files" class="section level2">
+<h2>Read in 1940 Census files</h2>
+<p>census &lt;- load_census_dmf_match(census_file = /home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv)</p>
+</div>
+<div id="create-censoc-file" class="section level2">
+<h2>Create CenSoc File</h2>
+<p>censoc.dmf &lt;- create_censoc_dmf(census, dmf)</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1798,59 +1795,54 @@ censoc.dmf &lt;- create_censoc_dmf(census, dmf)</code></pre>
 </ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgQ2FsY3VsYXRlIGFnZSBhdCBkZWF0aFxuY2Vuc29jLmRtZiA8LSBjYWxjdWxhdGVfYWdlX2F0X2RlYXRoKGNlbnNvYy5kbWYpXG5cbiMjIENhbGN1bGF0ZSB3ZWlnaHRzXG5jZW5zb2MuZG1mIDwtIGNyZWF0ZV93ZWlnaHRzX2NlbnNvY19kbWYoY2Vuc29jLmRtZiwgY29ob3J0cyA9IGMoMTg5NToxOTM5KSwgZGVhdGhfYWdlcyA9IGMoNjU6MTAwKSlcblxuIyMgQ2FsY3VsYXRlIERNRlxuY2Vuc29jLmRtZiA8LSBjZW5zb2MuZG1mICU+JSBcbiAgZmlsdGVyKCFuY2hhcihmbmFtZSkgPD0gMSlcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgQ2FsY3VsYXRlIGFnZSBhdCBkZWF0aFxuY2Vuc29jLmRtZiA8LSBjYWxjdWxhdGVfYWdlX2F0X2RlYXRoKGNlbnNvYy5kbWYpXG5cbmBgYCJ9 -->
 <pre class="r"><code>## Calculate age at death
 censoc.dmf &lt;- calculate_age_at_death(censoc.dmf)
-
-## Calculate weights
-censoc.dmf &lt;- create_weights_censoc_dmf(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:100))
-
-## Calculate DMF
-censoc.dmf &lt;- censoc.dmf %&gt;% 
-  filter(!nchar(fname) &lt;= 1)</code></pre>
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gZXZhbChqc3ViLCBTRGVudiwgcGFyZW50LmZyYW1lKCkpIDogb2JqZWN0ICdiZGF5JyBub3QgZm91bmRcbiJ9 -->
+<pre><code>Error in eval(jsub, SDenv, parent.frame()) : object 'bday' not found</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Select variables for public release</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2Vuc29jLmRtZi53ZWIgPC0gY2Vuc29jLmRtZiAlPiUgXG4gIHNlbGVjdChISVNUSUQsIGJ5ZWFyLCBibW9udGgsIGR5ZWFyLCBkbW9udGgsIGRlYXRoX2FnZSwgd2VpZ2h0KVxuYGBgIn0= -->
-<pre class="r"><code>censoc.dmf.web &lt;- censoc.dmf %&gt;% 
-  select(HISTID, byear, bmonth, dyear, dmonth, death_age, weight)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2Vuc29jLmRtZi53ZWIgPC0gY2Vuc29jLmRtZiAlPiUgXG4gIHNlbGVjdChISVNUSUQsIGJ5ZWFyLCBibW9udGgsIGR5ZWFyLCBkbW9udGgsIGRlYXRoX2FnZSwgd2VpZ2h0KVxuYGBgXG5gYGAifQ== -->
+<p><code>r</code>r censoc.dmf.web &lt;- censoc.dmf %&gt;% select(HISTID, byear, bmonth, dyear, dmonth, death_age, weight)</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Write out CenSoc with for website. This is the file we will publicly release. As per our agreement with IPUMS, we cannot release day of death or day of birth.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmd3JpdGUoY2Vuc29jLmRtZi53ZWIsIFwiL2NlbnNvYy9kYXRhL2NlbnNvY19maWxlc19mb3Jfd2Vic2l0ZS9jZW5zb2NfZG1mX3YxLmNzdlwiKVxuYGBgIn0= -->
-<pre class="r"><code># fwrite(censoc.dmf.web, &quot;/censoc/data/censoc_files_for_website/censoc_dmf_v1.csv&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBmd3JpdGUoY2Vuc29jLmRtZi53ZWIsIFxcL2NlbnNvYy9kYXRhL2NlbnNvY19maWxlc19mb3Jfd2Vic2l0ZS9jZW5zb2NfZG1mX3YxLmNzdlxcKVxuYGBgXG5gYGAifQ== -->
+<p><code>r</code>r # fwrite(censoc.dmf.web, /censoc/data/censoc_files_for_website/censoc_dmf_v1.csv)</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Optional: add all person variables and household variables from 1940 census</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2Vuc3VzIDwtIGZyZWFkKFwiL2hvbWUvaXB1bXMvY2FzZXktaXB1bXMvSVBVTVMyMDE5LzE5NDAvVFNWL1AudHN2XCIpXG5cbmNlbnNvYy5kbWYuYWxsLnZhcnMgPC0gY2Vuc29jLmRtZiAlPiUgXG4gIHNlbGVjdCgtQUdFLCAtU0VYLCAtTkFNRUxBU1QsIC1OQU1FRlJTVCkgJT4lIFxuICBpbm5lcl9qb2luKGNlbnN1cylcblxuaG91c2Vob2xkX2NlbnN1cyA8LSBmcmVhZChcIi9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9ILnRzdlwiKVxuc2V0RFQoY2Vuc29jLmRtZi5hbGwudmFycylcbmNlbnNvYy5kbWYuYWxsLnZhcnMgPC0gYWRkX2hvdXNlaG9sZF92YXJpYWJsZXMoY2Vuc29jID0gY2Vuc29jLmRtZi5hbGwudmFycywgaG91c2Vob2xkX2NlbnN1cyA9IGhvdXNlaG9sZF9jZW5zdXMpXG5gYGAifQ== -->
-<pre class="r"><code>census &lt;- fread(&quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv&quot;)
-
-censoc.dmf.all.vars &lt;- censoc.dmf %&gt;% 
-  select(-AGE, -SEX, -NAMELAST, -NAMEFRST) %&gt;% 
-  inner_join(census)
-
-household_census &lt;- fread(&quot;/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv&quot;)
-setDT(censoc.dmf.all.vars)
-censoc.dmf.all.vars &lt;- add_household_variables(censoc = censoc.dmf.all.vars, household_census = household_census)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2Vuc3VzIDwtIGZyZWFkKFxcL2hvbWUvaXB1bXMvY2FzZXktaXB1bXMvSVBVTVMyMDE5LzE5NDAvVFNWL1AudHN2XFwpXG5cbmNlbnNvYy5kbWYuYWxsLnZhcnMgPC0gY2Vuc29jLmRtZiAlPiUgXG4gIHNlbGVjdCgtQUdFLCAtU0VYLCAtTkFNRUxBU1QsIC1OQU1FRlJTVCkgJT4lIFxuICBpbm5lcl9qb2luKGNlbnN1cylcblxuaG91c2Vob2xkX2NlbnN1cyA8LSBmcmVhZChcXC9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9ILnRzdlxcKVxuc2V0RFQoY2Vuc29jLmRtZi5hbGwudmFycylcbmNlbnNvYy5kbWYuYWxsLnZhcnMgPC0gYWRkX2hvdXNlaG9sZF92YXJpYWJsZXMoY2Vuc29jID0gY2Vuc29jLmRtZi5hbGwudmFycywgaG91c2Vob2xkX2NlbnN1cyA9IGhvdXNlaG9sZF9jZW5zdXMpXG5gYGBcbmBgYCJ9 -->
+<p><code>r</code>r census &lt;- fread(/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv)</p>
+<p>censoc.dmf.all.vars &lt;- censoc.dmf %&gt;% select(-AGE, -SEX, -NAMELAST, -NAMEFRST) %&gt;% inner_join(census)</p>
+<p>household_census &lt;- fread(/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv) setDT(censoc.dmf.all.vars) censoc.dmf.all.vars &lt;- add_household_variables(censoc = censoc.dmf.all.vars, household_census = household_census)</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Write out CenSoc file with all variables</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmd3JpdGUoY2Vuc29jLmRtZi5hbGwudmFycywgXCIvY2Vuc29jL2RhdGEvY2Vuc29jX2xpbmtlZF93aXRoX2NlbnN1cy8xOTQwL2NlbnNvY19kbWZfYWxsX3ZhcnNfdjEuY3N2XCIpXG5gYGAifQ== -->
-<pre class="r"><code># fwrite(censoc.dmf.all.vars, &quot;/censoc/data/censoc_linked_with_census/1940/censoc_dmf_all_vars_v1.csv&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBmd3JpdGUoY2Vuc29jLmRtZi5hbGwudmFycywgXFwvY2Vuc29jL2RhdGEvY2Vuc29jX2xpbmtlZF93aXRoX2NlbnN1cy8xOTQwL2NlbnNvY19kbWZfYWxsX3ZhcnNfdjEuY3N2XFwpXG5gYGBcbmBgYCJ9 -->
+<p><code>r</code>r # fwrite(censoc.dmf.all.vars, /censoc/data/censoc_linked_with_census/1940/censoc_dmf_all_vars_v1.csv)</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
+</div>
 
 <div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCmF1dGhvcjogQ2FzZXkgQnJlZW4gKGNhc2V5YnJlZW5AYmVya2VsZXkuZWR1KQotLS0KClN1bW1hcnk6IFRoaXMgdmlnbmV0dGUgZ29lcyB0aHJvdWdoIHRoZSBzdGVwcyBvZiBjcmVhdGUgdGhlIENlblNvYy1ETUYgZmlsZSBmcm9tIGlucHV0IHNvdXJjZSBkYXRhIChTb2NpYWwgU2VjdXJpdHkgRGVhdGggTWFzdGVyIEZpbGUgYW5kIDE5NDAgQ2Vuc3VzKS4gV2UgbWF0Y2ggbWVuIG9uIHRoZWlyIGZpcnN0IG5hbWUsIGxhc3QgbmFtZSwgYW5kIGFnZSBhdCBjZW5zdXMuIAoKQSBjb3B5IG9mIHRoZSBgY2Vuc29jZGV2YCBwYWNrYWdlIG11c3QgYmUgY2xvbmVkIGZyb20gR2l0SHViOiAKCmBgYHtyfQojIGxpYnJhcnkoZGV2dG9vbHMpIAojIGluc3RhbGxfZ2l0aHViKCJjYXNleWJyZWVuL2NlbnNvY2RldiIpCmBgYAoKTGlicmFyeSBQYWNrYWdlcwpgYGB7cn0KbGlicmFyeShjZW5zb2NkZXYpCmxpYnJhcnkodGlkeXZlcnNlKQpsaWJyYXJ5KGRhdGEudGFibGUpCmBgYAoKUmVhZCBpbiBTb2NpYWwgU2VjdXJpdHkgRGVhdGggTWFzdGVyIGZpbGUsIDE5NDAgY2Vuc3VzIGZpbGUsIGFuZCBjcmVhdGUgY2Vuc29jIGZpbGUuIAoKTm90ZTogbl9jbGVhbl9rZXlzIHZhcmlhYmxlIGluIHRoZSAiY2Vuc3VzIiBmaWxlIHJlZmVycyB0byB0aGUgdG90YWwgbnVtYmVyIG9mIHVuaXF1ZSBrZXlzIGZvciBib3RoIG1lbiAqYW5kKiB3b21lbi4gCmBgYHtyfQojIyBSZWFkIGluIERNRiAoU1NETSkgZmlsZXMKZG1mX2ZpbGVzID0gYygiL2hvbWUvaXB1bXMvam9zaC1pcHVtcy9wcm9ncy9zc2RtL3NzZG0xIiwKICAgICAgICAgICAgICAgICAgICAgIi9ob21lL2lwdW1zL2pvc2gtaXB1bXMvcHJvZ3Mvc3NkbS9zc2RtMiIsCiAgICAgICAgICAgICAgICAgICAgICIvaG9tZS9pcHVtcy9qb3NoLWlwdW1zL3Byb2dzL3NzZG0vc3NkbTMiKQoKZG1mIDwtIGxvYWRfZG1mX2RlYXRocyhkbWZfZmlsZXMpCgojIyBSZWFkIGluIDE5NDAgQ2Vuc3VzIGZpbGVzCmNlbnN1cyA8LSBsb2FkX2NlbnN1c19kbWZfbWF0Y2goY2Vuc3VzX2ZpbGUgPSAiL2hvbWUvaXB1bXMvY2FzZXktaXB1bXMvSVBVTVMyMDE5LzE5NDAvVFNWL1AudHN2IikKCiMjIENyZWF0ZSBDZW5Tb2MgRmlsZQpjZW5zb2MuZG1mIDwtIGNyZWF0ZV9jZW5zb2NfZG1mKGNlbnN1cywgZG1mKQpgYGAKCi0gQ2FsY3VsYXRlIGFnZSBhdCBkZWF0aCB2YXJpYWJsZXMgCi0gQ2FsY3VsYXRlIHdlaWdodHMKLSBSZW1vdmUgbWF0Y2hlcyB3aGVyZSBmaXJzdCBuYW1lIHdhcyBvbmx5IG9uZSBjaGFyYWN0ZXIgCmBgYHtyfQojIyBDYWxjdWxhdGUgYWdlIGF0IGRlYXRoCmNlbnNvYy5kbWYgPC0gY2FsY3VsYXRlX2FnZV9hdF9kZWF0aChjZW5zb2MuZG1mKQoKIyMgQ2FsY3VsYXRlIHdlaWdodHMKY2Vuc29jLmRtZiA8LSBjcmVhdGVfd2VpZ2h0c19jZW5zb2NfZG1mKGNlbnNvYy5kbWYsIGNvaG9ydHMgPSBjKDE4OTU6MTkzOSksIGRlYXRoX2FnZXMgPSBjKDY1OjEwMCkpCgojIyBDYWxjdWxhdGUgRE1GCmNlbnNvYy5kbWYgPC0gY2Vuc29jLmRtZiAlPiUgCiAgZmlsdGVyKCFuY2hhcihmbmFtZSkgPD0gMSkKYGBgCgpTZWxlY3QgdmFyaWFibGVzIGZvciBwdWJsaWMgcmVsZWFzZQpgYGB7cn0KY2Vuc29jLmRtZi53ZWIgPC0gY2Vuc29jLmRtZiAlPiUgCiAgc2VsZWN0KEhJU1RJRCwgYnllYXIsIGJtb250aCwgZHllYXIsIGRtb250aCwgZGVhdGhfYWdlLCB3ZWlnaHQpCmBgYAoKV3JpdGUgb3V0IENlblNvYyB3aXRoIGZvciB3ZWJzaXRlLiBUaGlzIGlzIHRoZSBmaWxlIHdlIHdpbGwgcHVibGljbHkgcmVsZWFzZS4gQXMgcGVyIG91ciBhZ3JlZW1lbnQgd2l0aCBJUFVNUywgd2UgY2Fubm90IHJlbGVhc2UgZGF5IG9mIGRlYXRoIG9yIGRheSBvZiBiaXJ0aC4gCmBgYHtyfQojIGZ3cml0ZShjZW5zb2MuZG1mLndlYiwgIi9jZW5zb2MvZGF0YS9jZW5zb2NfZmlsZXNfZm9yX3dlYnNpdGUvY2Vuc29jX2RtZl92MS5jc3YiKQpgYGAKCk9wdGlvbmFsOiBhZGQgYWxsIHBlcnNvbiB2YXJpYWJsZXMgYW5kIGhvdXNlaG9sZCB2YXJpYWJsZXMgZnJvbSAxOTQwIGNlbnN1cwpgYGB7cn0KY2Vuc3VzIDwtIGZyZWFkKCIvaG9tZS9pcHVtcy9jYXNleS1pcHVtcy9JUFVNUzIwMTkvMTk0MC9UU1YvUC50c3YiKQoKY2Vuc29jLmRtZi5hbGwudmFycyA8LSBjZW5zb2MuZG1mICU+JSAKICBzZWxlY3QoLUFHRSwgLVNFWCwgLU5BTUVMQVNULCAtTkFNRUZSU1QpICU+JSAKICBpbm5lcl9qb2luKGNlbnN1cykKCmhvdXNlaG9sZF9jZW5zdXMgPC0gZnJlYWQoIi9ob21lL2lwdW1zL2Nhc2V5LWlwdW1zL0lQVU1TMjAxOS8xOTQwL1RTVi9ILnRzdiIpCnNldERUKGNlbnNvYy5kbWYuYWxsLnZhcnMpCmNlbnNvYy5kbWYuYWxsLnZhcnMgPC0gYWRkX2hvdXNlaG9sZF92YXJpYWJsZXMoY2Vuc29jID0gY2Vuc29jLmRtZi5hbGwudmFycywgaG91c2Vob2xkX2NlbnN1cyA9IGhvdXNlaG9sZF9jZW5zdXMpCmBgYAoKV3JpdGUgb3V0IENlblNvYyBmaWxlIHdpdGggYWxsIHZhcmlhYmxlcwpgYGB7cn0KIyBmd3JpdGUoY2Vuc29jLmRtZi5hbGwudmFycywgIi9jZW5zb2MvZGF0YS9jZW5zb2NfbGlua2VkX3dpdGhfY2Vuc3VzLzE5NDAvY2Vuc29jX2RtZl9hbGxfdmFyc192MS5jc3YiKQpgYGAK</div>
 
