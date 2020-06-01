@@ -1,0 +1,88 @@
+---
+title: "Creating the CenSoc DMF File"
+output: html_notebook
+author: Casey Breen (caseybreen@berkeley.edu)
+---
+
+Summary: This vignette goes through the steps of creating the CenSoc-DMF file from input source data (Social Security Death Master File and 1940 Census). We match men on their first name, last name, and age at census. 
+
+A copy of the `censocdev` package must be cloned from GitHub.
+
+```{r}
+#Un-comment these lines to install the package
+#library(devtools) 
+#install_github("caseybreen/censocdev")
+```
+
+We load the following packages:
+```{r message=FALSE, warning=FALSE}
+library(censocdev)
+library(tidyverse)
+library(data.table)
+```
+
+First we read in the Social Security Death Master file, a collection of 83 million records reported to the Social Security Administration, and the 1940 census file, and use these to create the Censoc file. Our matched file includes only men, due to record-linking challenges associated with surname changes for women.
+
+Note: n_clean_keys variable in the "census" file refers to the total number of unique keys for both men *and* women. 
+```{r}
+## Read in DMF (SSDM) files
+dmf_files = c("/home/ipums/josh-ipums/progs/ssdm/ssdm1",
+                     "/home/ipums/josh-ipums/progs/ssdm/ssdm2",
+                     "/home/ipums/josh-ipums/progs/ssdm/ssdm3")
+
+dmf <- load_dmf_deaths(dmf_files)
+```
+
+```{r}
+## Read in 1940 Census files
+census <- load_census_dmf_match(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
+```
+Now we merge both files.
+```{r}
+## Create CenSoc File
+censoc.dmf <- create_censoc_dmf(census, dmf)
+```
+After merging, we can calculate variables. First, we calculate a variable for age at death in years. The code used addresses missing values of the day and month variables with imputation, but yields a missing value for age at death if the birth or death year is missing.
+```{r}
+## Calculate age at death
+censoc.dmf <- calculate_age_at_death(censoc.dmf)
+```
+
+We also calculate inverse inclusion-probability weights to the Human Mortality Database (HMD) Lexis Triangles on age at death, year of birth, year of death, and sex (the sample is restricted to males only) for cohorts born from 1895-1939 with ages at death of 65-100.
+
+```{r}
+## Calculate weights
+censoc.dmf <- create_weights_censoc_dmf(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:100))
+```
+Then we remove matches where the first name was only one character long.
+```{r}
+censoc.dmf <- censoc.dmf %>% 
+  filter(!nchar(fname) <= 1)
+```
+
+We then select variables for public release: HISTID, used for linking with census person and household-level variables; variables for birth and death month and year, and age at death; and sample weight. As per our agreement with IPUMS, we cannot release day of death or day of birth.
+
+```{r}
+censoc.dmf.web <- censoc.dmf %>% 
+  select(HISTID, byear, bmonth, dyear, dmonth, death_age, weight)
+```
+We then write out the CenSoc file for the website. This is the file we will publicly release. 
+```{r}
+# fwrite(censoc.dmf.web, "/censoc/data/censoc_files_for_website/censoc_dmf_v1.csv")
+```
+An optional step is to add all person variables and household variables from the 1940 census.
+```{r}
+census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
+
+censoc.dmf.all.vars <- censoc.dmf %>% 
+  select(-AGE, -SEX, -NAMELAST, -NAMEFRST) %>% 
+  inner_join(census)
+
+household_census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv")
+setDT(censoc.dmf.all.vars)
+censoc.dmf.all.vars <- add_household_variables(censoc = censoc.dmf.all.vars, household_census = household_census)
+```
+We can then write out this version of the CenSoc file with all variables.
+```{r}
+# fwrite(censoc.dmf.all.vars, "/censoc/data/censoc_linked_with_census/1940/censoc_dmf_all_vars_v1.csv")
+```
