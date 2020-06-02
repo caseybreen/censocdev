@@ -11,14 +11,12 @@ Steps to make CenSoc Demo File:
 (2) Link Crosswalk 
 (2) Link to CenSoc-DMF 
 
-
 Library the Packages for analysis 
 ```{r}
 library(data.table)
 library(tidyverse)
 library(ipumsr)
 ```
-
 
 Read in the 1 percent file and the crosswalk from IPUMS.
 ```{r}
@@ -60,9 +58,9 @@ demo_file %>%
   summarize(n = n()) %>% 
   mutate(`freq %` = round(100*n / sum(n), 1))
 ```
+
+
 ## Consturct CenSoc-DMF Demo
-
-
 ```{r}
 censoc.dmf <- fread("/censoc/data/censoc_files_for_website/censoc_dmf_v1.csv")
 
@@ -97,7 +95,6 @@ write_csv(demo_file_dmf_cleaned, "/censoc/data/censoc_files_for_website/censoc_d
 
 
 ## Construct CenSoc-Numident Demo
-
 ```{r}
 censoc.numident <- fread("/censoc/data/censoc_files_for_website/censoc_numident_v1.csv")
 

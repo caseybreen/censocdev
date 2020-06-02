@@ -1,12 +1,11 @@
 ---
 title: "Creating the CenSoc DMF File"
-output: html_notebook
-author: Casey Breen (caseybreen@berkeley.edu)
+author: Casey Breen (caseybreen@berkeley.edu) and Mallika Snyder (mallikasnyder@berkeley.edu)
 ---
 
 Summary: This vignette goes through the steps of creating the CenSoc-DMF file from input source data (Social Security Death Master File and 1940 Census). We match men on their first name, last name, and age at census. 
 
-A copy of the `censocdev` package must be cloned from GitHub.
+Note: We recommend cloning a copy of the `censocdev` package from GitHub repository (https://github.com/caseybreen/censocdev). This will give access to all functions — and allow you to contribute and improve the package (by pushing changes).
 
 ```{r}
 #Un-comment these lines to install the package
@@ -37,11 +36,13 @@ dmf <- load_dmf_deaths(dmf_files)
 ## Read in 1940 Census files
 census <- load_census_dmf_match(census_file = "/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
 ```
+
 Now we merge both files.
 ```{r}
 ## Create CenSoc File
 censoc.dmf <- create_censoc_dmf(census, dmf)
 ```
+
 After merging, we can calculate variables. First, we calculate a variable for age at death in years. The code used addresses missing values of the day and month variables with imputation, but yields a missing value for age at death if the birth or death year is missing.
 ```{r}
 ## Calculate age at death
@@ -54,6 +55,7 @@ We also calculate inverse inclusion-probability weights to the Human Mortality D
 ## Calculate weights
 censoc.dmf <- create_weights_censoc_dmf(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:100))
 ```
+
 Then we remove matches where the first name was only one character long.
 ```{r}
 censoc.dmf <- censoc.dmf %>% 
@@ -66,10 +68,12 @@ We then select variables for public release: HISTID, used for linking with censu
 censoc.dmf.web <- censoc.dmf %>% 
   select(HISTID, byear, bmonth, dyear, dmonth, death_age, weight)
 ```
+
 We then write out the CenSoc file for the website. This is the file we will publicly release. 
 ```{r}
 # fwrite(censoc.dmf.web, "/censoc/data/censoc_files_for_website/censoc_dmf_v1.csv")
 ```
+
 An optional step is to add all person variables and household variables from the 1940 census.
 ```{r}
 census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/P.tsv")
@@ -82,6 +86,7 @@ household_census <- fread("/home/ipums/casey-ipums/IPUMS2019/1940/TSV/H.tsv")
 setDT(censoc.dmf.all.vars)
 censoc.dmf.all.vars <- add_household_variables(censoc = censoc.dmf.all.vars, household_census = household_census)
 ```
+
 We can then write out this version of the CenSoc file with all variables.
 ```{r}
 # fwrite(censoc.dmf.all.vars, "/censoc/data/censoc_linked_with_census/1940/censoc_dmf_all_vars_v1.csv")
