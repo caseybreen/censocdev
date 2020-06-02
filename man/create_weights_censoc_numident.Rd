@@ -6,8 +6,11 @@
 This function will weight the numident file up to HMD lexis triangles
 Restrict data to deaths from 1988 - 2005 with age_at_death between}
 \usage{
-create_weights_censoc_numident(censoc.numident, cohorts = c(1895:1939),
-  death_ages = c(65:100))
+create_weights_censoc_numident(
+  censoc.numident,
+  cohorts = c(1895:1939),
+  death_ages = c(65:100)
+)
 }
 \arguments{
 \item{data}{data.frame with birth and death info}

@@ -4,8 +4,10 @@
 \alias{select_birthplace}
 \title{Select place of birth}
 \usage{
-select_birthplace(data = numapp,
-  crosswalk = "/censoc/data/crosswalks/bpl_crosswalk.csv")
+select_birthplace(
+  data = numapp,
+  crosswalk = "/censoc/data/crosswalks/bpl_crosswalk.csv"
+)
 }
 \arguments{
 \item{numapp}{path to the NUMAPP files}
