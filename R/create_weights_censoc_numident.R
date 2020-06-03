@@ -22,7 +22,7 @@ create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:193
     group_by(death_age, dyear, byear, sex) %>%
     tally() %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
-    ungroup(dyear, death_age)
+    ungroup()
 
   ## Calculate death weights
   death_weights <- numdeath_aggregate_counts %>%
@@ -36,7 +36,7 @@ create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:193
   ## Calculate weights
   death_weights_for_link <-  death_weights %>%
     mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_")) %>%
-    ungroup(dyear, death_age, sex) %>%
+    ungroup() %>%
     select(inclusion_prob, linking_key) %>%
     mutate(weight = 1/inclusion_prob) %>%
     select(-inclusion_prob)
