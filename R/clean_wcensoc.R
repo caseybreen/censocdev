@@ -9,11 +9,11 @@
 #'
 clean_wcensoc <- function(wcensoc, census_year){
   
-  ## Remove rows where dyear is greater than byear
+  ## Keep rows where dyear is greater than byear
   wcensoc <- wcensoc[dyear >= byear]
   
-  ## Remove rows where dyear is after census
-  ## this should never happen 
+  ## Keep rows where dyear is after census
+  ## The reverse should never happen 
   wcensoc <- wcensoc[dyear >= census_year]
   
   return(wcensoc)
