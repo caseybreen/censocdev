@@ -27,7 +27,7 @@ Whether the CenSoc-DMF or CenSoc-Numident file is a better choice for your analy
 
 ## Downloading 1940 Full-Count Census from IPUMS
 
-The CenSoc datasets links the 1940 Census to the mortality records.
+The CenSoc datasets link the 1940 Census to the mortality records.
 
 [IPUMS](https://ipums.org/what-is-ipums) provides integrated census and survey data from across the world free of charge to the broader research community. To access the IPUMS-USA data collection, you first need to [register](https://uma.pop.umn.edu/usa/user/new?return_url=https%3A%2F%2Fusa.ipums.org%2Fusa-action%2Fmenu). 
 
@@ -39,7 +39,7 @@ Once you have an account, go to https://usa.ipums.org/usa/ and under 'CREATE YOU
 
  Select the 1940 Full Count Census:
 
-- Click the 'SELECT SAMPLES' button. This will take you to a page with all possible census and ACS data that are available.
+- Click the 'SELECT SAMPLES' button. This will take you to a page with all possible census and ACS data available.
 - Uncheck the 'Default sample from each year' box
 - Click the 'USA FULL COUNT' tab
 - Check the 1940 100% box
@@ -49,13 +49,13 @@ This will take you back to the variable selection page.
 
 #### Select Variables for Analysis
 
-All extracts will by default include `HISTID`, the variable used to the census file to the CenSoc file.
+All extracts will by default include `HISTID`, the variable used to the link the census file to the CenSoc file.
 
 Choose variables for your analysis. For example, you could select `RACE`, which is under PERSONAL &rarr; RACE, ETHNICITY, AND NATIVITY.
 
 #### Select Cases
 
-The IPUMS "select cases" feature allows users to conditionally choose which states to include in an extract. This can be helpful if you're only interested in a subset of the Census. For example, if you are working with the CenSoc-DMF file, which includes only men, it makes sense to restrict your cases to men-only. 
+The IPUMS "select cases" feature allows users to conditionally choose which states to include in an extract. This can be helpful if you are only interested in a subset of the Census. For example, if you are working with the CenSoc-DMF file, which includes only men, it makes sense to restrict your cases to men-only. 
 
 ### Downloading the IPUMS extract
 
@@ -63,7 +63,7 @@ To work with IPUMS data in R, it is usually easiest to download the data as a CS
 
 You can work with other formats in R as well, but CSV is generally the easiest. The only downside is that variable values are numeric codes. The [IPUMSR package](https://cran.r-project.org/web/packages/ipumsr/vignettes/ipums.html) helps assign variable labels, value labels, and more.
  
-Once you are happy with your dataset, click the 'SUBMIT EXTRACT' button. Because it is full count data, you will need to agree to special usage terms. Click Ok to extract the dataset.
+Once you are happy with your dataset, click the 'SUBMIT EXTRACT' button. Because it is full count data, you will need to agree to special usage terms. Click OK to extract the dataset.
 
 Given the size of the file, the processing may take several hours. Once the file is ready, you will receive an email from IPUMS with a link to download the resulting dataset. As all IPUMS datasets come compressed, the data needs to be uncompressed before it can be used. For more information on IPUMS extracts, please see [IPUMS-USA](https://usa.ipums.org/usa/data.shtml/).
 

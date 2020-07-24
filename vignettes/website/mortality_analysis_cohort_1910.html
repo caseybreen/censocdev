@@ -12,7 +12,7 @@
 
 <meta name="author" content="Casey Breen (caseybreen@berkeley.edu)" />
 
-<meta name="date" content="2020-04-20" />
+<meta name="date" content="2020-07-17" />
 
 <title>Mortality Analysis of the 1910 Cohort</title>
 
@@ -303,7 +303,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Mortality Analysis of the 1910 Cohort</h1>
 <h4 class="author">Casey Breen (<a href="mailto:caseybreen@berkeley.edu" class="email">caseybreen@berkeley.edu</a>)</h4>
-<h4 class="date">2020-04-20</h4>
+<h4 class="date">2020-07-17</h4>
 
 
 
@@ -343,8 +343,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="data-preparation" class="section level2">
 <h2>Data Preparation</h2>
-<p>IPUMS variables often have value labels, which is text that corresponds to numeric codes (e.g., the <code>SEX</code> variable has value labels: 1 = “Male”, 2 = “Female”).</p>
-<p>The <code>IPUMSR</code> package includes a helpful functions for assigning values labels (see the <a href="http://tech.popdata.org/ipumsr/index.html">ipumsr website</a> for more information and tutorials). In this vignette, for simplicity, we’ll manually code our value labels.</p>
+<p>IPUMS variables often have value labels, which are text that corresponds to numeric codes (e.g., the <code>SEX</code> variable has value labels: 1 = “Male”, 2 = “Female”).</p>
+<p>The <code>IPUMSR</code> package includes helpful functions for assigning values labels (see the <a href="http://tech.popdata.org/ipumsr/index.html">ipumsr website</a> for more information and tutorials). In this vignette, for simplicity, we will manually code our value labels.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">## recode educ_yrs var to years of education</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>censoc &lt;-<span class="st"> </span>censoc <span class="op">%&gt;%</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">educ_yrs =</span> <span class="kw">case_when</span>(</span>
@@ -384,7 +384,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="quick-exploratory-data-analysis" class="section level2">
 <h2>Quick Exploratory Data Analysis</h2>
-<p>Exploratory data analysis is an important part of the modeling process. Exploratory data analysis can help us understand the main characteristics of the data and their relationship with our dependent variable, age at death. Here, we’ll briefly explore some associations between our independent and dependent variables.</p>
+<p>Exploratory data analysis is an important part of the modeling process. Exploratory data analysis can help us understand the main characteristics of the data and their relationship with our dependent variable, age at death. Here, we will briefly explore some associations between our independent and dependent variables.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">## additional years of life expectancy </span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>educ_df &lt;-<span class="st"> </span>censoc <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="st">  </span><span class="kw">group_by</span>(educ_yrs) <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -426,10 +426,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="ols-regression" class="section level2">
 <h2>OLS Regression</h2>
-<p>There are two specific considerations of using regression on age of death to analyze the CenSoc Mortality data. First, we are only observing deaths for a narrow window. As the left and right truncation ages vary by birth cohort, it is important to include fixed effect terms for each year of birth. Models of the form:</p>
+<p>There are two specific considerations for using regression on age of death to analyze the CenSoc Mortality data. First, we are only observing deaths for a narrow window. As the left and right truncation ages vary by birth cohort, it is important to include fixed effect terms for each year of birth. Models of the form:</p>
 <p><span class="math display">\[ Age\_at\_death = birth\_year\_dummy + covariates\_of\_interest \]</span></p>
 <p>provide estimates of the effect of the covariates on the age of death in the sample, controlling for birth cohort truncation effects.</p>
-<p>In this case, we’re only looking at the cohort of 1910, so we don’t need to include a fixed effect term for year of birth.</p>
+<p>In this case, we are only looking at the cohort of 1910, so we do not need to include a fixed effect term for year of birth.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">## Prepare for Regression</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>censoc &lt;-<span class="st"> </span>censoc <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">race_string =</span> <span class="kw">as.factor</span>(race_string)) <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -469,7 +469,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="visualizing-model-coefficients" class="section level2">
 <h2>Visualizing Model Coefficients</h2>
 <p>The <code>broom</code> package takes the results from the model we ran in R and conveniently formats it as a data.frame representation. Using this package, we both extract and plot our coefficients and associated confidence intervals.</p>
-<p>For a more comprehensive review of working with model-based graphics in <code>R</code>, we recommend Kieran Healy’s <a href="https://socviz.co/">Data Visualization: A practical Introduction</a>.</p>
+<p>For a more comprehensive review of working with model-based graphics in <code>R</code>, we recommend Kieran Healy’s <a href="https://socviz.co/">Data Visualization: A Practical Introduction</a>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">## construct a data.frame of the results of our statistical model</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>tidy.model &lt;-<span class="st"> </span><span class="kw">tidy</span>(model, <span class="dt">conf.int =</span> T)</span>
 <span id="cb5-3"><a href="#cb5-3"></a>tidy.model &lt;-<span class="st"> </span><span class="kw">subset</span>(tidy.model, <span class="op">!</span>term <span class="op">%in%</span><span class="st"> &quot;(Intercept)&quot;</span>)</span>

@@ -11,15 +11,15 @@ vignette: >
 
 This tutorial will walk through the steps of visualizing differentials in e(65) — life expectancy conditional on surviving to age 65 — by ZIP Code using the Berkeley Unified Numident Mortality Database 
 
-Specifically, this vignette will walk through the steps of (1) calculating differentials by ZIP Code and (2) create a choropleth map in R using the choroplethr package. Choropleths are thematic maps where each geographic region is colored or shaded according to some metric.
+Specifically, this vignette will walk through the steps of (1) calculating differentials by ZIP Code and (2) creating a choropleth map in R using the `choroplethr` package. Choropleths are thematic maps where each geographic region is colored or shaded according to some metric.
 
-Though this analysis focuses on the New York City borough of Manhattan, this approach can be replicated for other regions to similar effect. 
+Though this analysis focuses on the New York City borough of Manhattan, the approach can be replicated for other regions to similar effect. 
 
 ### Geography in BUNMD
 
-There are several geography variables in the Berkeley Unified Numident Mortality Database (BUNMD).
+There are several geographic variables in the Berkeley Unified Numident Mortality Database (BUNMD).
 
-- `bpl` variable reports birthplace. For persons born in the United States, the geographic resolution is state-level, and for persons born outside of the United States, the geographic resolution is country-level. 
+- `bpl` variable reports birthplace. For persons born in the United States, the geographic resolution is state-level, and for persons born outside the United States, the geographic resolution is country-level. 
 
 - `zip_residence` variable reports the 9-digit ZIP Code of residence at the time of death for a portion of records. ZIP Codes, while not the most robust geographic unit of analysis, can offer insights into a variety of spatial questions.
 
@@ -38,7 +38,7 @@ bunmd <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunm
 
 ### Preparing Data for Analysis 
 
-We’ll look at the sub-sample of the BUNMD with high death coverage — deaths occuring between 1988-2005. For our analysis, we'll focus on 5-digit ZIP Codes, rather than the full 9-digit ZIP Codes. 
+We will look at the subsample of the BUNMD with high death coverage — deaths occurring between 1988-2005. For our analysis, we will focus on 5-digit ZIP Codes, rather than the full 9-digit ZIP Codes. 
 
 ```{r, eval = F}
 ## Read ZIP Codes
@@ -120,6 +120,6 @@ manhattan.plot <- choro$render() +
 
 ### Interpretation
 
-When interpreting these mortality differentials, it's important to remember that we are only observing deaths for a truncated window. This truncation will tend to downwardly bias the estimated effects of any covariates, as it excludes the tails of the distribution, thus reducing the average difference between groups. The average differences between groups will be measured to be smaller if we exclude the tails of the distribution.
+When interpreting these mortality differentials, it is important to remember that we are only observing deaths for a truncated window. This truncation will tend to downwardly bias the estimated effects of any covariates, as it excludes the tails of the distribution, thus reducing the average difference between groups. The average differences between groups will be measured to be smaller if we exclude the tails of the distribution.
 
 Appropriate regression coefficient adjustments can be found through simulation. Please see [BUNMD working paper](https://censoc.berkeley.edu/wp-content/uploads/2020/04/bunmd_paper.pdf) for more information. 

@@ -48,9 +48,9 @@ censoc <- censoc %>%
 
 ## Data Preparation
 
-IPUMS variables often have value labels, which is text that corresponds to numeric codes (e.g., the `SEX` variable has value labels: 1 = "Male", 2 = "Female").
+IPUMS variables often have value labels, which are text that corresponds to numeric codes (e.g., the `SEX` variable has value labels: 1 = "Male", 2 = "Female").
 
-The `IPUMSR` package includes a helpful functions for assigning values labels (see the [ipumsr website](http://tech.popdata.org/ipumsr/index.html) for more information and tutorials). In this vignette, for simplicity, we'll manually code our value labels. 
+The `IPUMSR` package includes helpful functions for assigning values labels (see the [ipumsr website](http://tech.popdata.org/ipumsr/index.html) for more information and tutorials). In this vignette, for simplicity, we will manually code our value labels. 
 
 ```{r, eval = F}
 ## recode educ_yrs var to years of education
@@ -94,7 +94,7 @@ censoc <- censoc %>%
 
 ## Quick Exploratory Data Analysis 
 
-Exploratory data analysis is an important part of the modeling process. Exploratory data analysis can help us understand the main characteristics of the data and their relationship with our dependent variable, age at death. Here, we’ll briefly explore some associations between our independent and dependent variables.
+Exploratory data analysis is an important part of the modeling process. Exploratory data analysis can help us understand the main characteristics of the data and their relationship with our dependent variable, age at death. Here, we will briefly explore some associations between our independent and dependent variables.
 
 ```{r, eval = F}
 ## additional years of life expectancy 
@@ -139,13 +139,13 @@ ggarrange(educ_plot, income_plot)
 
 ## OLS Regression
 
-There are two specific considerations of using regression on age of death to analyze the CenSoc Mortality data. First, we are only observing deaths for a narrow window. As the left and right truncation ages vary by birth cohort, it is important to include fixed effect terms for each year of birth. Models of the form:
+There are two specific considerations for using regression on age of death to analyze the CenSoc Mortality data. First, we are only observing deaths for a narrow window. As the left and right truncation ages vary by birth cohort, it is important to include fixed effect terms for each year of birth. Models of the form:
 
 $$ Age\_at\_death = birth\_year\_dummy + covariates\_of\_interest $$
 
 provide estimates of the effect of the covariates on the age of death in the sample, controlling for birth cohort truncation effects.
 
-In this case, we're only looking at the cohort of 1910, so we don't need to include a fixed effect term for year of birth. 
+In this case, we are only looking at the cohort of 1910, so we do not need to include a fixed effect term for year of birth. 
 
 ```{r, eval = F}
 ## Prepare for Regression
@@ -190,7 +190,7 @@ summary(model)
 
 The `broom` package takes the results from the model we ran in R and conveniently formats it as a data.frame representation. Using this package, we both extract and plot our coefficients and associated confidence intervals. 
 
-For a more comprehensive review of working with model-based graphics in `R`, we recommend Kieran Healy's [Data Visualization: A practical Introduction](https://socviz.co/). 
+For a more comprehensive review of working with model-based graphics in `R`, we recommend Kieran Healy's [Data Visualization: A Practical Introduction](https://socviz.co/). 
 
 ```{r, eval = F}
 ## construct a data.frame of the results of our statistical model

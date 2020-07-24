@@ -1,0 +1,324 @@
+---
+title: "OLS Regression with Truncated CenSoc Data"
+author: "Casey Breen (caseybreen@berkeley.edu)"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+**Summary**: This vignette presents a method for calculating mortality differentials using Ordinary Least Squares (OLS) regression on age at death. The goal of this vignette is to  motivate the need for adjustment factors for interpreting OLS Regression coefficients when working with truncated data and work through a stylized example using this method to explore the relationship between wage income and longevity in the CenSoc-Numident dataset. 
+
+Before getting started with the vignette, make sure to: 
+
+- [Download](https://censoc-download.demog.berkeley.edu/) the CenSoc-Numident File 
+- [Download](https://usa.ipums.org/usa/) the IPUMS 1940 full count census 
+- Install packages if necessary (use the `install.packages()` function)
+    - `tidyverse`
+    - `ipumsr`
+    - `brooms`
+    - `knitr`
+    - `devtools`
+    - `data.table`
+    
+The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website).
+
+## Setup
+
+```{r Library packages, warning=FALSE, message=FALSE, eval = F}
+## Library Packages
+library(tidyverse)
+library(ipumsr)
+library(broom)
+library(knitr)
+library(devtools)
+library(data.table)
+
+## Set seed for reproducibility
+set.seed(0.4886)
+
+## Source some files from a GitHub Repository
+devtools::source_url("https://github.com/caseybreen/numident_paper/blob/master/code/00_helper_functions.R?raw=TRUE")
+```
+
+## Merging CenSoc-Numident and Census
+
+To work with the full CenSoc-Numident file, you need to:
+
+1) Download the CenSoc-Numident file
+2) Download 1940 census data from IPUMS
+3) Merge CenSoc and census files on `HISTID` variable
+
+Please see the ["Getting Started with CenSoc Vignette"](https://censoc.berkeley.edu/wp-content/uploads/2020/04/getting_started_with_censoc.html) for a more detailed explanation.
+
+ if both datasets can fit into your computer's memory, here's some sample R code for merging the datasets on the `HISTID` variable:
+
+```{r, eval = F}
+## read in censoc file
+censoc <- fread('path/to/censoc/file.csv')
+
+## read in census file
+census <- fread('path/to/census/file.csv')
+
+## join the census files by HISTID
+merged_df <- inner_join(censoc, census, by = "HISTID")
+```
+
+### Memory Limitations 
+
+One challenge of working with the full CenSoc-Numident data is that we must work with the large 1940 full count census file, which has over 130 million records and be ~20+ GB in size. This often means that it's too large that to fit into our computer's memory.
+
+A memory-conscious solution is to break the dataset up and work in "chunks." The `ipumsr` package has a few functions to help out with this. 
+
+## Example Workflow using ipumsr
+
+The `ipumsr` package, developed by Greg Ellis at the Minnesota Population Center, reads in IPUMS data and its associated metadata, such as variable and value labels. It also has some helpful functions for working with big IPUMS datasets.
+
+To break the dataset up and work in "chunks", we'll use the `read_ipums_micro_chunked()` function. Here we'll use the function to (i) read in a chunk of the 1940 census (ii) merge that chunk to the CenSoc-Numident on the `HISTID` variable and (iii) repeat for every chunk and then combine all the merged chunks. Then we'll be ready to get started on our analysis. 
+
+To work with the `ipumsr` package, you need to download your census extract as either a .csv file or a fixed-width .dat file and the DDI (a data documentation file). Please see the  [ipumsr instructions](https://cran.r-project.org/web/packages/ipumsr/vignettes/ipums.html) for a more detailed coverage. 
+
+```{r, eval = F}
+## set paths to censoc file 
+censoc_numident <- fread("~/Documents/data/censoc/censoc_numident_v1.csv")
+
+## Set paths to IPUMS data file — .csv or .dat file! 
+ipums_data <- "~/Documents/data/ipums/fc_1940/usa_00033.csv"
+
+## set path to IPUMS DDI file 
+ipums_ddi <- "~/Documents/data/ipums/fc_1940/usa_00033.xml"
+
+## Read in data in chunks and merge with censoc
+censoc_numident_linked <- read_ipums_micro_chunked(ddi = ipums_ddi,
+                                           data_file = ipums_data, 
+  callback = IpumsDataFrameCallback$new(function(x, pos) {
+    suppressWarnings(inner_join(x, censoc_numident, by = "HISTID"))
+  }), 
+  chunk_size = 1000000,
+)
+## This is a bit slow -- it might take up to 45+ minutes.
+
+#> Use of data from IPUMS USA is subject to conditions including that users should
+#> cite the data appropriately. Use command `ipums_conditions()` for more details.
+
+#> |========================================================   | 90% 16963 MB
+```
+
+
+### Set Value Labels
+
+The `ipumsr` package imports the value labels (for example, the `SEX` variable has value labels: 1 = "Male", 2 = "Female." For example, if we're interested in birthplace, we can create a new variable with meaningful strings:
+
+```{r, eval = F}
+## Look at value labels for pirthplace 
+ipums_val_labels(censoc_numident_linked$BPL)
+
+## A tibble: 163 x 2
+#     val lbl                 
+#   <dbl> <chr>               
+# 1     1 Alabama             
+# 2     2 Alaska              
+# 3     4 Arizona             
+# 4     5 Arkansas            
+# 5     6 California          
+# 6     8 Colorado   
+
+## create a new string variable for birthplace
+censoc_numident_linked %>% 
+  mutate(BPL_string = as_factor(BPL)) %>% ## create new string variable for birth place
+  select(HISTID, BPL, BPL_string) %>% ## print out a few rows
+  sample_n(5) 
+```
+
+|HISTID                               | BPL|BPL_string |
+|:------------------------------------|---:|:----------|
+|A25606D5-4E07-460D-9DF4-F23C89440249 |   6|California |
+|DB43E7FC-9077-4A20-890A-65CB8F7E51C9 |  17|Illinois   |
+|DD0ED6E5-2058-4FBC-A830-D38FC6425DA5 |  17|Illinois   |
+|5AB5B1E4-D332-49DB-A8C9-1F6E4F459771 |  39|Ohio       |
+|FEA7EC29-BDF7-41FD-9955-5442D56D8DC2 |  26|Michigan   |
+
+It can be useful to keep the original numeric codes. For example, if you want to restrict to persons born in North America, it's easy with the original BPL codes as the codes are ordered in a meaningful way — we just restrict to BPL codes 200 or smaller. It's more difficult, however, if you have to specify each individual state and country.  
+
+## OLS Regression Truncation
+
+Using OLS Regression on age of death with fixed effect terms for each year of birth is a straightforward method for analyzing CenSoc mortality data. There are a few specific considerations of using regression on age of death to analyze the CenSoc Mortality data. The CenSoc-Numident file only includes deaths occurring in the window of 1988-2005 (the period with high death coverage). As the left and right truncation ages vary by birth cohort, it is important to include fixed effect terms for each year of birth. Models of the form:
+
+$$ Age\_at\_death = birth\_year\_dummy + covariates\_of\_interest $$
+
+provide estimates of the effect of the covariates on the age of death in the sample, controlling for birth cohort truncation effects. In this example, we work with the cohorts of 1900-1920, so we need to include a fixed effect term for year of birth. 
+
+As the truncated window of deaths excludes the tails of the mortality distribution, any measurement of the average difference between groups will be downwardly biased. For example, imagine there are two types of lobsters: red lobsters (mean: 5 lbs) and blue lobsters (mean: 1 lb). Lobsters fishers aren't able to sell lobsters that are too small or too large -- so they only catch lobsters are between 2 and 3 pounds. If we just look at the lobsters that are caught, we're only observing small red lobster and big blue lobsters, and will be understating the true difference in size between the lobsters. By the same logic, the coefficients in our OLS regression model will underestimate the size of the true effect.
+
+![](figures/distribution_age_of_death.png){width=100%}
+For example, in the Figure above, we show two distributions of age at death in which population A (solid line) has an e65 — life expectancy at age 65 — of 18 years and population B (dashed line) has an e65 of 19 years. If we only observe deaths from ages 78 to 95, as we would for the cohort of 1910, the difference in these truncated means will only be 0.358, understating the e65 difference by a factor of 2.79. This 2.79 will be our adjustment factor. 
+
+To account for this, we can calculate adjustment factors to help us more accurately interpret our regression coefficients. Users can do their full statistical analysis and then apply regression coefficients to help us better interpret our results. 
+
+## Calculating Regression Coefficient Adjustment Factors
+
+We will step through calculating regression adjustment coefficients. First, we'll decide upon the appropriate parameters for the Gompertz model — a popular old age mortality model. In general, we can just use default values to calculate our mortality parameters. The Gompertz parameters can be left at their default values of $\beta = 0.1$ and $M = 84$ unless there is a reason to override these values based on external estimates.
+
+For demonstration purposes, in this vignette, we'll use maximum likelihood estimation to calculate new Gompertz parameters from the birth cohort of 1910. We'll then use simulation to calculate adjustment factors for this data set. For a more detailed discussion of this maximum likelihood estimation method, see the [“The Berkeley Unified Numident Mortality Database"](https://censoc.berkeley.edu/wp-content/uploads/2020/04/bunmd_paper.pdf) working paper. 
+
+```{r, eval = F}
+## Format data for maximum likelihood estimation
+deaths_tabulated <- censoc_numident_linked %>%
+  filter(byear %in% 1910) %>%
+  group_by(death_age) %>%
+  summarize(deaths = sum(weight)) %>%
+  filter(death_age %in% 78:94) %>%
+  tibble::deframe()
+
+## Maximum Likelihood Estimation
+x.left <- min(as.numeric(names(deaths_tabulated)))
+x.right <- max(as.numeric(names(deaths_tabulated))) + 1
+
+## Truncation 
+out <- counts.trunc.gomp.est(deaths_tabulated, x.left = x.left,
+                             x.right = x.right,
+                             b.start = 1/9, M.start = 80)
+
+## Get Gompertz Parameters
+(b.vec <- exp(out$par[1]))
+(M.vec <- exp(out$par[2]))
+
+## Get adjustment Factor
+adjust.factor <- get.bunmd.adjust.factor(1905:1915,
+                        M = M.vec,
+                        b = b.vec,
+                        N = 1000000)
+
+#> [1] 0.09249799
+#> [1] 84.30276
+#> [1] "simulating: please be patient"
+#> [1] "regressing: please continue to be patient"
+#> [1] 3.1
+```
+
+## Mortality Differentials by Relative Wage Income
+
+The association between relative income and mortality in the United States has been well-documented. Can we see this association in our CenSoc-Numident dataset?
+
+To answer this question, we'll use the `INCWAGE` variable. This is an imperfect measure of income, as it was only collected for salary and wage workers. Census enumerators in 1940 were explicitly instructed to "not include earnings of businessmen, farmers, or professional persons who depend upon business profits, sales of crops, or fees for income and who do not work for wages or salaries." (See [instructions to enumeration](https://usa.ipums.org/usa/voliii/inst1940.shtml#584) for more detail). In this analysis, we account for this by only including persons with non-zero wages — other researchers may take a different approach. 
+
+The CenSoc-Numident file is already restricted to deaths occurring in the "high-coverage" period of 1988-2005. We further restrict this analysis to the birth cohorts of 1905 to 1915 and deaths for persons 65+ (these are the birth cohorts and ages at death for which we have the best death coverage). 
+
+```{r mortality differentials by occupation, fig.height = 5.5, fig.width = 5.5, fig.align = "center", eval = F}
+## Calculate income deciles
+## Restrict to cohorts of 1900-1920
+censoc_incwage <- censoc_numident_linked %>% 
+  filter(byear %in% c(1905:1915)) %>% 
+  filter(dyear >= 65) %>% 
+  filter(INCWAGE > 0 & INCWAGE <= 5001) %>% ## INCWAGE is topcoded at $5001; higher values denote NA/Missing
+  mutate(wage_decile = ntile(INCWAGE, 10)) %>% 
+  mutate(wage_decile = as.factor(wage_decile)) %>%
+  mutate(educ_yrs = case_when(
+  EDUCD== 2 ~ 0,
+  EDUCD== 14 ~ 1,
+  EDUCD== 15 ~ 2,
+  EDUCD== 16 ~ 3,
+  EDUCD== 17 ~ 4,
+  EDUCD== 22 ~ 5,
+  EDUCD== 23 ~ 6,
+  EDUCD== 25 ~ 7,
+  EDUCD== 26 ~ 8,
+  EDUCD== 30 ~ 9,
+  EDUCD== 40 ~ 10,
+  EDUCD== 50 ~ 11,
+  EDUCD== 60 ~ 12,
+  EDUCD== 70 ~ 13,
+  EDUCD== 80 ~ 14,
+  EDUCD== 90 ~ 15,
+  EDUCD== 100 ~ 16,
+  EDUCD== 110 ~ 17
+))
+
+## Prepare data for model
+censoc_incwage <- censoc_incwage %>% 
+  mutate(race_string = as_factor(RACE),
+         bpl_string = as_factor(BPL),
+         sex_string = as_factor(SEX),
+         byear = as_factor(byear))
+
+## print out variables for model
+censoc_incwage %>% 
+  select(death_age, byear, sex_string, race_string, bpl_string, sex_string, educ_yrs) %>% 
+  sample_n(6)
+```
+
+| death_age| byear|sex_string |race_string                  |bpl_string    | educ_yrs|
+|---------:|-----:|:----------|:----------------------------|:-------------|--------:|
+|        83|  1914|Male       |White                        |Indiana       |        8|
+|        86|  1913|Male       |Black/African American       |Mississippi   |        4|
+|        79|  1911|Female     |White                        |Maine         |       12|
+|        78|  1915|Male       |White                        |Tennessee     |       12|
+|        73|  1914|Female     |White                        |Massachusetts |       10|
+|        84|  1915|Male       |White                        |Montana       |       12|
+
+
+Here, we'll run our regression and inflate our regression coefficients and standard errors by our adjustment factor of 3.1. 
+
+```{r, eval = F}
+## Run linear model 
+## Use both IPUMS and CenSoc weights
+model <- lm(death_age ~  wage_decile +  byear + race_string + sex_string
+                                    + educ_yrs + bpl_string,
+                     data = censoc_incwage,
+                     weight = weight) 
+
+## Put model results into a data.frame 
+model.df <- tidy(model, conf.int = T) %>% 
+  mutate(estimate_adj = estimate * adjust.factor,
+         std.error_adj = std.error * adjust.factor)
+  
+## Select coefficients and standard errors from OLS model
+model.df <- model.df %>%
+  filter(str_detect(term, "wage_decile")) %>% 
+  mutate(quantile = as.numeric(substr(term, 12, 15))) %>% 
+  select(quantile, value = estimate, value_adj = estimate_adj, std.error, std.error_adj = std.error_adj) %>% 
+  add_row(quantile = 1, value = 0, std.error = 0, value_adj = 0, std.error_adj = 0)
+
+## Plot 
+income_decile_ols_coefficients <- ggplot(data = model.df) + 
+  geom_pointrange(aes(ymin = value - std.error,
+                      ymax = value + std.error,
+                      y = value,
+                      x = quantile, 
+                      color = "Raw")) + 
+  geom_pointrange(aes(ymin = value_adj - std.error_adj,
+                      ymax = value_adj + std.error_adj,
+                      y = value_adj,
+                      x = quantile,
+                      color = "Adjusted")
+                  ) + 
+  theme_bw(base_size = 18) + 
+  labs(title = "Income pattern of Longevity at Age 65",
+       x = "Wage Income Decile",
+       y = "Additional Years of Life") +
+  scale_x_continuous(breaks=seq(0,17,2)) + 
+  scale_color_manual(name = "", values = c("Adjusted" = "black", "Raw" = "red")) + 
+  theme(legend.position = "bottom")
+
+ggsave(plot = income_decile_ols_coefficients, filename = "figures/income_decile_ols_coefficients.png")
+```
+<center>
+![](figures/income_decile_ols_coefficients.png){width=80%}
+<center>
+
+## Interpretation
+
+The plot shows the association between relative wage income and longevity, after controlling for gender, race, place of birth, and years of education. The reference group for this plot is the first income decile. When interpreting these mortality differentials, we should keep in mind that the plotted adjusted regression coefficients — and  standard errors — have been scaled-up by a factor of 3.22. 
+
+## Conclusion
+
+The CenSoc-Numident dataset allows researchers to explore broad patterns of mortality differentials in the United States. However, the truncated mortality distribution presents challenges for mortality estimation. To overcome this, we use OLS regression with adjustment factors to scale-up the magnitude of the regression coefficients to account for the downward bias from truncation. 
+
+
+
+
+
+
+
