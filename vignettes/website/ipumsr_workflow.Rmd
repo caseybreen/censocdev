@@ -1,5 +1,5 @@
 ---
-title: "CenSoc workflow with the `ipumsr` package"
+title: "An `ipumsr` Workflow for Big CenSoc Data"
 author: "Casey Breen"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -9,7 +9,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-**Summary**: This vignette presents a workflow for analyzing CenSoc data using the `ipumsr` package, an easy way to import IPUMS data and its associated metadata into `R`. The goal of this vignette is to provide motivation as to why CenSoc users may want to use the `ipumsr` package and provide a basic outline of its functionality. 
+**Summary**: This vignette presents a workflow for analyzing CenSoc data using the `ipumsr` package, an easy way to import IPUMS data and its associated metadata into R. The goal of this vignette is to provide motivation as to why CenSoc users may want to use the `ipumsr` package and provide a basic outline of its functionality. 
 
 Before getting started with the vignette, you'll need to: 
 
@@ -17,8 +17,7 @@ Before getting started with the vignette, you'll need to:
 
     - `tidyverse`
     - `ipumsr`
-    - `brooms`
-    
+
 2. [Download](https://censoc-download.demog.berkeley.edu/) the CenSoc-Numident or CenSoc-DMF file 
 
 3. [Download](https://usa.ipums.org/usa/) the 1940 full count census and accompanying DDI from IPUMS (instructions below)
@@ -29,15 +28,15 @@ The original R notebook (.Rmd file) for this vignette can be downloaded [here](h
 ## IPUMS and the `ipumsr` package
 
 
-[IPUMS](https://ipums.org/what-is-ipums) provides integrated census and survey data from across the world free of charge to the broader research community. IPUMS is a terrific resource to the social science community—they clean and harmonize data, and offer an interactive extract system that allows users to select only the samples and variables relevant for their research question.  To access the IPUMS-USA data collection, you first need to [register](https://uma.pop.umn.edu/usa/user/new?return_url=https%3A%2F%2Fusa.ipums.org%2Fusa-action%2Fmenu). 
+[IPUMS](https://ipums.org/what-is-ipums) provides integrated census and survey data from across the world free of charge to the broader research community. IPUMS is a terrific resource for the social science community—they clean and harmonize data and offer an interactive extract system that allows users to select only the samples and variables relevant for their research question.  To access the IPUMS-USA data collection, you first need to [register](https://uma.pop.umn.edu/usa/user/new?return_url=https%3A%2F%2Fusa.ipums.org%2Fusa-action%2Fmenu). 
 
-The `ipumsr` package, created by Greg Ellis at the Institute for Social Research and Data Innovation, reads in IPUMS data and its associated metadata, such as variable descriptions and value labels. It also has some helpful functions for working with big IPUMS datasets. In the context of CenSoc, it's particularly helpful for assigning meaningful text labels to numeric codes (e.g., for the `SEX` variable, 1 = "Male", 2 = "Female"). 
+The `ipumsr` package, created by Greg Freedman Ellis at the Institute for Social Research and Data Innovation, reads in IPUMS data and its associated metadata, such as variable descriptions and value labels, into R. It also has some helpful functions for working with big IPUMS datasets. In the context of CenSoc, it's particularly helpful for assigning meaningful text labels to numeric codes (e.g., for the `SEX` variable, 1 = "Male", 2 = "Female"). 
 
 For a more thorough coverage of the `ipumsr` package, please visit the [ipumsr website](http://tech.popdata.org/ipumsr/articles/ipums.html). 
 
 ### Downloading 1940 Full-Count Census from IPUMS
 
-Once you have an account, visit https://usa.ipums.org/usa/ and select 'GET DATA', listed under 'CREATE YOUR CUSTOM DATA SET'. 
+Once you have an account, visit https://usa.ipums.org/usa/ and select 'GET DATA', listed under 'CREATE YOUR CUSTOM DATA SET.' 
 
 #### Select data sample
 
@@ -53,20 +52,19 @@ This will take you back to the variable selection page.
 
 #### Select Variables for Analysis
 
-All extracts will, by default, include `HISTID`, the variable used to the link the census file to the CenSoc file.
+All extracts will, by default, include `HISTID`, the variable used to link the census file to the CenSoc file.
 
 Choose variables for your analysis. For example, you could select `RACE`, which is under PERSONAL &rarr; RACE, ETHNICITY, AND NATIVITY.
 
 #### Select Cases
 
-The IPUMS "select cases" feature allows users to conditionally choose which records to include in an extract. This can be helpful if you are only interested in a subset of the Census. For example, if you are working with the CenSoc-DMF file, which includes only men, it makes sense to restrict your cases to men-only. 
+The IPUMS "select cases" feature allows users to conditionally choose which records to include in an extract. If you are only interested in a subset of the Census, this is a great way to reduce the size of your extract! For example, if you are working with the CenSoc-DMF file, which includes only men, it would make sense to restrict your cases to men-only. 
 
 #### Downloading the data and DDI
 
-To do this, visit the 'EXTRACT REQUEST' page, and click 'Change', which is located next to 'DATA FORMAT'. Then,  select 'Comma delimited (.csv)' or 'Fixed-width text (.dat) and click the submit button. Once you are happy with your dataset, click the 'SUBMIT EXTRACT' button. Agree to to full-count usage terms, and click 'OK' to extract the dataset.
+To do this, visit the 'EXTRACT REQUEST' page and click 'Change,' which is located next to 'DATA FORMAT.' Then,  select 'Comma delimited (.csv)' or 'Fixed-width text (.dat) and click the submit button. Once you are happy with your dataset, click the 'SUBMIT EXTRACT' button. Agree to the full-count usage terms, and click 'OK' to extract the dataset.
 
 Given the size of the extract, it may take a few hours before it's available for download. Once the file is ready, you will receive an email from IPUMS with a link to download the resulting dataset. For more information on IPUMS extracts, please see [IPUMS-USA](https://usa.ipums.org/usa/data.shtml/).
-
 
 To read in IPUMS data with the `ipumsr` package, you'll need to download:
 
@@ -79,24 +77,28 @@ To read in IPUMS data with the `ipumsr` package, you'll need to download:
 
 ```{r Library packages, warning=FALSE, message=FALSE, eval = F}
 ## Library Packages
-library(tidyverse) ## set of packages to facillitate data analysis 
-library(ipumsr) ## reads in ipums data and associated metadata
+library(tidyverse) ## functions for data manipulation and visualization
+library(ipumsr) ## reads in IPUMS data and associated metadata
 ```
 
 ### Merging CenSoc and Census
 
-To work with the full CenSoc-Numident file, you'll need to (i) read in the 1940 census, (ii) read in the CenSoc File, and (iii) match them on the HISTID variable. 
+To work with the full CenSoc files, you'll first need to (i) read in the 1940 census, (ii) read in the CenSoc File, and (iii) merge them on the HISTID variable. Note that we also have pre-linked CenSoc "demo" files — please see this [vignette](https://cran.r-project.org/web/packages/ipumsr/vignettes/ipums.html) for more information.
 
-If both datasets can fit into your computer's memory, merging the datasets on the `HISTID` variable is fairly straightforward:
+One challenge of working with the full CenSoc files is that you must work with large files. For example: 
+
+- Full Count 1940 Census File (30 variables): 132 million records, 18 GB
+- CenSoc Numident: 6.8 million records, 760 MB
+
+If both datasets fit into your computer or server's memory, merging the datasets on the `HISTID` variable is straightforward. 
 
 ```{r, eval = F}
 ## read in censoc file
-censoc <- read_csv("~/Documents/data/censoc_numident_v1/censoc_numident_v1.csv")
+censoc <- read_csv("~/path/to/censoc/censoc_numident_v1.csv")
 
-
-## read in census file with IPUMSR
-census <- read_ipums_micro(data = '~/Documents/data/ipums/usa_00036.csv.gz',
-                           ddi = '~/Documents/data/ipums/usa_00036.xml')
+## read in census file with ipumsr package
+census <- read_ipums_micro(data_file = '~/path/to/ipums/usa_00036.csv.gz',
+                           ddi = '~/path/to/ipums/usa_00036.xml')
 
 ## join the census files by HISTID
 censoc_numident_linked <- inner_join(censoc, census, by = "HISTID")
@@ -104,29 +106,29 @@ censoc_numident_linked <- inner_join(censoc, census, by = "HISTID")
 
 ### "Chunked" strategy for overcoming memory limitations 
 
-One challenge of working with a full CenSoc file is that you must work with the large 1940 full count census file, which has over 130 million records and can be ~20+ GB in size. This often means that it's too large to fit into a computer's memory.
+A memory-conscious solution is to break the census dataset up and work in "chunks." The `ipumsr` package has the `read_ipums_micro_chunked()` functions to help out with this. The code below uses that function to (i) read in a chunk of the 1940 census (ii) merge that chunk to the CenSoc file on the `HISTID` variable and (iii) repeat for every chunk and then combine all the merged chunks. Then you'll be ready to get started on your analysis. 
 
-A memory-conscious solution is to break the dataset up and work in "chunks." The `ipumsr` package has the `read_ipums_micro_chunked()` functions to help out with this. The code below uses that function to (i) read in a chunk of the 1940 census (ii) merge that chunk to the CenSoc file on the `HISTID` variable and (iii) repeat for every chunk and then combine all the merged chunks. Then you'll be ready to get started on your analysis. 
+Depending on how many variables you've included in your 1940 census extract, the approach may take a while. For reference, the below code took approximately ~50 minutes on a 2018 base Macbook Pro with 16 GB of memory. The good news is that you only need to do this once — see the instructions below on how to save your merged data file.  
 
 ```{r, eval = F}
 ## set paths to censoc file 
-censoc <- read_csv("~/Documents/data/censoc_numident_v1/censoc_numident_v1.csv")
+censoc <- read_csv("~/path/to/censoc/censoc_numident_v1.csv")
 
 ## Set paths to IPUMS data file — .csv or .dat file! 
-ipums_data <- '~/Documents/data/ipums/usa_00036.csv.gz'
+ipums_data <- '~/path/to/census/usa_00033.csv'
 
 ## set path to IPUMS DDI file 
-ipums_ddi <- '~/Documents/data/ipums/usa_00036.xml'
+ipums_ddi <- '~/path/to/census/ddi/usa_00033.xml'
 
 ## Read in data in chunks and merge with censoc
 censoc_numident_linked <- read_ipums_micro_chunked(ddi = ipums_ddi,
                                            data_file = ipums_data, 
   callback = IpumsDataFrameCallback$new(function(x, pos) {
-    suppressWarnings(inner_join(x, censoc, by = "HISTID"))
+    inner_join(x, censoc, by = "HISTID")
   }), 
-  chunk_size = 1000000,
+  chunk_size = 500000,
 )
-## This is slow -- it might take up to 45+ minutes.
+## This is slow -- it takes ~an hour. 
 
 #> Use of data from IPUMS USA is subject to conditions including that users should
 #> cite the data appropriately. Use command `ipums_conditions()` for more details.
@@ -134,42 +136,50 @@ censoc_numident_linked <- read_ipums_micro_chunked(ddi = ipums_ddi,
 #> |========================================================   | 90% 16963 MB
 ```
 
-### Assign metadata 
+There are a few other strategies for handling datasets too large for memory in R: 
 
-If you have already read-in and linked your CenSoc file using another approach, you can still use  `ipumsr` and a DDI to assign meaningful value labels to the linked file — just use the `ipums_collect()` function. 
+- *Three Strategies for Working with Big Data in R.*  ([link](https://rviews.rstudio.com/2019/07/17/3-big-data-strategies-for-r/))
+- *Big IPUMS Data* vignette ([link](https://cran.r-project.org/web/packages/ipumsr/vignettes/ipums-bigdata.html))
+- *Introduction to Disk.Frame package* ([link](https://diskframe.com/index.html))
 
-```{r, eval = F}
+### Assign metadata to already-linked CenSoc data
+
+Even if you have already read in and linked your CenSoc file to the 1940 census **not** using one of the above approaches, you can still assign meaningful value labels to the linked file — just use the `ipums_collect()` function. 
+
+```{r, eval = F} 
 ## read in IPUMS DDI for IPUMS extract
-ddi_extract <- read_ipums_ddi("/data/josh/CenSoc/censoc_data/ipums_1940_extract/fullcount.ddi.xml")
+ddi_extract <- read_ipums_ddi("/path/to/ddi/usa_00033.xml")
 
-## assign metadata using ipumsr package
+## assign metadata using the ipumsr package
 censoc_numident_linked <- ipums_collect(data = censoc_numident_linked,  
                        ddi = ddi_extract, 
                        var_attrs = c("val_labels", "var_label", "var_desc"))
 ```
+
 ## `ipumsr` package functionality
 
 There are several helpful functions in the `ipumsr` package to work with the metadata. In this vignette, we'll only cover a few. 
 
 ### Explore variable descriptions 
 
-For starters, the `ipums_view()` function will display a webpage with variable descriptions and value labels in the RStudio viewer. This is an easy way to learn more about the 1940 census variables. 
+The `ipums_view()` function will display a webpage with variable descriptions and value labels in the RStudio viewer. This is an easy way to learn more about the 1940 census variables. 
 
 ```{r, eval = F}
 ipums_view(censoc_numident_linked)
 ```
-![](figures/ipums_viewer.png){width=100%}
 
+![](figures/ipums_viewer.png){width=100%}
 
 ### Set Value Labels
 
-The `ipumsr` package imports the associated metadata, such as variable labels, value labels, and more from the IPUMS extract. Particularly helpful are variables labels; they translate the numeric IPUMS code into meaningful text strings (e.g., the `SEX` variable has value labels: 1 = "Male", 2 = "Female.") 
+The `ipumsr` package imports the associated metadata, such as variable labels, value labels, and more from the IPUMS extract. Particularly helpful are value labels, which translate the numeric IPUMS code into meaningful text strings (e.g., the `SEX` variable has value labels: 1 = "Male", 2 = "Female.") 
 
+The `ipumsr` package stores labelled values using the `labelled` class from the `haven` package. The main way to create a factor variable from these labels is the `as_factor()` function (**note**: the base R `as.factor()` function will not work). 
 
-For example, if you're interested in birthplace, you can convert the numeric `BPL` into a new factor variable with text labels using the `as_factor` function: 
+For example, if you're interested in birthplace, you can convert the numeric `BPL` into a meaningful text string variable using the `as_factor()` function: 
 
 ```{r, eval = F}
-## Look at value labels for pirthplace 
+## Look at value labels for birthplace 
 ipums_val_labels(censoc_numident_linked$BPL)
 
 ## A tibble: 163 x 2
@@ -182,9 +192,15 @@ ipums_val_labels(censoc_numident_linked$BPL)
 # 5     6 California          
 # 6     8 Colorado   
 
-## create a new string variable for birthplace
-censoc_numident_linked %>% 
-  mutate(BPL_string = as_factor(BPL)) %>% ## create new string variable for birth place
+## create a new string variable for birthplace 
+censoc_numident_linked$BPL_string = as_factor(censoc_numident_linked$BPL)
+
+## alternative method to create new string variable for birth place (style of tidyverse)
+censoc_numident_linked <- censoc_numident_linked %>% 
+  mutate(BPL_string = as_factor(BPL))
+
+## look at a few rows
+censoc_numident_linked %>%
   select(HISTID, BPL, BPL_string) %>% ## print out a few rows
   sample_n(5) 
 ```
@@ -197,8 +213,29 @@ censoc_numident_linked %>%
 |5AB5B1E4-D332-49DB-A8C9-1F6E4F459771 |  39|Ohio       |
 |FEA7EC29-BDF7-41FD-9955-5442D56D8DC2 |  26|Michigan   |
 
-Note that in some cases, it may be useful to keep the original numeric codes. For example, if you want to restrict to persons born in North America, it's easier to do so with the original BPL codes, as the codes are ordered in a meaningful way — you just restrict to BPL codes 200 or smaller. It's more difficult, however, if you have to specify each individual state and country in North America. 
+We now can use the easily interpretable `BPL_string` variable for our analysis.  
+
+In some cases, it may be useful to keep the original numeric codes. For example, if you want to restrict to persons born in North America, it's easier to do so with the original BPL codes, as the codes are ordered in a meaningful way—you just restrict to BPL codes below 200. It's more difficult, however, if you have to specify each individual state and country in North America. 
+
+### Saving your data and metadata
+
+To save your data file and it's associated metadata, you need to write it out as an object. The metadata cannot be stored in a .CSV file, so if you want to save the metadata, you'll need to save the entire object to a file using the `saveRDS` function. 
+
+```{r, eval = F}
+## save censoc data file with metadata
+saveRDS(object = censoc_numident_linked, file = "/path/to/data/censoc_numident_linked.rds")
+
+## read in censoc data file with metadata
+censoc_numident_linked <- readRDS("/path/to/data/censoc_numident_linked.rds")
+```
+
+**Note:** Another option is to convert all the relevant variables from numeric to meaningful factor variables at the beginning of your analysis, and then write out the .CSV file. You'll lose the metadata, but you can always reassign it with the `ipums_collect()` function. 
 
 ## Conclusion
 
-The `ipumsr` package, while requiring a few extra steps, offers a convenient workflow for analyzing CenSoc data. While there are many ways to effectively work with CenSoc data in `R`, `ipumsr` allows us to assign meaningful variable labels to numeric codes and overcome memory limitations by reading the data in chunks. 
+The `ipumsr` packages offers a convenient workflow for analyzing large CenSoc datasets. While there are many ways to work with CenSoc data in `R`, the `ipumsr` package is the most efficient way to handle IPUMS value labels, variable descriptions, and more. 
+
+The `ipumsr` package is currently maintained by Derek Burk and has a [user-support forum](https://forum.ipums.org/c/ipumsr/18). 
+
+
+

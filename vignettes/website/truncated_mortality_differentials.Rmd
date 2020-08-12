@@ -9,7 +9,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-**Summary**: This vignette presents a method for calculating mortality differentials using Ordinary Least Squares (OLS) regression on age at death. The goal of this vignette is to highlight the need for adjustment factors for interpreting OLS Regression coefficients when working with truncated data and work through a stylized example using this method to explore the relationship between wage income and longevity in the CenSoc-Numident dataset. 
+**Summary**: This vignette presents a method for calculating mortality differentials using Ordinary Least Squares (OLS) regression on age of death. The goal of this vignette is to highlight the need for adjustment factors for interpreting OLS Regression coefficients when working with truncated data and work through a stylized example using this method to explore the relationship between wage income and longevity in the CenSoc-Numident dataset. 
 
 Before getting started with the vignette, make sure to: 
 
@@ -52,10 +52,10 @@ $$ Age\_at\_death = birth\_year\_dummy + covariates\_of\_interest $$
 
 provide estimates of the effect of the covariates on the age of death in the sample, controlling for birth cohort truncation effects. In this example, we work with the cohorts of 1900-1920, so we need to include a fixed effect term for year of birth. 
 
-As the truncated window of deaths excludes the tails of the mortality distribution, any measurement of the average difference between groups will be downwardly biased. Imagine there are two types of lobsters: red lobsters with an average weight of 5 lbs and blue lobsters with an average weight of 1 lb. Lobster fishers aren't able to sell lobsters that are too small or too large — so they catch only lobsters between 2 and 3 pounds. If we just look at the lobsters that are caught, we're observing only small red lobsters and big blue lobsters. If we compare the size of the caught lobsters, we would be understating the true difference in size between the red and blue lobsters. By the same logic, the coefficients in our OLS regression model will underestimate the size of the true effect.
+As the truncated window of deaths excludes the tails of the mortality distribution, any measurement of the average difference between groups will be downwardly biased. Imagine there are two types of lobsters: red lobsters with an average weight of 5 pounds and blue lobsters with an average weight of 2 pounds. Lobster fishers aren't able to sell lobsters that are too small or too large — so they catch only lobsters between 3 and 4 pounds. If we just look at the lobsters that are caught, we're observing only small red lobsters and big blue lobsters. If we compare the size of the caught lobsters, we would be understating the true difference in size between the red and blue lobsters. By the same logic, the coefficients in our OLS regression model will underestimate the size of the true effect.
 
 ![](figures/distribution_age_of_death.png){width=100%}
-For example, in the Figure above, we show two distributions of age at death in which population A (solid line) has an e65 — life expectancy at age 65 — of 18 years and population B (dashed line) has an e65 of 19 years. If we only observe deaths from ages 78 to 95, as we would for the cohort of 1910, the difference in these truncated means would only be 0.358, understating the e65 difference by a factor of 2.79. Bearing this in mind, we'll use 2.79 as our adjustment factor. 
+For example, in the Figure above, we show two distributions of age of death in which population A (solid line) has an e65 — life expectancy at age 65 — of 18 years and population B (dashed line) has an e65 of 19 years. If we only observe deaths from ages 78 to 95, as we would for the cohort of 1910, the difference in these truncated means would only be 0.358, understating the e65 difference by a factor of 2.79. Bearing this in mind, we'll use 2.79 as our adjustment factor. 
 
 To account for this, we can calculate adjustment factors to help us more accurately interpret our regression coefficients. Users can do their full statistical analysis and then apply regression coefficients to help us better interpret our results. 
 
@@ -102,7 +102,7 @@ adjust.factor <- get.bunmd.adjust.factor(1905:1915,
 
 ## Mortality Differentials by Relative Wage Income
 
-The association between relative wage income and mortality in the United States has been well-documented. Can we see this association in our CenSoc-Numident dataset?
+The association between relative wage income and mortality has been well-documented in the US. Can we see this association in our CenSoc-Numident dataset?
 
 To answer this question, we'll use the `INCWAGE` variable. This is an imperfect measure of income, as it was only collected for salary and wage workers. Census enumerators in 1940 were explicitly instructed to "not include earnings of businessmen, farmers, or professional persons who depend upon business profits, sales of crops, or fees for income and who do not work for wages or salaries." (See [instructions to enumeration](https://usa.ipums.org/usa/voliii/inst1940.shtml#584) for more detail). In this analysis, we account for this by only including persons with non-zero wages — other researchers may take a different approach. 
 
