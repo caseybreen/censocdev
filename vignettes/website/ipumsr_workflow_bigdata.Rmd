@@ -1,6 +1,6 @@
 ---
 title: "An `ipumsr` Workflow for Big CenSoc Data"
-author: "Casey Breen"
+author: "Casey Breen (caseybreen@berkeley.edu)"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -64,7 +64,7 @@ The IPUMS "select cases" feature allows users to conditionally choose which reco
 
 To do this, visit the 'EXTRACT REQUEST' page and click 'Change,' which is located next to 'DATA FORMAT.' Then,  select 'Comma delimited (.csv)' or 'Fixed-width text (.dat) and click the submit button. Once you are happy with your dataset, click the 'SUBMIT EXTRACT' button. Agree to the full-count usage terms, and click 'OK' to extract the dataset.
 
-Given the size of the extract, it may take a few hours before it's available for download. Once the file is ready, you will receive an email from IPUMS with a link to download the resulting dataset. For more information on IPUMS extracts, please see [IPUMS-USA](https://usa.ipums.org/usa/data.shtml/).
+Given the size of the extract, it may take a few hours before it's available for download. Once the file is ready, you will receive an email from IPUMS with a link to download the resulting dataset. For more information on IPUMS extracts, please see [IPUMS-USA](https://usa.ipums.org/usa/).
 
 To read in IPUMS data with the `ipumsr` package, you'll need to download:
 
@@ -75,13 +75,7 @@ To read in IPUMS data with the `ipumsr` package, you'll need to download:
 
 ## IPUMSR Workflow
 
-```{r Library packages, warning=FALSE, message=FALSE, eval = F}
-## Library Packages
-library(tidyverse) ## functions for data manipulation and visualization
-library(ipumsr) ## reads in IPUMS data and associated metadata
-```
-
-### Merging CenSoc and Census
+### Merging CenSoc and Census Data
 
 To work with the full CenSoc files, you'll first need to (i) read in the 1940 census, (ii) read in the CenSoc File, and (iii) merge them on the HISTID variable. Note that we also have pre-linked CenSoc "demo" files — please see this [vignette](https://cran.r-project.org/web/packages/ipumsr/vignettes/ipums.html) for more information.
 
@@ -93,6 +87,10 @@ One challenge of working with the full CenSoc files is that you must work with l
 If both datasets fit into your computer or server's memory, merging the datasets on the `HISTID` variable is straightforward. 
 
 ```{r, eval = F}
+## Library Packages
+library(tidyverse) ## functions for data manipulation and visualization
+library(ipumsr) ## reads in IPUMS data and associated metadata
+
 ## read in censoc file
 censoc <- read_csv("~/path/to/censoc/censoc_numident_v1.csv")
 
@@ -106,9 +104,9 @@ censoc_numident_linked <- inner_join(censoc, census, by = "HISTID")
 
 ### "Chunked" strategy for overcoming memory limitations 
 
-A memory-conscious solution is to break the census dataset up and work in "chunks." The `ipumsr` package has the `read_ipums_micro_chunked()` functions to help out with this. The code below uses that function to (i) read in a chunk of the 1940 census (ii) merge that chunk to the CenSoc file on the `HISTID` variable and (iii) repeat for every chunk and then combine all the merged chunks. Then you'll be ready to get started on your analysis. 
+A memory-conscious solution is to break the census dataset up and work in chunks. The `ipumsr` package has the `read_ipums_micro_chunked()` functions to read in a set number of observations at a time (chunks). The code below uses that function to (i) read in a chunk of the 1940 census (ii) merge that chunk to the CenSoc file on the `HISTID` variable and (iii) repeat for every chunk and then combine all the merged chunks. Then you'll be ready to get started on your analysis. 
 
-Depending on how many variables you've included in your 1940 census extract, the approach may take a while. For reference, the below code took approximately ~50 minutes on a 2018 base Macbook Pro with 16 GB of memory. The good news is that you only need to do this once — see the instructions below on how to save your merged data file.  
+Depending on how many variables you've included in your 1940 census extract, the approach may take a while. For reference, the below code took approximately 50 minutes on a 2018 base Macbook Pro with 16 GB of memory. The good news is that you only need to do this once — see the instructions below on how to save your merged data file.  
 
 ```{r, eval = F}
 ## set paths to censoc file 
@@ -144,7 +142,7 @@ There are a few other strategies for handling datasets too large for memory in R
 
 ### Assign metadata to already-linked CenSoc data
 
-Even if you have already read in and linked your CenSoc file to the 1940 census **not** using one of the above approaches, you can still assign meaningful value labels to the linked file — just use the `ipums_collect()` function. 
+If you import and link your CenSoc file to the 1940 Census using a different approach, you can still use the IPUMSR package to assign meaningful value labels to the linked file — just use the `ipums_collect()` function. 
 
 ```{r, eval = F} 
 ## read in IPUMS DDI for IPUMS extract
@@ -158,7 +156,7 @@ censoc_numident_linked <- ipums_collect(data = censoc_numident_linked,
 
 ## `ipumsr` package functionality
 
-There are several helpful functions in the `ipumsr` package to work with the metadata. In this vignette, we'll only cover a few. 
+There are [several helpful functions](https://cran.r-project.org/web/packages/ipumsr/ipumsr.pdf) in the `ipumsr` package to work with the metadata. In this vignette, we'll only cover a few. 
 
 ### Explore variable descriptions 
 
