@@ -3,7 +3,7 @@ title: "Condense Numident Entries"
 output: html_notebook
 ---
 
-In this notebook, we take cleaned application files and claims files "condenses" them to select the best record per person.
+In this notebook, we take cleaned application files and claims files and "condense" them to select the best record per person.
 
 Background: One person may have multiple applications or claims entries. As the BUNMD file will ultimately contain one record per person, this code selects the "best" value for sex, race, etc. across entries using a set of decision rules. 
 

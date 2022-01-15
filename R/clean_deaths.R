@@ -71,14 +71,26 @@ clean_deaths <- function(numdeath.file.path = "/censoc/data/numident/1_numident_
 
   ssn_state_crosswalk <- fread(ssn_state_crosswalk_path)
 
-  numdeath[,"ssn_3" := as.numeric(substr(ssn, 1, 3))]
+  numdeath[,"area_number" := as.numeric(substr(ssn, 1, 3))]
+  numdeath[,"group_number" := as.numeric(substr(ssn, 4, 5))]
 
   ## merge and drop unnecessary columns
+  ## manually add BPL requiring area number and group number
   numdeath <- numdeath %>%
-    left_join(ssn_state_crosswalk, by = "ssn_3") %>%
-    select(-ssn_3, -label)
+    left_join(ssn_state_crosswalk, by = "area_number") %>%
+    mutate(socstate = case_when(
+      area_number == 580 & group_number == 20 ~ 11000,
+      area_number == 586 & group_number %in% 20:28 ~ 10000,
+      area_number == 586 & group_number %in% 1:18 ~ 10500,
+      area_number == 580 & group_number %in% 1:18 ~ 11500,
+      area_number == 232 & group_number %in% 30 ~ 3700,
+      area_number == 232 & group_number != 30 ~ 5400,
+      TRUE ~ as.numeric(socstate)
+    )) %>%
+    select(-area_number, -label, -group_number)
 
   numdeath[numdeath == '' | numdeath == ' '] <- NA
 
   return(numdeath)
 }
+

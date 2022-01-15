@@ -12,7 +12,7 @@ clean_apps <- function(numapp.file.path = "/censoc/data/numident/1_numident_file
   columns.to.keep <- c("NUMI_SSN", "NUMI_CITIZENSHIP_CODE", "NUMI_CYCLE_DATE", "NUMI_ENTRY_CODE", "NUMI_DOB", "NUMI_SEX",
                        "NUMI_RACE", "NUMI_POB_STATE_COUNTRY", "NUMI_POB_FOREIGN_IND", "NUMI_NH_NAME_FIRST",
                        "NUMI_NH_NAME_MIDDLE", "NUMI_NH_NAME_LAST", "NUMI_MTH_NAME_FIRST", "NUMI_MTH_NAME_MIDDLE",
-                       "NUMI_MTH_NAME_LAST", "NUMI_FTH_NAME_FIRST", "NUMI_FTH_NAME_MIDDLE", "NUMI_FTH_NAME_LAST")
+                       "NUMI_MTH_NAME_LAST", "NUMI_FTH_NAME_FIRST", "NUMI_FTH_NAME_MIDDLE", "NUMI_FTH_NAME_LAST", "NUMI_POB_CITY", "NUMI_POB_CITY_OFLO")
 
   numapp <-  fread(file = numapp.file.path, select = columns.to.keep)
 
@@ -34,7 +34,9 @@ clean_apps <- function(numapp.file.path = "/censoc/data/numident/1_numident_file
              "mother_lname" = "NUMI_MTH_NAME_LAST",
              "father_fname" = "NUMI_FTH_NAME_FIRST",
              "father_mname" = "NUMI_FTH_NAME_MIDDLE",
-             "father_lname" = "NUMI_FTH_NAME_LAST")
+             "father_lname" = "NUMI_FTH_NAME_LAST",
+             "pob_city" = "NUMI_POB_CITY",
+             "pob_city_oflo" = "NUMI_POB_CITY_OFLO")
 
   ## rename columns
   numapp <- select(numapp, variable.names)

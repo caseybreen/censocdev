@@ -11,7 +11,7 @@
 
 create_weights_bunmd <- function(file, death_years = c(1988:2005), death_ages = c(65:100), cohorts = c(1895:1940)) {
 
-  ## download deaths from HMD
+  ## read deaths from HMD
   hmd_deaths <-  fread("/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
@@ -41,7 +41,9 @@ create_weights_bunmd <- function(file, death_years = c(1988:2005), death_ages = 
     ungroup(dyear, death_age, sex) %>%
     select(inclusion_prob, linking_key) %>%
     mutate(weight = 1/inclusion_prob) %>%
-    select(-inclusion_prob)
+    select(-inclusion_prob) %>%
+    ungroup() %>%
+    select(-byear)
 
   ## link to file
   file <- file %>%

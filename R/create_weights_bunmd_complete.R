@@ -49,7 +49,8 @@ create_weights_bunmd_complete <- function(bunmd.file, dyears = c(1988:2005), coh
 
   ## create linking key
   high_coverage_complete_sample <- high_coverage_complete_sample %>%
-    mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_"))
+    mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_")) %>%
+    select(-byear)
 
   ## link death weights to ssn
   weights.df <- high_coverage_complete_sample %>%
