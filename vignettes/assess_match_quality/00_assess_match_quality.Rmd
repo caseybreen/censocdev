@@ -246,7 +246,7 @@ dmf_characteristics_table <- inner_join(census_1940_characteristics, dmf_1940_ch
   gt() 
 
 ## print 
-dmf_characteristics_table%>% 
+dmf_characteristics_table %>% 
   as_latex() %>%
   as.character() %>%
   cat()
@@ -254,7 +254,6 @@ dmf_characteristics_table%>%
 ## save table 
 dmf_characteristics_table %>%
   gtsave("dmf_characteristics.tex", path = here("vignettes/assess_match_quality/figs/")) 
-
 ```
 
 
