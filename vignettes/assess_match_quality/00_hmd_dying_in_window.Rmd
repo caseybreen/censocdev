@@ -41,7 +41,8 @@ l_2005 <- hmd %>%
 
 
 dmf <- tibble(cohort = 1900:1940,
-                  prop_dying = (l_1975-l_2005)/l_1940)
+                  prop_dying = (l_1975-l_2005)/l_1940,
+              dataset = "dmf")
 ```
 
 ```{r}
@@ -50,7 +51,7 @@ l_1940 <- hmd %>%
   pull(Male) %>% 
   as.numeric()
 
-l_1975 <- hmd %>% 
+l_1988 <- hmd %>% 
   filter(Age == 1988 - Year) %>% 
   pull(Male) %>% 
   as.numeric()
@@ -61,8 +62,36 @@ l_2005 <- hmd %>%
   as.numeric()
 
 numident <- tibble(cohort = 1900:1940,
-                  prop_dying = (l_1975-l_2005)/l_1940)
+                  l_1988, l_2005, l_1940,
+                  prop_dying = (l_1988-l_2005)/l_1940,
+                  dataset = "numident") %>% 
+    mutate(prop_dying_smoothed = zoo::rollmean(prop_dying, k = 5, na.pad = T)) 
+
 ```
 
 
+```{r}
+write_csv(numident, here("vignettes/assess_match_quality/data/numident_death_prop.csv"))
+write_csv(dmf, here("vignettes/assess_match_quality/data/dmf_death_prop.csv"))
+```
+
+
+```{r}
+dmf %>% 
+  bind_rows(numident) %>% 
+  group_by(dataset) %>% 
+  mutate(avg = zoo::rollmean(prop_dying, k = 5, na.pad = T)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = cohort, y = avg, linetype = dataset)) + 
+  geom_line() + 
+  geom_point() + 
+  theme_cowplot() + 
+  labs(y = "Proportion Dying",
+       x = "Cohort" )
+
+```
+
+```{r}
+gompertztrunc::get.
+```
 
