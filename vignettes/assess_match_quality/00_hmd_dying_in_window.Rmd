@@ -20,7 +20,7 @@ hmd <- fread(here("vignettes/assess_match_quality/data/cExposures_1x1.txt"))
 
 ```{r}
 hmd <- hmd %>% 
-  filter(Year %in% 1900:1940) 
+  filter(Year %in% 1899:1940) 
 ```
 
 ```{r}
@@ -40,9 +40,10 @@ l_2005 <- hmd %>%
   as.numeric()
 
 
-dmf <- tibble(cohort = 1900:1940,
-                  prop_dying = (l_1975-l_2005)/l_1940,
-              dataset = "dmf")
+dmf <- tibble(cohort = 1899:1940,
+              prop_dying = (l_1975-l_2005)/l_1940,
+              dataset = "dmf") %>% 
+    mutate(prop_dying_5yr_smoothed = zoo::rollmean(prop_dying, k = 3, na.pad = T)) 
 ```
 
 ```{r}
@@ -61,11 +62,11 @@ l_2005 <- hmd %>%
   pull(Male) %>% 
   as.numeric()
 
-numident <- tibble(cohort = 1900:1940,
+numident <- tibble(cohort = 1899:1940,
                   l_1988, l_2005, l_1940,
                   prop_dying = (l_1988-l_2005)/l_1940,
                   dataset = "numident") %>% 
-    mutate(prop_dying_smoothed = zoo::rollmean(prop_dying, k = 5, na.pad = T)) 
+    mutate(prop_dying_5yr_smoothed = zoo::rollmean(prop_dying, k = 3, na.pad = T)) 
 
 ```
 
@@ -79,10 +80,7 @@ write_csv(dmf, here("vignettes/assess_match_quality/data/dmf_death_prop.csv"))
 ```{r}
 dmf %>% 
   bind_rows(numident) %>% 
-  group_by(dataset) %>% 
-  mutate(avg = zoo::rollmean(prop_dying, k = 5, na.pad = T)) %>% 
-  ungroup() %>% 
-  ggplot(aes(x = cohort, y = avg, linetype = dataset)) + 
+  ggplot(aes(x = cohort, y = prop_dying_5yr_smoothed, linetype = dataset)) + 
   geom_line() + 
   geom_point() + 
   theme_cowplot() + 
