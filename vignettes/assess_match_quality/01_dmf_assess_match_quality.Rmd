@@ -137,7 +137,7 @@ match_rate <- census_1940_hh_vars %>%
 
 match_rate <- match_rate %>% 
   left_join(dmf_death_prop, by = "age") %>% 
-  mutate(match_rate_adusted = (1/prop_dying) * match_rate)
+  mutate(match_rate_adusted = (1/prop_dying_5yr_smoothed) * match_rate)
 
 ## dmf match rate (conservative)
 match_rate_conservative <- census_1940_hh_vars %>% 
@@ -147,7 +147,7 @@ match_rate_conservative <- census_1940_hh_vars %>%
 
 match_rate_conservative <- match_rate_conservative %>% 
   left_join(dmf_death_prop, by = "age") %>% 
-  mutate(match_rate_adusted = (1/prop_dying) * match_rate)
+  mutate(match_rate_adusted = (1/prop_dying_5yr_smoothed) * match_rate)
 
 ## plot dmf match rate 
 dmf_match_rate <- match_rate %>% 
@@ -158,8 +158,9 @@ dmf_match_rate <- match_rate %>%
   geom_point() + 
   theme_cowplot() + 
   ggsci::scale_color_lancet() + 
-  labs(x = "Age",
-       y = "Match Rate") + 
+  labs(x = "Birth Cohort",
+       y = "Match Rate",
+       title = "Raw Match Rate") + 
   ylim(0, .5) + 
   theme(legend.position = "bottom", legend.title = element_blank()) 
 
@@ -173,15 +174,18 @@ dmf_match_rate_adjusted <- match_rate %>%
   geom_point() + 
   theme_cowplot() + 
   ggsci::scale_color_lancet() + 
-  labs(x = "Age",
-       y = "Match Rate") + 
+  labs(x = "Birth Cohort",
+       y = "Match Rate",
+       title = "Adjusted Match Rate") + 
   ylim(0, .5) + 
   theme(legend.position = "bottom", legend.title = element_blank()) 
 
 
+## combine into one plot 
 dmf_match_rate_combined <- cowplot::plot_grid(dmf_match_rate, dmf_match_rate_adjusted, labels = "auto")
+
 ## save plot 
-ggsave(dmf_match_rate, filename = here("vignettes/assess_match_quality/figs/dmf_raw_match_rate.pdf"), height = 7, width = 10)
+ggsave(dmf_match_rate_combined, filename = here("vignettes/assess_match_quality/figs/dmf_raw_match_rate.pdf"), height = 4, width = 10)
 ```
 
 ## Comparison of Socioeconomic Status 
@@ -277,8 +281,6 @@ ggsave(matched_characteristics_plot_conservative, filename = here("vignettes/ass
 ## recode additional variables 
 census_1940_hh_vars <- census_1940_hh_vars %>% 
   filter()
-
-
 
 ## 1940 census 
 census_1940_characteristics <- census_1940_hh_vars %>% 
