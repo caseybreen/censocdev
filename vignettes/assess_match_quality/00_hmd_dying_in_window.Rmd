@@ -1,0 +1,68 @@
+---
+title: "R Notebook"
+---
+
+Summary: Use HMD cohort 1x1 "exposure to risk" data to estimate proportion of people born in a given cohort dying during the appropriate window 
+
+
+```{r}
+library(data.table)
+library(tidyverse)
+library(cowplot)
+library(here)
+```
+
+
+```{r}
+hmd <- fread(here("vignettes/assess_match_quality/data/cExposures_1x1.txt"))
+```
+
+
+```{r}
+hmd <- hmd %>% 
+  filter(Year %in% 1900:1940) 
+```
+
+```{r}
+l_1940 <- hmd %>% 
+  filter(Age == 1940 - Year) %>% 
+  pull(Male) %>% 
+  as.numeric()
+
+l_1975 <- hmd %>% 
+  filter(Age == 1975 - Year) %>% 
+  pull(Male) %>% 
+  as.numeric()
+
+l_2005 <- hmd %>% 
+  filter(Age == 2005 - Year) %>% 
+  pull(Male) %>% 
+  as.numeric()
+
+
+dmf <- tibble(cohort = 1900:1940,
+                  prop_dying = (l_1975-l_2005)/l_1940)
+```
+
+```{r}
+l_1940 <- hmd %>% 
+  filter(Age == 1940 - Year) %>% 
+  pull(Male) %>% 
+  as.numeric()
+
+l_1975 <- hmd %>% 
+  filter(Age == 1988 - Year) %>% 
+  pull(Male) %>% 
+  as.numeric()
+
+l_2005 <- hmd %>% 
+  filter(Age == 2005 - Year) %>% 
+  pull(Male) %>% 
+  as.numeric()
+
+numident <- tibble(cohort = 1900:1940,
+                  prop_dying = (l_1975-l_2005)/l_1940)
+```
+
+
+
