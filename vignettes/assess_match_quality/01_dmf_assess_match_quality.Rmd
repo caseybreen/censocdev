@@ -30,6 +30,9 @@ census_1940 <- fread("/ipums-repo2019/1940/TSV/P.tsv", select = c("HISTID", "SER
 census_1940_h <- fread("/ipums-repo2019/1940/TSV/H.tsv", select = c("SERIAL", "STATEFIP", "OWNERSHP", "URBAN", "REGION")) %>% 
   janitor::clean_names()
 
+
+dmf_death_prop <- read_csv(here("vignettes/assess_match_quality/data/dmf_death_prop.csv")) %>% 
+  mutate(age = 1940 - cohort) ## imprecise but OK
 ```
 
 ```{r}
@@ -123,8 +126,6 @@ census_1940_hh_vars <- census_1940_hh_vars %>%
     TRUE ~ "Other"
   ))
   
-  
-  
 ```
 
 ```{r}
@@ -134,25 +135,51 @@ match_rate <- census_1940_hh_vars %>%
   summarize(match_rate = round(mean(match_standard == "Matched"), 3)) %>% 
   mutate(match_type = "standard")
 
+match_rate <- match_rate %>% 
+  left_join(dmf_death_prop, by = "age") %>% 
+  mutate(match_rate_adusted = (1/prop_dying) * match_rate)
+
 ## dmf match rate (conservative)
 match_rate_conservative <- census_1940_hh_vars %>% 
   group_by(age) %>% 
   summarize(match_rate = round(mean(match_conservative == "Matched"), 3)) %>% 
   mutate(match_type = "conservative")
 
+match_rate_conservative <- match_rate_conservative %>% 
+  left_join(dmf_death_prop, by = "age") %>% 
+  mutate(match_rate_adusted = (1/prop_dying) * match_rate)
+
 ## plot dmf match rate 
 dmf_match_rate <- match_rate %>% 
   bind_rows(match_rate_conservative) %>% 
-  ggplot(aes(x = age, y = match_rate, color = match_type)) + 
+  filter(cohort %in% c(1900:1935)) %>% 
+  ggplot(aes(x = cohort, y = match_rate, color = match_type)) + 
   geom_line() + 
   geom_point() + 
   theme_cowplot() + 
   ggsci::scale_color_lancet() + 
   labs(x = "Age",
        y = "Match Rate") + 
-  xlim(0, 100) + 
+  ylim(0, .5) + 
   theme(legend.position = "bottom", legend.title = element_blank()) 
 
+
+## plot dmf match rate 
+dmf_match_rate_adjusted <- match_rate %>% 
+  bind_rows(match_rate_conservative) %>% 
+  filter(cohort %in% c(1900:1935)) %>% 
+  ggplot(aes(x = cohort, y = match_rate_adusted, color = match_type)) + 
+  geom_line() + 
+  geom_point() + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  labs(x = "Age",
+       y = "Match Rate") + 
+  ylim(0, .5) + 
+  theme(legend.position = "bottom", legend.title = element_blank()) 
+
+
+dmf_match_rate_combined <- cowplot::plot_grid(dmf_match_rate, dmf_match_rate_adjusted, labels = "auto")
 ## save plot 
 ggsave(dmf_match_rate, filename = here("vignettes/assess_match_quality/figs/dmf_raw_match_rate.pdf"), height = 7, width = 10)
 ```
