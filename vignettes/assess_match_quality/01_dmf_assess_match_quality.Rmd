@@ -136,7 +136,7 @@ match_rate <- census_1940_hh_vars %>%
 
 match_rate <- match_rate %>% 
   left_join(dmf_death_prop, by = "age") %>% 
-  mutate(match_rate_adusted = (1/prop_dying_5yr_smoothed) * match_rate)
+  mutate(match_rate_adusted = (1/prop_dying) * match_rate)
 
 ## dmf match rate (conservative)
 match_rate_conservative <- census_1940_hh_vars %>% 
@@ -146,7 +146,7 @@ match_rate_conservative <- census_1940_hh_vars %>%
 
 match_rate_conservative <- match_rate_conservative %>% 
   left_join(dmf_death_prop, by = "age") %>% 
-  mutate(match_rate_adusted = (1/prop_dying_5yr_smoothed) * match_rate)
+  mutate(match_rate_adusted = (1/prop_dying) * match_rate)
 
 ## plot dmf match rate 
 dmf_match_rate <- match_rate %>% 
