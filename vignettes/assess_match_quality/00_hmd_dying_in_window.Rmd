@@ -39,11 +39,10 @@ l_2005 <- hmd %>%
   pull(Male) %>% 
   as.numeric()
 
-
 dmf <- tibble(cohort = 1899:1940,
               prop_dying = (l_1975-l_2005)/l_1940,
-              dataset = "dmf") %>% 
-    mutate(prop_dying_5yr_smoothed = zoo::rollmean(prop_dying, k = 3, na.pad = T)) 
+              dataset = "Casey Method") %>% 
+    mutate(prop_dying_5yr_smoothed = zoo::rollmean(prop_dying, k = 5, na.pad = T)) 
 ```
 
 ```{r}
@@ -65,8 +64,8 @@ l_2005 <- hmd %>%
 numident <- tibble(cohort = 1899:1940,
                   l_1988, l_2005, l_1940,
                   prop_dying = (l_1988-l_2005)/l_1940,
-                  dataset = "numident") %>% 
-    mutate(prop_dying_5yr_smoothed = zoo::rollmean(prop_dying, k = 3, na.pad = T)) 
+                  dataset = "Numident (1988-2005)") %>% 
+    mutate(prop_dying_5yr_smoothed = zoo::rollmean(prop_dying, k = 5, na.pad = T)) 
 
 ```
 
@@ -78,18 +77,131 @@ write_csv(dmf, here("vignettes/assess_match_quality/data/dmf_death_prop.csv"))
 
 
 ```{r}
-dmf %>% 
+prob_dying_window_plot <- dmf %>% 
   bind_rows(numident) %>% 
-  ggplot(aes(x = cohort, y = prop_dying_5yr_smoothed, linetype = dataset)) + 
-  geom_line() + 
-  geom_point() + 
+  ggplot(aes(x = cohort, y = prop_dying_5yr_smoothed, linetype = dataset, shape = dataset)) + 
+  geom_line(size = .75) + 
+  geom_point(size = 2.5) + 
   theme_cowplot() + 
-  labs(y = "Proportion Dying",
-       x = "Cohort" )
+  labs(y = "Probability Dying in Coverage Window",
+       x = "Cohort" ) + 
+  ylim(0, 0.8) + 
+  theme(legend.position = "bottom", legend.title = element_blank())
 
+
+ggsave(prob_dying_window_plot, 
+       filename = here("vignettes/assess_match_quality/figs/prob_dying_in_window.pdf"),
+       height = 5, width = 7)
 ```
+
+
+## attempt 2 
 
 ```{r}
-gompertztrunc::get.
+hmd_mort <- fread(here("vignettes/assess_match_quality/data/cMx_1x1.txt"))
+
+
+
+years <- 1900:1940
+result <- list()
+
+for (i in years){
+  
+## dying between 65 and 95 
+p25_65 <- hmd_mort %>% 
+  filter(Year == i) %>% 
+  filter(Male != ".") %>% 
+  mutate(Male = as.numeric(Male)) %>% 
+  mutate(qx = Male / (1 + 0.5 * Male)) %>% 
+  mutate(px = 1 - qx) %>% 
+  filter(Age %in% (1975-i):(2005-i)) %>% 
+  summarize(prod(px))
+
+## dying between 25 and 65 
+p35_30 <- hmd_mort %>% 
+  filter(Year == i) %>% 
+  filter(Male != ".") %>% 
+  mutate(Male = as.numeric(Male)) %>% 
+  mutate(qx = Male / (1 + 0.5 * Male)) %>% 
+  mutate(px = 1 - qx) %>% 
+  filter(Age %in% (1940-i):(1975-i-1)) %>% 
+  summarize(prod(px))
+
+ prob = (p35_30) * (1-p25_65)
+
+result[[i]] <- tibble(cohort = i,
+                        prop_dying = as.numeric(prob))
+
+}
+dmf_new <- bind_rows(result) %>% 
+    mutate(dataset = "Carl Method")
+
 ```
+
+
+```{r}
+years <- 1900:1940
+result <- list()
+
+for (i in years){
+  
+## dying between 65 and 95 
+p25_65 <- hmd_mort %>% 
+  filter(Year == i) %>% 
+  filter(Male != ".") %>% 
+  mutate(Male = as.numeric(Male)) %>% 
+  mutate(qx = Male / (1 + 0.5 * Male)) %>% 
+  mutate(px = 1 - qx) %>% 
+  filter(Age %in% (1988-i):(2005-i)) %>% 
+  summarize(prod(px))
+
+## dying between 25 and 65 
+p35_30 <- hmd_mort %>% 
+  filter(Year == i) %>% 
+  filter(Male != ".") %>% 
+  mutate(Male = as.numeric(Male)) %>% 
+  mutate(qx = Male / (1 + 0.5 * Male)) %>% 
+  mutate(px = 1 - qx) %>% 
+  filter(Age %in% (1940-i):(1988-i-1)) %>% 
+  summarize(prod(px))
+
+ prob = (p35_30) * (1-p25_65)
+
+result[[i]] <- tibble(cohort = i,
+                        prop_dying = as.numeric(prob))
+
+}
+
+numident_new <- bind_rows(result) %>% 
+  mutate(dataset = "numident_new")
+```
+
+
+```{r}
+prob_dying_window_plot_new <- dmf %>% 
+  mutate(prop_dying = prop_dying_5yr_smoothed) %>% 
+  bind_rows(dmf_new) %>% 
+  ggplot(aes(x = cohort, y = prop_dying, linetype = dataset, shape = dataset)) + 
+  geom_line(size = .75) + 
+  geom_point(size = 2.5) + 
+  theme_cowplot() + 
+  labs(y = "Probability Dying in Coverage Window",
+       x = "Cohort" ) + 
+  ylim(0, 0.8) + 
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+
+prob_dying_window_plot_new <- numident_new %>% 
+  bind_rows(numident) %>% 
+  ggplot(aes(x = cohort, y = prop_dying, linetype = dataset, shape = dataset)) + 
+  geom_line(size = .75) + 
+  geom_point(size = 2.5) + 
+  theme_cowplot() + 
+  labs(y = "Probability Dying in Coverage Window",
+       x = "Cohort" ) + 
+  ylim(0, 0.8) + 
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+
 
