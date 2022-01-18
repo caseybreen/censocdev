@@ -1,9 +1,9 @@
 ---
-title: "Assessing Match Quality"
+title: "CenSoc-DMF: Assessing Match Quality"
 author: "Casey Breen" 
 ---
 
-Summary: Assessing match quality in the 1940 census. 
+Summary: Assessing match quality in the CenSoc-DMF (V2) file. 
 
 ```{r}
 ## Library packages 
@@ -14,6 +14,7 @@ library(cowplot)
 library(gt)
 library(ipumsr)
 library(here)
+library(janitor)
 ```
 
 
@@ -30,13 +31,13 @@ census_1940 <- fread("/ipums-repo2019/1940/TSV/P.tsv", select = c("HISTID", "SER
 census_1940_h <- fread("/ipums-repo2019/1940/TSV/H.tsv", select = c("SERIAL", "STATEFIP", "OWNERSHP", "URBAN", "REGION")) %>% 
   janitor::clean_names()
 
-
+## read in data describing probability of dying in left and right truncated window 
 dmf_death_prop <- read_csv(here("vignettes/assess_match_quality/data/dmf_death_prop.csv")) %>% 
   mutate(age = 1940 - cohort) ## imprecise but OK
 ```
 
 ```{r}
-## combine census 
+## combine census person and household vars 
 census_1940_hh_vars <- census_1940 %>% 
   inner_join(census_1940_h, by = c("serialp" = "serial"))
 
@@ -44,27 +45,28 @@ census_1940_hh_vars <- census_1940 %>%
 census_1940_hh_vars <- census_1940_hh_vars %>% 
   left_join(dmf, by = "histid")
 
-## drop sex 
+## drop women (dmf only has men) 
 census_1940_hh_vars <- census_1940_hh_vars %>% 
   filter(sex == 1)
 
-## recode 
+## recode education variable to years of education
 census_1940_hh_vars <- census_1940_hh_vars %>% 
   censocdev::recode_education(educ_var = educ)
 
-## data dictionary initiative
+## read data dictionary initiative (DDI) file with varnames and var labels 
 ipums_ddi <- ipumsr::read_ipums_ddi("/ipums-repo2019-1/fullcount.ddi.xml")
 
+## add on ipums value + variable labels  
 census_1940_hh_vars <- census_1940_hh_vars %>% 
   janitor::clean_names(case = "all_caps") %>% 
   ipumsr::ipums_collect(ipums_ddi, var_attrs = c("val_labels", "var_label", "var_desc")) %>% 
-    janitor::clean_names()
+  janitor::clean_names()
 ```
 
-## Calculate match rate 
+## Recode variables 
 
 ```{r}
-## create variable indicating whether someone has been matched 
+## recode variables 
 census_1940_hh_vars <- census_1940_hh_vars %>% 
   mutate(match_conservative = case_when(
     link_abe_exact_conservative == 1 ~ "Matched",
@@ -122,6 +124,8 @@ census_1940_hh_vars <- census_1940_hh_vars %>%
     TRUE ~ "Other"
   ))
 ```
+
+## Calculate DMF match rate 
 
 ```{r}
 ## dmf match rate (standard)
@@ -183,99 +187,7 @@ dmf_match_rate_combined <- cowplot::plot_grid(dmf_match_rate, dmf_match_rate_adj
 ggsave(dmf_match_rate_combined, filename = here("vignettes/assess_match_quality/figs/dmf_raw_match_rate.pdf"), height = 4, width = 10)
 ```
 
-## Comparison of Socioeconomic Status 
-
-```{r}
-## Calculate sample proportion (standard)
-characteristics_standard <- census_1940_hh_vars %>% 
-  group_by(age, match_standard) %>%
-  summarize(p_hs = mean(hs),
-            p_rural = mean(rural),
-            p_black = mean(black),
-            p_white = mean(white),
-            p_homeown = mean(homeown),
-            p_household_head = mean(p_hh_head)) %>% 
-  pivot_longer(cols = starts_with("p_"), names_to = "type",
-               names_prefix = "p_", values_to = "prop")
-
-## Calculate sample proportion (conservative)
-matched_characteristics_conservative <- census_1940_hh_vars %>% 
-  group_by(age, match_conservative) %>%
-  summarize(p_hs = mean(hs),
-            p_rural = mean(rural),
-            p_black = mean(black),
-            p_white = mean(white),
-            p_homeown = mean(homeown),
-            p_household_head = mean(p_hh_head)) %>% 
-  pivot_longer(cols = starts_with("p_"), names_to = "type",
-               names_prefix = "p_", values_to = "prop")
-
-## Reshape data (standard)
-matched_characteristics_standard <- matched_characteristics_standard %>% 
-  mutate(type = as.factor(case_when(
-    type == "hs" ~ "Educ: High School",
-    type == "rural" ~ "Rural",
-    type == "black" ~ "Race: Black",
-    type == "white" ~ "Race: White",
-    type == "household_head" ~ "Houshold Head",
-    type == "homeown" ~ "Home Owner"
-  ))) %>% 
-  mutate(type = factor(type, levels=c('Educ: High School',
-                                      'Race: Black','Race: White', 'Rural',
-                                      "Houshold Head", "Home Owner"))) %>% 
-
-
-## Reshape data (conservative)
-matched_characteristics_conservative <- matched_characteristics_conservative %>% 
-  mutate(type = as.factor(case_when(
-    type == "hs" ~ "Educ: High School",
-    type == "rural" ~ "Rural",
-    type == "black" ~ "Race: Black",
-    type == "white" ~ "Race: White",
-    type == "household_head" ~ "Houshold Head",
-    type == "homeown" ~ "Home Owner"
-  ))) %>% 
-  mutate(type = factor(type, levels=c('Educ: High School',
-                                      'Race: Black','Race: White', 'Rural',
-                                      "Houshold Head", "Home Owner")))
-
-
-
-
-## Plot data —— DMF representativeness (standard)
-matched_characteristics_plot_standard <- matched_characteristics_standard %>% 
-   ggplot(aes(x = age, y = prop, color = as.factor(match_standard))) + 
-  geom_line(size = 1) + 
-  theme_cowplot() + 
-  ggsci::scale_color_lancet() + 
-  xlim(20, 50) + 
-  theme(legend.position = "bottom", legend.title = element_blank()) + 
-  facet_wrap(~type) + 
-    background_grid() 
-
-## Plot data —— DMF representativeness (conservative)
-matched_characteristics_plot_conservative <- matched_characteristics_conservative %>% 
-   ggplot(aes(x = age, y = prop, color = as.factor(match_conservative))) + 
-  geom_line(size = 1) + 
-  theme_cowplot() + 
-  ggsci::scale_color_lancet() + 
-  xlim(20, 50) + 
-  theme(legend.position = "bottom", legend.title = element_blank()) + 
-  facet_wrap(~type) + 
-  background_grid() 
-
-
-dmf_matched_characteristics_plot <- cowplot::plot_grid(matched_characteristics_plot_standard, matched_characteristics_plot_conservative, rows = 2) 
-
-
-## save plot 
-ggsave(matched_characteristics_plot_standard, filename = here("vignettes/assess_match_quality/figs/dmf_matched_characteristics_plot_standard.pdf"), height = 7, width = 10)
-
-## save plot 
-ggsave(matched_characteristics_plot_conservative, filename = here("vignettes/assess_match_quality/figs/dmf_matched_characteristics_plot_conservative.pdf"), height = 7, width = 10)
-```
-
-## Comparison of Socioeconomic Status 
+## Comparison of Socioeconomic Status (Age-Specific Plots)
 
 ```{r}
 ## Calculate sample proportion (unmatched)
@@ -352,13 +264,14 @@ matched_characteristics_plot_standard <- matched_characteristics_combined %>%
 
 ## save plot 
 ggsave(matched_characteristics_plot_standard, filename = here("vignettes/assess_match_quality/figs/dmf_socioeconomic_characteristics.pdf"), height = 7, width = 10)
-
 ```
 
 
+## Comparison of Socioeconomic Class (Table)
+
 ```{r}
 ## recode data  
- gen <- census_1940_hh_vars %>% 
+census_1940_hh_vars_recode  <- census_1940_hh_vars %>% 
   mutate(rural = case_when(
     rural == 1 ~ "Rural",
     TRUE ~ "Urban"
@@ -366,8 +279,11 @@ ggsave(matched_characteristics_plot_standard, filename = here("vignettes/assess_
   homeown = case_when(
     homeown == 1 ~ "Home Owner",
     TRUE ~ "Not Home Owner"
-  )) %>% 
-  filter(age %in% 20:40) %>% 
+  ),
+  region_string = as_factor(region)) %>% 
+  filter(age %in% 20:40)
+
+census_characteristics <- census_1940_hh_vars_recode %>% 
   select(histid, race_recode, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
   pivot_longer(-histid) %>% 
   group_by(name, value) %>%
@@ -375,17 +291,8 @@ ggsave(matched_characteristics_plot_standard, filename = here("vignettes/assess_
   mutate(prop = round(100*prop.table(n), 1)) %>% 
   rename(n_gen = n, prop_gen = prop)
 
-censoc_dmf_1940_standard <- census_1940_hh_vars %>% 
+dmf_characteristics_standard <- census_1940_hh_vars_recode %>% 
   filter(link_abe_exact_standard == 1) %>% 
-  mutate(rural = case_when(
-    rural == 1 ~ "Rural",
-    TRUE ~ "Urban"
-  ),
-  homeown = case_when(
-    homeown == 1 ~ "Home Owner",
-    TRUE ~ "Not Home Owner"
-  )) %>% 
-  filter(age %in% 20:40) %>% 
   select(histid, race_recode, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
   pivot_longer(-histid) %>% 
   group_by(name, value) %>%
@@ -393,17 +300,8 @@ censoc_dmf_1940_standard <- census_1940_hh_vars %>%
   mutate(prop = round(100*prop.table(n), 1)) %>% 
   rename(n_gen_standard = n, prop_standard = prop)
 
-censoc_dmf_1940_conservative <- census_1940_hh_vars %>% 
+dmf_characteristics_conservative <- census_1940_hh_vars_recode %>% 
   filter(link_abe_exact_conservative == 1) %>% 
-  mutate(rural = case_when(
-    rural == 1 ~ "Rural",
-    TRUE ~ "Urban"
-  ),
-  homeown = case_when(
-    homeown == 1 ~ "Home Owner",
-    TRUE ~ "Not Home Owner"
-  )) %>% 
-  filter(age %in% 20:40) %>% 
   select(histid, race_recode, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
   pivot_longer(-histid) %>% 
   group_by(name, value) %>%
@@ -411,23 +309,16 @@ censoc_dmf_1940_conservative <- census_1940_hh_vars %>%
   mutate(prop = round(100*prop.table(n), 1)) %>% 
   rename(n_gen_conservative = n, prop_conservative = prop)
 
-
-unweighted_data <- gen %>% 
-  inner_join(censoc_dmf_1940_standard, by = c("name", "value")) %>% 
-  inner_join(censoc_dmf_1940_conservative, by = c("name", "value")) %>% 
- # mutate(name = as.factor(name), value = as.factor(name)) %>% 
-  mutate(name = factor(name, levels = c("educ_level", "race_recode", "homeown", "sei_recode", "rural", "region_string", "Marital"))) %>% 
-  # mutate(value = factor(value, levels = c('Male', 'Female',
-  #                                     '18-29', '30-44', '45-59', '60+',
-  #                                     '<HS Equivalent', "HS Equivalent", "Some college", "Bachelors", "Advanced degree",
-  #                                     "White, non-Hispanic", "Black, non-Hispanic", "Other, non-Hispanic", "Hispanic", "2+, non-Hispanic", "Asian, non-Hispanic",
-  #                                     "<$29,999", "$30,000 to $74,999", "$75,000 to $124,999", ">$125,000+",
-  #                                     "Non-Metro Area", "Metro Area",
-  #                                     "Married", "Widowed", "Divorced", "Separated", "Never married", "Living with partner"))) %>% 
+combined_characteristics <- census_characteristics %>% 
+  inner_join(dmf_characteristics_standard, by = c("name", "value")) %>% 
+  inner_join(dmf_characteristics_conservative, by = c("name", "value")) %>% 
+  mutate(name = as.factor(name), value = as.factor(value)) %>% 
+  mutate(name = factor(name, levels = c("educ_level", "race_recode", "marital_status", "homeown", "sei_recode", "rural", "region_string"))) %>% 
   arrange(name, value) 
 
 ## create table 
-table_s3 <- gt(data = unweighted_data) %>% 
+## will have to do some manual clean-up but this gets us 80% of the way
+table_s3 <- gt(data = combined_characteristics) %>% 
   tab_spanner(
     label = "General Pop",
     columns = vars(
@@ -462,25 +353,118 @@ table_s3 <- gt(data = unweighted_data) %>%
 
 
 table_s3 %>%
-  gtsave("dmf_characteristics_new.tex", path = here("vignettes/assess_match_quality/figs/")) 
+  gtsave("dmf_characteristics_table.tex", path = here("vignettes/assess_match_quality/figs/")) 
 ```
 
+## Match Rate by Population Subgroup
 
 ```{r}
-match_rate_characteristics <- census_1940_hh_vars %>% 
-  mutate(rural = case_when(
-    rural == 1 ~ "Rural",
-    TRUE ~ "Urban"
-  ),
-  homeown = case_when(
-    homeown == 1 ~ "Home Owner",
-    TRUE ~ "Not Home Owner"
-  )) %>% 
-  filter(age %in% 20:40) %>% 
-  select(histid, race_recode, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
-  pivot_longer(-c(histid, link_abe_exact_standard)) %>% 
+census_1940_hh_vars_recode <- census_1940_hh_vars_recode %>% 
+  mutate(link_abe_exact_conservative_dummy = case_when(
+    link_abe_exact_conservative == 1 ~ 1,
+    TRUE ~ 0))
+
+race_match_rate <- census_1940_hh_vars_recode %>% 
+  select(histid, link_abe_exact_standard, link_abe_exact_conservative_dummy, race_recode) %>%
+  pivot_longer(-c(histid, link_abe_exact_standard, link_abe_exact_conservative_dummy)) %>% 
   group_by(name, value) %>%
-  summarize(mean(!is.na(link_abe_exact_standard)))
+  summarize(Standard = mean(!is.na(link_abe_exact_standard)),
+            Conservative = mean(link_abe_exact_conservative_dummy)) %>% 
+ pivot_longer(
+   cols = starts_with(c("Standard","Conservative")),
+   names_to = "match_type",
+   values_to = "rate",
+   values_drop_na = TRUE
+ )
+
+education_match_rate <- census_1940_hh_vars_recode %>% 
+  select(histid, link_abe_exact_standard, link_abe_exact_conservative_dummy,  educ_level) %>%
+  pivot_longer(-c(histid, link_abe_exact_standard, link_abe_exact_conservative_dummy)) %>% 
+  group_by(name, value) %>%
+    summarize(Standard = mean(!is.na(link_abe_exact_standard)),
+            Conservative = mean(link_abe_exact_conservative_dummy)) %>% 
+ pivot_longer(
+   cols = starts_with(c("Standard","Conservative")),
+   names_to = "match_type",
+   values_to = "rate",
+   values_drop_na = TRUE
+ )
+
+region_match_rate <- census_1940_hh_vars_recode %>% 
+  select(histid, link_abe_exact_standard, link_abe_exact_conservative_dummy, region_string) %>%
+  pivot_longer(-c(histid, link_abe_exact_standard, link_abe_exact_conservative_dummy)) %>% 
+  group_by(name, value) %>%
+    summarize(Standard = mean(!is.na(link_abe_exact_standard)),
+            Conservative = mean(link_abe_exact_conservative_dummy)) %>% 
+ pivot_longer(
+   cols = starts_with(c("Standard","Conservative")),
+   names_to = "match_type",
+   values_to = "rate",
+   values_drop_na = TRUE
+ )
+
+## race plot 
+race_match_rate_plot <- race_match_rate %>% 
+  mutate(value = case_when(
+    value == "Other" ~ "Other Race",
+    TRUE ~ value
+  )) %>% 
+  ggplot(aes(x = rate, y = reorder(value, rate), shape = match_type, color = match_type)) + 
+  geom_point(size = 3) + 
+  theme_cowplot() + 
+  xlim(0, .22) + 
+  labs(x = "Match Rate",
+       y = "",
+       title = "Race") + 
+  ggsci::scale_color_lancet() +
+      theme(legend.position = "none") 
+
+## education plot 
+education_match_rate_plot <- education_match_rate %>% 
+  mutate(value = case_when(
+    value == "High School or some college" ~ "High School",
+    TRUE ~ value
+  )) %>% 
+  filter(!is.na(value)) %>% 
+  ggplot(aes(x = rate, y = reorder(value, rate), shape = match_type, color = match_type)) + 
+  geom_point(size = 3) + 
+  theme_cowplot() + 
+  xlim(0, .22) + 
+  labs(x = "Match Rate",
+       y = "",
+       title = "Education") + 
+  ggsci::scale_color_lancet() + 
+    theme(legend.position = "none") 
+
+## region plot
+region_match_rate_plot <- region_match_rate %>% 
+  filter(!is.na(value)) %>% 
+  mutate(value = str_remove(value, (" Division"))) %>%
+  mutate(value = str_remove(value, c(" Div."))) %>% 
+  ggplot(aes(x = rate, y = reorder(value, rate), shape = match_type, color = match_type)) + 
+  geom_point(size = 3 ) + 
+  theme_cowplot() + 
+  xlim(0, .22) + 
+  labs(x = "Match Rate",
+       y = "",
+       title = "Region") + 
+  ggsci::scale_color_lancet() + 
+  theme(legend.position = "none") 
+
+## get shared legend 
+legend_b <- get_legend(
+  region_match_rate_plot + 
+    theme(legend.position = "bottom", legend.title = element_blank())
+)
+
+## plot no legend 
+plot_nolegend <- cowplot::plot_grid(race_match_rate_plot, education_match_rate_plot, region_match_rate_plot, nrow = 1)
+
+## shared legend 
+subgroup_match_rate_plot_legend <- plot_grid(plot_nolegend, legend_b, ncol = 1, rel_heights = c(1, .1))
+
+ggsave(subgroup_match_rate_plot_legend <- plot_grid(plot_nolegend, legend_b, ncol = 1, rel_heights = c(1, .1))
+, filename = here("vignettes/assess_match_quality/figs/dmf_match_rate_subgroups.pdf"), height = 3, width = 14)
 ```
 
 
