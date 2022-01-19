@@ -257,7 +257,7 @@ matched_characteristics_plot_standard <- matched_characteristics_combined %>%
   theme(legend.position = "bottom", legend.title = element_blank()) + 
   facet_wrap(~type) + 
   background_grid() + 
-  labs(title = "CenSoc-Numident: Comparison of Socioeconomic Characteristics",
+  labs(title = "CenSoc-Numident: Comparison of Socioeconomic Characteristics (Women)",
        y = "Proportion",
        x = "Age")
 
