@@ -467,7 +467,7 @@ plot_nolegend <- cowplot::plot_grid(race_match_rate_plot, education_match_rate_p
 subgroup_match_rate_plot_legend <- plot_grid(plot_nolegend, legend_b, ncol = 1, rel_heights = c(1, .1))
 
 ggsave(subgroup_match_rate_plot_legend <- plot_grid(plot_nolegend, legend_b, ncol = 1, rel_heights = c(1, .1))
-, filename = here("vignettes/assess_match_quality/figs/numident_match_rate_subgroups.pdf"), height = 3, width = 14)
+, filename = here("vignettes/assess_match_quality/figs/numident_match_rate_subgroups.pdf"), height = 4, width = 13)
 ```
 
 
