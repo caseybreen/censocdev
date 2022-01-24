@@ -3,7 +3,7 @@ title: "CenSoc-Numident: Assessing Match Quality"
 author: "Casey Breen" 
 ---
 
-Summary: Assessing match quality for men in the CenSoc-Numident (V2) file. 
+Summary: Assessing match quality middle initials in the CenSoc-Numident (V2) file. 
 
 ```{r}
 ## Library packages 
@@ -221,11 +221,11 @@ ggplot(aes(x = educ_yrs,
 
 
 ## save plot 
-ggsave(middle_initial_plot, filename = here("vignettes/assess_match_quality/figs/middle_initial_plot.pdf"), height = 5, width = 7)
+ggsave(middle_initial_plot, filename = here("vignettes/assess_match_quality/figs/numident_education_middle_initial_plot.pdf"), height = 5, width = 7)
 ```
 
 ```{r}
- middle_initial_agreement <- censoc_numident_middle %>% 
+ middle_initial_agreement_byear_flex <- censoc_numident_middle %>% 
     filter(link_abe_exact_conservative == 1) %>% 
   group_by(byeardiff_census_minus_numident) %>% 
   summarize(middle = mean(agreement),
@@ -241,10 +241,8 @@ ggsave(middle_initial_plot, filename = here("vignettes/assess_match_quality/figs
   labs(x = "Birth Year Difference (Census - Numident)",
        y = "Middle Initial Agreemen")
 
- censoc_numident_middle %>% 
-    filter(link_abe_exact_conservative == 1) %>% 
-  group_by(byeardiff_census_minus_numident) %>% 
-   tally()
+## save plot 
+ggsave(middle_initial_agreement_byear_flex, filename = here("vignettes/assess_match_quality/figs/numident_byearflex_middle_initial_plot.pdf"), height = 6, width = 8)
 ```
 
 
@@ -315,7 +313,7 @@ association_between_educ_and_longevity <- education_standard %>%
        col = "Middle Initial Agreement")
 
 ## save plot 
-ggsave(association_between_educ_and_longevity, filename = here("vignettes/assess_match_quality/figs/numident_association_between_educ_and_longevity.pdf"), height = 5, width = 7)
+ggsave(association_between_educ_and_longevity, filename = here("vignettes/assess_match_quality/figs/numident_association_between_educ_and_longevity.pdf"), height = 6, width = 8.5)
 ```
 
 

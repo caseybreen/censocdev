@@ -1,0 +1,221 @@
+---
+title: "CenSoc-Numident: Assessing Match Quality"
+author: "Casey Breen and Kathy Perez" 
+---
+
+Summary: Assessing match quality for men in the CenSoc-Numident (V2) file. 
+
+
+```{r}
+## Library packages 
+library(tidyverse)
+library(data.table)
+library(censocdev)
+library(cowplot)
+library(gt)
+library(ipumsr)
+library(here)
+library(janitor)
+```
+
+## Read in data 
+
+```{r}
+## read in dmf 
+dmf <- fread("/censoc/data/censoc_v2/censoc_dmf_v2.csv") %>% 
+  janitor::clean_names()
+
+## read in 1940 census 
+census_1940 <- fread("/ipums-repo2019/1940/TSV/P.tsv", select = c("HISTID", "SERIALP", "AGE", "INCWAGE", "SEX", "EDUC", "RACE", "RELATE", "REGION", "MARST", "SEI")) %>% 
+  janitor::clean_names()
+
+## read in 1940 census household
+census_1940_h <- fread("/ipums-repo2019/1940/TSV/H.tsv", select = c("SERIAL", "STATEFIP", "OWNERSHP", "URBAN", "REGION")) %>% 
+  janitor::clean_names()
+
+## read in data describing probability of dying in left and right truncated window 
+dmf_death_prop <- read_csv(here("vignettes/assess_match_quality/data/dmf_death_prop.csv")) %>% 
+  mutate(age = 1940 - cohort) ## imprecise but OK
+```
+
+## Link data 
+
+```{r}
+## combine census person and household vars 
+census_1940_hh_vars <- census_1940 %>% 
+  inner_join(census_1940_h, by = c("serialp" = "serial"))
+
+## add on dmf  
+census_1940_hh_vars <- census_1940_hh_vars %>% 
+  left_join(dmf, by = "histid")
+
+## drop women (dmf only has men) 
+census_1940_hh_vars <- census_1940_hh_vars %>% 
+  filter(sex == 1)
+
+## recode education variable to years of education
+census_1940_hh_vars <- census_1940_hh_vars %>% 
+  censocdev::recode_education(educ_var = educ)
+
+## read data dictionary initiative (DDI) file with varnames and var labels 
+ipums_ddi <- ipumsr::read_ipums_ddi("/ipums-repo2019-1/fullcount.ddi.xml")
+
+## add on ipums value + variable labels  
+census_1940_hh_vars <- census_1940_hh_vars %>% 
+  janitor::clean_names(case = "all_caps") %>% 
+  ipumsr::ipums_collect(ipums_ddi, var_attrs = c("val_labels", "var_label", "var_desc")) %>% 
+  janitor::clean_names()
+```
+
+## Recode variables 
+
+```{r}
+## recode variables 
+census_1940_hh_vars <- census_1940_hh_vars %>% 
+  mutate(match_conservative = case_when(
+    link_abe_exact_conservative == 1 ~ "Matched",
+    TRUE ~ "Unmatched"
+  ),
+  match_standard = case_when(
+    link_abe_exact_conservative %in% c(0, 1) ~ "Matched",
+    TRUE ~ "Unmatched"
+  ), 
+  hs = case_when(
+    educ >= 60 & educ < 998 ~ 1,
+    TRUE ~ 0
+  ), 
+  rural = case_when(
+    urban == 1 ~ 1,
+    TRUE ~ 0
+  ),
+  black = case_when( 
+    race == 200 ~ 1,
+    TRUE ~ 0
+  ), white = case_when(
+    race == 100 ~ 1,
+    TRUE ~ 0
+  ),
+  homeown = case_when(
+    ownershp == 10 ~ 1, 
+    TRUE ~ 0
+  ),
+  p_hh_head = case_when(
+    relate == 101 ~ 1, 
+    TRUE ~ 0
+  ),
+  p_hh_head = case_when(
+    relate == 101 ~ 1, 
+    TRUE ~ 0
+  ),
+  educ_level = case_when(
+    educ <= 50 ~ "< High School",
+    educ %in% 60:90 ~ "High School or some college",
+    educ %in% 100 ~ "Bachelors Degree",
+    educ %in% 110:116 ~ "Advanced Degree"
+  ), 
+  sei_recode = case_when(
+    sei %in% 1:9 ~ "sei_1_9",
+    sei %in% 10:14 ~ "sei_10_14",
+    sei %in% 15:25 ~ "sei_15_25",
+    sei >= 26 ~      "sei_26+"
+  ),
+  marital_status = case_when(
+      marst %in% 1:2 ~ "married",
+      TRUE ~ "not married" ),
+  race_recode = case_when(
+    race == 100 ~ "White",
+    race == 200 ~ "Black",
+    TRUE ~ "Other"
+  ))
+```
+
+
+## generate table 
+
+```{r}
+## recode data  
+census_1940_hh_vars_recode  <- census_1940_hh_vars %>% 
+  mutate(rural = case_when(
+    rural == 1 ~ "Rural",
+    TRUE ~ "Urban"
+  ),
+  homeown = case_when(
+    homeown == 1 ~ "Home Owner",
+    TRUE ~ "Not Home Owner"
+  ),
+  region_string = as_factor(region)) %>% 
+  filter(age %in% 20:40)
+
+census_characteristics <- census_1940_hh_vars_recode %>% 
+  select(histid, race_recode, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
+  pivot_longer(-histid) %>% 
+  group_by(name, value) %>%
+  tally() %>%            
+  mutate(prop = round(100*prop.table(n), 1)) %>% 
+  rename(n_gen = n, prop_gen = prop)
+
+dmf_characteristics_standard <- census_1940_hh_vars_recode %>% 
+  filter(link_abe_exact_standard == 1) %>% 
+  select(histid, race_recode, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
+  pivot_longer(-histid) %>% 
+  group_by(name, value) %>%
+  tally() %>%            
+  mutate(prop = round(100*prop.table(n), 1)) %>% 
+  rename(n_gen_standard = n, prop_standard = prop)
+
+dmf_characteristics_conservative <- census_1940_hh_vars_recode %>% 
+  filter(link_abe_exact_conservative == 1) %>% 
+  select(histid, race_recode, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
+  pivot_longer(-histid) %>% 
+  group_by(name, value) %>%
+  tally() %>%            
+  mutate(prop = round(100*prop.table(n), 1)) %>% 
+  rename(n_gen_conservative = n, prop_conservative = prop)
+
+combined_characteristics <- census_characteristics %>% 
+  inner_join(dmf_characteristics_standard, by = c("name", "value")) %>% 
+  inner_join(dmf_characteristics_conservative, by = c("name", "value")) %>% 
+  mutate(name = as.factor(name), value = as.factor(value)) %>% 
+  mutate(name = factor(name, levels = c("educ_level", "race_recode", "marital_status", "homeown", "sei_recode", "rural", "region_string"))) %>% 
+  arrange(name, value) 
+
+## create table 
+## will have to do some manual clean-up but this gets us 80% of the way
+table_s3 <- gt(data = combined_characteristics) %>% 
+  tab_spanner(
+    label = "General Pop",
+    columns = vars(
+      n_gen, prop_gen)) %>% 
+  tab_spanner(
+    label = "Standard",
+    columns = vars(
+      n_gen_standard, prop_standard)) %>% 
+  tab_spanner(
+    label = "Conservative",
+    columns = vars(
+      n_gen_conservative, prop_conservative)) %>% 
+  cols_label(
+    "n_gen" = "No.",
+    "prop_gen" = "%",
+    "n_gen_standard" = "No.",
+    "prop_standard" = "%",
+    "n_gen_conservative"  = "No.",
+    "prop_conservative" = "%",
+    value = ""
+  ) %>% 
+  # row_group_order(
+  #     groups = c("Gender", "Age", "Education", "Race")
+  #   ) %>% 
+  tab_style(
+    style = list(
+      cell_text(weight = "bold")),
+    locations = cells_row_groups()
+  ) %>% 
+  opt_row_striping(row_striping = T) %>% 
+  cols_align("left")
+
+
+table_s3 %>%
+  gtsave("dmf_characteristics_table.tex", path = here("vignettes/assess_match_quality/figs/")) 
+```
+
