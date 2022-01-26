@@ -240,7 +240,7 @@ census_1940_hh_vars_recode_ba  <- census_1940_hh_vars %>%
 ```
 
 
-#table for black americans
+#table for black americans: dmf
 ```{r}
 
 ## tabulations for men in 1940 census 
