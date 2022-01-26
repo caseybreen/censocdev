@@ -223,3 +223,101 @@ table_s3 %>%
   gtsave("dmf_characteristics_table.tex", path = here("vignettes/assess_match_quality/figs/")) 
 ```
 
+
+#data frame with just black americans
+```{r}
+census_1940_hh_vars_recode_ba  <- census_1940_hh_vars %>% 
+  mutate(rural = case_when(
+    rural == 1 ~ "Rural",
+    TRUE ~ "Urban"
+  ),
+  homeown = case_when(
+    homeown == 1 ~ "Home Owner",
+    TRUE ~ "Not Home Owner"
+  ),
+  region_string = as_factor(region)) %>% 
+  filter(age %in% 20:40, race_recode == "Black")
+```
+
+
+#table for black americans
+```{r}
+
+## tabulations for men in 1940 census 
+census_characteristics_ba <- census_1940_hh_vars_recode_ba %>% 
+  select(histid, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
+  pivot_longer(-histid) %>% 
+  group_by(name, value) %>%
+  tally() %>%            
+  mutate(prop = round(100*prop.table(n), 1)) %>% 
+  rename(n_gen = n, prop_gen = prop)
+
+## tabulations for men in CenSoc-DMF standard 
+dmf_characteristics_standard_ba <- census_1940_hh_vars_recode_ba %>% 
+  filter(link_abe_exact_standard == 1) %>% 
+  select(histid, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
+  pivot_longer(-histid) %>% 
+  group_by(name, value) %>%
+  tally() %>%            
+  mutate(prop = round(100*prop.table(n), 1)) %>% 
+  rename(n_gen_standard = n, prop_standard = prop)
+
+## tabulations for men in CenSoc-DMF conservative 
+dmf_characteristics_conservative_ba <- census_1940_hh_vars_recode_ba %>% 
+  filter(link_abe_exact_conservative == 1) %>% 
+  select(histid, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
+  pivot_longer(-histid) %>% 
+  group_by(name, value) %>%
+  tally() %>%            
+  mutate(prop = round(100*prop.table(n), 1)) %>% 
+  rename(n_gen_conservative = n, prop_conservative = prop)
+
+combined_characteristics_ba <- census_characteristics_ba %>% 
+  inner_join(dmf_characteristics_standard_ba, by = c("name", "value")) %>% 
+  inner_join(dmf_characteristics_conservative_ba, by = c("name", "value")) %>% 
+  mutate(name = as.factor(name), value = as.factor(value)) %>% 
+  mutate(name = factor(name, levels = c("educ_level", "marital_status", "homeown", "sei_recode", "rural", "region_string"))) %>% 
+  arrange(name, value) 
+
+## create table 
+## will have to do some manual clean-up but this gets us 80% of the way
+table_s3_ba <- gt(data = combined_characteristics_ba) %>% 
+  tab_spanner(
+    label = "General Pop",
+    columns = vars(
+      n_gen, prop_gen)) %>% 
+  tab_spanner(
+    label = "Standard",
+    columns = vars(
+      n_gen_standard, prop_standard)) %>% 
+  tab_spanner(
+    label = "Conservative",
+    columns = vars(
+      n_gen_conservative, prop_conservative)) %>% 
+  cols_label(
+    "n_gen" = "No.",
+    "prop_gen" = "%",
+    "n_gen_standard" = "No.",
+    "prop_standard" = "%",
+    "n_gen_conservative"  = "No.",
+    "prop_conservative" = "%",
+    value = ""
+  ) %>% 
+  # row_group_order(
+  #     groups = c("Gender", "Age", "Education", "Race")
+  #   ) %>% 
+  tab_style(
+    style = list(
+      cell_text(weight = "bold")),
+    locations = cells_row_groups()
+  ) %>% 
+  opt_row_striping(row_striping = T) %>% 
+  cols_align("left")
+
+## save table 
+table_s3_ba %>%
+  gtsave("dmf_characteristics_blackamericans_table.tex", path = here("vignettes/assess_match_quality/figs/"))
+
+
+```
+
