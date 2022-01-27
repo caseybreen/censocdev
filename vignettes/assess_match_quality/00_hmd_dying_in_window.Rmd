@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Dying in window"
 ---
 
 Summary: Use HMD cohort 1x1 "exposure to risk" data to estimate proportion of people born in a given cohort dying during the appropriate window 
@@ -13,94 +13,10 @@ library(here)
 ```
 
 
-```{r}
-hmd <- fread(here("vignettes/assess_match_quality/data/cExposures_1x1.txt"))
-```
-
-
-```{r}
-hmd <- hmd %>% 
-  filter(Year %in% 1899:1940) 
-```
-
-```{r}
-l_1940 <- hmd %>% 
-  filter(Age == 1940 - Year) %>% 
-  pull(Male) %>% 
-  as.numeric()
-
-l_1975 <- hmd %>% 
-  filter(Age == 1975 - Year) %>% 
-  pull(Male) %>% 
-  as.numeric()
-
-l_2005 <- hmd %>% 
-  filter(Age == 2005 - Year) %>% 
-  pull(Male) %>% 
-  as.numeric()
-
-dmf <- tibble(cohort = 1899:1940,
-              prop_dying = (l_1975-l_2005)/l_1940,
-              dataset = "Casey Method") %>% 
-    mutate(prop_dying_5yr_smoothed = zoo::rollmean(prop_dying, k = 5, na.pad = T)) 
-```
-
-```{r}
-l_1940 <- hmd %>% 
-  filter(Age == 1940 - Year) %>% 
-  pull(Male) %>% 
-  as.numeric()
-
-l_1988 <- hmd %>% 
-  filter(Age == 1988 - Year) %>% 
-  pull(Male) %>% 
-  as.numeric()
-
-l_2005 <- hmd %>% 
-  filter(Age == 2005 - Year) %>% 
-  pull(Male) %>% 
-  as.numeric()
-
-numident <- tibble(cohort = 1899:1940,
-                  l_1988, l_2005, l_1940,
-                  prop_dying = (l_1988-l_2005)/l_1940,
-                  dataset = "Numident (1988-2005)") %>% 
-    mutate(prop_dying_5yr_smoothed = zoo::rollmean(prop_dying, k = 5, na.pad = T)) 
-
-```
-
-
-```{r}
-write_csv(numident, here("vignettes/assess_match_quality/data/numident_death_prop.csv"))
-write_csv(dmf, here("vignettes/assess_match_quality/data/dmf_death_prop.csv"))
-```
-
-
-```{r}
-prob_dying_window_plot <- dmf %>% 
-  bind_rows(numident) %>% 
-  ggplot(aes(x = cohort, y = prop_dying_5yr_smoothed, linetype = dataset, shape = dataset)) + 
-  geom_line(size = .75) + 
-  geom_point(size = 2.5) + 
-  theme_cowplot() + 
-  labs(y = "Probability Dying in Coverage Window",
-       x = "Cohort" ) + 
-  ylim(0, 0.8) + 
-  theme(legend.position = "bottom", legend.title = element_blank())
-
-
-ggsave(prob_dying_window_plot, 
-       filename = here("vignettes/assess_match_quality/figs/prob_dying_in_window.pdf"),
-       height = 5, width = 7)
-```
-
-
 ## attempt 2 
 
 ```{r}
 hmd_mort <- fread(here("vignettes/assess_match_quality/data/cMx_1x1.txt"))
-
-
 
 years <- 1900:1940
 result <- list()
@@ -133,8 +49,8 @@ result[[i]] <- tibble(cohort = i,
                         prop_dying = as.numeric(prob))
 
 }
-dmf_new <- bind_rows(result) %>% 
-    mutate(dataset = "Carl Method")
+dmf <- bind_rows(result) %>% 
+    mutate(dataset = "DMF (1975-2005)")
 
 ```
 
@@ -172,26 +88,19 @@ result[[i]] <- tibble(cohort = i,
 
 }
 
-numident_new <- bind_rows(result) %>% 
-  mutate(dataset = "numident_new")
+numident <- bind_rows(result) %>% 
+  mutate(dataset = "Numident (1999-2005)")
 ```
 
 
 ```{r}
-prob_dying_window_plot_new <- dmf %>% 
-  mutate(prop_dying = prop_dying_5yr_smoothed) %>% 
-  bind_rows(dmf_new) %>% 
-  ggplot(aes(x = cohort, y = prop_dying, linetype = dataset, shape = dataset)) + 
-  geom_line(size = .75) + 
-  geom_point(size = 2.5) + 
-  theme_cowplot() + 
-  labs(y = "Probability Dying in Coverage Window",
-       x = "Cohort" ) + 
-  ylim(0, 0.8) + 
-  theme(legend.position = "bottom", legend.title = element_blank())
+write_csv(numident, here("vignettes/assess_match_quality/data/numident_death_prop.csv"))
+write_csv(dmf, here("vignettes/assess_match_quality/data/dmf_death_prop.csv"))
+```
 
 
-prob_dying_window_plot_new <- numident_new %>% 
+```{r}
+prob_dying_window_plot <- dmf %>% 
   bind_rows(numident) %>% 
   ggplot(aes(x = cohort, y = prop_dying, linetype = dataset, shape = dataset)) + 
   geom_line(size = .75) + 
@@ -201,7 +110,10 @@ prob_dying_window_plot_new <- numident_new %>%
        x = "Cohort" ) + 
   ylim(0, 0.8) + 
   theme(legend.position = "bottom", legend.title = element_blank())
+
+
+ggsave(prob_dying_window_plot, 
+       filename = here("vignettes/assess_match_quality/figs/prob_dying_in_window.pdf"),
+       height = 5, width = 7)
 ```
-
-
 
