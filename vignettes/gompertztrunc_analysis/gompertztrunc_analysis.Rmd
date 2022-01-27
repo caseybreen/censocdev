@@ -71,8 +71,6 @@ numident <- numident %>%
 ```
 
 ```{r}
-set.seed(0.4886)
-
 dmf_sample <- dmf %>% 
   filter(byear %in% 1905:1914) %>% 
   sample_n(100000)
@@ -174,7 +172,7 @@ estimates_plot <- bind_rows(dmf_education_old_pooled,
         legend.title = element_blank()) +
   ylim(0, .35)
   
-ggsave(plot = estimates_plot, filename = "figures/education_X_pooled_mle_ols.png", height = 6, width = 9)
+ggsave(plot = estimates_plot, filename = "figures/education_X_pooled_mle_ols.png", height = 5.5, width = 8)
 ```
 
 ```{r}
@@ -190,7 +188,7 @@ estimates_plot_ols <- bind_rows(dmf_education_old_pooled,
              y = e65, 
              ymin = e65_lower,
              ymax = e65_upper)) + 
-  geom_pointrange(aes(color = method), position = position_dodge(width = 0.2), shape = 1, color = "red") + 
+  geom_pointrange(aes(color = "Regression on Age of Death"), position = position_dodge(width = 0.2), shape = 1) + 
   theme_cowplot() + 
   labs(x = "",
        y = "estimate",
@@ -198,9 +196,9 @@ estimates_plot_ols <- bind_rows(dmf_education_old_pooled,
        subtitle = "Men, birth cohorts of 1905-1914") + 
   theme(legend.position = "bottom", 
         legend.title = element_blank()) +
+  scale_color_manual(name = "", values = c("Regression on Age of Death" = "#ED0000FF")) + 
   ylim(0, .35)
 
-  
-ggsave(plot = estimates_plot_ols, filename = "figures/education_X_pooled_ols.png", height = 6, width = 9)
+ggsave(plot = estimates_plot_ols, filename = "figures/education_X_pooled_ols.png", height = 5.5, width = 8)
 ```
 
