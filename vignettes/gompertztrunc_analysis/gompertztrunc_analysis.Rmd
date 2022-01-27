@@ -1,0 +1,206 @@
+---
+title: "Mortality Differences by State"
+output: html_notebook
+---
+
+MLE Multiple Cohorts 
+
+```{r}
+## library packages 
+library(data.table)
+library(tidyverse)
+library(broom) 
+library(socviz)
+library(cowplot)      
+library(ggsci)
+library(rstan)
+library(tidyverse)
+library(bayesplot)
+library(rstanarm)
+library(gompertztrunc)
+```
+
+
+```{r}
+## read in prelinked CenSoc datasets and filter to "conservative" matches 
+dmf <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/censoc_dmf_v2_linked.csv") %>% 
+   filter(link_abe_exact_conservative == 1)
+
+numident <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/censoc_numident_v2_linked.csv") %>% 
+   filter(link_abe_exact_conservative == 1)
+
+## function to recode the IPUMS education code to years of educaiton 
+recode_education <- function(df) {
+  df <- df  %>%
+    mutate(educ_yrs = case_when(
+      EDUCD == 2 ~ 0,
+      EDUCD == 12 ~ 0,
+      EDUCD == 14 ~ 1,
+      EDUCD == 15 ~ 2,
+      EDUCD == 16 ~ 3,
+      EDUCD == 17 ~ 4,
+      EDUCD == 22 ~ 5,
+      EDUCD == 23 ~ 6,
+      EDUCD == 25 ~ 7,
+      EDUCD == 26 ~ 8,
+      EDUCD == 30 ~ 9,
+      EDUCD == 40 ~ 10,
+      EDUCD == 50 ~ 11,
+      EDUCD == 60 ~ 12,
+      EDUCD == 70 ~ 13,
+      EDUCD == 80 ~ 14,
+      EDUCD == 90 ~ 15,
+      EDUCD == 100 ~ 16,
+      EDUCD == 110 ~ 17,
+      EDUCD == 111 ~ 17,
+      EDUCD == 112 ~ 17,
+      EDUCD == 113 ~ 17
+    ))
+  return(df)
+}
+
+## recode dmf education variable 
+dmf <- dmf %>% 
+  recode_education() %>% 
+  filter(!is.na(educ_yrs))
+
+## recode numident education variable 
+numident <- numident %>% 
+  recode_education() %>% 
+  filter(!is.na(educ_yrs))
+```
+
+```{r}
+set.seed(0.4886)
+
+dmf_sample <- dmf %>% 
+  filter(byear %in% 1905:1914) %>% 
+  sample_n(100000)
+
+dmf_education_mle <- gompertz_mle(death_age ~ educ_yrs, data = dmf_sample, 
+                                         left_trunc = 1975,
+                                         right_trunc = 2005)
+
+dmf_education_mle_results <- gompertztrunc::convert_hazards_to_ex(dmf_education_mle$results) %>% 
+  mutate(method = "MLE",
+         sample = "DMF (1975-2005)")
+
+
+dmf_education_old_pooled <- tidy(lm(death_age ~ educ_yrs + as.factor(byear), data = dmf_sample)) %>% 
+   filter(term == "educ_yrs") %>% 
+  mutate(e65 = estimate,
+         e65_lower = estimate - 1.96*std.error,
+         e65_upper = estimate + 1.96*std.error) %>% 
+  mutate(method = "OLS",
+         sample = "DMF (1975-2005)")
+```
+
+
+```{r}
+dmf_sample_restricted <- dmf %>% 
+  filter(byear %in% 1905:1914 & dyear %in% 1988:2005) %>% 
+  sample_n(100000)
+
+dmf_education_mle_restricted <- gompertz_mle(death_age ~ educ_yrs, data = dmf_sample_restricted, 
+                                         left_trunc = 1988,
+                                         right_trunc = 2005)
+
+dmf_education_mle_results_restricted <- gompertztrunc::convert_hazards_to_ex(dmf_education_mle_restricted$results) %>% 
+   mutate(method = "MLE",
+         sample = "DMF (1988-2005)")
+
+
+dmf_education_old_pooled_restricted <- tidy(lm(death_age ~ educ_yrs + as.factor(byear), data = dmf_sample_restricted)) %>% 
+   filter(term == "educ_yrs") %>% 
+  mutate(e65 = estimate,
+         e65_lower = estimate - 1.96*std.error,
+         e65_upper = estimate + 1.96*std.error) %>% 
+  mutate(method = "OLS",
+         sample = "DMF (1988-2005)")
+```
+
+
+```{r}
+numident_sample <- numident %>% 
+  filter(sex == 1) %>% 
+  filter(byear %in% 1905:1914) %>% 
+  sample_n(100000)
+
+
+numident_education_mle <- gompertz_mle(death_age ~ educ_yrs, data = numident_sample, 
+                                         left_trunc = 1988,
+                                         right_trunc = 2005)
+
+numident_education_mle_results <- gompertztrunc::convert_hazards_to_ex(numident_education_mle$results) %>% 
+  mutate(method = "MLE",
+         sample = "Numident (1988-2005)")
+
+
+numident_education_ols_pooled <- tidy(lm(death_age ~ educ_yrs + as.factor(byear), data = numident_sample)) %>% 
+  filter(term == "educ_yrs") %>% 
+  mutate(e65 = estimate,
+         e65_lower = estimate - 1.96*std.error,
+         e65_upper = estimate + 1.96*std.error) %>% 
+  mutate(method = "OLS",
+         sample = "Numident (1988-2005)")
+  
+```
+
+
+```{r}
+estimates_plot <- bind_rows(dmf_education_old_pooled,
+          dmf_education_mle_results, 
+          numident_education_mle_results, 
+          numident_education_ols_pooled,
+          dmf_education_mle_results_restricted,
+          dmf_education_old_pooled_restricted) %>% 
+  mutate(method = case_when(
+    method == "OLS" ~ "Regression on Age of Death",
+    method == "MLE" ~ "Parametic Gompertz (Accounting for Truncation)",
+    TRUE ~ method
+  )) %>% 
+  ggplot(aes(x = sample,
+             y = e65, 
+             ymin = e65_lower,
+             ymax = e65_upper)) + 
+  geom_pointrange(aes(color = method), position = position_dodge(width = 0.2), shape = 1) + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  labs(x = "",
+       y = "estimate",
+       title = "Association Between Education (Years) and Longevity",
+       subtitle = "Men, birth cohorts of 1905-1914") + 
+  theme(legend.position = "bottom", 
+        legend.title = element_blank()) +
+  ylim(0, .35)
+  
+ggsave(plot = estimates_plot, filename = "figures/education_X_pooled_mle_ols.png", height = 6, width = 9)
+```
+
+```{r}
+estimates_plot_ols <- bind_rows(dmf_education_old_pooled,
+          numident_education_ols_pooled,
+          dmf_education_old_pooled_restricted) %>% 
+  mutate(method = case_when(
+    method == "OLS" ~ "Regression on Age of Death",
+    method == "MLE" ~ "Parametic Gompertz (Accounting for Truncation)",
+    TRUE ~ method
+  )) %>% 
+  ggplot(aes(x = sample,
+             y = e65, 
+             ymin = e65_lower,
+             ymax = e65_upper)) + 
+  geom_pointrange(aes(color = method), position = position_dodge(width = 0.2), shape = 1, color = "red") + 
+  theme_cowplot() + 
+  labs(x = "",
+       y = "estimate",
+       title = "Association Between Education (Years) and Longevity",
+       subtitle = "Men, birth cohorts of 1905-1914") + 
+  theme(legend.position = "bottom", 
+        legend.title = element_blank()) +
+  ylim(0, .35)
+
+  
+ggsave(plot = estimates_plot_ols, filename = "figures/education_X_pooled_ols.png", height = 6, width = 9)
+```
+
