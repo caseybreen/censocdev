@@ -1,8 +1,10 @@
 ---
-title: "CenSoc Numident: Black Men Characteristics"
+title: "CenSoc Numident: Black Women Characteristics"
+author: "Kathy Perez"
+date: "1/26/2022"
 output: html_document
 ---
-Summary: Characteristics of Black men in Numident data
+Summary: Characteristics of Black women in Numident data
 
 ```{r}
 ## Library packages 
@@ -16,9 +18,10 @@ library(here)
 library(janitor)
 ```
 
-#read in numident
+#Read in numident
 ```{r}
 ## read in numident 
+
 numident <- fread("/censoc/data/censoc_v2/censoc_numident_v2.csv") %>% 
   janitor::clean_names()
 
@@ -34,9 +37,8 @@ census_1940_h <- fread("/ipums-repo2019/1940/TSV/H.tsv", select = c("SERIAL", "S
 numident_death_prop <- read_csv(here("vignettes/assess_match_quality/data/numident_death_prop.csv")) %>% 
   mutate(age = 1940 - cohort) ## imprecise but OK
 ```
-
-
-#Linking the data
+```
+#linking the data
 ```{r}
 ## combine census person and household vars 
 census_1940_hh_vars <- census_1940 %>% 
@@ -46,9 +48,9 @@ census_1940_hh_vars <- census_1940 %>%
 census_1940_hh_vars <- census_1940_hh_vars %>% 
   left_join(numident, by = "histid")
 
-#drop women
+#drop men
 census_1940_hh_vars <- census_1940_hh_vars %>% 
-  filter(sex.x == 1)
+  filter(sex.x == 2)
 
 ## recode education variable to years of education
 census_1940_hh_vars <- census_1940_hh_vars %>% 
@@ -64,10 +66,8 @@ census_1940_hh_vars <- census_1940_hh_vars %>%
   janitor::clean_names()
 ```
 
-
 #Recode variables
 ```{r}
-
 census_1940_hh_vars <- census_1940_hh_vars %>% 
   mutate(match_conservative = case_when(
     link_abe_exact_conservative == 1 ~ "Matched",
@@ -130,7 +130,7 @@ census_1940_hh_vars <- census_1940_hh_vars %>%
   ))
 ```
 
-# Recode and filter data
+#Recode and filter data
 ```{r}
 census_1940_hh_vars_recode_bam  <- census_1940_hh_vars %>% 
   mutate(rural = case_when(
@@ -145,6 +145,7 @@ census_1940_hh_vars_recode_bam  <- census_1940_hh_vars %>%
   filter(age %in% 20:40, race_recode == "Black")
 ```
 
+#Generate table
 ```{r}
 ## tabulations for men in 1940 census 
 census_characteristics_bam <- census_1940_hh_vars_recode_bam %>% 
@@ -216,12 +217,10 @@ table_s3_bam <- gt(data = combined_characteristics_bam) %>%
   ) %>% 
   opt_row_striping(row_striping = T) %>% 
   cols_align("left")
-
 ```
 
 #Save table
 ```{r}
-## save table 
 table_s3_bam %>%
   gtsave("numident_characteristics_black_men_table.tex", path = here("vignettes/assess_match_quality/figs/"))
 ```
