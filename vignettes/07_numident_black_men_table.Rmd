@@ -1,0 +1,25 @@
+---
+title: "CenSoc Numident Black Men Characteristics"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## Library packages 
+library(tidyverse)
+library(data.table)
+library(censocdev)
+library(cowplot)
+library(gt)
+library(ipumsr)
+library(here)
+library(janitor)
+```
+
+```{r}
+
+```
+
