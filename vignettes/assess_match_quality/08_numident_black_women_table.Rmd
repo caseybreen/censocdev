@@ -1,8 +1,10 @@
 ---
-title: "CenSoc Numident: Black Men Characteristics"
+title: "CenSoc Numident: Black Women Characteristics"
+author: "Kathy Perez"
+date: "1/26/2022"
 output: html_document
 ---
-Summary: Characteristics of Black men in Numident data
+Summary: Characteristics of Black women in Numident data
 
 ```{r}
 ## Library packages 
@@ -16,9 +18,10 @@ library(here)
 library(janitor)
 ```
 
-#read in numident
+#Read in numident
 ```{r}
 ## read in numident 
+
 numident <- fread("/censoc/data/censoc_v2/censoc_numident_v2.csv") %>% 
   janitor::clean_names()
 
@@ -35,7 +38,6 @@ numident_death_prop <- read_csv(here("vignettes/assess_match_quality/data/numide
   mutate(age = 1940 - cohort) ## imprecise but OK
 ```
 
-
 #Linking the data
 ```{r}
 ## combine census person and household vars 
@@ -46,9 +48,9 @@ census_1940_hh_vars <- census_1940 %>%
 census_1940_hh_vars <- census_1940_hh_vars %>% 
   left_join(numident, by = "histid")
 
-#drop women
+#drop men
 census_1940_hh_vars <- census_1940_hh_vars %>% 
-  filter(sex.x == 1)
+  filter(sex.x == 2)
 
 ## recode education variable to years of education
 census_1940_hh_vars <- census_1940_hh_vars %>% 
@@ -67,7 +69,6 @@ census_1940_hh_vars <- census_1940_hh_vars %>%
 
 #Recode variables
 ```{r}
-
 census_1940_hh_vars <- census_1940_hh_vars %>% 
   mutate(match_conservative = case_when(
     link_abe_exact_conservative == 1 ~ "Matched",
@@ -130,9 +131,9 @@ census_1940_hh_vars <- census_1940_hh_vars %>%
   ))
 ```
 
-# Recode and filter data
+#Recode and filter data
 ```{r}
-census_1940_hh_vars_recode_bam  <- census_1940_hh_vars %>% 
+census_1940_hh_vars_recode_baw  <- census_1940_hh_vars %>% 
   mutate(rural = case_when(
     rural == 1 ~ "Rural",
     TRUE ~ "Urban"
@@ -145,9 +146,10 @@ census_1940_hh_vars_recode_bam  <- census_1940_hh_vars %>%
   filter(age %in% 20:40, race_recode == "Black")
 ```
 
+#Generate table
 ```{r}
-## tabulations for men in 1940 census 
-census_characteristics_bam <- census_1940_hh_vars_recode_bam %>% 
+## tabulations for women in 1940 census 
+census_characteristics_baw <- census_1940_hh_vars_recode_baw %>% 
   select(histid, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
   pivot_longer(-histid) %>% 
   group_by(name, value) %>%
@@ -155,8 +157,8 @@ census_characteristics_bam <- census_1940_hh_vars_recode_bam %>%
   mutate(prop = round(100*prop.table(n), 1)) %>% 
   rename(n_gen = n, prop_gen = prop)
 
-## tabulations for men in CenSoc-Numident standard 
-numident_characteristics_standard_bam <- census_1940_hh_vars_recode_bam %>% 
+## tabulations for women in CenSoc-Numident standard 
+numident_characteristics_standard_baw <- census_1940_hh_vars_recode_baw %>% 
   filter(link_abe_standard == 1) %>% 
   select(histid, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
   pivot_longer(-histid) %>% 
@@ -165,8 +167,8 @@ numident_characteristics_standard_bam <- census_1940_hh_vars_recode_bam %>%
   mutate(prop = round(100*prop.table(n), 1)) %>% 
   rename(n_gen_standard = n, prop_standard = prop)
 
-## tabulations for men in CenSoc-Numident conservative 
-numident_characteristics_conservative_bam <- census_1940_hh_vars_recode_bam %>% 
+## tabulations for women in CenSoc-Numident conservative 
+numident_characteristics_conservative_baw <- census_1940_hh_vars_recode_baw %>% 
   filter(link_abe_exact_conservative == 1) %>% 
   select(histid, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%
   pivot_longer(-histid) %>% 
@@ -175,16 +177,16 @@ numident_characteristics_conservative_bam <- census_1940_hh_vars_recode_bam %>%
   mutate(prop = round(100*prop.table(n), 1)) %>% 
   rename(n_gen_conservative = n, prop_conservative = prop)
 
-combined_characteristics_bam <- census_characteristics_bam %>% 
-  inner_join(numident_characteristics_standard_bam, by = c("name", "value")) %>% 
-  inner_join(numident_characteristics_conservative_bam, by = c("name", "value")) %>% 
+combined_characteristics_baw <- census_characteristics_baw %>% 
+  inner_join(numident_characteristics_standard_baw, by = c("name", "value")) %>% 
+  inner_join(numident_characteristics_conservative_baw, by = c("name", "value")) %>% 
   mutate(name = as.factor(name), value = as.factor(value)) %>% 
   mutate(name = factor(name, levels = c("educ_level", "marital_status", "homeown", "sei_recode", "rural", "region_string"))) %>% 
   arrange(name, value) 
 
 ## create table 
 ## will have to do some manual clean-up but this gets us 80% of the way
-table_s3_bam <- gt(data = combined_characteristics_bam) %>% 
+table_s3_baw <- gt(data = combined_characteristics_baw) %>% 
   tab_spanner(
     label = "General Pop",
     columns = vars(
@@ -216,13 +218,11 @@ table_s3_bam <- gt(data = combined_characteristics_bam) %>%
   ) %>% 
   opt_row_striping(row_striping = T) %>% 
   cols_align("left")
-
 ```
 
 #Save table
 ```{r}
-## save table 
-table_s3_bam %>%
-  gtsave("numident_characteristics_black_men_table.tex", path = here("vignettes/assess_match_quality/figs/"))
+table_s3_baw %>%
+  gtsave("numident_characteristics_black_women_table.tex", path = here("vignettes/assess_match_quality/figs/"))
 ```
 
