@@ -32,7 +32,7 @@ census_1940_h <- fread("/ipums-repo2019/1940/TSV/H.tsv", select = c("SERIAL", "S
   janitor::clean_names()
 
 ## read in data describing probability of dying in left and right truncated window 
-numident_death_prop <- read_csv(here("vignettes/assess_match_quality/data/numident_death_prop.csv")) %>% 
+numident_death_prop <- read_csv(here("vignettes/assess_match_quality/data/numident_women_death_prop.csv")) %>% 
   mutate(age = 1940 - cohort) ## imprecise but OK
 ```
 

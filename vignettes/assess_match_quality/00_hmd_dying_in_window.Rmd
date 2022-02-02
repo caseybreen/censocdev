@@ -6,6 +6,7 @@ Summary: Use HMD cohort 1x1 "exposure to risk" data to estimate proportion of pe
 
 
 ```{r}
+## Library packages
 library(data.table)
 library(tidyverse)
 library(cowplot)
@@ -89,12 +90,52 @@ result[[i]] <- tibble(cohort = i,
 }
 
 numident <- bind_rows(result) %>% 
-  mutate(dataset = "Numident (1999-2005)")
+  mutate(dataset = "Numident (198-2005)")
 ```
 
 
 ```{r}
+years <- 1900:1940
+result <- list()
+
+for (i in years){
+  
+## dying between 65 and 95 
+p25_65 <- hmd_mort %>% 
+  filter(Year == i) %>% 
+  filter(Female != ".") %>% 
+  mutate(Female = as.numeric(Female)) %>% 
+  mutate(qx = Female / (1 + 0.5 * Female)) %>% 
+  mutate(px = 1 - qx) %>% 
+  filter(Age %in% (1988-i):(2005-i)) %>% 
+  summarize(prod(px))
+
+## dying between 25 and 65 
+p35_30 <- hmd_mort %>% 
+  filter(Year == i) %>% 
+  filter(Female != ".") %>% 
+  mutate(Female = as.numeric(Female)) %>% 
+  mutate(qx = Female / (1 + 0.5 * Female)) %>% 
+  mutate(px = 1 - qx) %>% 
+  filter(Age %in% (1940-i):(1988-i-1)) %>% 
+  summarize(prod(px))
+
+ prob = (p35_30) * (1-p25_65)
+
+result[[i]] <- tibble(cohort = i,
+                        prop_dying = as.numeric(prob))
+
+}
+
+numident_women <- bind_rows(result) %>% 
+  mutate(dataset = "Numident Women (1988-2005)")
+```
+
+
+
+```{r}
 write_csv(numident, here("vignettes/assess_match_quality/data/numident_death_prop.csv"))
+write_csv(numident_women, here("vignettes/assess_match_quality/data/numident_women_death_prop.csv"))
 write_csv(dmf, here("vignettes/assess_match_quality/data/dmf_death_prop.csv"))
 ```
 
@@ -102,6 +143,7 @@ write_csv(dmf, here("vignettes/assess_match_quality/data/dmf_death_prop.csv"))
 ```{r}
 prob_dying_window_plot <- dmf %>% 
   bind_rows(numident) %>% 
+  bind_rows(numident_women) %>% 
   ggplot(aes(x = cohort, y = prop_dying, linetype = dataset, shape = dataset)) + 
   geom_line(size = .75) + 
   geom_point(size = 2.5) + 
