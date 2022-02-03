@@ -40,12 +40,12 @@ bunmd_bpl_plot <- bunmd_tab %>%
   filter(byear %in% 1900:1940) %>% 
   filter(!is.na(sex)) %>% 
   ggplot(aes(x = byear, y = bpl_available, shape = sex, linetype = sex)) + 
-  geom_line() + 
-  geom_point() + 
+   geom_line(size = .75) + 
+  geom_point(size = 2.5) + 
   theme_cowplot() + 
   ylim(0, 1) + 
   labs(x = "Birth Year",
-       y = "Proportion Birthplace Available") + 
+       y = "Birthplace Available") + 
   theme(legend.position = "bottom", legend.title = element_blank()) 
 
 
