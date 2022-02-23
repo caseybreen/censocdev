@@ -133,7 +133,7 @@ middle_initial_agreement_plot <- match_rate %>%
   bind_rows(match_rate_standard) %>% 
   bind_rows(match_rate_standard_not_conservative) %>% 
   filter(byear %in% c(1900:1939)) %>% 
-  ggplot(aes(x = byear, y = match_rate, ymin = match_rate - 1.96*se, ymax = match_rate + 1.96*se,  color = match)) + 
+  ggplot(aes(x = byear, y = match_rate, ymin = match_rate - 1.96*se, ymax = match_rate + 1.96*se,  color = match, shape = match)) + 
   geom_pointrange() + 
   geom_line() + 
   theme_cowplot() + 
@@ -218,78 +218,6 @@ ggplot(aes(x = educ_yrs,
   group_by(byeardiff_census_minus_dmf) %>% 
    tally()
  
-```
-
-
-
-```{r}
-standard <- censoc_dmf_middle %>% 
-  filter(byear %in% 1905:1915)
-
-conservative <- censoc_dmf_middle %>% 
-  filter(link_abe_exact_conservative == 1) %>% 
-  filter(byear %in% 1905:1915)
-
-standard_not_conservative <- censoc_dmf_middle %>% 
-  filter(link_abe_exact_conservative == 0) %>% 
-  filter(byear %in% 1905:1915)
-
-education_standard <- standard %>% 
-  group_by(agreement) %>%
-  do(fitHour = tidy(lm(death_age ~ educ_yrs + as.factor(byear), data = .))) %>% 
-  unnest(fitHour) %>% 
-  mutate(method = "standard")
-
-education_conservative <- conservative %>% 
-  group_by(agreement) %>%
-  do(fitHour = tidy(lm(death_age ~ educ_yrs + as.factor(byear), data = .))) %>% 
-  unnest(fitHour) %>% 
-  mutate(method = "conservative")
-
-education_standard_conservative <- standard_not_conservative %>% 
-  group_by(agreement) %>%
-  do(fitHour = tidy(lm(death_age ~ educ_yrs + as.factor(byear), data = .))) %>% 
-  unnest(fitHour) %>% 
-  mutate(method = "standard, not conservative")
-
-education_pooled_standard <- tidy(lm(death_age ~ educ_yrs + as.factor(byear), standard)) %>% 
-  mutate(method = "standard") 
-
-education_pooled_conservative <- tidy(lm(death_age ~ educ_yrs + as.factor(byear), conservative)) %>% 
-  mutate(method = "conservative")
-
-education_pooled_standard_noconservative <- tidy(lm(death_age ~ educ_yrs + as.factor(byear), standard_not_conservative)) %>% 
-  mutate(method = "standard, not conservative")
-
-association_between_educ_and_longevity <- education_standard %>%  
-  bind_rows(education_conservative) %>% 
-  bind_rows(education_standard_conservative) %>% 
-  bind_rows(education_pooled_standard) %>% 
-  bind_rows(education_pooled_conservative) %>% 
-  bind_rows(education_pooled_standard_noconservative) %>% 
-  filter(term == "educ_yrs") %>% 
-  mutate(agreement = case_when(
-    agreement == 1 ~ "Agree",
-    agreement == 0 ~"Disagree",
-    TRUE ~ "Pooled")) %>% 
-  ggplot(aes(x = method,
-             y = estimate, 
-             ymin = estimate - 1.96 * std.error,
-             ymax = estimate + 1.96*std.error,
-             color = as.factor(agreement))) + 
-  geom_pointrange(position = position_dodge(0.1)) + 
-  ggsci::scale_color_lancet() + 
-  cowplot::theme_cowplot() + 
-  theme(legend.position = "bottom") + 
-  ylim(0, 0.15) + 
-  labs(x = "Match Method",
-       y = "Coefficient",
-       title = "Association between years of education and longevity (OLS)",
-       subtitle = "CenSoc-DMF, Birth cohorts of 1910-1920 (Men Only)",
-       col = "Middle Initial Agreement")
-
-## save plot 
-ggsave(association_between_educ_and_longevity, filename = here("vignettes/assess_match_quality/figs/dmf_association_between_educ_and_longevity.pdf"), height = 5, width = 7)
 ```
 
 
