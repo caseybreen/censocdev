@@ -152,9 +152,9 @@ match_rate_conservative <- match_rate_conservative %>%
 numident_match_rate <- match_rate %>% 
   bind_rows(match_rate_conservative) %>% 
   filter(cohort %in% c(1900:1935)) %>% 
-  ggplot(aes(x = cohort, y = match_rate, color = match_type)) + 
-  geom_line() + 
-  geom_point() + 
+  ggplot(aes(x = cohort, y = match_rate, color = match_type, shape = match_type)) + 
+  geom_line(size = 1) + 
+  geom_point(size = 2.5) + 
   theme_cowplot() + 
   ggsci::scale_color_lancet() + 
   labs(x = "Birth Cohort",
@@ -167,9 +167,9 @@ numident_match_rate <- match_rate %>%
 numident_match_rate_adjusted <- match_rate %>% 
   bind_rows(match_rate_conservative) %>% 
   filter(cohort %in% c(1900:1935)) %>% 
-  ggplot(aes(x = cohort, y = match_rate_adusted, color = match_type)) + 
-  geom_line() + 
-  geom_point() + 
+  ggplot(aes(x = cohort, y = match_rate_adusted, color = match_type, shape = match_type)) + 
+  geom_line(size = 1) + 
+  geom_point(size = 2.5) + 
   theme_cowplot() + 
   ggsci::scale_color_lancet() + 
   labs(x = "Birth Cohort",
@@ -249,8 +249,8 @@ matched_characteristics_combined <- unmatched_characteristics %>%
 
 ## Plot data —— numident representativeness (standard)
 matched_characteristics_plot_standard <- matched_characteristics_combined %>% 
-   ggplot(aes(x = age, y = prop, color = category)) + 
-  geom_line(size = 1) + 
+   ggplot(aes(x = age, y = prop, color = category, linetype= category)) + 
+  geom_line(size = 1.2) + 
   theme_cowplot() + 
   ggsci::scale_color_lancet() + 
   xlim(20, 50) + 
@@ -259,7 +259,8 @@ matched_characteristics_plot_standard <- matched_characteristics_combined %>%
   background_grid() + 
   labs(title = "CenSoc-Numident: Comparison of Socioeconomic Characteristics (Men)",
        y = "Proportion",
-       x = "Age")
+       x = "Age") + 
+  theme(legend.key.width=unit(1.5, "cm"))
 
 ## save plot 
 ggsave(matched_characteristics_plot_standard, filename = here("vignettes/assess_match_quality/figs/numident_socioeconomic_characteristics.pdf"), height = 7, width = 10)

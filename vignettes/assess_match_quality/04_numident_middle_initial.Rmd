@@ -141,7 +141,7 @@ middle_initial_agreement_plot <- match_rate %>%
   bind_rows(match_rate_standard) %>% 
   bind_rows(match_rate_standard_not_conservative) %>% 
   filter(byear %in% c(1900:1939)) %>% 
-  ggplot(aes(x = byear, y = match_rate, ymin = match_rate - 1.96*se, ymax = match_rate + 1.96*se,  color = match)) + 
+  ggplot(aes(x = byear, y = match_rate, ymin = match_rate - 1.96*se, ymax = match_rate + 1.96*se,  color = match, shape = match)) + 
   geom_pointrange() + 
   geom_line() + 
   theme_cowplot() + 
@@ -189,7 +189,8 @@ ggplot(aes(x = educ_yrs,
            y = agreement_mean,
            ymin = agreement_mean - 1.96*se,
            ymax = agreement_mean + 1.96*se,
-           color = method)) + 
+           color = method,
+           shape = method)) + 
   geom_pointrange() + 
   geom_line() + 
   theme_cowplot() + 
@@ -291,6 +292,7 @@ association_between_educ_and_longevity <- education_standard %>%
   bind_rows(education_pooled_standard) %>% 
   bind_rows(education_pooled_conservative) %>% 
   bind_rows(education_pooled_standard_noconservative) %>% 
+  mutate(agreement = as.factor(agreement)) %>% 
   filter(term == "educ_yrs") %>% 
   mutate(agreement = case_when(
     agreement == 1 ~ "Agree",
@@ -300,7 +302,8 @@ association_between_educ_and_longevity <- education_standard %>%
              y = estimate, 
              ymin = estimate - 1.96 * std.error,
              ymax = estimate + 1.96*std.error,
-             color = as.factor(agreement))) + 
+             color = agreement,
+             shape = agreement)) + 
   geom_pointrange(position = position_dodge(0.1)) + 
   ggsci::scale_color_lancet() + 
   cowplot::theme_cowplot() + 
@@ -310,7 +313,8 @@ association_between_educ_and_longevity <- education_standard %>%
        y = "Coefficient",
        title = "Association between years of education and longevity (OLS)",
        subtitle = "CenSoc-Numident, Birth cohorts of 1900-1920 (Men Only)",
-       col = "Middle Initial Agreement")
+       col = "Middle Initial Agreement",
+       shape = "Middle Initial Agreement")
 
 ## save plot 
 ggsave(association_between_educ_and_longevity, filename = here("vignettes/assess_match_quality/figs/numident_association_between_educ_and_longevity.pdf"), height = 6, width = 8.5)
