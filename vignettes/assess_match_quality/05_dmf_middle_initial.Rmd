@@ -20,7 +20,7 @@ library(broom)
 
 
 ```{r}
-dmf_full <- fread("/censoc/data/ssdm/dmf.csv")
+dmf_full <- fread("/censoc/data/dmf/dmf.csv")
 ```
 
 
