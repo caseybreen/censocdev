@@ -1,0 +1,417 @@
+---
+title: "Assessing match quality from BUNMD/Numident"
+author: "Maria Osborne" 
+---
+
+Summary: Assessing match quality in the CenSoc-Numident file. Uses BUNMD as population denominator rather than
+1940 census.
+
+# Read in data
+```{r}
+# published files
+library(plyr)
+library(data.table)
+library(cowplot)
+library(ggsci)
+
+pub_numident <- fread('/home/ipums/ugury-ipums/censoc-abe-implementation/data/final-v2-matched-datasets/censoc_numident_v2.csv')
+full_bunmd <- list.files(path="/home/ipums/ugury-ipums/censoc-abe-implementation/data/cleaned-bunmd-by-bpl", full.names = TRUE) %>% 
+  lapply(read.csv) %>% 
+  rbind.fill() 
+
+library(tidyverse)
+library(dplyr)
+# matched bunmd/census with multiple ID files (this has more rows than the published numident)
+matched_bunmd <- fread('/home/ipums/ugury-ipums/censoc-abe-implementation/data/matched-census-bunmd/matched_census_bunmd.csv')
+```
+
+
+# make sure these are the correct data files
+```{r}
+# look at the number of rows
+nrow(matched_bunmd)
+nrow(pub_numident)
+
+# make sure that the numident is a subset of those in the matched bunmd
+matched_ids <- matched_bunmd$id_A
+num_ids <- pub_numident$HISTID
+
+common_nodes <- intersect(matched_ids, num_ids)
+length(common_nodes)
+
+setequal(common_nodes, num_ids)
+
+# let's briefly check the id's that DON'T make it into the numident
+# why are they matched but not published? (N ~ 2 million)
+excluded_nodes <- setdiff(matched_ids, num_ids)
+excluded_set <- matched_bunmd %>% filter(id_A %in% excluded_nodes)
+head(excluded_set)
+# the VAST majority have death dates outside out time window, and the rest have birth year > 1940. OK!
+```
+
+
+# Let's create the sets that we want to use for this analysis
+```{r}
+# matched sets
+bun_numident_std <- matched_bunmd %>% filter(id_A %in% num_ids)
+cons_ids <- (pub_numident %>% filter(link_abe_exact_conservative == 1))$HISTID
+bun_numident_cons <- matched_bunmd %>% filter(id_A %in% cons_ids)
+
+# make sure these are the correct sample sizes
+nrow(bun_numident_std)
+nrow(bun_numident_cons)
+
+# data sets by sex
+male_numident_std <- bun_numident_std %>% filter(sex_B==1)
+female_numident_std <- bun_numident_std %>% filter(sex_B==2)
+male_numident_cons <- bun_numident_cons %>% filter(sex_B==1)
+female_numident_cons <- bun_numident_cons %>% filter(sex_B==2)
+
+# get ssns for matched nodes
+std_ssns <- (matched_bunmd %>% filter(id_A %in% num_ids))$id_B
+cons_ssns <- (matched_bunmd %>% filter(id_A %in% cons_ids))$id_B
+  
+# full bunmd with flags for matches
+full_bunmd <- full_bunmd %>% mutate(num_std_flag = ssn %in% std_ssns,
+                                          num_cons_flag = ssn %in% cons_ssns)
+```
+
+
+# pare down the bunmd 
+```{r}
+# most important: people born after 1940, or who do not die in the death coverage window
+bunmd_date_filtered <- full_bunmd %>% filter(byear < 1940 | (byear==1940 & bmonth <= 3)) %>% 
+  filter(dyear %in% 1988:2005) # N= 32.5 million
+
+
+# full case information only
+bunmd_restricted <- bunmd_date_filtered %>% filter(bpl!=99999 & !is.na(race_first)) # N= 22.3 million
+# bpl availible (not complete case)
+bunmd_bpl <- bunmd_date_filtered %>% filter(bpl != 99999)
+
+
+# looking at the proportion native born
+table((bunmd_restricted$bpl < 10000)) # about 90% of the people in the full case sample are native born
+table((bunmd_date_filtered$bpl < 10000)) # about 70% of the people in the date-restricted sample are native born
+table((bunmd_bpl$bpl < 10000)) # 90% native born for those with birthplace info
+```
+
+
+
+# Male match rates
+```{r}
+
+
+# raw match rates
+library(dplyr)
+raw_male_standard <- bunmd_date_filtered %>%
+  filter(sex==1, byear %in% 1900:1935) %>% 
+  group_by(byear) %>% 
+  dplyr::summarize(match_rate = round(mean(num_std_flag), 3)) %>% 
+  mutate(match_type = "standard")
+raw_male_conservative <- bunmd_date_filtered %>%
+  filter(sex==1, byear %in% 1900:1935) %>% 
+  group_by(byear) %>% 
+  dplyr::summarize(match_rate = round(mean(num_cons_flag), 3)) %>% 
+  mutate(match_type = "conservative")
+
+# plot raw match rates
+raw_bunmd_match_rate_male <- raw_male_standard %>% 
+  bind_rows(raw_male_conservative) %>% 
+  filter(byear %in% c(1900:1935)) %>% 
+  ggplot(aes(x = byear, y = match_rate, color = match_type, shape = match_type)) + 
+  geom_line(size=1) + 
+  geom_point(size = 2.5) + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  labs(x = "Birth Cohort",
+       y = "Match Rate",
+       title = "Raw Match Rate") + 
+  ylim(0, .5) + 
+  theme(legend.position = "bottom", legend.title = element_blank()) 
+
+
+# bpl-availble match rates
+bpl_male_standard <- bunmd_bpl %>%
+  filter(sex==1, byear %in% 1900:1935) %>% 
+  group_by(byear) %>% 
+  dplyr::summarize(match_rate = round(mean(num_std_flag), 3)) %>% 
+  mutate(match_type = "standard")
+bpl_male_conservative <- bunmd_bpl %>%
+  filter(sex==1, byear %in% 1900:1935) %>% 
+  group_by(byear) %>% 
+  dplyr::summarize(match_rate = round(mean(num_cons_flag), 3)) %>% 
+  mutate(match_type = "conservative")
+
+# plot bpl-availible match rates
+bpl_bunmd_match_rate_male <- bpl_male_standard %>% 
+  bind_rows(bpl_male_conservative) %>% 
+  filter(byear %in% c(1900:1935)) %>% 
+  ggplot(aes(x = byear, y = match_rate, color = match_type, shape = match_type)) + 
+  geom_line(size=1) + 
+  geom_point(size = 2.5) + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  labs(x = "Birth Cohort",
+       y = "Match Rate",
+       title = "Birthplace-Available Match Rate") + 
+  ylim(0, .5) + 
+  theme(legend.position = "bottom", legend.title = element_blank()) 
+
+# combined plots
+bunmd_match_rate_combined_male <- cowplot::plot_grid(raw_bunmd_match_rate_male, bpl_bunmd_match_rate_male, labels = "auto")
+
+bunmd_match_rate_combined_male 
+
+ggsave(bunmd_match_rate_combined_male,
+        filename = "/home/ipums/mariaosborne-ipums/censoc/bunmd_men_plot.pdf",
+        height = 4, width = 10)
+
+```
+
+
+# Female match rates
+```{r}
+# raw
+raw_female_standard <- bunmd_date_filtered %>%
+  filter(sex==2, byear %in% 1900:1935) %>% 
+  group_by(byear) %>% 
+  dplyr::summarize(match_rate = round(mean(num_std_flag), 3)) %>% 
+  mutate(match_type = "standard")
+raw_female_conservative <- bunmd_date_filtered %>%
+  filter(sex==2, byear %in% 1900:1935) %>% 
+  group_by(byear) %>% 
+  dplyr::summarize(match_rate = round(mean(num_cons_flag), 3)) %>% 
+  mutate(match_type = "conservative")
+
+# raw rates plot
+raw_bunmd_match_rate_female <- raw_female_standard %>% 
+  bind_rows(raw_female_conservative) %>% 
+  filter(byear %in% c(1900:1935)) %>% 
+  ggplot(aes(x = byear, y = match_rate, color = match_type, shape=match_type)) + 
+  geom_line(size=1) + 
+  geom_point(size=2.5) + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  labs(x = "Birth Cohort",
+       y = "Match Rate",
+       title = "Raw Match Rate") + 
+  ylim(0, .5) + 
+  theme(legend.position = "bottom", legend.title = element_blank()) 
+
+
+# bpl-availible
+bpl_female_standard <- bunmd_bpl %>%
+  filter(sex==2, byear %in% 1900:1935) %>% 
+  group_by(byear) %>% 
+  dplyr::summarize(match_rate = round(mean(num_std_flag), 3)) %>% 
+  mutate(match_type = "standard")
+bpl_female_conservative <- bunmd_bpl %>%
+  filter(sex==2, byear %in% 1900:1935) %>% 
+  group_by(byear) %>% 
+  dplyr::summarize(match_rate = round(mean(num_cons_flag), 3)) %>% 
+  mutate(match_type = "conservative")
+
+# bpl-availible plot
+bpl_bunmd_match_rate_female <- bpl_female_standard %>% 
+  bind_rows(bpl_female_conservative) %>% 
+  filter(byear %in% c(1900:1935)) %>% 
+  ggplot(aes(x = byear, y = match_rate, color = match_type, shape=match_type)) + 
+  geom_line(size=1) + 
+  geom_point(size=2) + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  labs(x = "Birth Cohort",
+       y = "Match Rate",
+       title = "Birthplace-Available Match Rate") + 
+  ylim(0, .5) + 
+  theme(legend.position = "bottom", legend.title = element_blank()) 
+
+#combine plots
+bunmd_match_rate_combined_female <- cowplot::plot_grid(raw_bunmd_match_rate_female, bpl_bunmd_match_rate_female, labels = "auto")
+
+bunmd_match_rate_combined_female 
+
+ ggsave(bunmd_match_rate_combined_female,
+        filename = "/home/ipums/mariaosborne-ipums/censoc/bunmd_women_plot.pdf",
+        height = 4, width = 10)
+```
+
+
+# Compare race in matched/unmatched samples (single sex)
+set set == 1 or 2
+```{r}
+unmatched_characteristics <- bunmd_bpl %>% 
+  filter(sex==1, byear %in% 1915:1940) %>% 
+  group_by(byear) %>% 
+  filter(!num_std_flag & !num_cons_flag) %>% 
+  dplyr::summarize(p_black = mean(race_first==2, na.rm=T),
+            p_white = mean(race_first==1, na.rm=T)) %>% 
+  pivot_longer(cols = starts_with("p_"), names_to = "type",
+               names_prefix = "p_", values_to = "prop") %>% 
+  mutate(category = "Unmatched")
+
+## Calculate sample proportion (standard)
+matched_characteristics_standard <- bunmd_bpl %>% 
+  filter(sex==1, byear %in% 1915:1940) %>% 
+  group_by(byear) %>% 
+  filter(num_std_flag) %>% 
+  dplyr::summarize(p_black = mean(race_first==2, na.rm=T),
+            p_white = mean(race_first==1, na.rm=T)) %>% 
+  pivot_longer(cols = starts_with("p_"), names_to = "type",
+               names_prefix = "p_", values_to = "prop") %>% 
+  mutate(category = "Matched (Standard)")
+
+## Calculate sample proportion (conservative)
+matched_characteristics_conservative <- bunmd_bpl %>% 
+  filter(sex==1, byear %in% 1915:1940) %>% 
+  group_by(byear) %>% 
+  filter(num_cons_flag) %>% 
+  dplyr::summarize(p_black = mean(race_first==2, na.rm=T),
+            p_white = mean(race_first==1, na.rm=T)) %>% 
+  pivot_longer(cols = starts_with("p_"), names_to = "type",
+               names_prefix = "p_", values_to = "prop") %>% 
+  mutate(category = "Matched (Conservative)")
+
+## Rename vars for facets and set factor levels  
+matched_characteristics_combined <- unmatched_characteristics %>% 
+  bind_rows(matched_characteristics_standard) %>% 
+  bind_rows(matched_characteristics_conservative) %>% 
+  mutate(type = as.factor(case_when(
+    type == "black" ~ "Race: Black",
+    type == "white" ~ "Race: White",
+  ))) %>% 
+  mutate(type = factor(type, levels=c('Race: Black','Race: White')))
+
+matched_characteristics_plot_standard <- matched_characteristics_combined %>% 
+   ggplot(aes(x =byear, y = prop, color = category, linetype= category)) + 
+  geom_line(size = 1.2) + 
+  theme_cowplot() + 
+  ggsci::scale_color_lancet() + 
+  theme(legend.position = "bottom", legend.title = element_blank()) + 
+  facet_wrap(~type) + 
+  background_grid() + 
+  labs(title = "BUNMD: Comparison of race in matched and unmatched sets (men)",
+       y = "Proportion",
+       x = "Birth Year") +
+  theme(legend.key.width=unit(1.5, "cm"))
+
+matched_characteristics_plot_standard
+ggsave(matched_characteristics_plot_standard,
+       filename = "/home/ipums/mariaosborne-ipums/censoc/bunmd_race_comp_men.pdf",
+       height = 7, width = 10)
+
+```
+
+
+# look at how often race is missing by cohort
+(this is why we only include byear > 1915 in above plots)
+```{r}
+#missing race data?
+bunmd_bpl %>% 
+  filter(sex==2, byear %in% 1900:1940, !num_std_flag, !num_cons_flag) %>%
+  group_by(byear, is.na(race_first)) %>% tally() %>% mutate(p=n/sum(n)) %>% arrange(byear)
+
+bunmd_bpl %>% 
+  filter(sex==2, byear %in% 1900:1940, num_std_flag) %>%
+  group_by(byear, is.na(race_first)) %>% tally() %>% mutate(p=n/sum(n)) %>% arrange(byear)
+
+bunmd_bpl %>% 
+  filter(sex==2, byear %in% 1900:1940, num_cons_flag) %>%
+  group_by(byear, is.na(race_first)) %>% tally() %>% mutate(p=n/sum(n)) %>% arrange(byear)
+```
+
+
+
+# Tabulations of geographic regions of birth and race 
+(for a single sex)
+```{r}
+bunmd_bpl <- bunmd_bpl %>%
+  mutate(race_recode= case_when(race_first == 1 ~ "White",
+                                race_first ==2 ~ "Black",
+                                race_first %in% 3:6 ~ "Other",
+                                TRUE ~ 'Missing')) %>% 
+  mutate(region_of_birth = case_when(bpl %in% c(900,2300,2500,3300,4400,5000) ~ 'New England',
+                                     bpl %in% c(3400,3600,4200) ~ 'Middle Atlantic',
+                                     bpl %in% c(1700,1800,2600,3900,5500) ~ 'East North Central',
+                                     bpl %in% c(1900,2000,2700,2900,3100,3800,4600) ~ 'West North Central',
+                                     bpl %in% c(1000,1100,1200,1300,2400,3700,4500,5100,5400) ~ 'South Atlantic',
+                                     bpl %in% c(100,2100,2800,4700) ~ 'East South Central',
+                                     bpl %in% c(500,2200,4000,4010,4800) ~ 'West South Central',
+                                     bpl %in% c(400,800,1600,3000,3200,3500,4900,5600) ~ 'Mountain',
+                                     bpl %in% c(200,600,1500,4100,5300) ~ 'Pacific',
+                                     bpl == 99999 ~ 'Missing',
+                                     TRUE ~ 'Foreign Born'))
+
+bunmd_bpl_case <- bunmd_bpl %>% filter(byear %in% 1915:1940, sex==2)
+bun_characteristics <- bunmd_bpl_case %>% 
+  select(ssn, race_recode, region_of_birth) %>%
+  pivot_longer(-ssn) %>% 
+  group_by(name, value) %>%
+  tally() %>%            
+  mutate(prop = round(100*prop.table(n), 1)) %>% 
+  rename(n_gen = n, prop_gen = prop)
+numident_characteristics_standard <- bunmd_bpl_case %>% 
+  filter(num_std_flag) %>% 
+  select(ssn, race_recode, region_of_birth) %>%
+  pivot_longer(-ssn) %>% 
+  group_by(name, value) %>%
+  tally() %>%            
+  mutate(prop = round(100*prop.table(n), 1)) %>% 
+  rename(n_gen_standard = n, prop_standard = prop)
+numident_characteristics_conservative <- bunmd_bpl_case %>% 
+  filter(num_cons_flag) %>% 
+  select(ssn, race_recode, region_of_birth) %>%
+  pivot_longer(-ssn) %>% 
+  group_by(name, value) %>%
+  tally() %>%            
+  mutate(prop = round(100*prop.table(n), 1)) %>% 
+  rename(n_gen_conservative = n, prop_conservative = prop)
+combined_characteristics <- bun_characteristics %>% 
+  inner_join(numident_characteristics_standard, by = c("name", "value")) %>% 
+  inner_join(numident_characteristics_conservative, by = c("name", "value")) %>% 
+  mutate(name = as.factor(name), value = as.factor(value)) %>% 
+  mutate(name = factor(name, levels = c( "race_recode", "region_of_birth"))) %>% 
+  arrange(name, value) 
+```
+
+
+# create table
+```{r}
+table_s3 <- gt(data = combined_characteristics) %>% 
+  tab_spanner(
+    label = "General Pop",
+    columns = vars(
+      n_gen, prop_gen)) %>% 
+  tab_spanner(
+    label = "Standard",
+    columns = vars(
+      n_gen_standard, prop_standard)) %>% 
+  tab_spanner(
+    label = "Conservative",
+    columns = vars(
+      n_gen_conservative, prop_conservative)) %>% 
+  cols_label(
+    "n_gen" = "No.",
+    "prop_gen" = "%",
+    "n_gen_standard" = "No.",
+    "prop_standard" = "%",
+    "n_gen_conservative"  = "No.",
+    "prop_conservative" = "%",
+    value = ""
+  ) %>% 
+  tab_style(
+    style = list(
+      cell_text(weight = "bold")),
+    locations = cells_row_groups()
+  ) %>% 
+  opt_row_striping(row_striping = T) %>% 
+  cols_align("left") 
+
+table_s3 
+
+table_s3  %>% gtsave("bunmd_table_women.tex", path ="/home/ipums/mariaosborne-ipums/censoc/")
+```
+
+
+
