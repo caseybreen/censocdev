@@ -30,12 +30,11 @@ create_weights_censoc_dmf <- function(censoc.dmf, cohorts = c(1895:1939), death_
     inner_join(hmd_deaths, by = "linking_key") %>%
     mutate(proportion_matched = n/Male) %>%
     group_by(dyear, byear, death_age) %>%
-    summarize(inclusion_prob = mean(proportion_matched), Male = mean(Male))
+    summarize(inclusion_prob = mean(proportion_matched), Male = mean(Male), .groups = 'drop')
 
   ## divide death weights
   death_weights_for_link <- death_weights %>%
     mutate(linking_key = paste(dyear, byear, death_age, sep = "_")) %>%
-    ungroup() %>%
     select(inclusion_prob, linking_key) %>%
     mutate(weight = 1/inclusion_prob) %>%
     select(-inclusion_prob)
