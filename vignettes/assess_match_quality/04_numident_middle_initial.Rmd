@@ -20,6 +20,7 @@ library(broom)
 
 
 ```{r}
+## read in BUNMD 
 bunmd <- fread("/censoc/data/censoc_v2/bunmd_v2.csv")
 
 bunmd %>% 
@@ -30,7 +31,7 @@ bunmd %>%
 ```{r}
 ## read in numident 
 ## special file with ssn 
-numident <- fread("/censoc/data/censoc_v2/test_files/censoc_numident_v2_test_file.csv") %>% 
+numident <- fread("/censoc/data/censoc_v2.1/censoc_numident_v2.1.csv") %>% 
   janitor::clean_names()
 
 ## numident 
@@ -236,7 +237,7 @@ ggsave(middle_initial_plot, filename = here("vignettes/assess_match_quality/figs
              ymin = middle - 1.96*se,
              ymax = middle + 1.96*se,
              )) + 
-  geom_pointrange() + 
+  geom_pointrange(size = 1) + 
   theme_cowplot() + 
   ylim(0, 1) + 
   labs(x = "Birth Year Difference (Census - Numident)",
@@ -319,7 +320,6 @@ association_between_educ_and_longevity <- education_standard %>%
 ## save plot 
 ggsave(association_between_educ_and_longevity, filename = here("vignettes/assess_match_quality/figs/numident_association_between_educ_and_longevity.pdf"), height = 6, width = 8.5)
 ```
-
 
 
 ```{r}

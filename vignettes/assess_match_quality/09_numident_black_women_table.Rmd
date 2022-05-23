@@ -2,8 +2,9 @@
 title: "CenSoc Numident: Black Women Characteristics"
 author: "Kathy Perez"
 date: "1/26/2022"
-output: html_document
 ---
+
+
 Summary: Characteristics of Black women in Numident data
 
 ```{r}
@@ -22,7 +23,7 @@ library(janitor)
 ```{r}
 ## read in numident 
 
-numident <- fread("/censoc/data/censoc_v2/censoc_numident_v2.csv") %>% 
+numident <- fread("/censoc/data/censoc_v2.1/censoc_numident_v2.1.csv") %>% 
   janitor::clean_names()
 
 ## read in 1940 census 

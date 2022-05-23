@@ -22,7 +22,7 @@ library(janitor)
 
 ```{r}
 ## read in dmf 
-dmf <- fread("/censoc/data/censoc_v2/censoc_dmf_v2.csv") %>% 
+dmf <- fread("/censoc/data/censoc_v2.1/censoc_dmf_v2.1.csv") %>% 
   janitor::clean_names()
 
 ## read in 1940 census 
@@ -144,7 +144,11 @@ census_1940_hh_vars_recode  <- census_1940_hh_vars %>%
     TRUE ~ "Not Home Owner"
   ),
   region_string = as_factor(region)) %>% 
-  filter(age %in% 20:40)
+  filter(age %in% 20:40) %>% 
+   mutate(link_abe_exact_standard = case_when(
+    link_abe_exact_conservative %in% c(0, 1) ~ 1,
+    TRUE ~ 0
+  ))
 
 ## tabulations for men in 1940 census 
 census_characteristics <- census_1940_hh_vars_recode %>% 
@@ -236,13 +240,16 @@ census_1940_hh_vars_recode_ba  <- census_1940_hh_vars %>%
     TRUE ~ "Not Home Owner"
   ),
   region_string = as_factor(region)) %>% 
-  filter(age %in% 20:40, race_recode == "Black")
+  filter(age %in% 20:40, race_recode == "Black") %>% 
+  mutate(link_abe_exact_standard = case_when(
+    link_abe_exact_conservative %in% c(0, 1) ~ 1,
+    TRUE ~ 0
+  ))
 ```
 
 
 #table for black americans: dmf
 ```{r}
-
 ## tabulations for men in 1940 census 
 census_characteristics_ba <- census_1940_hh_vars_recode_ba %>% 
   select(histid, educ_level, sei_recode, marital_status, region_string, rural, homeown) %>%

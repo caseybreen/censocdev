@@ -27,10 +27,10 @@ dmf_full <- fread("/censoc/data/dmf/dmf.csv")
 ```{r}
 ## read in numident 
 ## special file with ssn 
-dmf <- fread("/censoc/data/censoc_v2/test_files/censoc_dmf_v2_test_file.csv") %>% 
+dmf <- fread("/censoc/data/censoc_v2.1/censoc_dmf_v2.1.csv") %>% 
   janitor::clean_names()
 
-## numident 
+## dmf  
 dmf <- dmf %>% 
   left_join(dmf_full %>% select(ssn, mname), by = "ssn")
 
@@ -38,7 +38,7 @@ dmf <- dmf %>%
 census_1940 <- fread("/ipums-repo2019/1940/TSV/P.tsv", select = c("NAMEFRST", "HISTID", "SERIALP", "AGE", "INCWAGE", "SEX", "EDUC", "RACE", "RELATE", "MARST", "SEI")) %>% 
   janitor::clean_names()
 
-## 
+## dmf 
 censoc_dmf <- dmf %>% 
   left_join(census_1940, by = "histid")
 ```
