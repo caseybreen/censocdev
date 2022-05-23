@@ -31,12 +31,11 @@ create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:193
       sex == 1 ~ n/Male,
       sex == 2 ~ n/Female)) %>%
     group_by(dyear, byear, sex, death_age) %>%
-    summarize(inclusion_prob = mean(proportion_matched), Male = mean(Male), Female = mean(Female), Total = mean(Total))
+    summarize(inclusion_prob = mean(proportion_matched), Male = mean(Male), Female = mean(Female), Total = mean(Total), .groups = 'drop')
 
   ## Calculate weights
   death_weights_for_link <-  death_weights %>%
     mutate(linking_key = paste(dyear, byear, death_age, sex, sep = "_")) %>%
-    ungroup() %>%
     select(inclusion_prob, linking_key) %>%
     mutate(weight = 1/inclusion_prob) %>%
     select(-inclusion_prob)
