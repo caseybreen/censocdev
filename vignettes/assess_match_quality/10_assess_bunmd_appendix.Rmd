@@ -8,21 +8,19 @@ Summary: Assessing match quality in the CenSoc-Numident file. Uses BUNMD as popu
 
 # Read in data
 ```{r}
-# published files
+# library packages 
 library(plyr)
 library(data.table)
 library(cowplot)
 library(ggsci)
-
-pub_numident <- fread('/home/ipums/ugury-ipums/censoc-abe-implementation/data/final-v2-matched-datasets/censoc_numident_v2.csv')
-full_bunmd <- list.files(path="/home/ipums/ugury-ipums/censoc-abe-implementation/data/cleaned-bunmd-by-bpl", full.names = TRUE) %>% 
-  lapply(read.csv) %>% 
-  rbind.fill() 
-
 library(tidyverse)
 library(dplyr)
-# matched bunmd/census with multiple ID files (this has more rows than the published numident)
-matched_bunmd <- fread('/home/ipums/ugury-ipums/censoc-abe-implementation/data/matched-census-bunmd/matched_census_bunmd.csv')
+
+## numident 
+pub_numident <- fread('/home/ipums/ugury-ipums/censoc-abe-implementation/data/final-v2-matched-datasets/censoc_numident_v2.csv')
+
+## full bunmd 
+full_bunmd <- fread("/censoc/data/censoc_v2/bunmd_v2.csv")
 ```
 
 
@@ -103,7 +101,6 @@ table((bunmd_bpl$bpl < 10000)) # 90% native born for those with birthplace info
 
 
 # raw match rates
-library(dplyr)
 raw_male_standard <- bunmd_date_filtered %>%
   filter(sex==1, byear %in% 1900:1935) %>% 
   group_by(byear) %>% 
