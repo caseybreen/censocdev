@@ -4,10 +4,10 @@ author: "Maria Osborne"
 output: html_notebook
 ---
 
-summary:
+Summary:
 Assessment of CenSoc-DMF using the DMF as a population denominator.
 Since there are no covariates in the DMF, the only thing we will really do here
-is compute the match rates (# of matched / # of people in the DMF). Since there is
+is compute the match rates (# of matched / # of people in the DMF). As there is
 no sex information in the DMF, but only men are matched, I use data from HMD
 to approximate the male-specific match rate.
 
@@ -17,27 +17,26 @@ library(cowplot)
 library(ggsci)
 library(data.table)
 library(tidyverse)
-# full (unlinked), N = 61,111,735
+library(here)
+
+# read full DMF (unlinked), N = 61,111,735
 dmf_full <- fread('/censoc/data/dmf/ssdm.csv')
 
-# linked files 
-# id_B = ssn,
-# id_A = histid
-dmf_linked <- fread('/home/ipums/ugury-ipums/censoc-abe-implementation/data/matched-census-dmf/matched_census_dmf.csv')
-dmf_ssns <- dmf_linked$id_B
+# read linked files 
+dmf_linked <- fread('/censoc/data/censoc_v2.1/censoc_dmf_v2.1.csv')
+# get IDs of everyne in the linked set
+dmf_ssns <- dmf_linked$ssn
+dmf_cons_ssns <- dmf_linked[link_abe_exact_conservative==1, ssn]
 
-# unfortunately, conservative links aren't marked here. so let's get the HISTID's from the published version
-pub_dmf <- fread('/home/ipums/mariaosborne-ipums/censoc/censoc_dmf_v2.csv')
-dmf_cons_histid <- (pub_dmf %>% filter(link_abe_exact_conservative==1))$HISTID
-dmf_linked <- dmf_linked %>% mutate(conservative_link = as.integer(id_A %in% dmf_cons_histid))
-dmf_cons_ssns <- (dmf_linked %>% filter(conservative_link==1))$id_B
 
-# flag standard and conservative links in the unmated using ssn
+# flag standard and conservative links in the full/unmatched using ssn
 dmf_full <- dmf_full %>% mutate(link_standard = ssn %in% dmf_ssns,
                                 link_conservative = ssn %in% dmf_cons_ssns)
 
-# filter to used death years
+# restrict to used death years, N = 54,625,460
 dmf_full_date_restricted <- dmf_full %>% filter(dyear %in% 1975:2005)
+
+
 ```
 
 
@@ -46,14 +45,7 @@ dmf_full_date_restricted <- dmf_full %>% filter(dyear %in% 1975:2005)
 hmd <- fread('/home/ipums/mariaosborne-ipums/censoc/hmd_death_counts.txt')
 hmd <- hmd %>% mutate(Age = case_when(Age == "110+" ~ 110,
                                       TRUE ~ as.numeric(Age)))
-hmd <- hmd %>% filter(Year %in% 1975:2005)
-for (i in 1975:2005) {
-  dt <- hmd %>% filter(Year==i, Age >= 40)
-  male_deaths <- sum(dt$Male)
-  total_deaths <- sum(dt$Total)
-  ratio <- male_deaths/total_deaths
-  print(ratio)
-}
+
 
 # Compute sex ratio of deaths 1975-2005 for each birth cohort
 # this will be a little off since we're using cohort = year - age
@@ -63,13 +55,9 @@ for (c in 1910:1930) {
   male_deaths <- sum(cdt$Male)
   total_deaths <- sum(cdt$Total)
   sex_ratio <- male_deaths/total_deaths
-  #print(c)
-  #print(sex_ratio)
+  print(sex_ratio)
 }
 
-dmf_matches <- dmf_full_date_restricted %>%
-  group_by(byear) %>%
-  summarize(match_rate = mean())
 ```
 
 
@@ -77,10 +65,6 @@ dmf_matches <- dmf_full_date_restricted %>%
 # Total match rate
 (date of death considered, gender NOT considered)
 ```{r}
-dmf_full_date_restricted %>% filter(byear >= 1870) %>%
-  group_by(byear) %>%
-  summarize(match_rate = mean(link_standard),cons_match_rate = mean(link_conservative))
-
 dmf_full_date_restricted %>% filter(byear %in% 1900:1935) %>%
   group_by(byear) %>%
   summarize(match_rate = mean(link_standard),cons_match_rate = mean(link_conservative)) %>% 
@@ -97,17 +81,16 @@ dmf_full_date_restricted %>% filter(byear %in% 1900:1935) %>%
 
 # Approximated male-only match rate
 ```{r}
-# numerator: no. of link=TRUE for each byear
-# denominator: no. of ppl w/ byear * sex ratio
-
+# make data frame with matches
 dmf_matches_sex <- data.frame(matrix(ncol=5, nrow=0))
 for (c in 1880:1940) {
-  # NUM: COUNT UP number of matched nodes for each cohort
+  # count up number of matched nodes for each cohort
   ctd <- dmf_full_date_restricted %>% filter(byear==c)
   std_matches <- sum(ctd$link_standard)
   cons_matches <- sum(ctd$link_conservative)
   dmf_total_deaths <- nrow(ctd)
    
+  # compute sex ratio for this cohort
   cdt_hmd <- hmd %>% filter(cohort==c)
   male_deaths <- sum(cdt_hmd$Male)
   total_deaths <- sum(cdt_hmd$Total)
@@ -115,12 +98,16 @@ for (c in 1880:1940) {
   
   dmf_matches_sex <- rbind(dmf_matches_sex, c(c, std_matches, cons_matches, dmf_total_deaths, sex_ratio))
 }
+
+# rename columns
 names(dmf_matches_sex) <- c('cohort', 'num_std', 'num_cons', 'num_deaths', 'sex_ratio')
+
+# look at number of deaths, number of matches, and sex ratio per cohort
 dmf_matches_sex
 ```
 
 
-plot male-specific match rate
+# plot male-specific match rate
 ```{r}
 # multiple total deaths by preseumed sex ratio (% of deaths that are male according to HMD)
 dmf_matches_sex <- dmf_matches_sex %>%
@@ -150,13 +137,13 @@ dmf_match_rate_plot <- dmf_matches_sex_standard %>%
 dmf_match_rate_plot 
 
 ggsave(dmf_match_rate_plot, 
-       filename = "/home/ipums/mariaosborne-ipums/censoc/dmf_denominator_match_rate_plot.pdf",
+       filename = here("vignettes/assess_match_quality/figs/dmf_denominator_match_rate_plot.pdf"),
        height = 5, width = 7)
 ```
 
 
 
-# plot sex ratio
+# Plot sex ratio by cohort
 ```{r}
 sex_ratio_plot <- ggplot(dmf_matches_sex %>% filter(cohort %in% 1900:1935), aes(cohort, sex_ratio))+
   geom_point(size=2.5)+
@@ -169,7 +156,7 @@ sex_ratio_plot <- ggplot(dmf_matches_sex %>% filter(cohort %in% 1900:1935), aes(
 sex_ratio_plot
 
 ggsave(sex_ratio_plot, 
-       filename = "/home/ipums/mariaosborne-ipums/censoc/dmf_sex_ratio_plot.pdf",
+       filename = here("vignettes/assess_match_quality/figs/dmf_sex_ratio_plot.pdf"),
        height = 5, width = 7)
 ```
 
