@@ -148,7 +148,7 @@ prob_dying_window_plot <- dmf %>%
   geom_line(size = .75) + 
   geom_point(size = 2.5) + 
   theme_cowplot() + 
-  labs(y = "Probability Dying in Coverage Window",
+  labs(y = "Probability Dying in Window",
        x = "Cohort" ) + 
   ylim(0, 0.8) + 
   theme(legend.position = "bottom", legend.title = element_blank())
@@ -156,6 +156,6 @@ prob_dying_window_plot <- dmf %>%
 
 ggsave(prob_dying_window_plot, 
        filename = here("vignettes/assess_match_quality/figs/prob_dying_in_window.pdf"),
-       height = 7, width = 9)
+       height = 6, width = 8)
 ```
 
