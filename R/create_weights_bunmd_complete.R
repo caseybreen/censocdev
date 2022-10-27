@@ -1,6 +1,6 @@
-#' Create weights
+#' Create weights for BUNMD
 #' This function will weight the numident file up to HMD lexis triangles
-#' Restrict data to deaths from 1988 - 2005 with age_at_death between
+#' Restrict data to deaths from 1988 - 2005 with age_at_death between 65 and 100.
 #'
 #' @param data data.frame with birth and death info
 #' @return data.frame

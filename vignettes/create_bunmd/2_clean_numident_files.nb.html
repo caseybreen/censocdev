@@ -1486,6 +1486,8 @@ window.initializeCodeFolding = function(show) {
   // select all R code blocks
   var rCodeBlocks = $('pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan, pre.julia, pre.foldable');
   rCodeBlocks.each(function() {
+    // skip if the block has fold-none class
+    if ($(this).hasClass('fold-none')) return;
 
     // create a collapsable div to wrap the code in
     var div = $('<div class="collapse r-code-collapse"></div>');
@@ -1501,7 +1503,9 @@ window.initializeCodeFolding = function(show) {
     showCodeButton.append(showCodeText);
     showCodeButton
         .attr('data-toggle', 'collapse')
+        .attr('data-bs-toggle', 'collapse') // BS5
         .attr('data-target', '#' + id)
+        .attr('data-bs-target', '#' + id)   // BS5
         .attr('aria-expanded', showThis)
         .attr('aria-controls', id);
 
@@ -1591,6 +1595,7 @@ if (window.hljs) {
 
 
 
+
 <style type="text/css">
 #rmd-source-code {
   display: none;
@@ -1621,6 +1626,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -1730,7 +1738,7 @@ pre code {
 <div id="header">
 
 <div class="btn-group pull-right float-right">
-<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
 <ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
 <li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
 <li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
@@ -1757,26 +1765,64 @@ pre code {
 <p>Library Packages</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjZW5zb2NkZXYpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkoZGF0YS50YWJsZSlcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjZW5zb2NkZXYpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmBgYCJ9 -->
 <pre class="r"><code>library(censocdev)
-library(tidyverse)
-library(data.table)</code></pre>
+library(tidyverse)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXHUwMDFiWzMwbeKUgOKUgCBcdTAwMWJbMW1BdHRhY2hpbmcgcGFja2FnZXNcdTAwMWJbMjJtIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2UgMS4zLjAg4pSA4pSAXHUwMDFiWzM5bVxuXHUwMDFiWzMwbVx1MDAxYlszMm3inJNcdTAwMWJbMzBtIFx1MDAxYlszNG1nZ3Bsb3QyXHUwMDFiWzMwbSAzLjMuMCAgICAgXHUwMDFiWzMybeKck1x1MDAxYlszMG0gXHUwMDFiWzM0bXB1cnJyICBcdTAwMWJbMzBtIDAuMy40XG5cdTAwMWJbMzJt4pyTXHUwMDFiWzMwbSBcdTAwMWJbMzRtdGliYmxlIFx1MDAxYlszMG0gMy4wLjQgICAgIFx1MDAxYlszMm3inJNcdTAwMWJbMzBtIFx1MDAxYlszNG1zdHJpbmdyXHUwMDFiWzMwbSAxLjQuMFxuXHUwMDFiWzMybeKck1x1MDAxYlszMG0gXHUwMDFiWzM0bXRpZHlyICBcdTAwMWJbMzBtIDEuMS4yICAgICBcdTAwMWJbMzJt4pyTXHUwMDFiWzMwbSBcdTAwMWJbMzRtZm9yY2F0c1x1MDAxYlszMG0gMC41LjBcblx1MDAxYlszMm3inJNcdTAwMWJbMzBtIFx1MDAxYlszNG1yZWFkciAgXHUwMDFiWzMwbSAxLjQuMCAgICAgXHUwMDFiWzM5bVxuXHUwMDFiWzMwbeKUgOKUgCBcdTAwMWJbMW1Db25mbGljdHNcdTAwMWJbMjJtIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2VfY29uZmxpY3RzKCkg4pSA4pSAXG5cdTAwMWJbMzFteFx1MDAxYlszMG0gXHUwMDFiWzM0bWRhdGEudGFibGVcdTAwMWJbMzBtOjpcdTAwMWJbMzJtYmV0d2VlbigpXHUwMDFiWzMwbSBtYXNrcyBcdTAwMWJbMzRtZHBseXJcdTAwMWJbMzBtOjpiZXR3ZWVuKClcblx1MDAxYlszMW14XHUwMDFiWzMwbSBcdTAwMWJbMzRtZHBseXJcdTAwMWJbMzBtOjpcdTAwMWJbMzJtZmlsdGVyKClcdTAwMWJbMzBtICAgICAgIG1hc2tzIFx1MDAxYlszNG1zdGF0c1x1MDAxYlszMG06OmZpbHRlcigpXG5cdTAwMWJbMzFteFx1MDAxYlszMG0gXHUwMDFiWzM0bWRhdGEudGFibGVcdTAwMWJbMzBtOjpcdTAwMWJbMzJtZmlyc3QoKVx1MDAxYlszMG0gICBtYXNrcyBcdTAwMWJbMzRtZHBseXJcdTAwMWJbMzBtOjpmaXJzdCgpXG5cdTAwMWJbMzFteFx1MDAxYlszMG0gXHUwMDFiWzM0bWRwbHlyXHUwMDFiWzMwbTo6XHUwMDFiWzMybWxhZygpXHUwMDFiWzMwbSAgICAgICAgICBtYXNrcyBcdTAwMWJbMzRtc3RhdHNcdTAwMWJbMzBtOjpsYWcoKVxuXHUwMDFiWzMxbXhcdTAwMWJbMzBtIFx1MDAxYlszNG1kYXRhLnRhYmxlXHUwMDFiWzMwbTo6XHUwMDFiWzMybWxhc3QoKVx1MDAxYlszMG0gICAgbWFza3MgXHUwMDFiWzM0bWRwbHlyXHUwMDFiWzMwbTo6bGFzdCgpXG5cdTAwMWJbMzFteFx1MDAxYlszMG0gXHUwMDFiWzM0bXB1cnJyXHUwMDFiWzMwbTo6XHUwMDFiWzMybXRyYW5zcG9zZSgpXHUwMDFiWzMwbSAgICBtYXNrcyBcdTAwMWJbMzRtZGF0YS50YWJsZVx1MDAxYlszMG06OnRyYW5zcG9zZSgpXHUwMDFiWzM5bVxuIn0= -->
+<pre><code>[30m── [1mAttaching packages[22m ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──[39m
+[30m[32m✓[30m [34mggplot2[30m 3.3.0     [32m✓[30m [34mpurrr  [30m 0.3.4
+[32m✓[30m [34mtibble [30m 3.0.4     [32m✓[30m [34mstringr[30m 1.4.0
+[32m✓[30m [34mtidyr  [30m 1.1.2     [32m✓[30m [34mforcats[30m 0.5.0
+[32m✓[30m [34mreadr  [30m 1.4.0     [39m
+[30m── [1mConflicts[22m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+[31mx[30m [34mdata.table[30m::[32mbetween()[30m masks [34mdplyr[30m::between()
+[31mx[30m [34mdplyr[30m::[32mfilter()[30m       masks [34mstats[30m::filter()
+[31mx[30m [34mdata.table[30m::[32mfirst()[30m   masks [34mdplyr[30m::first()
+[31mx[30m [34mdplyr[30m::[32mlag()[30m          masks [34mstats[30m::lag()
+[31mx[30m [34mdata.table[30m::[32mlast()[30m    masks [34mdplyr[30m::last()
+[31mx[30m [34mpurrr[30m::[32mtranspose()[30m    masks [34mdata.table[30m::transpose()[39m</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkYXRhLnRhYmxlKVxuYGBgIn0= -->
+<pre class="r"><code>library(data.table)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Clean and write out death files</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZndyaXRlKGRlYXRocywgXCIvY2Vuc29jL2RhdGEvbnVtaWRlbnQvM19udW1pZGVudF9maWxlc19jbGVhbmVkX2FuZF9jb25kZW5zZWQvZGVhdGhzX2NsZWFuZWQuY3N2XCIpXG5cbmBgYCJ9 -->
-<pre class="r"><code>fwrite(deaths, &quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/deaths_cleaned.csv&quot;)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgd3JpdGUgb3V0IGNsZWFuZWQgZGVhdGggcmVjb3Jkc1xuZndyaXRlKGRlYXRocywgXCIvY2Vuc29jL2RhdGEvbnVtaWRlbnQvMl9udW1pZGVudF9maWxlc19jbGVhbmVkL2RlYXRoc19jbGVhbmVkLmNzdlwiKVxuXG5gYGAifQ== -->
+<pre class="r"><code>## write out cleaned death records
+fwrite(deaths, &quot;/censoc/data/numident/2_numident_files_cleaned/deaths_cleaned.csv&quot;)
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5Xcml0dGVuIDAuMCUgb2YgNDk0NTkyOTMgcm93cyBpbiAyIHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xNiUuIEVUQSA1MzUyIHNlY3MuICAgICAgXG5Xcml0dGVuIDI4LjMlIG9mIDQ5NDU5MjkzIHJvd3MgaW4gMyBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgOSBzZWNzLiAgICAgIFxuV3JpdHRlbiA1NS45JSBvZiA0OTQ1OTI5MyByb3dzIGluIDQgc2VjcyB1c2luZyA2IHRocmVhZHMuIG1heEJ1ZmZVc2VkPTE4JS4gRVRBIDMgc2Vjcy4gICAgICBcbldyaXR0ZW4gODIuOSUgb2YgNDk0NTkyOTMgcm93cyBpbiA1IHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xOCUuIEVUQSAxIHNlY3MuICAgICAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Xcml0dGVuIDAuMCUgb2YgNDk0NTkyOTMgcm93cyBpbiAzIHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMCUuIEVUQSAxMTA5MyBzZWNzLiAgICAgIFxuV3JpdHRlbiAxMi41JSBvZiA0OTQ1OTI5MyByb3dzIGluIDQgc2VjcyB1c2luZyA2IHRocmVhZHMuIG1heEJ1ZmZVc2VkPTEwJS4gRVRBIDI5IHNlY3MuICAgICAgXG5Xcml0dGVuIDI0LjclIG9mIDQ5NDU5MjkzIHJvd3MgaW4gNSBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTAlLiBFVEEgMTUgc2Vjcy4gICAgICBcbldyaXR0ZW4gMzYuMyUgb2YgNDk0NTkyOTMgcm93cyBpbiA2IHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMCUuIEVUQSAxMCBzZWNzLiAgICAgIFxuV3JpdHRlbiA0OC4yJSBvZiA0OTQ1OTI5MyByb3dzIGluIDcgc2VjcyB1c2luZyA2IHRocmVhZHMuIG1heEJ1ZmZVc2VkPTEwJS4gRVRBIDcgc2Vjcy4gICAgICBcbldyaXR0ZW4gNTkuOCUgb2YgNDk0NTkyOTMgcm93cyBpbiA4IHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMCUuIEVUQSA1IHNlY3MuICAgICAgXG5Xcml0dGVuIDcxLjMlIG9mIDQ5NDU5MjkzIHJvd3MgaW4gOSBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTAlLiBFVEEgMyBzZWNzLiAgICAgIFxuV3JpdHRlbiA4Mi42JSBvZiA0OTQ1OTI5MyByb3dzIGluIDEwIHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMCUuIEVUQSAyIHNlY3MuICAgICAgXG5Xcml0dGVuIDk0LjMlIG9mIDQ5NDU5MjkzIHJvd3MgaW4gMTEgc2VjcyB1c2luZyA2IHRocmVhZHMuIG1heEJ1ZmZVc2VkPTEwJS4gRVRBIDAgc2Vjcy4gICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiJ9 -->
 <pre><code>
-Written 0.0% of 49459293 rows in 2 secs using 6 threads. maxBuffUsed=16%. ETA 5352 secs.      
-Written 28.3% of 49459293 rows in 3 secs using 6 threads. maxBuffUsed=18%. ETA 9 secs.      
-Written 55.9% of 49459293 rows in 4 secs using 6 threads. maxBuffUsed=18%. ETA 3 secs.      
-Written 82.9% of 49459293 rows in 5 secs using 6 threads. maxBuffUsed=18%. ETA 1 secs.      
+Written 0.0% of 49459293 rows in 3 secs using 6 threads. maxBuffUsed=10%. ETA 11093 secs.      
+Written 12.5% of 49459293 rows in 4 secs using 6 threads. maxBuffUsed=10%. ETA 29 secs.      
+Written 24.7% of 49459293 rows in 5 secs using 6 threads. maxBuffUsed=10%. ETA 15 secs.      
+Written 36.3% of 49459293 rows in 6 secs using 6 threads. maxBuffUsed=10%. ETA 10 secs.      
+Written 48.2% of 49459293 rows in 7 secs using 6 threads. maxBuffUsed=10%. ETA 7 secs.      
+Written 59.8% of 49459293 rows in 8 secs using 6 threads. maxBuffUsed=10%. ETA 5 secs.      
+Written 71.3% of 49459293 rows in 9 secs using 6 threads. maxBuffUsed=10%. ETA 3 secs.      
+Written 82.6% of 49459293 rows in 10 secs using 6 threads. maxBuffUsed=10%. ETA 2 secs.      
+Written 94.3% of 49459293 rows in 11 secs using 6 threads. maxBuffUsed=10%. ETA 0 secs.      
+                                                                                                                                     </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZndyaXRlKGRlYXRocywgXCIvY2Vuc29jL2RhdGEvbnVtaWRlbnQvM19udW1pZGVudF9maWxlc19jbGVhbmVkX2FuZF9jb25kZW5zZWQvZGVhdGhzX2NsZWFuZWQuY3N2XCIpXG5gYGAifQ== -->
+<pre class="r"><code>fwrite(deaths, &quot;/censoc/data/numident/3_numident_files_cleaned_and_condensed/deaths_cleaned.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Xcml0dGVuIDAuMCUgb2YgNDk0NTkyOTMgcm93cyBpbiAzIHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMCUuIEVUQSAxMjU2NyBzZWNzLiAgICAgIFxuV3JpdHRlbiAxMi45JSBvZiA0OTQ1OTI5MyByb3dzIGluIDQgc2VjcyB1c2luZyA2IHRocmVhZHMuIG1heEJ1ZmZVc2VkPTEwJS4gRVRBIDMxIHNlY3MuICAgICAgXG5Xcml0dGVuIDI1LjIlIG9mIDQ5NDU5MjkzIHJvd3MgaW4gNSBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTAlLiBFVEEgMTYgc2Vjcy4gICAgICBcbldyaXR0ZW4gMzcuNCUgb2YgNDk0NTkyOTMgcm93cyBpbiA2IHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMCUuIEVUQSAxMSBzZWNzLiAgICAgIFxuV3JpdHRlbiA0OC45JSBvZiA0OTQ1OTI5MyByb3dzIGluIDcgc2VjcyB1c2luZyA2IHRocmVhZHMuIG1heEJ1ZmZVc2VkPTEwJS4gRVRBIDcgc2Vjcy4gICAgICBcbldyaXR0ZW4gNjAuNyUgb2YgNDk0NTkyOTMgcm93cyBpbiA4IHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMCUuIEVUQSA1IHNlY3MuICAgICAgXG5Xcml0dGVuIDcyLjIlIG9mIDQ5NDU5MjkzIHJvd3MgaW4gOSBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTAlLiBFVEEgMyBzZWNzLiAgICAgIFxuV3JpdHRlbiA4My42JSBvZiA0OTQ1OTI5MyByb3dzIGluIDEwIHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xMCUuIEVUQSAyIHNlY3MuICAgICAgXG5Xcml0dGVuIDk1LjElIG9mIDQ5NDU5MjkzIHJvd3MgaW4gMTEgc2VjcyB1c2luZyA2IHRocmVhZHMuIG1heEJ1ZmZVc2VkPTEwJS4gRVRBIDAgc2Vjcy4gICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiJ9 -->
+<pre><code>
+Written 0.0% of 49459293 rows in 3 secs using 6 threads. maxBuffUsed=10%. ETA 12567 secs.      
+Written 12.9% of 49459293 rows in 4 secs using 6 threads. maxBuffUsed=10%. ETA 31 secs.      
+Written 25.2% of 49459293 rows in 5 secs using 6 threads. maxBuffUsed=10%. ETA 16 secs.      
+Written 37.4% of 49459293 rows in 6 secs using 6 threads. maxBuffUsed=10%. ETA 11 secs.      
+Written 48.9% of 49459293 rows in 7 secs using 6 threads. maxBuffUsed=10%. ETA 7 secs.      
+Written 60.7% of 49459293 rows in 8 secs using 6 threads. maxBuffUsed=10%. ETA 5 secs.      
+Written 72.2% of 49459293 rows in 9 secs using 6 threads. maxBuffUsed=10%. ETA 3 secs.      
+Written 83.6% of 49459293 rows in 10 secs using 6 threads. maxBuffUsed=10%. ETA 2 secs.      
+Written 95.1% of 49459293 rows in 11 secs using 6 threads. maxBuffUsed=10%. ETA 0 secs.      
                                                                                                                                      </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
@@ -1792,24 +1838,26 @@ Written 82.9% of 49459293 rows in 5 secs using 6 threads. maxBuffUsed=18%. ETA 1
 fwrite(apps, &quot;/censoc/data/numident/2_numident_files_cleaned/apps_cleaned.csv&quot;)
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5Xcml0dGVuIDAuMCUgb2YgNzIxMjA1MTYgcm93cyBpbiAxMCBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgNTIzNzggc2Vjcy4gICAgICBcbldyaXR0ZW4gNS4wJSBvZiA3MjEyMDUxNiByb3dzIGluIDExIHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xOCUuIEVUQSAyMTUgc2Vjcy4gICAgICBcbldyaXR0ZW4gMTIuOCUgb2YgNzIxMjA1MTYgcm93cyBpbiAxMiBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgODQgc2Vjcy4gICAgICBcbldyaXR0ZW4gMjEuMCUgb2YgNzIxMjA1MTYgcm93cyBpbiAxMyBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgNTAgc2Vjcy4gICAgICBcbldyaXR0ZW4gMjkuMiUgb2YgNzIxMjA1MTYgcm93cyBpbiAxNCBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMzUgc2Vjcy4gICAgICBcbldyaXR0ZW4gMzcuNCUgb2YgNzIxMjA1MTYgcm93cyBpbiAxNSBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMjUgc2Vjcy4gICAgICBcbldyaXR0ZW4gNDUuNSUgb2YgNzIxMjA1MTYgcm93cyBpbiAxNiBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMTkgc2Vjcy4gICAgICBcbldyaXR0ZW4gNTMuNSUgb2YgNzIxMjA1MTYgcm93cyBpbiAxNyBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMTUgc2Vjcy4gICAgICBcbldyaXR0ZW4gNjEuNyUgb2YgNzIxMjA1MTYgcm93cyBpbiAxOCBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMTEgc2Vjcy4gICAgICBcbldyaXR0ZW4gNjkuOCUgb2YgNzIxMjA1MTYgcm93cyBpbiAxOSBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgOCBzZWNzLiAgICAgIFxuV3JpdHRlbiA3Ny45JSBvZiA3MjEyMDUxNiByb3dzIGluIDIwIHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xOCUuIEVUQSA1IHNlY3MuICAgICAgXG5Xcml0dGVuIDg1LjElIG9mIDcyMTIwNTE2IHJvd3MgaW4gMjEgc2VjcyB1c2luZyA2IHRocmVhZHMuIG1heEJ1ZmZVc2VkPTE4JS4gRVRBIDMgc2Vjcy4gICAgICBcbldyaXR0ZW4gOTEuOCUgb2YgNzIxMjA1MTYgcm93cyBpbiAyMiBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMiBzZWNzLiAgICAgIFxuV3JpdHRlbiA5MS45JSBvZiA3MjEyMDUxNiByb3dzIGluIDgwIHNlY3MgdXNpbmcgNiB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xOCUuIEVUQSA3IHNlY3MuICAgICAgXG5Xcml0dGVuIDkyLjElIG9mIDcyMTIwNTE2IHJvd3MgaW4gODIgc2VjcyB1c2luZyA2IHRocmVhZHMuIG1heEJ1ZmZVc2VkPTE4JS4gRVRBIDcgc2Vjcy4gICAgICBcbldyaXR0ZW4gOTkuMSUgb2YgNzIxMjA1MTYgcm93cyBpbiA4MyBzZWNzIHVzaW5nIDYgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMCBzZWNzLiAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIn0= -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Xcml0dGVuIDAuMiUgb2YgNzIxMjA1MTYgcm93cyBpbiAxNSBzZWNzIHVzaW5nIDEwIHRocmVhZHMuIG1heEJ1ZmZVc2VkPTE4JS4gRVRBIDgwMDcgc2Vjcy4gICAgICBcbldyaXR0ZW4gOC43JSBvZiA3MjEyMDUxNiByb3dzIGluIDE2IHNlY3MgdXNpbmcgMTAgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMTc3IHNlY3MuICAgICAgXG5Xcml0dGVuIDE2LjglIG9mIDcyMTIwNTE2IHJvd3MgaW4gMTcgc2VjcyB1c2luZyAxMCB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xOCUuIEVUQSA4OCBzZWNzLiAgICAgIFxuV3JpdHRlbiAyNC40JSBvZiA3MjEyMDUxNiByb3dzIGluIDE4IHNlY3MgdXNpbmcgMTAgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgNTggc2Vjcy4gICAgICBcbldyaXR0ZW4gMzMuNSUgb2YgNzIxMjA1MTYgcm93cyBpbiAxOSBzZWNzIHVzaW5nIDEwIHRocmVhZHMuIG1heEJ1ZmZVc2VkPTE4JS4gRVRBIDM5IHNlY3MuICAgICAgXG5Xcml0dGVuIDQxLjAlIG9mIDcyMTIwNTE2IHJvd3MgaW4gMjAgc2VjcyB1c2luZyAxMCB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xOCUuIEVUQSAzMCBzZWNzLiAgICAgIFxuV3JpdHRlbiA0OC4xJSBvZiA3MjEyMDUxNiByb3dzIGluIDIxIHNlY3MgdXNpbmcgMTAgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMjMgc2Vjcy4gICAgICBcbldyaXR0ZW4gNTYuOCUgb2YgNzIxMjA1MTYgcm93cyBpbiAyMiBzZWNzIHVzaW5nIDEwIHRocmVhZHMuIG1heEJ1ZmZVc2VkPTE4JS4gRVRBIDE3IHNlY3MuICAgICAgXG5Xcml0dGVuIDY0LjElIG9mIDcyMTIwNTE2IHJvd3MgaW4gMjMgc2VjcyB1c2luZyAxMCB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xOCUuIEVUQSAxMyBzZWNzLiAgICAgIFxuV3JpdHRlbiA3MC44JSBvZiA3MjEyMDUxNiByb3dzIGluIDI0IHNlY3MgdXNpbmcgMTAgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMTAgc2Vjcy4gICAgICBcbldyaXR0ZW4gNzcuMyUgb2YgNzIxMjA1MTYgcm93cyBpbiAyNSBzZWNzIHVzaW5nIDEwIHRocmVhZHMuIG1heEJ1ZmZVc2VkPTE4JS4gRVRBIDcgc2Vjcy4gICAgICBcbldyaXR0ZW4gODQuMiUgb2YgNzIxMjA1MTYgcm93cyBpbiAyNiBzZWNzIHVzaW5nIDEwIHRocmVhZHMuIG1heEJ1ZmZVc2VkPTE4JS4gRVRBIDUgc2Vjcy4gICAgICBcbldyaXR0ZW4gODQuNCUgb2YgNzIxMjA1MTYgcm93cyBpbiA4MSBzZWNzIHVzaW5nIDEwIHRocmVhZHMuIG1heEJ1ZmZVc2VkPTE4JS4gRVRBIDE1IHNlY3MuICAgICAgXG5Xcml0dGVuIDg0LjYlIG9mIDcyMTIwNTE2IHJvd3MgaW4gOTIgc2VjcyB1c2luZyAxMCB0aHJlYWRzLiBtYXhCdWZmVXNlZD0xOCUuIEVUQSAxNiBzZWNzLiAgICAgIFxuV3JpdHRlbiA5MS4zJSBvZiA3MjEyMDUxNiByb3dzIGluIDkzIHNlY3MgdXNpbmcgMTAgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgOCBzZWNzLiAgICAgIFxuV3JpdHRlbiA5OC40JSBvZiA3MjEyMDUxNiByb3dzIGluIDk0IHNlY3MgdXNpbmcgMTAgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMSBzZWNzLiAgICAgIFxuV3JpdHRlbiA5OC42JSBvZiA3MjEyMDUxNiByb3dzIGluIDk3IHNlY3MgdXNpbmcgMTAgdGhyZWFkcy4gbWF4QnVmZlVzZWQ9MTglLiBFVEEgMSBzZWNzLiAgICAgIFxuV3JpdHRlbiA5OC44JSBvZiA3MjEyMDUxNiByb3dzIGluIDEwNCBzZWNzIHVzaW5nIDEwIHRocmVhZHMuIG1heEJ1ZmZVc2VkPTE4JS4gRVRBIDEgc2Vjcy4gICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiJ9 -->
 <pre><code>
-Written 0.0% of 72120516 rows in 10 secs using 6 threads. maxBuffUsed=18%. ETA 52378 secs.      
-Written 5.0% of 72120516 rows in 11 secs using 6 threads. maxBuffUsed=18%. ETA 215 secs.      
-Written 12.8% of 72120516 rows in 12 secs using 6 threads. maxBuffUsed=18%. ETA 84 secs.      
-Written 21.0% of 72120516 rows in 13 secs using 6 threads. maxBuffUsed=18%. ETA 50 secs.      
-Written 29.2% of 72120516 rows in 14 secs using 6 threads. maxBuffUsed=18%. ETA 35 secs.      
-Written 37.4% of 72120516 rows in 15 secs using 6 threads. maxBuffUsed=18%. ETA 25 secs.      
-Written 45.5% of 72120516 rows in 16 secs using 6 threads. maxBuffUsed=18%. ETA 19 secs.      
-Written 53.5% of 72120516 rows in 17 secs using 6 threads. maxBuffUsed=18%. ETA 15 secs.      
-Written 61.7% of 72120516 rows in 18 secs using 6 threads. maxBuffUsed=18%. ETA 11 secs.      
-Written 69.8% of 72120516 rows in 19 secs using 6 threads. maxBuffUsed=18%. ETA 8 secs.      
-Written 77.9% of 72120516 rows in 20 secs using 6 threads. maxBuffUsed=18%. ETA 5 secs.      
-Written 85.1% of 72120516 rows in 21 secs using 6 threads. maxBuffUsed=18%. ETA 3 secs.      
-Written 91.8% of 72120516 rows in 22 secs using 6 threads. maxBuffUsed=18%. ETA 2 secs.      
-Written 91.9% of 72120516 rows in 80 secs using 6 threads. maxBuffUsed=18%. ETA 7 secs.      
-Written 92.1% of 72120516 rows in 82 secs using 6 threads. maxBuffUsed=18%. ETA 7 secs.      
-Written 99.1% of 72120516 rows in 83 secs using 6 threads. maxBuffUsed=18%. ETA 0 secs.      
+Written 0.2% of 72120516 rows in 15 secs using 10 threads. maxBuffUsed=18%. ETA 8007 secs.      
+Written 8.7% of 72120516 rows in 16 secs using 10 threads. maxBuffUsed=18%. ETA 177 secs.      
+Written 16.8% of 72120516 rows in 17 secs using 10 threads. maxBuffUsed=18%. ETA 88 secs.      
+Written 24.4% of 72120516 rows in 18 secs using 10 threads. maxBuffUsed=18%. ETA 58 secs.      
+Written 33.5% of 72120516 rows in 19 secs using 10 threads. maxBuffUsed=18%. ETA 39 secs.      
+Written 41.0% of 72120516 rows in 20 secs using 10 threads. maxBuffUsed=18%. ETA 30 secs.      
+Written 48.1% of 72120516 rows in 21 secs using 10 threads. maxBuffUsed=18%. ETA 23 secs.      
+Written 56.8% of 72120516 rows in 22 secs using 10 threads. maxBuffUsed=18%. ETA 17 secs.      
+Written 64.1% of 72120516 rows in 23 secs using 10 threads. maxBuffUsed=18%. ETA 13 secs.      
+Written 70.8% of 72120516 rows in 24 secs using 10 threads. maxBuffUsed=18%. ETA 10 secs.      
+Written 77.3% of 72120516 rows in 25 secs using 10 threads. maxBuffUsed=18%. ETA 7 secs.      
+Written 84.2% of 72120516 rows in 26 secs using 10 threads. maxBuffUsed=18%. ETA 5 secs.      
+Written 84.4% of 72120516 rows in 81 secs using 10 threads. maxBuffUsed=18%. ETA 15 secs.      
+Written 84.6% of 72120516 rows in 92 secs using 10 threads. maxBuffUsed=18%. ETA 16 secs.      
+Written 91.3% of 72120516 rows in 93 secs using 10 threads. maxBuffUsed=18%. ETA 8 secs.      
+Written 98.4% of 72120516 rows in 94 secs using 10 threads. maxBuffUsed=18%. ETA 1 secs.      
+Written 98.6% of 72120516 rows in 97 secs using 10 threads. maxBuffUsed=18%. ETA 1 secs.      
+Written 98.8% of 72120516 rows in 104 secs using 10 threads. maxBuffUsed=18%. ETA 1 secs.      
                                                                                                                                      </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
@@ -1820,15 +1868,15 @@ Written 99.1% of 72120516 rows in 83 secs using 6 threads. maxBuffUsed=18%. ETA 
 </ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2xhaW1zIDwtIGNsZWFuX2NsYWltcyhudW1jbGFpbS5maWxlLnBhdGggPSBcXC9jZW5zb2MvZGF0YS9udW1pZGVudC8xX251bWlkZW50X2ZpbGVzX3dpdGhfb3JpZ2luYWxfdmFybmFtZXMvY2xhaW1zX29yaWdpbmFsLmNzdlxcKVxuXG4jIyB3cml0ZSBvdXQgY2xlYW5lZCBjbGFpbXMgZmlsZXNcbmZ3cml0ZShjbGFpbXMsIFxcL2NlbnNvYy9kYXRhL251bWlkZW50LzJfbnVtaWRlbnRfZmlsZXNfY2xlYW5lZC9jbGFpbXNfY2xlYW5lZC5jc3ZcXClcbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r claims &lt;- clean_claims(numclaim.file.path = /censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv)</p>
-<div id="write-out-cleaned-claims-files" class="section level2">
-<h2>write out cleaned claims files</h2>
-<p>fwrite(claims, /censoc/data/numident/2_numident_files_cleaned/claims_cleaned.csv)</p>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY2xhaW1zIDwtIGNsZWFuX2NsYWltcyhudW1jbGFpbS5maWxlLnBhdGggPSBcXC9jZW5zb2MvZGF0YS9udW1pZGVudC8xX251bWlkZW50X2ZpbGVzX3dpdGhfb3JpZ2luYWxfdmFybmFtZXMvY2xhaW1zX29yaWdpbmFsLmNzdlxcKVxuXG4jIyB3cml0ZSBvdXQgY2xlYW5lZCBjbGFpbXMgZmlsZXNcbmZ3cml0ZShjbGFpbXMsIFxcL2NlbnNvYy9kYXRhL251bWlkZW50LzJfbnVtaWRlbnRfZmlsZXNfY2xlYW5lZC9jbGFpbXNfY2xlYW5lZC5jc3ZcXClcbmBgYFxuYGBgXG5gYGAifQ== -->
+<p><code>r</code>r</p>
+<pre class="r"><code>claims &lt;- clean_claims(numclaim.file.path = \/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv\)
+
+## write out cleaned claims files
+fwrite(claims, \/censoc/data/numident/2_numident_files_cleaned/claims_cleaned.csv\)</code></pre>
 <pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
-</div>
 
 <div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2xlYW4gTnVtYXBwbGljYXRpb24gRmlsZXMiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCkluIHRoaXMgbm90ZWJvb2ssIHdlIHRha2UgdGhlIE51bWlkZW50IGZpbGVzIHdpdGggdGhlIHRocmVlIC5jc3YgZmlsZXMgKGFwcHMsIGNsYWltcywgZGVhdGhzKSB3aXRoIHRoZSBvcmlnaW5hbCBOQVJBIHZhcmlhYmxlIG5hbWVzIGFuZCB0YWtlIHNldmVyYWwgc3RlcHMgdG8gY2xlYW4gYW5kIGhhcm1vbml6ZSB0ZSBkYXRhOgoKMS4gUmVuYW1lIHZhcmlhYmxlIG5hbWVzCjIuIFJlY29kZSB2YWx1ZXMgdG8gTkEgKCIwIiwgIiIsICIgIiwgInVuayIsICJ1biIsICJ1bmtub3duIiB3ZXJlIGFsbCByZWNvZGVkIHRvIDApLiAKMy4gQWRkIGEgInNvY3N0YXRlIiB2YXJpYWJsZSBmb3IgdGhlIGRlYXRoIHJlY29yZHMsIHJlcG9ydGluZyB0aGUgc3RhdGUgaW4gd2hpY2ggdGhlIFNvY2lhbCBTZWN1cml0eSBudW1iZXIgd2FzIGlzc3VlZCAKNC4gUmVtb3ZlIGFsbCBtYXNrZWQgcmVjb3JkcyAoZS5nLiB6enp6IHJlY29yZHMpCgpMaWJyYXJ5IFBhY2thZ2VzCgpgYGB7cn0KbGlicmFyeShjZW5zb2NkZXYpCmxpYnJhcnkodGlkeXZlcnNlKQpsaWJyYXJ5KGRhdGEudGFibGUpCmBgYAoKQ2xlYW4gYW5kIHdyaXRlIG91dCBkZWF0aCBmaWxlcyAKCmBgYHtyfQojIyBjbGVhbiBkZWF0aHMgQU5EIGFkZCBzb2NzdGF0ZSBCUEwgdmFyaWFibGUKZGVhdGhzIDwtIGNsZWFuX2RlYXRocyhudW1kZWF0aC5maWxlLnBhdGggPSAiL2NlbnNvYy9kYXRhL251bWlkZW50LzFfbnVtaWRlbnRfZmlsZXNfd2l0aF9vcmlnaW5hbF92YXJuYW1lcy9kZWF0aHNfb3JpZ2luYWwuY3N2IiwKICAgICAgICAgICAgICAgICAgICAgICBzc25fc3RhdGVfY3Jvc3N3YWxrX3BhdGggPSAiLzkwZGF5cy9jYXNleWJyZWVuL3Nzbl90b19zdGF0ZV9jcm9zc3dhbGsuY3N2IikKCiMjIHdyaXRlIG91dCBjbGVhbmVkIGRlYXRoIHJlY29yZHMKZndyaXRlKGRlYXRocywgIi9jZW5zb2MvZGF0YS9udW1pZGVudC8yX251bWlkZW50X2ZpbGVzX2NsZWFuZWQvZGVhdGhzX2NsZWFuZWQuY3N2IikKZndyaXRlKGRlYXRocywgIi9jZW5zb2MvZGF0YS9udW1pZGVudC8zX251bWlkZW50X2ZpbGVzX2NsZWFuZWRfYW5kX2NvbmRlbnNlZC9kZWF0aHNfY2xlYW5lZC5jc3YiKQpgYGAKCkNsZWFuIGFuZCB3cml0ZSBvdXQgYXBwbGljYXRpb24gZmlsZXMgCgotIG9uZSBmcmVhZCB0YWJsZSBnaXZlcyBhbiBvbWlub3VzIHdhcm5pbmcg4oCUIGJ1dCB0aGlzIGNhbiBiZSBpZ25vcmVkLiAKVE9ETyBzdXBwcmVzcyAvIGNoYW5nZSBjb2RlIHRvIGF2b2lkIHdhcm5pbmcKYGBge3J9CmFwcHMgPC0gY2xlYW5fYXBwcyhudW1hcHAuZmlsZS5wYXRoID0gIi9jZW5zb2MvZGF0YS9udW1pZGVudC8xX251bWlkZW50X2ZpbGVzX3dpdGhfb3JpZ2luYWxfdmFybmFtZXMvYXBwbGljYXRpb25zX29yaWdpbmFsLmNzdiIpCgojIyB3cml0ZSBvdXQgY2xlYW5lZCBhcHBsaWNhdGlvbiBmaWxlcwpmd3JpdGUoYXBwcywgIi9jZW5zb2MvZGF0YS9udW1pZGVudC8yX251bWlkZW50X2ZpbGVzX2NsZWFuZWQvYXBwc19jbGVhbmVkLmNzdiIpCmBgYAoKQ2xlYW4gYW5kIHdyaXRlIG91dCBjbGFpbXMgZmlsZXMgCgotIG9uZSBmcmVhZCB0YWJsZSBnaXZlcyBhbiBvbWlub3VzIHdhcm5pbmcg4oCUIGJ1dCB0aGlzIGNhbiBiZSBpZ25vcmVkLiAKVE9ETyBzdXBwcmVzcyAvIGNoYW5nZSBjb2RlIHRvIGF2b2lkIHdhcm5pbmcKYGBge3J9CmNsYWltcyA8LSBjbGVhbl9jbGFpbXMobnVtY2xhaW0uZmlsZS5wYXRoID0gIi9jZW5zb2MvZGF0YS9udW1pZGVudC8xX251bWlkZW50X2ZpbGVzX3dpdGhfb3JpZ2luYWxfdmFybmFtZXMvY2xhaW1zX29yaWdpbmFsLmNzdiIpCgojIyB3cml0ZSBvdXQgY2xlYW5lZCBjbGFpbXMgZmlsZXMKZndyaXRlKGNsYWltcywgIi9jZW5zb2MvZGF0YS9udW1pZGVudC8yX251bWlkZW50X2ZpbGVzX2NsZWFuZWQvY2xhaW1zX2NsZWFuZWQuY3N2IikKYGBgCg==</div>
 

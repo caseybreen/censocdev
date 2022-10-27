@@ -7,7 +7,7 @@ output: html_notebook
 Summary:
 Assessment of CenSoc-DMF using the DMF as a population denominator.
 Since there are no covariates in the DMF, the only thing we will really do here
-is compute the match rates (# of matched / # of people in the DMF). Since there is
+is compute the match rates (# of matched / # of people in the DMF). As there is
 no sex information in the DMF, but only men are matched, I use data from HMD
 to approximate the male-specific match rate.
 
