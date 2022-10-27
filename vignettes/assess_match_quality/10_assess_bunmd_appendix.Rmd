@@ -3,24 +3,36 @@ title: "Assessing match quality from BUNMD/Numident"
 author: "Maria Osborne" 
 ---
 
-Summary: Assessing match quality in the CenSoc-Numident file. Uses BUNMD as population denominator rather than
-1940 census.
+Summary:
+Assessment of CenSoc-Numident using the BUNMD as a population denominator.
 
 # Read in data
 ```{r}
-# library packages 
-library(plyr)
+# published files
 library(data.table)
 library(cowplot)
 library(ggsci)
 library(tidyverse)
-library(dplyr)
+library(here)
+library(gt)
 
-## numident 
-pub_numident <- fread('/home/ipums/ugury-ipums/censoc-abe-implementation/data/final-v2-matched-datasets/censoc_numident_v2.csv')
-
-## full bunmd 
+pub_numident <- fread('/censoc/data/censoc_v2.1/censoc_numident_v2.1.csv')
 full_bunmd <- fread("/censoc/data/censoc_v2/bunmd_v2.csv")
+
+# get ssns for matched nodes
+std_ssns <- pub_numident$ssn
+cons_ssns <- pub_numident[link_abe_exact_conservative==1, ssn]
+
+# full bunmd with flags for matches
+full_bunmd <- full_bunmd %>% mutate(num_std_flag = ssn %in% std_ssns,
+                                          num_cons_flag = ssn %in% cons_ssns)
+
+# Pare down the bunmd
+# ... to relevent dates
+bunmd_date_filtered <- full_bunmd %>% filter(byear < 1940 | (byear==1940 & bmonth <= 3)) %>% 
+  filter(dyear %in% 1988:2005) # N= 32.5 million
+# ... to availible birthplace
+bunmd_bpl <- bunmd_date_filtered %>% filter(bpl != 99999)
 ```
 
 
@@ -77,15 +89,10 @@ full_bunmd <- full_bunmd %>% mutate(num_std_flag = ssn %in% std_ssns,
 
 # pare down the bunmd 
 ```{r}
-# most important: people born after 1940, or who do not die in the death coverage window
-bunmd_date_filtered <- full_bunmd %>% filter(byear < 1940 | (byear==1940 & bmonth <= 3)) %>% 
-  filter(dyear %in% 1988:2005) # N= 32.5 million
-
 
 # full case information only
 bunmd_restricted <- bunmd_date_filtered %>% filter(bpl!=99999 & !is.na(race_first)) # N= 22.3 million
-# bpl availible (not complete case)
-bunmd_bpl <- bunmd_date_filtered %>% filter(bpl != 99999)
+
 
 
 # looking at the proportion native born
@@ -98,8 +105,6 @@ table((bunmd_bpl$bpl < 10000)) # 90% native born for those with birthplace info
 
 # Male match rates
 ```{r}
-
-
 # raw match rates
 raw_male_standard <- bunmd_date_filtered %>%
   filter(sex==1, byear %in% 1900:1935) %>% 
@@ -161,7 +166,7 @@ bunmd_match_rate_combined_male <- cowplot::plot_grid(raw_bunmd_match_rate_male, 
 bunmd_match_rate_combined_male 
 
 ggsave(bunmd_match_rate_combined_male,
-        filename = "/home/ipums/mariaosborne-ipums/censoc/bunmd_men_plot.pdf",
+        filename = here("vignettes/assess_match_quality/figs/bunmd_men_plot.pdf"),
         height = 4, width = 10)
 
 ```
@@ -230,7 +235,7 @@ bunmd_match_rate_combined_female <- cowplot::plot_grid(raw_bunmd_match_rate_fema
 bunmd_match_rate_combined_female 
 
  ggsave(bunmd_match_rate_combined_female,
-        filename = "/home/ipums/mariaosborne-ipums/censoc/bunmd_women_plot.pdf",
+        filename = here("vignettes/assess_match_quality/figs/bunmd_women_plot.pdf"),
         height = 4, width = 10)
 ```
 
@@ -239,7 +244,7 @@ bunmd_match_rate_combined_female
 set set == 1 or 2
 ```{r}
 unmatched_characteristics <- bunmd_bpl %>% 
-  filter(sex==1, byear %in% 1915:1940) %>% 
+  filter(sex==2, byear %in% 1915:1940) %>% 
   group_by(byear) %>% 
   filter(!num_std_flag & !num_cons_flag) %>% 
   dplyr::summarize(p_black = mean(race_first==2, na.rm=T),
@@ -250,7 +255,7 @@ unmatched_characteristics <- bunmd_bpl %>%
 
 ## Calculate sample proportion (standard)
 matched_characteristics_standard <- bunmd_bpl %>% 
-  filter(sex==1, byear %in% 1915:1940) %>% 
+  filter(sex==2, byear %in% 1915:1940) %>% 
   group_by(byear) %>% 
   filter(num_std_flag) %>% 
   dplyr::summarize(p_black = mean(race_first==2, na.rm=T),
@@ -261,7 +266,7 @@ matched_characteristics_standard <- bunmd_bpl %>%
 
 ## Calculate sample proportion (conservative)
 matched_characteristics_conservative <- bunmd_bpl %>% 
-  filter(sex==1, byear %in% 1915:1940) %>% 
+  filter(sex==2, byear %in% 1915:1940) %>% 
   group_by(byear) %>% 
   filter(num_cons_flag) %>% 
   dplyr::summarize(p_black = mean(race_first==2, na.rm=T),
@@ -288,14 +293,14 @@ matched_characteristics_plot_standard <- matched_characteristics_combined %>%
   theme(legend.position = "bottom", legend.title = element_blank()) + 
   facet_wrap(~type) + 
   background_grid() + 
-  labs(title = "BUNMD: Comparison of race in matched and unmatched sets (men)",
+  labs(title = "BUNMD: Comparison of race in matched and unmatched sets (women)",
        y = "Proportion",
        x = "Birth Year") +
   theme(legend.key.width=unit(1.5, "cm"))
 
 matched_characteristics_plot_standard
 ggsave(matched_characteristics_plot_standard,
-       filename = "/home/ipums/mariaosborne-ipums/censoc/bunmd_race_comp_men.pdf",
+       filename = here("vignettes/assess_match_quality/figs/bunmd_race_comp_women.pdf"),
        height = 7, width = 10)
 
 ```
@@ -340,7 +345,7 @@ bunmd_bpl <- bunmd_bpl %>%
                                      bpl == 99999 ~ 'Missing',
                                      TRUE ~ 'Foreign Born'))
 
-bunmd_bpl_case <- bunmd_bpl %>% filter(byear %in% 1915:1940, sex==2)
+bunmd_bpl_case <- bunmd_bpl %>% filter(byear %in% 1915:1940, sex==1)
 bun_characteristics <- bunmd_bpl_case %>% 
   select(ssn, race_recode, region_of_birth) %>%
   pivot_longer(-ssn) %>% 
@@ -407,7 +412,7 @@ table_s3 <- gt(data = combined_characteristics) %>%
 
 table_s3 
 
-table_s3  %>% gtsave("bunmd_table_women.tex", path ="/home/ipums/mariaosborne-ipums/censoc/")
+table_s3  %>% gtsave("bunmd_table_men.tex", path =here("vignettes/assess_match_quality/figs/"))
 ```
 
 
