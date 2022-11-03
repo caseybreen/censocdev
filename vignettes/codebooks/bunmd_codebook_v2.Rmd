@@ -55,12 +55,13 @@ library(ggplot2)
 library(dplyr)
 library(data.table)
 library(kableExtra)
+library(here)
 
 ## read in the BUNMD
 bunmd <- fread("/data/josh/CenSoc/data_release_v2/bunmd_v2/bunmd_v2.csv")
 
-## set path for figures
-knitr::opts_knit$set(root.dir = '~mariaosborne/censoc/BUNMD_codebook/bunmd_v2/')
+## set path for reading figures
+knitr::opts_knit$set(root.dir = here("vignettes/codebooks/"))
 ```
 
 
@@ -414,7 +415,7 @@ bunmd %>%
 
 \vspace{75pt}
 
-![](codebook_illustrations/byear_plot.png)
+![](bunmd_codebook_graphics/byear_plot.png)
 \newpage 
 
 **\huge bmonth **
@@ -520,7 +521,7 @@ knitr::kable(bunmd %>%
 \vspace{75pt}
 \begin{center}
 \end{center}
-![](codebook_illustrations/dyear_plot.png) 
+![](bunmd_codebook_graphics/dyear_plot.png) 
 
 
 ```{r, echo = F, eval = F}
@@ -681,7 +682,7 @@ knitr::kable(bunmd %>%
 
 \vspace{75pt}
 
-![](codebook_illustrations/death_age.png)
+![](bunmd_codebook_graphics/death_age.png)
 
 ```{r, echo = F, eval = F}
 bunmd %>%
@@ -933,7 +934,7 @@ bunmd %>%
 
 \vspace{75pt}
 
-![](codebook_illustrations/age_app.png)
+![](bunmd_codebook_graphics/age_app.png)
 
 \newpage 
 
@@ -1053,7 +1054,7 @@ bunmd %>%
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=16cm]{codebook_illustrations/weights_lexis.png}
+\includegraphics[width=16cm]{bunmd_codebook_graphics/weights_lexis.png}
 \caption*{Average weight by age of death and year of death.}
 \end{figure}
 
@@ -1100,7 +1101,7 @@ weight_conservative.plot <- bunmd %>%
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=16cm]{codebook_illustrations/ccweights_lexis.png}
+\includegraphics[width=16cm]{bunmd_codebook_graphics/ccweights_lexis.png}
 \caption*{Average ccweight by age of death and year of death.}
 \end{figure}
 
