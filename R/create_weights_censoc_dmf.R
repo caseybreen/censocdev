@@ -1,3 +1,6 @@
+#########################################
+# revised by WON-TAK JOO (2022-11-10)   #
+#########################################
 #' Create weights
 #' This function will weight the numident censoc.dmf up to HMD lexis triangles
 #' Restrict data to certain cohorts and ages at deaths
@@ -9,10 +12,10 @@
 #' @export
 #'
 
-create_weights_censoc_dmf <- function(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:100)) {
+create_weights_censoc_dmf <- function(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:100), hmd_path = "/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") {
 
   ## deaths from HMD
-  hmd_deaths <-  fread("/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
+  hmd_deaths <-  fread(hmd_path) %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   ## create censoc-dmf counts

@@ -1,0 +1,1117 @@
+---
+title: "Berkeley Unified Numident Mortality Database Codebook[^updated]"
+output:
+  pdf_document:
+header-includes:
+- \usepackage{hyperref}
+- \usepackage{float}
+- \restylefloat{table}
+- \usepackage{caption}
+---
+[^updated]: Last updated: `r format(Sys.time(), '%d %B, %Y')`
+
+
+
+| Page| Variable            | Label                                        |
+|----:|:--------------------|:---------------------------------------------|
+|  \hyperlink{page.2}{2}    | \hyperlink{page.2}{ssn}                |Social Security Number                        |
+|  \hyperlink{page.3}{3}    | \hyperlink{page.3}{fname}              |First Name                                    |
+|  \hyperlink{page.4}{4}    | \hyperlink{page.4}{mname}              |Middle Name                                   | 
+|  \hyperlink{page.5}{5}    | \hyperlink{page.5}{lname}              |Last Name                                     |
+|  \hyperlink{page.6}{6}    | \hyperlink{page.6}{sex}                |Sex                                           |
+|  \hyperlink{page.7}{7}    | \hyperlink{page.7}{race\_first}         |Race on First Application                 |
+|  \hyperlink{page.8}{8}    | \hyperlink{page.8}{race\_first\_cyear}   |First Race: Application Year              |
+|  \hyperlink{page.9}{9}    | \hyperlink{page.9}{race\_first\_cmonth}  |First Race: Application Month             |
+|  \hyperlink{page.10}{10}  | \hyperlink{page.10}{race\_last}         |Race on Last Application                  |
+|  \hyperlink{page.11}{11}  | \hyperlink{page.11}{race\_last\_cyear}   |Last Race: Application Year               |
+|  \hyperlink{page.12}{12}  | \hyperlink{page.12}{race\_last\_cmonth}  |Last Race: Application Month              |
+|  \hyperlink{page.13}{13}  | \hyperlink{page.13}{race\_change}       |Change in Race Response Flag                  |
+|  \hyperlink{page.14}{14}  | \hyperlink{page.14}{bpl}               |Place of Birth                                |
+|  \hyperlink{page.15}{15}  | \hyperlink{page.15}{byear}             |Year of Birth                                 |
+|  \hyperlink{page.16}{16}  | \hyperlink{page.16}{bmonth}            |Month of Birth                                |
+|  \hyperlink{page.17}{17}  | \hyperlink{page.17}{bday}              |Day of Birth                                  |
+|  \hyperlink{page.18}{18}  | \hyperlink{page.18}{dyear}             |Year of Death                                 |
+|  \hyperlink{page.19}{19}  | \hyperlink{page.19}{dmonth}            |Month of Death                                |
+|  \hyperlink{page.20}{20}  | \hyperlink{page.20}{dday}              |Day of Death                                  |
+|  \hyperlink{page.21}{21}  | \hyperlink{page.21}{death\_age}         |Age at Death (Years)                          |
+|  \hyperlink{page.22}{22}  | \hyperlink{page.22}{zip\_residence}     |ZIP Code of Residence at Time of Death        |
+|  \hyperlink{page.23}{23}  | \hyperlink{page.23}{socstate}          |State where Social Security Number Issued     |
+|  \hyperlink{page.24}{24}  | \hyperlink{page.24}{father\_fname}      |Father's First Name                           |
+|  \hyperlink{page.25}{25}  | \hyperlink{page.25}{father\_mname}      |Father's Middle Name                          |
+|  \hyperlink{page.26}{26}  | \hyperlink{page.26}{father\_lname}      |Father's Last Name                            |
+|  \hyperlink{page.27}{27}  | \hyperlink{page.27}{mother\_fname}      |Mother's First Name                           |
+|  \hyperlink{page.28}{28}  | \hyperlink{page.28}{mother\_mname}      |Mother's Middle Name                          |
+|  \hyperlink{page.29}{29}  | \hyperlink{page.29}{mother\_lname}      |Mother's Last Name                            |
+|  \hyperlink{page.30}{30}  | \hyperlink{page.30}{age\_first\_application} |Age at First Social Security Application      |
+|  \hyperlink{page.31}{31}  | \hyperlink{page.31}{number\_apps}       |Number of Applications                        |
+|  \hyperlink{page.32}{32}  | \hyperlink{page.32}{number\_claims}     |Number of Claims                              |
+|  \hyperlink{page.33}{33}  | \hyperlink{page.33}{weight}            |High-Coverage Sub-Sample Weight               |
+|  \hyperlink{page.34}{34}  | \hyperlink{page.34}{ccweight}          |High-Coverage "Complete Case" Sub-Sample Weight|
+
+
+```{r echo = F, results='hide', message=FALSE, warning=FALSE}
+## Library Packages
+library(ggplot2)
+library(dplyr)
+library(data.table)
+library(kableExtra)
+library(here)
+
+## read in the BUNMD
+bunmd <- fread("/data/josh/CenSoc/data_release_v2/bunmd_v2/bunmd_v2.csv")
+
+## set path for reading figures
+knitr::opts_knit$set(root.dir = here("vignettes/codebooks/"))
+```
+
+
+\newpage 
+
+**\huge ssn**
+\normalsize
+\vspace{12pt}
+
+**Label**: Social Security Number
+
+**Description**: ssn reports a person's Social Security number, as recorded in the Numident death records. Uniquely identifies all records in the dataset. 
+
+\newpage 
+
+**\huge fname **
+\normalsize
+\vspace{12pt}
+
+**Label**: First Name
+
+**Description**: fname reports the first 16 letters of the person's first name, as recorded in the Numident death records.
+
+\newpage 
+
+**\huge mname **
+\normalsize
+\vspace{12pt}
+
+**Label:** Middle Name
+
+**Description**: mname reports the first 16 letters of the person's middle name, as recorded in the Numident death records.
+
+\newpage 
+
+
+**\huge lname **
+\normalsize
+\vspace{12pt}
+
+**Label:** Last Name 
+
+**Description**: lname reports the first 21 letters of the person's last name, as recorded in the Numident death records.
+
+\newpage 
+
+**\huge sex **
+\normalsize
+\vspace{12pt}
+
+**Label:** Sex
+
+**Description**: sex reports a person's sex, as recorded in the Numident death, application, or claims Records. 
+
+```{r, eval = F, echo = F}
+opts_chunk$set(fig.lp = '')
+
+knitr::kable(bunmd %>%
+    group_by(sex) %>%
+     tally() %>%
+     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(label = c("Men", "Women", "Missing")) %>%
+     select(sex, label, n, `freq %` = freq))
+```
+
+| sex|label   |        n| freq %|
+|---:|:-------|--------:|------:|
+|   1|Men     | 25769568|  52.20|
+|   2|Women   | 22686047|  46.00|
+|  NA|Missing |   882212|   1.79|
+
+\newpage 
+
+**\huge race\_first **
+\normalsize
+\vspace{12pt}
+
+**Label**: race first
+
+**Description**: race_first reports a person's race, as recorded on their most recent application entry. 
+
+
+**Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. They also removed the Other category.
+
+```{r, eval = F, echo = F}
+knitr::kable(bunmd %>%
+    group_by(race_first) %>%
+    tally() %>%
+    mutate(freq = round(n*100 / sum(n), 3)) %>%
+    mutate(label = c("White", "Black", "Other", "Asian, Asian American, or Pacific Islander", "Hispanic", "North American Indian or Alaskan Native", "Missing")) %>%
+    select(race_first, label, n, `freq %` = freq))
+```
+
+| race_first|label                                      |        n| freq %|
+|----------:|:------------------------------------------|--------:|------:|
+|          1|White                                      | 28850917| 58.476|
+|          2|Black                                      |  4066081|  8.241|
+|          3|Other                                      |   689360|  1.397|
+|          4|Asian, Asian American, or Pacific Islander |   207656|  0.421|
+|          5|Hispanic                                   |   286517|  0.581|
+|          6|North American Indian or Alaskan Native    |    17485|  0.035|
+|         NA|Missing                                    | 15219811| 30.848|
+
+\newpage
+
+**\huge race_first_cyear **
+\normalsize
+\vspace{12pt}
+
+**Label:** First Race: Application Year
+
+**Description**: race_first_cyear is a numeric variable reporting the year of the application on which a person reported their first race. 
+\vspace{12pt}
+
+\newpage 
+
+**\huge race_first_cmonth **
+\normalsize
+\vspace{12pt}
+
+**Label:** First Race: Application Month
+
+**Description**: race_first_cmonth is a numeric variable reporting the month of the application on which a person reported their first race. 
+
+\newpage 
+
+
+**\huge race\_last **
+\normalsize
+\vspace{12pt}
+
+**Label**: race last
+
+**Description**: race_last reports a person's race, as recorded on their most recent application entry.
+
+**Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. They also removed the Other category.
+
+```{r, eval = F, echo = F}
+knitr::kable(bunmd %>%
+    group_by(race_last) %>%
+    tally() %>%
+    mutate(freq = round(n*100 / sum(n), 3)) %>%
+    mutate(label = c("White", "Black", "Other", "Asian, Asian American, or Pacific Islander", "Hispanic", "North American Indian or Alaskan Native", "Missing")) %>%
+    select(race_last, label, n, `freq %` = freq))
+```
+
+| race_last|label                                      |        n| freq %|
+|---------:|:------------------------------------------|--------:|------:|
+|         1|White                                      | 28417859| 57.599|
+|         2|Black                                      |  4040665|  8.190|
+|         3|Other                                      |   469636|  0.952|
+|         4|Asian, Asian American, or Pacific Islander |   305470|  0.619|
+|         5|Hispanic                                   |   794762|  1.611|
+|         6|North American Indian or Alaskan Native    |    89624|  0.182|
+|        NA|Missing                                    | 15219811| 30.848|
+
+\newpage
+
+**\huge race_last_cyear **
+\normalsize
+\vspace{12pt}
+
+**Label:** First Race: Application Year
+
+**Description**: race_last_cyear reports the year of the application on which a person reported their last race. 
+
+\newpage 
+
+**\Huge race_last_cmonth **
+\normalsize
+\vspace{12pt}
+
+**Label:** Last Race: Application Month
+
+**Description**: race_last_cmonth is a numeric variable reporting the month of the application on which a person reported their last race. 
+
+\newpage 
+
+\newpage 
+
+**\huge race\_change **
+\normalsize
+\vspace{12pt}
+
+**Label**: Change in Race Response Flag
+
+**Description**: race_change is a numeric dichotomous variable reporting whether an individual changed their race response across their Social Security applications.
+ 
+```{r, eval = F, echo = F}
+knitr::kable(bunmd %>%
+               group_by(race_change) %>%
+               tally() %>%
+               mutate(freq = signif(n*100 / sum(n), 3)) %>%
+               mutate(label = c("No Change", "Change", "No Race Information")) %>%
+               select(race_change, label, n, `freq %` = freq))
+```
+
+| race_change|label               |        n| freq %|
+|-----------:|:-------------------|--------:|------:|
+|           0|No Change           | 33263321|  67.40|
+|           1|Change              |   855047|   1.73|
+|          NA|No Race Information | 15219459|  30.80|
+
+\newpage 
+
+**\huge bpl **
+\normalsize
+\vspace{12pt}
+
+**Label**: Birthplace
+
+**Description**: bpl is a numeric variable reporting the person's place of birth, as recorded in the Numident application or claims records. The accompanying bpl_string variable reports the person's place of birth as a character string. The numeric codes match the detailed IPUMS-USA Birthplace codes.
+
+For a complete list of IPUMS Birthplace codes, please see: https://usa.ipums.org/usa-action/variables/BPL
+
+
+```{r, echo = F, eval = F}
+bpl_tabulation <- bunmd %>%
+    filter(bpl < 10000) %>% 
+    group_by(bpl, bpl_string) %>%
+    tally() %>%
+    ungroup() %>% 
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
+    select(bpl, bpl_string, n, `freq %` = freq)
+
+
+rows <- seq_len(nrow(bpl_tabulation) %/% 2)
+knitr::kable(list(bpl_tabulation[rows,1:4],  
+           matrix(numeric(), nrow=0, ncol=1),
+           bpl_tabulation[-rows, 1:4]), 
+      caption = "This is the caption.",
+      label = "tables", format = "latex", booktabs = TRUE) 
+```
+
+\vspace{12pt}
+
+\begin{table}[H]
+\caption*{Birthplace Frequencies (for Native Born)}
+\centering
+\begin{tabular}[t]{rlrr}
+\toprule
+bpl & bpl\_string & n & freq \%\\
+\midrule
+100 & Alabama & 916460 & 2.84\\
+200 & Alaska & 25406 & 0.08\\
+400 & Arizona & 144300 & 0.45\\
+500 & Arkansas & 624232 & 1.93\\
+600 & California & 1115176 & 3.46\\
+\addlinespace
+800 & Colorado & 277268 & 0.86\\
+900 & Connecticut & 374288 & 1.16\\
+1000 & Delaware & 64978 & 0.20\\
+1100 & District of Columbia & 129166 & 0.40\\
+1200 & Florida & 462174 & 1.43\\
+\addlinespace
+1300 & Georgia & 1011492 & 3.14\\
+1500 & Hawaii & 91736 & 0.28\\
+1600 & Idaho & 125177 & 0.39\\
+1700 & Illinois & 1741873 & 5.40\\
+1800 & Indiana & 828095 & 2.57\\
+\addlinespace
+1900 & Iowa & 607860 & 1.88\\
+2000 & Kansas & 476683 & 1.48\\
+2100 & Kentucky & 866052 & 2.68\\
+2200 & Louisiana & 718460 & 2.23\\
+2300 & Maine & 205832 & 0.64\\
+\addlinespace
+2400 & Maryland & 436983 & 1.35\\
+2500 & Massachusetts & 970896 & 3.01\\
+2600 & Michigan & 1182488 & 3.67\\
+2700 & Minnesota & 568850 & 1.76\\
+2800 & Mississippi & 691061 & 2.14\\
+\bottomrule
+\end{tabular}
+\centering
+\begin{tabular}[t]{r}
+\toprule
+
+\bottomrule
+\end{tabular}
+\centering
+\begin{tabular}[t]{rlrr}
+\toprule
+bpl & bpl\_string & n & freq \%\\
+\midrule
+2900 & Missouri & 953475 & 2.96\\
+3000 & Montana & 129791 & 0.40\\
+3100 & Nebraska & 334691 & 1.04\\
+3200 & Nevada & 24990 & 0.08\\
+3300 & New Hampshire & 102281 & 0.32\\
+\addlinespace
+3400 & New Jersey & 845462 & 2.62\\
+3500 & New Mexico & 151357 & 0.47\\
+3600 & New York & 2646066 & 8.20\\
+3700 & North Carolina & 1100194 & 3.41\\
+3800 & North Dakota & 190312 & 0.59\\
+\addlinespace
+3900 & Ohio & 1547059 & 4.80\\
+4000 & Oklahoma & 691459 & 2.14\\
+4100 & Oregon & 197939 & 0.61\\
+4200 & Pennsylvania & 2480466 & 7.69\\
+4400 & Rhode Island & 160511 & 0.50\\
+\addlinespace
+4500 & South Carolina & 592424 & 1.84\\
+4600 & South Dakota & 168314 & 0.52\\
+4700 & Tennessee & 868901 & 2.69\\
+4800 & Texas & 1726094 & 5.35\\
+4900 & Utah & 158295 & 0.49\\
+\addlinespace
+5000 & Vermont & 87739 & 0.27\\
+5100 & Virginia & 790692 & 2.45\\
+5300 & Washington & 324126 & 1.00\\
+5400 & West Virginia & 560213 & 1.74\\
+5500 & Wisconsin & 713743 & 2.21\\
+\addlinespace
+5600 & Wyoming & 57795 & 0.18\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage 
+
+**\huge byear **
+\normalsize
+\vspace{12pt}
+
+**Label**: Birth Year
+
+**Description**: byear is a numeric variable reporting the person's year of birth, as recorded in the Numident death records.
+
+```{r, echo = F, eval = F}
+bunmd %>%
+    group_by(byear) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = byear, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal() + #replace with a different theme (theme_bw()) if the bbplot package isn't downloaded 
+  ggtitle("Year of Birth") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  theme(plot.title = element_text(size=25),
+        axis.title = element_text(size = 17), 
+    axis.text.y = element_text(size=17),
+    axis.text.x = element_text(size=17)) +
+  labs(x = "Year", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+![](bunmd_codebook_graphics/byear_plot.png)
+\newpage 
+
+**\huge bmonth **
+\normalsize
+\vspace{12pt}
+
+**Label:** Birth Month
+
+Description: bmonth is a numeric variable reporting the person's month of birth, as recorded in the Numident death records.   
+
+```{r, eval = F, echo = F}
+knitr::kable(bunmd %>%
+    group_by(bmonth) %>%
+    tally() %>%
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
+    mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Missing")) %>%
+    select(bmonth, label, n, `freq %` = freq))
+```
+
+| bmonth|label     |       n| freq %|
+|------:|:---------|-------:|------:|
+|      1|January   | 4181375|   8.47|
+|      2|February  | 3933555|   7.97|
+|      3|March     | 4296940|   8.71|
+|      4|April     | 3976307|   8.06|
+|      5|May       | 4051432|   8.21|
+|      6|June      | 3937147|   7.98|
+|      7|July      | 4221224|   8.56|
+|      8|August    | 4362872|   8.84|
+|      9|September | 4279353|   8.67|
+|     10|October   | 4173868|   8.46|
+|     11|November  | 3884566|   7.87|
+|     12|December  | 4039185|   8.19|
+|     NA|Missing   |       3|   0.00|
+
+\newpage 
+
+**\huge bday **
+\normalsize
+\vspace{12pt}
+
+**Label**: Birth Day
+
+**Description**: bday is a numeric variable reporting the person's day of birth, as recorded in the Numident death records.
+
+**Note:** It appears from the surplus of counts on the 1st and the 15th of the month that SSA might have done some imputation of missing values to these dates.
+
+
+```{r, eval = F, echo = F}
+knitr::kable(bunmd %>%
+    group_by(bday) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    select(bday, n, `freq %` = freq))
+```
+
+
+| bday|       n| freq %|
+|----:|-------:|------:|
+|    1| 1752583|  3.600|
+|    2| 1658244|  3.400|
+|    3| 1609261|  3.300|
+|    4| 1637955|  3.300|
+|    5| 1622040|  3.300|
+|    6| 1626699|  3.300|
+|    7| 1605110|  3.300|
+|    8| 1631598|  3.300|
+|    9| 1590390|  3.200|
+|   10| 1710297|  3.500|
+|   11| 1586088|  3.200|
+|   12| 1670822|  3.400|
+|   13| 1568796|  3.200|
+|   14| 1621064|  3.300|
+|   15| 1782188|  3.600|
+|   16| 1613051|  3.300|
+|   17| 1604846|  3.300|
+|   18| 1616778|  3.300|
+|   19| 1576661|  3.200|
+|   20| 1643349|  3.300|
+|   21| 1546797|  3.100|
+|   22| 1631722|  3.300|
+|   23| 1592459|  3.200|
+|   24| 1591364|  3.200|
+|   25| 1657548|  3.400|
+|   26| 1568447|  3.200|
+|   27| 1577419|  3.200|
+|   28| 1624799|  3.300|
+|   29| 1471946|  3.000|
+|   30| 1414317|  2.900|
+|   31|  901308|  1.800|
+|   NA|   31881|  0.065|
+
+\newpage 
+
+**\huge dyear **
+\normalsize
+\vspace{12pt}
+
+**Label**: Death Year
+
+**Description**: dyear is a numeric variable reporting the person's year of death, as recorded in the Numident death records.   
+
+\vspace{75pt}
+\begin{center}
+\end{center}
+![](bunmd_codebook_graphics/dyear_plot.png) 
+
+
+```{r, echo = F, eval = F}
+## Get HMD deaths from website
+hmd_deaths <- fread("/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_1x1/USA.Deaths_1x1.txt")
+
+## Tabulate deaths in BUNMD for 65+
+bunmd.deaths.tabulated <- bunmd %>%
+  filter(death_age >= 65) %>%
+  group_by(Year = dyear) %>%
+  filter(Year > 1960) %>%
+  summarize(deaths = n()) %>%
+  mutate(source = "BUNMD")
+
+## Tabulate deaths in BUNMD for 65+
+## Restrict to complete cases with sex, birthplace, race
+bunmd.deaths.complete.tabulated <- bunmd %>%
+  filter(dyear %in% c(1988:2005)) %>% 
+  filter(death_age >= 65) %>%
+  group_by(Year = dyear) %>%
+  filter(Year > 1960) %>%
+  filter(!is.na(ccweight)) %>%
+  summarize(deaths = n()) %>%
+  mutate(source = "BUNMD Complete Cases")
+
+## Tabulate deaths in HMD for 65+
+hmd.deaths.tabulated <- hmd_deaths %>%
+  filter(Age >= 65) %>%
+  group_by(Year) %>%
+  filter(Year > 1960) %>%
+  summarize(deaths = sum(Total)) %>%
+  mutate(source = "Human Mortality Database")
+
+## Combine into one data frame
+data.for.plot <- hmd.deaths.tabulated %>%
+  bind_rows(bunmd.deaths.tabulated) %>%
+  bind_rows(bunmd.deaths.complete.tabulated) %>%
+  filter(Year > 1970 & Year < 2009)
+
+## Create death coverage plot
+ggplot(data.for.plot) +
+  geom_line((aes(x = Year, y = deaths, linetype=source)), size = .9) +
+  scale_linetype_manual(values=c( "dashed", "dotted", "solid")) +
+  theme_minimal() + #replace with a different theme (theme_bw()) if the bbplot package isn't downloaded
+  theme(legend.position="bottom", legend.title = element_blank()) +
+  theme(plot.title = element_text(size = 25),
+        axis.title = element_text(size = 17),
+        axis.text.y = element_text(size=17),
+        axis.text.x = element_text(size=17), 
+        legend.text=element_text(size=15)) +
+  labs(title = "Year of Death 65+",
+       x = "Year",
+       y = "Count") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5))
+```
+
+\newpage 
+
+**\huge dmonth **
+\normalsize
+\vspace{12pt}
+
+**Label**: Death Month
+
+**Description**: dmonth is a numeric variable reporting the person's month of death, as recorded in the Numident death records.  
+
+```{r, echo = F, eval = F}
+knitr::kable(bunmd %>%
+    group_by(dmonth) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 3)) %>%
+    mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
+    select(dmonth, label, n, `freq %` = freq))
+```
+
+
+| dmonth|label     |       n| freq %|
+|------:|:---------|-------:|------:|
+|      1|January   | 4610022|   9.34|
+|      2|February  | 4119282|   8.35|
+|      3|March     | 4353899|   8.82|
+|      4|April     | 4036794|   8.18|
+|      5|May       | 4023999|   8.16|
+|      6|June      | 3828836|   7.76|
+|      7|July      | 3924851|   7.96|
+|      8|August    | 3887262|   7.88|
+|      9|September | 3835198|   7.77|
+|     10|October   | 4125914|   8.36|
+|     11|November  | 4102011|   8.31|
+|     12|December  | 4489759|   9.10|
+
+\newpage 
+
+**\huge dday **
+\normalsize
+\vspace{12pt}
+
+**Label**: Day of Death
+
+**Description**: dday is a numeric variable reporting the person's day of death, as recorded in the Numident death records.  
+
+**Note:** It appears from the surplus of counts on the 1st, 4th, and the 15th of the month that SSA might have done some imputation of missing values to these dates. Also, different periods have differ allocation patterns. 
+
+
+```{r, echo = F, eval = F}
+knitr::kable(bunmd %>%
+    group_by(dday) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    select(dday, n, `freq %` = freq))
+```
+
+| dday|       n| freq %|
+|----:|-------:|------:|
+|    1| 1432114|    2.9|
+|    2| 1240840|    2.5|
+|    3| 1258505|    2.6|
+|    4| 1281969|    2.6|
+|    5| 1241857|    2.5|
+|    6| 1238121|    2.5|
+|    7| 1234527|    2.5|
+|    8| 1237353|    2.5|
+|    9| 1234152|    2.5|
+|   10| 1236852|    2.5|
+|   11| 1234080|    2.5|
+|   12| 1234552|    2.5|
+|   13| 1230163|    2.5|
+|   14| 1231013|    2.5|
+|   15| 3392922|    6.9|
+|   16| 1227374|    2.5|
+|   17| 1228022|    2.5|
+|   18| 1223495|    2.5|
+|   19| 1223837|    2.5|
+|   20| 1230608|    2.5|
+|   21| 1218728|    2.5|
+|   22| 1217328|    2.5|
+|   23| 1219353|    2.5|
+|   24| 1216433|    2.5|
+|   25| 1214084|    2.5|
+|   26| 1216347|    2.5|
+|   27| 1215884|    2.5|
+|   28| 1217904|    2.5|
+|   29| 1130910|    2.3|
+|   30| 1104857|    2.2|
+|   31|  713927|    1.4|
+|   NA| 9559716|   19.0|
+
+\newpage 
+
+**\huge death\_age **
+\normalsize
+\vspace{12pt}
+
+**Label**: Age at Death (Years)
+
+**Description**: death_age is a numeric variable reporting the person's age at death in years, calculated using birth and death information recorded in the Numident death records.   
+
+\vspace{75pt}
+
+![](bunmd_codebook_graphics/death_age.png)
+
+```{r, echo = F, eval = F}
+bunmd %>%
+  filter(death_age %in% c(0:110)) %>% 
+    group_by(death_age) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = death_age, y = n)) + 
+    geom_point() + 
+    geom_line() + 
+    theme_minimal() +
+  ggtitle("Age of Death") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  theme(plot.title = element_text(size = 25),
+        axis.title = element_text(size = 17), 
+    axis.text.y = element_text(size=17),
+    axis.text.x = element_text(size=17)) +
+  labs(x = "Age at Death", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\newpage 
+
+**\huge zip\_residence **
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: ZIP Code of Residence at Time of Death
+
+**Description**: zip_residence is a string variable (9-characters) reporting a person's ZIP code of residence at time of death, as reported in the Numident death records. 
+
+\newpage 
+**\huge socstate **
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: State where Social Security Number Issued
+
+**Description**: The state in which the person's social security card was issued. Determined by first three (3) digits of Social Security number, as recorded in Numident death records. The accompanying socstate_string variable reports the state in which a person's social security card was issued as a character string. The numeric codes match the detailed IPUMS-USA Birthplace codes. 
+
+```{r, eval = F, echo = F}
+socstate_tabulation <- bunmd %>%
+    filter(socstate < 10000 | is.na(socstate)) %>% 
+    group_by(socstate, socstate_string) %>%
+    tally() %>%
+    ungroup() %>% 
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
+    select(socstate, socstate_string, n, `freq %` = freq)
+
+rows <- seq_len(nrow(socstate_tabulation) %/% 2)
+knitr::kable(list(socstate_tabulation[rows,1:4],  
+           matrix(numeric(), nrow=0, ncol=1),
+           socstate_tabulation[-rows, 1:4]), 
+      caption = "This is the caption.",
+      label = "tables", format = "latex", booktabs = TRUE) 
+```
+
+\vspace{12pt}
+
+\begin{table}[H]
+\caption*{Socstate Frequencies}
+\centering
+\begin{tabular}[t]{rlrr}
+\toprule
+socstate & socstate\_string & n & freq \%\\
+\midrule
+100 & Alabama & 1010756 & 2.07\\
+200 & Alaska & 35207 & 0.07\\
+400 & Arizona & 274363 & 0.56\\
+500 & Arkansas & 621147 & 1.27\\
+600 & California & 3381722 & 6.91\\
+\addlinespace
+800 & Colorado & 435935 & 0.89\\
+900 & Connecticut & 644841 & 1.32\\
+1000 & Delaware & 103907 & 0.21\\
+1100 & District of Columbia & 298017 & 0.61\\
+1200 & Florida & 1119359 & 2.29\\
+\addlinespace
+1300 & Georgia & 1171471 & 2.39\\
+1500 & Hawaii & 165054 & 0.34\\
+1600 & Idaho & 179125 & 0.37\\
+1700 & Illinois & 2855031 & 5.84\\
+1800 & Indiana & 1248048 & 2.55\\
+\addlinespace
+1900 & Iowa & 764643 & 1.56\\
+2000 & Kansas & 579408 & 1.18\\
+2100 & Kentucky & 917858 & 1.88\\
+2200 & Louisiana & 899017 & 1.84\\
+2300 & Maine & 283261 & 0.58\\
+\addlinespace
+2400 & Maryland & 728497 & 1.49\\
+2500 & Massachusetts & 1465566 & 3.00\\
+2600 & Michigan & 2034399 & 4.16\\
+2700 & Minnesota & 817858 & 1.67\\
+2800 & Mississippi & 687994 & 1.41\\
+\addlinespace
+2900 & Missouri & 1299368 & 2.66\\
+\bottomrule
+\end{tabular}
+\centering
+\begin{tabular}[t]{r}
+\toprule
+
+\bottomrule
+\end{tabular}
+\centering
+\begin{tabular}[t]{rlrr}
+\toprule
+socstate & socstate\_string & n & freq \%\\
+\midrule
+3000 & Montana & 163411 & 0.33\\
+3100 & Nebraska & 390427 & 0.80\\
+3200 & Nevada & 59479 & 0.12\\
+3300 & New Hampshire & 154388 & 0.32\\
+3400 & New Jersey & 1510334 & 3.09\\
+\addlinespace
+3500 & New Mexico & 207319 & 0.42\\
+3600 & New York & 4980871 & 10.18\\
+3700 & North Carolina & 1349016 & 2.76\\
+3800 & North Dakota & 181420 & 0.37\\
+3900 & Ohio & 2460960 & 5.03\\
+\addlinespace
+4000 & Oklahoma & 779894 & 1.59\\
+4100 & Oregon & 423383 & 0.87\\
+4200 & Pennsylvania & 3266642 & 6.68\\
+4400 & Rhode Island & 252536 & 0.52\\
+4500 & South Carolina & 637802 & 1.30\\
+\addlinespace
+4600 & South Dakota & 174252 & 0.36\\
+4700 & Tennessee & 1115600 & 2.28\\
+4800 & Texas & 2562712 & 5.24\\
+4900 & Utah & 208380 & 0.43\\
+5000 & Vermont & 110991 & 0.23\\
+\addlinespace
+5100 & Virginia & 1014527 & 2.07\\
+5300 & Washington & 675565 & 1.38\\
+5400 & West Virginia & 646790 & 1.32\\
+5500 & Wisconsin & 1021002 & 2.09\\
+5600 & Wyoming & 86773 & 0.18\\
+\addlinespace
+NA &  & 471923 & 0.96\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage 
+
+
+**\huge father\_fname **
+\normalsize
+\vspace{12pt}
+
+**Label**: Father's First Name
+
+**Description**: father_fname is a character variable reporting the first 16 letters of the person's father's first name, as recorded in the Numident application records.
+
+\newpage 
+
+**\huge father\_mname **
+\normalsize
+\vspace{12pt}
+
+**Label**: Father's Middle Name
+
+**Description**: father_mname is a character variable reporting the first 16 letters of the person's father's middle name, as recorded in the Numident application records.
+
+\newpage 
+
+
+**\huge father\_lname **
+\normalsize
+\vspace{12pt}
+
+**Label**: Father's Last Name 
+
+**Description**: father_lname is a character variable reporting the first 21 letters of the person's father's last name, as recorded in the Numident application records.
+
+\newpage 
+
+
+**\huge mother\_fname **
+\normalsize
+\vspace{12pt}
+
+**Label**: Mother's First Name
+
+**Description**: mother_fname is a character variable reporting the first 16 letters of the person's mother's first name, as recorded in the Numident application records.
+
+\newpage 
+
+**\huge mother\_mname **
+\normalsize
+\vspace{12pt}
+
+**Label**: Mother's Middle Name
+
+**Description**: mother_mname is a character variable reporting the first 16 letters of the person's mother's middle name, as recorded in the Numident application records.
+
+\newpage 
+
+
+**\huge mother\_lname **
+\normalsize
+\vspace{12pt}
+
+**Label**: Mother's Last Name 
+
+**Description**: mother_lname is a character variable reporting the first 21 letters of the person's mother's last name, as recorded in the Numident application records.
+
+\newpage 
+
+**\huge age\_first\_application **
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: Age at First Social Security Application 
+
+**Description**: age_first_application reports the age at which the person submitted their first Social Security Application. 
+
+```{r, echo = F, eval = F}
+bunmd %>%
+    group_by(age_first_application) %>%
+    filter(age_first_application %in% c(0:110)) %>% 
+    summarise(n = n()) %>%
+    ggplot(aes(x = age_first_application, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal() + #replace with a different theme (theme_bw()) if the bbplot package isn't downloaded 
+  ggtitle("Age of First Application") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  theme(plot.title = element_text(size = 25),
+        axis.title = element_text(size = 17), 
+    axis.text.y = element_text(size=17),
+    axis.text.x = element_text(size=17)) +
+  labs(x = "Age of First Application", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+![](bunmd_codebook_graphics/age_app.png)
+
+\newpage 
+
+**\huge number\_apps **
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: Total Number of Applications 
+
+**Description**: number_apps reports the person's total number of Social Security applications, as recorded in the Numident application records. This variable was top-coded at 10. 
+
+
+```{r, eval = F, echo = F}
+topcode <- function(a, top) { 
+    return(ifelse(a > top, top, a))
+}
+## manually switch 10 to 10+ 
+knitr::kable(bunmd %>%
+    mutate(number_apps = topcode(number_apps, 10)) %>%         
+    group_by(number_apps) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    select(number_apps, n, `freq %` = freq))
+```
+
+| number_apps|        n| freq %|
+|-----------:|--------:|------:|
+|           0| 14166703| 29.000|
+|           1| 17646617| 36.000|
+|           2| 10107569| 20.000|
+|           3|  4309930|  8.700|
+|           4|  1710582|  3.500|
+|           5|   719300|  1.500|
+|           6|   323112|  0.650|
+|           7|   155220|  0.310|
+|           8|    80363|  0.160|
+|           9|    43690|  0.089|
+|          10+|    74741|  0.150|
+
+
+\newpage 
+
+**\huge number\_claims **
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: Total Number of Claims 
+
+**Description**: number_claims reports the person's total number of Social Security claims, as recorded in the Numident claim records. This variable was top-coded at 3. 
+
+
+```{r, eval = F, echo = F}
+topcode <- function(a, top) { 
+    return(ifelse(a > top, top, a))
+}
+## manually switch 3 to 3+ 
+knitr::kable(bunmd %>%
+    mutate(number_claims = topcode(number_claims, 3)) %>%         
+    group_by(number_claims) %>%
+    tally() %>%
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
+    select(number_claims, n, `freq %` = freq))
+```
+
+| number_claims|        n|  freq %|
+|-------------:|--------:|-----:|
+|             0| 32931311| 66.75|
+|             1| 16360228| 33.16|
+|             2|    45187|  0.09|
+|             3+|     1101|  0.00|
+
+\newpage 
+
+**\huge weight**
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: High Coverage Sample Weight
+
+**Description**: A post-stratification person-weight to Human Mortality Database (HMD) totals for persons (1) born between 1895-1940 (2) dying between 1988-2005 and (3) dying between ages 65-100 (4) with a non-missing value for sex. Please see the CenSoc methods protocol for more details on weighting procedure. 
+
+```{r, eval = F, echo = F}
+bunmd %>% 
+  summarize(min(weight, na.rm = T), max(weight, na.rm = T))
+
+bunmd %>%
+    ggplot() + 
+    geom_histogram(aes(x = weight)) + 
+    theme_minimal() + #replace with a different theme (theme_bw()) if the bbplot package isn't downloaded 
+  ggtitle("Distribution of weights") + 
+  theme(legend.position="bottom") +
+  theme(plot.title = element_text(size = 25),
+        axis.title = element_text(size = 17), 
+    axis.text.y = element_text(size=17),
+    axis.text.x = element_text(size=17)) +
+  labs(x = "Weight", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{40pt}
+
+|Value           | Label          |                
+|---------------:|---------------:|
+|    NA          | No weight assigned|
+|    Min Weight  | 0.961       | 
+|    Max Weight  | 2.383          |
+
+\vspace{30pt}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=16cm]{bunmd_codebook_graphics/weights_lexis.png}
+\caption*{Average weight by age of death and year of death.}
+\end{figure}
+
+\newpage 
+
+**\huge ccweight**
+
+\vspace{12pt}
+
+**Label**: High Coverage "Complete Case" Sample Weight
+
+**Description**: A post-stratification person-weight to Human Mortality Database (HMD) totals for persons (1) born between 1895-1940 (2) dying between 1988-2005 (3) dying between ages 65-100 (4) with a non-missing value for sex (5) with a non-missing value for birth place and (6) with a non-missing value for race. Please see the CenSoc methods protocol for more details on weighting procedure.
+
+```{r, eval = F, echo = F}
+ccweight_tab <- bunmd %>%
+  filter(!is.na(ccweight)) %>% 
+  summarize('Min Weight' = round(min(ccweight),2), 'Max Weight' = round(max(ccweight), 2)) %>%
+  mutate(id = 1:n()) %>% 
+  pivot_longer(-id, names_to = "Label", values_to = "Value") %>% 
+  select(Value, Label) %>% 
+  add_row(Label = "No Weight Assigned", Value = NA) %>% 
+  knitr::kable()
+
+weight_conservative.plot <- bunmd %>%
+  filter(!is.na(ccweight)) %>% 
+  ggplot() +
+    geom_boxplot(aes(x=ccweight), fill='grey92') +
+    ylim(-1,1) +
+    theme_minimal(15) +
+    theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank()) +
+    ggtitle("Distribution of Weights") +
+    xlab('Weight')
+```
+
+\vspace{40pt}
+
+|Value           | Label          |                
+|---------------:|---------------:|
+|    NA          | Incomplete case |
+|    Min Weight  | 1.02           | 
+|    Max Weight  | 18.71          |
+
+\vspace{30pt}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=16cm]{bunmd_codebook_graphics/ccweights_lexis.png}
+\caption*{Average ccweight by age of death and year of death.}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+

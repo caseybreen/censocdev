@@ -1,3 +1,6 @@
+#########################################
+# revised by WON-TAK JOO (2022-11-10)   #
+#########################################
 #' Create weights
 #' This function will weight the numident file up to HMD lexis triangles
 #' Restrict data to deaths from 1988 - 2005 with age_at_death between
@@ -9,10 +12,10 @@
 #' @export
 #'
 
-create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:1939), death_ages = c(65:100)) {
+create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:1939), death_ages = c(65:100), hmd_path = "/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") {
 
   ## Read in death by lexis triangle from HMD
-  hmd_deaths <-  fread("/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
+  hmd_deaths <-  fread(hmd_path) %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   ## Calculate counts of deaths in the Numident
