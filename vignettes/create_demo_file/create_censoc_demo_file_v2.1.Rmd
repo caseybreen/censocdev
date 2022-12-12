@@ -1,9 +1,8 @@
 ---
 title: "Make CenSoc Demo File"
-output: html_notebook
 ---
 
-Summary: In this Notebook, I make the CenSoc-DMF Demo file. 
+Summary: In this Notebook, I make the CenSoc-DMF and CenSoc-Numident Demo file. 
 
 Steps to make CenSoc Demo File:
 
