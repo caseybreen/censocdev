@@ -6,11 +6,15 @@ author: Casey Breen
 Summary: This code tracks the total number of CenSoc users. Specifically, it reads in a log of all people who have signed up to download CenSoc data. Next, it creates parses download-log files from the website. 
 
 ```{r}
+## library packages
 library(tidyverse)
+library(here)
 library(lubridate)
 library(ApacheLogProcessor)
 library(stringr)
 library(cowplot)
+library(DBI)
+library(RSQLite)
 ```
 
 
@@ -18,17 +22,13 @@ library(cowplot)
 
 ```{r}
 ## censoc download sqlite DBI
-
 path.to.db <- "/admin/lab_writeable/Censoc1313/Sqdata/crusers.db"  # not renamed from Creles project
 
+## create temp file 
 tmp.db <- tempfile()
 
 # user needs to own file or something, otherwise it is locked. So make a copy
 system( paste0("cp -a ",  path.to.db, " ", tmp.db ) )
-
-#RSQlite is used
-  library(DBI)
-  library(RSQLite)
 
   db <- dbConnect(SQLite(), tmp.db ,  flags = SQLITE_RO, synchronous = NULL)
 
@@ -42,7 +42,6 @@ system( paste0("cp -a ",  path.to.db, " ", tmp.db ) )
   dbDisconnect(db)
   
 ## Filter to dates after our first release (April 1st, 2020)
-  
 users <- signup_log %>% 
   mutate(date = as_date(dateh)) %>% 
   filter(date > "2020-04-01") %>% 
@@ -55,8 +54,9 @@ users <- users %>%
   group_by(fname, lname) %>% 
   arrange(date) %>% 
   filter(row_number() == 1)
-
 ```
+
+## Visualize new sign-ups 
 
 ```{r}
 ## number of new users by month
@@ -64,8 +64,9 @@ users %>%
   group_by(month = lubridate::floor_date(date, "month")) %>%
   tally()
 
-## number of new users
-users %>% group_by(date) %>% 
+## number of cumulative (new) users
+total_censoc_users <- users %>% 
+  group_by(date) %>% 
   tally() %>% 
   mutate(source = "New Signup",
          total = cumsum(n)) %>% 
@@ -74,30 +75,39 @@ users %>% group_by(date) %>%
   theme_cowplot() + 
   labs(y = "Users",
        x = "Date",
-       title = "Total CenSoc Users")
+       title = "Total CenSoc Users (Unique)")
+
+## plot cumultative number of users 
+ggsave(plot = total_censoc_users, filename = here("vignettes/user_logs/figs/total_censoc_users.png"), height = 4, width = 6)
 ```
 
-## Parse String Logs from Website
+## Parse String Logs from Website 
+
+The code below parses string logs from the CenSoc data download page to figure out which datasets a user downloaded. 
 
 ```{r}
 ## Parse Strings 
 censocLogs <- read.multiple.apache.access.log("/admin/lab_writeable/Censoc1313/Weblogs/",
 prefix="censoc-access.log")
 
+## Restrict to data 
 download_logs <- censocLogs %>% 
   filter(httpcode == 200) %>% 
   filter(str_detect(url, pattern = "GET /Data/"))
 
+## scrape url to figure out which dataset was downloaded 
 download_logs <- download_logs %>% 
   mutate(dataset_downloaded = case_when(
-    str_detect(url, pattern = "bunmd_v1") == TRUE ~ "BUNMD_V1",
-    str_detect(url, pattern = "bunmd_v2") == TRUE ~ "BUNMD_V2",
-    str_detect(url, pattern = "numident_v1") == TRUE ~ "CenSoc-Numident_V1",
-    str_detect(url, pattern = "numident_v2") == TRUE ~ "CenSoc-Numident_V2",
+    str_detect(url, pattern = "bunmd_v1") == TRUE ~ "BUNMD",
+    str_detect(url, pattern = "bunmd_v2") == TRUE ~ "BUNMD",
+    str_detect(url, pattern = "numident_v1") == TRUE ~ "CenSoc-Numident",
+    str_detect(url, pattern = "numident_v2") == TRUE ~ "CenSoc-Numident",
     str_detect(url, pattern = "numident_demo") == TRUE ~ "CenSoc-Numident Demo",
-    str_detect(url, pattern = "dmf_v1") == TRUE ~ "CenSoc-DMF_V1",
-    str_detect(url, pattern = "dmf_v2") == TRUE ~ "CenSoc-DMF_V2",
+    str_detect(url, pattern = "dmf_v1") == TRUE ~ "CenSoc-DMF",
+    str_detect(url, pattern = "dmf_v2") == TRUE ~ "CenSoc-DMF",
     str_detect(url, pattern = "dmf_demo") == TRUE ~ "CenSoc-DMF Demo",
+    str_detect(url, pattern = "numident_enlistment") == TRUE ~ "CenSoc-Numident WWII Enlistment",
+    str_detect(url, pattern = "dmf_enlistment") == TRUE ~ "CenSoc-DMF WWII Enlistment",  
     TRUE ~ NA_character_
   )) %>% 
   mutate(url2 = url) %>% 
@@ -106,6 +116,7 @@ download_logs <- download_logs %>%
 ```
 
 ## Create a list of all downloads
+
 ```{r}
 ## all downloads 
 signup_log <- signup_log %>% 
@@ -115,15 +126,38 @@ signup_log <- signup_log %>%
 censoc_downloaders <- download_logs %>% 
   left_join(signup_log) 
 
-## Create wide dataset
-censoc_downloaders <- censoc_downloaders %>% 
+## Create long dataset
+censoc_downloaders_long <- censoc_downloaders %>% 
   group_by(fname, lname, dataset_downloaded) %>% 
   filter(row_number() == 1) %>% 
   dplyr::select(fname, lname, email, dataset_downloaded, dateh) %>% 
-  ungroup()
+  ungroup() %>% 
+  filter(!is.na(dataset_downloaded)) 
 
-all_downloads <- censoc_downloaders %>% 
+## visualize downloads 
+downloads_by_dataset <- censoc_downloaders_long %>% 
+  filter(dateh >= as_date("2022-01-01")) %>% 
   filter(!is.na(dataset_downloaded)) %>% 
+  group_by(dataset_downloaded) %>% 
+  tally() %>% 
+  ggplot() + 
+  geom_col(aes(x = reorder(dataset_downloaded, n), y = n), color = "black", fill = "grey") + 
+  geom_text(aes(x = reorder(dataset_downloaded, n), y = n + 3, label = n), color = "black") + 
+  coord_flip() + 
+  labs(x = "",                                                     
+       y = "Downloads",
+       title = "Downloads by Dataset (2022)") + 
+  theme_cowplot()
+
+## save file 
+ggsave(plot = downloads_by_dataset, filename = here("vignettes/user_logs/figs/downloads_by_dataset.png"), height = 5, width = 9)
+```
+
+## m\Match users onto the dataset they downloaded 
+
+```{r}
+## Create long dataset 
+censoc_downloaders_wide <- censoc_downloaders_long %>% 
   mutate(download = 1) %>% 
   pivot_wider(id_cols = c(fname, lname, email),
               names_from = dataset_downloaded, 
@@ -132,58 +166,9 @@ all_downloads <- censoc_downloaders %>%
 ## combine with original user file
 users <- users %>% 
   left_join(all_downloads %>% 
-              select(-fname, -lname), by = ("email")) %>% 
-  select(-datetm, -dateh, -link)
-
-users_new <- users %>% 
-  filter(date >= as_date("2021-02-10"))
+              select(-fname, -lname), by = ("email")) 
 
 ```
-
-## Visualize 
-
-```{r}
-## new signups over time
-new_signups <- signup_log %>% 
-  mutate(date = as_date(dateh)) %>% 
-  filter(date > "2020-04-01") %>% 
-  group_by(fname, lname) %>% 
-  arrange(by(date)) %>% 
-  filter(row_number() == 1) %>% 
-  group_by(date) %>% 
-  tally() %>% 
-  mutate(source = "New Signup",
-         total = cumsum(n))
-
-new_signups %>% 
-ggplot() + 
-  geom_line(aes(x = date, y = total), size = 1, color = "black") + 
-  theme_light(base_size = 30) + 
-  labs(y = "Users",
-       x = "Date",
-       title = "CenSoc Users (New)")+ 
-  ylim(0, 220)
-```
-
-
-```{r}
-## Downloads by dataset
-downloads <- censoc_downloaders %>% 
-  filter(!is.na(dataset_downloaded)) %>% 
-  group_by(dataset_downloaded) %>% 
-  tally()
-
-downloads %>% 
-  ggplot() + 
-  geom_point(aes(x = reorder(dataset_downloaded, n), y = n), size = 7, color = "black") + 
-  coord_flip() + 
-  labs(x = "",                                                     
-       y = "Downloads",
-       title = "Downloads by Dataset") + 
-  theme_light(base_size = 30) 
-```
-
-
 
 
 
