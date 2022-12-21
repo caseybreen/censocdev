@@ -1,0 +1,393 @@
+---
+title: "CenSoc-DMF Codebook[^updated]"
+output:
+  pdf_document: default
+header-includes: \usepackage{hyperref}
+---
+[^updated]: Last updated: `r format(Sys.time(), '%d %B, %Y')`
+
+
+| Page| Variable     | Label                                        |
+|----:|:-------------|:---------------------------------------------|
+|   \hyperlink{page.2}{2}  | \hyperlink{page.2}{HISTID}        |Historical unique identifier                  |
+|   \hyperlink{page.3}{3}  | \hyperlink{page.3}{byear}         |Year of birth                                 |
+|   \hyperlink{page.4}{4}  | \hyperlink{page.4}{bmonth}        |Month of birth                                |
+|   \hyperlink{page.5}{5}  | \hyperlink{page.5}{dyear}         |Year of death                                 |
+|   \hyperlink{page.6}{6}  | \hyperlink{page.6}{dmonth}        |Month of death                                |
+|   \hyperlink{page.7}{7}  | \hyperlink{page.7}{death\_age}    |Age at death (years)                          |
+|   \hyperlink{page.8}{8}  | \hyperlink{page.8}{link\_abe\_exact\_conservative} |Flag for conservative ABE match |
+|   \hyperlink{page.9}{9}  | \hyperlink{page.9}{weight}        |CenSoc weight                                 |
+|   \hyperlink{page.10}{10}  | \hyperlink{page.10}{weight\_conservative} |CenSoc weight (Conservative Sample)  |
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{pernum} |Person number in sample weight|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{perwt} |IPUMS person weight|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{age} |Age in 1940|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{sex} |Sex in 1940|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{bpl} |Place of birth|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{mbpl} |Mother's place of birth|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{fbpl} |Father's place of birth|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{educd} |Educational attainment (detailed)|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{empstatd} |Employment status (detailed)|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{hispan} |Hispanic/Spanish/Latino origin|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{inconwg} |Had non-wage/salary income over $50|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{marst} |Marital status|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{nativity} |Foreign birthplace or parentage|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{occ} |Occupation|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{occscore} |Occupational income score|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{ownership} |Ownership of dwelling (tenure)|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{race} |Race|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{rent} |Montly contract rent|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{serial} |Household serial number|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{statefip} |State of residence 1940|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{urban} |Urban/rural status|
+
+
+\vspace{50pt}
+
+**Summary**: The CenSoc-DMF Version 2.1 dataset (N = 7,762,221) links the full-count 1940 Census to the Death Master File (DMF), a collection of death records reported to the Social Security Administration. Records were linked using the standard and conservative ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/return-migrants.pdf)). To merge 1940 Census variables with this dataset, researchers can obtain a copy of the 1940 Census from IPUMS-USA and link on the individual-level, unique identifier HISTID variable.
+
+\newpage 
+
+**\huge HISTID**
+\normalsize
+\vspace{12pt}
+
+**Label**: Historical Unique Identifier
+
+**Description**: HISTID is a unique individual-level identifier. It can be used to merge the CenSoc-DMF file with the 1940 Full-Count Census from IPUMS. 
+
+\newpage 
+
+**\huge byear **
+\normalsize
+\vspace{12pt}
+
+**Label**: Birth Year
+
+**Description**: byear reports a person's year of birth, as recorded in the Social Security Death Master File.  
+
+```{r echo = F, results='hide', message=FALSE, warning=FALSE}
+## Library Packages
+library(tidyverse)
+library(data.table)
+
+## read in censoc_dmf_v2.1 data file
+# censoc_dmf_v2.1 <- read_csv("/data/josh/CenSoc/data_release_v2.1/dmf_v2.1/censoc_dmf_v2.1.csv")
+censoc_dmf_v2.1<-read_csv("~censoc_dmf_demo_v2.1.csv") # DMF file I created in codebook demo
+# censoc_dmf_v2.1;censoc_dmf_v2.1b
+# censoc_dmf_v2.1<-censoc_dmf_v2.1 %>% 
+#   inner_join(censoc_dmf_v2.1b, by = c("HISTID" = "histid", "byear", "bmonth","dyear", "dmonth", "death_age", "weight"))
+```
+
+```{r, include = F}
+byear_plot <- censoc_dmf_v2.1 %>%
+    group_by(byear) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = byear, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) + #replace with a different theme (theme_bw()) if the bbplot package isn't downloaded 
+  ggtitle("Year of Birth") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Year", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+byear_plot
+```
+<!-- ![](figures/byear_plot.png) -->
+\newpage 
+**\huge bmonth **
+\normalsize
+\vspace{12pt}
+
+**Label:** Birth Month
+
+**Description:** bmonth reports a person's month of birth, as recorded in the Social Security Death Master File.  
+
+```{r, include = F}
+## run in the console and copy and paste into documentation
+bmonth_tabulated <- knitr::kable(censoc_dmf_v2.1 %>%
+    filter(bmonth != 0) %>% 
+    group_by(bmonth) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
+    select(bmonth, label, n, `freq %` = freq))
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+bmonth_tabulated
+```
+
+\newpage 
+
+**\huge dyear **
+\normalsize
+\vspace{12pt}
+
+**Label**: Death Year
+
+**Description**: dyear reports a person's year of death, as recorded in the Social Security Death Master File.     
+
+```{r, include = F}
+
+dyear_plot <-
+  censoc_dmf_v2.1 %>%
+    group_by(dyear) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = dyear, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) +  
+  ggtitle("Year of Death") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Year", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma, limits = c(0, 3000)) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+
+```
+
+\vspace{75pt}
+
+```{r, echo =F}
+dyear_plot
+```
+
+\newpage 
+
+**\huge dmonth **
+\normalsize
+\vspace{12pt}
+
+**Label**: Death Month
+
+**Description**: dmonth reports a person's month of death, as recorded in the Social Security Death Master File.  
+
+```{r, include = F}
+dmonth_tabulated <- knitr::kable(censoc_dmf_v2.1 %>%
+    group_by(dmonth) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
+    select(dmonth, label, n, `freq %` = freq))
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+dmonth_tabulated
+```
+
+
+\newpage 
+
+**\huge death\_age **
+\normalsize
+\vspace{12pt}
+
+**Label**: Age at Death (Years)
+
+**Description**: death_age reports a person's age at death in years, calculated using the birth and death information recorded in the Social Security Death Master File.    
+
+```{r, include = F}
+death_age_plot <- censoc_dmf_v2.1 %>%
+    group_by(death_age) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = death_age, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) + #replace with a different theme (theme_bw()) if the bbplot package isn't downloaded 
+  ggtitle("Age at Death") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Age at Death", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+death_age_plot
+```
+
+\newpage
+
+**\huge link\_abe\_exact\_conservative**
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: Flag for conservative ABE match
+
+**Description**: A flag variable reporting whether a match was established with the ABE conservative match with exact names.  
+
+```{r, include = F}
+link_abe_exact_conservative_tabulated <- knitr::kable(censoc_dmf_v2.1 %>%
+    group_by(link_abe_exact_conservative) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 3)) %>%
+    arrange(desc(link_abe_exact_conservative)) %>% 
+    mutate(label = c("Conservative and Standard ABE Link", "Standard ABE Link Only")) %>%
+    select(link_abe_exact_conservative, label, n, `freq %` = freq))
+```
+
+\vspace{50pt}
+
+```{r, echo = F}
+link_abe_exact_conservative_tabulated
+```
+
+\newpage
+
+**\huge weight**
+\normalsize
+
+\vspace{12pt}
+
+
+**Label**: Sample Weights \footnote{The IPUMS-USA 1940 1% sample also includes a weight (`perweight`) to account for the 1940 sampling procedure (thus no weights for the 100% complete count 1940 census). For analysis, we recommend using both sets of weights. A final weight can be constructed by multiplying the two weights together.}  
+
+**Description**: A post-stratification person-weight to Human Mortality Database (HMD) totals for persons (1) born between 1895-1939 (2) dying between 1975-2005 (3) dying between ages 65-100. Please see the CenSoc Methods Protocol for more details on weighting procedure.
+
+```{r, include = F}
+weights_tabulated <- censoc_dmf_v2.1 %>%
+  filter(!is.na(weight)) %>% 
+  summarize('Min Weight' = round(min(weight),2), 'Max Weight' = round(max(weight), 2)) %>%
+  mutate(id = 1:n()) %>% 
+  pivot_longer(-id, names_to = "Label", values_to = "Value") %>% 
+  select(Value, Label) %>% 
+  add_row(Label = "No Weight Assigned", Value = NA) %>% 
+  knitr::kable()
+  
+weight.plot <- censoc_dmf_v2.1 %>%
+  filter(!is.na(weight)) %>% 
+  ggplot() +
+    geom_boxplot(aes(x=weight), fill='grey92') +
+    ylim(-1,1) +
+    theme_minimal(15) +
+    theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank()) +
+    ggtitle("Distribution of Weights") +
+    xlab('Weight')
+```
+
+\vspace{50pt}
+
+```{r, echo = F}
+weights_tabulated
+```
+
+\vspace{50pt}
+
+```{r echo = F, results='hide', message=FALSE, warning=FALSE}
+weight.plot
+```
+
+\newpage
+
+**\huge weight\_conservative**
+\normalsize
+
+\vspace{12pt}
+
+
+**Label**: Sample Weights (Conservative Sample)
+
+**Description**: A post-stratification person-weight to Human Mortality Database (HMD) totals (only for matches established via the conservative ABE algorithm) for persons (1) born between 1895-1939 (2) dying between 1975-2005 (3) dying between ages 65-100. Please see the CenSoc Methods Protocol for more details on weighting procedure.
+
+```{r, include = F}
+weights_conservtive_tabulated <- censoc_dmf_v2.1 %>%
+  filter(link_abe_exact_conservative == 1) %>% 
+  filter(!is.na(weight_conservative)) %>% 
+  summarize('Min Weight' = round(min(weight_conservative),2), 'Max Weight' = round(max(weight_conservative), 2)) %>%
+  mutate(id = 1:n()) %>% 
+  pivot_longer(-id, names_to = "Label", values_to = "Value") %>% 
+  select(Value, Label) %>% 
+  add_row(Label = "No Weight Assigned", Value = NA) %>% 
+  knitr::kable()
+  
+weight_conservative.plot <- censoc_dmf_v2.1 %>%
+  filter(link_abe_exact_conservative == 1) %>% 
+  filter(!is.na(weight_conservative)) %>% 
+  ggplot() +
+    geom_boxplot(aes(x=weight_conservative), fill='grey92') +
+    ylim(-1,1) +
+    theme_minimal(15) +
+    theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank()) +
+    ggtitle("Distribution of Weights") +
+    xlab('Weight')
+```
+
+\vspace{50pt}
+
+```{r, echo = F}
+weights_conservtive_tabulated
+```
+
+\vspace{50pt}
+
+```{r echo = F, results='hide', message=FALSE, warning=FALSE}
+weight_conservative.plot
+```
+\newpage
+  
+**\huge IPUMS 1940 Census Variable**
+\normalsize
+
+
+\vspace{12pt}
+
+The variables below are from the IPUMS-USA 1940 1% census sample. We recommend looking at the terrific documentation on the IPUMS-USA website: \hyperlink{https://usa.ipums.org/usa/index.shtml}{https://usa.ipums.org/usa/index.shtml.} 
+
+| Variable     | Label                                        |
+|:-------------|:---------------------------------------------|
+| pernum |Person number in sample weight|
+|perwt |IPUMS person weight \footnote{The `perweight` accounts for the 1940 sampling procedure to construct the 1% sample, and thus is only available in the 1940 1% sample. For analysis, we recommend using both the IPUMS `perweight` and the CenSoc `weight.` A final weight can be constructed by multiplying the two weights together} |
+|   age |Age in 1940|
+|   sex |Sex in 1940|
+|   bpl |Place of birth|
+|   mbpl |Mother's place of birth|
+|   fbpl |Father's place of birth|
+|   educd |Educational attainment (detailed)|
+|   empstatd |Employment status (detailed)|
+|   hispan |Hispanic/Spanish/Latino origin|
+|   inconwg |Had non-wage/salary income over $50|
+|   marst |Marital status|
+|   nativity |Foreign birthplace or parentage|
+|   occ |Occupation|
+|   occscore |Occupational income score|
+|   ownership |Ownership of dwelling (tenure)|
+|   race |Race|
+|   rent |Montly contract rent|
+|   serial |Household serial number|
+|   statefip |State of residence 1940|
+|   urban |Urban/rural status|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
