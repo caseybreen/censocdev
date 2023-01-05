@@ -12,7 +12,7 @@ header-includes:
 
 
 | Page| Variable     | Label                                        |
-|----:|:-------------|:---------------------------------------------|
+|----:|:-----------------------|:---------------------------------------------|
 |   \hyperlink{page.3}{3}  | \hyperlink{page.3}{HISTID}        |Historical unique identifier                  |
 |   \hyperlink{page.4}{4}  | \hyperlink{page.4}{byear}         |Year of birth                                 |
 |   \hyperlink{page.5}{5}  | \hyperlink{page.5}{bmonth}        |Month of birth                                |
@@ -36,8 +36,6 @@ header-includes:
 |   \hyperlink{page.24}{24}  | \hyperlink{page.24}{pernum} |Person number in sample weight|
 |   \hyperlink{page.24}{24}  | \hyperlink{page.24}{perwt} |IPUMS person weight|
 |   \hyperlink{page.24}{24}  | \hyperlink{page.24}{age} |Age in 1940|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{sex} |Sex in 1940|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{bpl} |Place of birth|
 |   \hyperlink{page.24}{24}  | \hyperlink{page.24}{mbpl} |Mother's place of birth|
 |   \hyperlink{page.24}{24}  | \hyperlink{page.24}{fbpl} |Father's place of birth|
 |   \hyperlink{page.24}{24}  | \hyperlink{page.24}{educd} |Educational attainment (detailed)|
@@ -388,8 +386,10 @@ knitr::kable(list(bpl_tabulation[rows,1:4],
            matrix(numeric(), nrow=0, ncol=1),
            bpl_tabulation[-rows, 1:4]),
       caption = "BPL Tabulation (Native born only)",
-      label = "tables", format = "latex", booktabs = TRUE)  %>%
-  kableExtra::kable_styling(latex_options = "HOLD_position")
+      label = "tables", format = "latex", longtable = T, booktabs = TRUE) %>% 
+      add_header_above(c("bpl",  "bpl_string", "n",  "freq")) %>% 
+  kableExtra::kable_styling(latex_options = c("repeat_header"))
+# %>%  kableExtra::kable_styling(latex_options = c("HOLD_position")) #doesn't go past one page
 ```
 
 
@@ -510,7 +510,9 @@ link_abe_exact_conservative_tabulated
 **\huge weight**
 \normalsize
 
-**Label**: Sample Weight
+**Label**: Sample Weight [^1]  
+
+[^1]: The IPUMS-USA 1940 1% sample also includes a weight (`perweight`) to account for the 1940 sampling procedure (thus no weights for the 100% complete count 1940 census). For analysis, we recommend using both sets of weights. A final weight can be constructed by multiplying the two weights together.  
 
 \vspace{12pt}
 
@@ -656,15 +658,13 @@ weights_lexis_conservative
 
 \vspace{12pt}
 
-The variables below are from the IPUMS-USA 1940 1% census sample. We recommend looking at the terrific documentation on the IPUMS-USA website: \hyperlink{https://usa.ipums.org/usa/index.shtml}{https://usa.ipums.org/usa/index.shtml.} 
+The variables below are from the IPUMS-USA 1940 1% census sample. We recommend looking at the terrific documentation on the IPUMS-USA website: [https://usa.ipums.org/usa/index.shtml.](https://usa.ipums.org/usa/index.shtml) 
 
 | Variable     | Label                                        |
 |:-------------|:---------------------------------------------|
 | pernum |Person number in sample weight|
-|perwt |IPUMS person weight \footnote{The `perweight` accounts for the 1940 sampling procedure to construct the 1% sample, and thus is only available in the 1940 1% sample. For analysis, we recommend using both the IPUMS `perweight` and the CenSoc `weight.` A final weight can be constructed by multiplying the two weights together} |
+|perwt |IPUMS person weight[^2] |
 |   age |Age in 1940|
-|   sex |Sex in 1940|
-|   bpl |Place of birth|
 |   mbpl |Mother's place of birth|
 |   fbpl |Father's place of birth|
 |   educd |Educational attainment (detailed)|
@@ -683,7 +683,7 @@ The variables below are from the IPUMS-USA 1940 1% census sample. We recommend l
 |   urban |Urban/rural status|
 
 
-
+[^2]: The `perweight` accounts for the 1940 sampling procedure to construct the 1% sample, and thus is only available in the 1940 1% sample. For analysis, we recommend using both the IPUMS `perweight` and the CenSoc `weight.` A final weight can be constructed by multiplying the two weights together
 
 
 
