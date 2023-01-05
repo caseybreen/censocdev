@@ -1,12 +1,22 @@
 ---
-title: "Untitled"
-output: pdf_document
+title: "Make CenSoc Demo File"
+output: html_notebook
 ---
+
+Summary: In this Notebook, I make the CenSoc-DMF Demo file. 
+
+Steps to make CenSoc Demo File:
+
+(1) Read in IPUMS 1940 1% Extract
+(2) Link Crosswalk 
+(2) Link to CenSoc-DMF 
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Library the Packages for analysis 
 ```{r}
 library(tidyverse)
 library(dplyr)
@@ -16,11 +26,8 @@ library(ipumsr)
 
 
 ```{r}
-# setwd("../Censoc_examp/censocdev")
 ipums1pct<-read_csv("sampleIPUMS.csv")
 xwalk<-fread("/data/josh/CenSoc/crosswalks/1940_histid_cc_1p_xwalk.txt")
-# dmfdata<-read_csv("/data/josh/CenSoc/censoc_data/censoc_dmf_v2/censoc_dmf_v2.csv")
-# numidentdata<-read_csv("/data/josh/CenSoc/censoc_data/censoc_numident_v2/censoc_numident_v2.csv")
 
 dmfdata<-read_csv("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
 numidentdata<-read_csv("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
@@ -28,32 +35,15 @@ numidentdata<-read_csv("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2
 
 dmfdata2<-read_csv("/data/josh/CenSoc/data_release_v2.1/dmf_v2.1/censoc_dmf_v2.1.csv")
 numidentdata2<-read_csv("/data/josh/CenSoc/data_release_v2.1/numident_v2.1/censoc_numident_v2.1.csv")
-
-# ipums_1940<-read_csv("/data/josh/CenSoc/archive/ipums_1940_census.csv") 
-
-# ipums_1940head<-head(ipums_1940)
-# ipums_1940head 
 ```
 
 ```{r}
-# length(vars_to_keep)
-# length(vars_convert_to_labels)
 numidentdata<-numidentdata %>% 
   mutate(sexcheck = sex == SEX) %>% filter(sexcheck == T) #92 instances of unmatched sex
 
 demo_file<-
   ipums1pct %>% 
   inner_join(xwalk, by = c("SERIAL" = "serial", "PERNUM" = "pernum")) %>% relocate(histid)
-  
-# ipums_1940select<-ipums_1940 %>% 
-#   inner_join(xwalk, by = c("SERIAL" = "serial", "PERNUM" = "pernum")) %>% select(histid, AGE, SEX, RACE)
-# 
-# ipums_select<-ipums_1940select %>% select(histid, AGE_fc = AGE, SEX_fc = SEX, RACE_fc = RACE)
-# dmfdata2
-# ipums_select
-# numidentdata2
-# demofile<-demo_file %>% 
-#   inner_join(ipums_select, by = "histid")
 ```
 Demo to numident
 ```{r}
@@ -68,13 +58,11 @@ numident2.1<-
   numidentdata_demo %>% 
   filter(AGE.x == AGE.y,
          RACE.x == RACE.y) #85865 remaining observations
-nrow(numident2.1)
 ```
 Demo to DMF
 ```{r}
 dmfdemo<-demo_file %>% 
   inner_join(dmfdata2, by = c("histid"="HISTID")) #76,496
-# numidentdemo2<-
 
 dmfdata_demo<-
   dmfdemo %>% 
@@ -84,14 +72,10 @@ dmf2.1<-
   filter(AGE.x == AGE.y,
          SEX.x == SEX.y,
          RACE.x == RACE.y) #70,211 remaining obs
-  
-  dmfdata_demo$weight.x
 
 ```
 
 ```{r}
-# vars_to_keep <- c("HISTID", "bmonth", "byear", "dmonth", "dyear", "death_age", "weight", "PERWT", "AGE", "SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHIP", "PERNUM", "RACE", "RENT", "SERIAL", "STATEFIP", "URBAN")
-
 vars_convert_to_labels <- c("SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "MARST", "NATIVITY", "OCC", "OWNERSHIP", "RACE", "STATEFIP", "URBAN", "INCNONWG")
 newdata<-function(dataset){
   dataset %>% 
@@ -129,25 +113,23 @@ newdata<-function(dataset){
 demo_file_numident<-newdata(numident2.1)
 demo_file_dmf<-newdata(dmf2.1)
 
-
-# write_csv(demo_file_numident, "/censoc/data/censoc_files_for_website/censoc_numident_demo_v21.csv")
 ```
-bmonth
+
+# Combine files to add ABE matching
 ```{r}
-countfun<-function(dataset, variable = byear){
-  dataset %>% count(variable) %>% mutate(`freq %` = n/nrow(dataset))
-}
-# demo_file_dmf %>% 
-#   count(byear) %>% mutate(`freq %`= byear/nrow(demo_file_dmf))
-countfun(demo_file_dmf)
+censoc_dmf_v2.1josh<-read_csv("/data/josh/CenSoc/data_release_v2.1/dmf_v2.1/censoc_dmf_v2.1.csv")
+demo_file_dmf<-censoc_dmf_v2.1josh %>% inner_join(demo_file_dmf, by = c("HISTID" = "histid", "byear", "bmonth","dyear", "dmonth", "death_age", "weight"))
 
-demo_file_dmf %>% 
-  ggplot(aes())
+censoc_numident_v2.1josh <- read_csv("/data/josh/CenSoc/data_release_v2.1/numident_v2.1/censoc_numident_v2.1.csv") %>% 
+  mutate(sex = as.factor(sex)) %>% select(-bpl)
+demo_file_numidenta<-censoc_numident_v2.1josh %>% inner_join(demo_file_numident, by = c("HISTID" = "histid", "byear", "bmonth","dyear", "dmonth", "death_age", "weight", "sex"))
+
+
+
+write_csv(demo_file_numidenta, "/censoc/data/censoc_files_for_website/censoc_numident_demo_v2.1.csv")
+write_csv(demo_file_dmf, "/censoc/data/censoc_files_for_website/censoc_dmf_demo_v2.1.csv")
 ```
 
-```{r}
-glimpse(demo_file_dmf)
-```
 
 
 
