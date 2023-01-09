@@ -18,10 +18,32 @@ header-includes: \usepackage{hyperref}
 |   \hyperlink{page.8}{8}  | \hyperlink{page.8}{link\_abe\_exact\_conservative} |Flag for conservative ABE match |
 |   \hyperlink{page.9}{9}  | \hyperlink{page.9}{weight}        |CenSoc weight                                 |
 |   \hyperlink{page.10}{10}  | \hyperlink{page.10}{weight\_conservative} |CenSoc weight (Conservative Sample)  |
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{pernum} |Person number in sample weight|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{perwt} |IPUMS person weight|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{age} |Age in 1940|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{sex} |Sex in 1940|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{bpl} |Place of birth|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{mbpl} |Mother's place of birth|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{fbpl} |Father's place of birth|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{educd} |Educational attainment (detailed)|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{empstatd} |Employment status (detailed)|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{hispan} |Hispanic/Spanish/Latino origin|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{inconwg} |Had non-wage/salary income over $50|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{marst} |Marital status|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{nativity} |Foreign birthplace or parentage|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{occ} |Occupation|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{occscore} |Occupational income score|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{ownership} |Ownership of dwelling (tenure)|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{race} |Race|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{rent} |Montly contract rent|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{serial} |Household serial number|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{statefip} |State of residence 1940|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{urban} |Urban/rural status|
 
-\vspace{250pt}
 
-**Summary**: The CenSoc-DMF Version 2.1 dataset (N = 7,762,221) links the full-count 1940 Census to the Death Master File (DMF), a collection of death records reported to the Social Security Administration. Records were linked using the standard and conservative ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/return-migrants.pdf)). To merge 1940 Census variables with this dataset, researchers can obtain a copy of the 1940 Census from IPUMS-USA and link on the individual-level, unique identifier HISTID variable.
+\vspace{50pt}
+
+**Summary**: The CenSoc-DMF Version 2.1 dataset (N = 70,211) links the full-count 1940 Census to the Death Master File (DMF), a collection of death records reported to the Social Security Administration. Records were linked using the standard and conservative ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/return-migrants.pdf)). To merge 1940 Census variables with this dataset, researchers can obtain a copy of the 1940 Census from IPUMS-USA and link on the individual-level, unique identifier HISTID variable.
 
 \newpage 
 
@@ -49,7 +71,8 @@ library(tidyverse)
 library(data.table)
 
 ## read in censoc_dmf_v2.1 data file
-censoc_dmf_v2.1 <- read_csv("/data/josh/CenSoc/data_release_v2.1/dmf_v2.1/censoc_dmf_v2.1.csv")
+
+censoc_dmf_v2.1<-read_csv("~/censoc_dmf_demo_v2.1.csv") # DMF file I created in codebook demo
 ```
 
 ```{r, include = F}
@@ -113,7 +136,8 @@ bmonth_tabulated
 
 ```{r, include = F}
 
-dyear_plot <- censoc_dmf_v2.1 %>%
+dyear_plot <-
+  censoc_dmf_v2.1 %>%
     group_by(dyear) %>%
     summarise(n = n()) %>%
     ggplot(aes(x = dyear, y = n)) + 
@@ -125,7 +149,7 @@ dyear_plot <- censoc_dmf_v2.1 %>%
   xlab("title") + 
   labs(x = "Year", 
        y = "Count") + 
-  scale_y_continuous(labels = scales::comma, limits = c(0, 300000)) + 
+  scale_y_continuous(labels = scales::comma, limits = c(0, 3000)) + 
   scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
 
 ```
@@ -231,10 +255,11 @@ link_abe_exact_conservative_tabulated
 \vspace{12pt}
 
 
-**Label**: Sample Weights
+**Label**: Sample Weights[^1]  
 
-**Description**: A post-stratification person-weight to Human Mortality Database (HMD) totals for persons (1) born between 1895-1939 (2) dying between 1975-2005 (3) dying between ages 65-100. Please see the CenSoc Methods Protocol for more details on weighting procedure.
+**Description**: A post-stratification person-weight to Human Mortality Database (HMD) totals for persons (1) born between 1895-1939 (2) dying between 1975-2005 (3) dying between ages 65-100. Please see the CenSoc Methods Protocol for more details on weighting procedure.  
 
+[^1]: The IPUMS-USA 1940 1% sample also includes a weight (`perweight`) to account for the 1940 sampling procedure (thus no weights for the 100% complete count 1940 census). For analysis, we recommend using both sets of weights. A final weight can be constructed by multiplying the two weights together.  
 ```{r, include = F}
 weights_tabulated <- censoc_dmf_v2.1 %>%
   filter(!is.na(weight)) %>% 
@@ -314,6 +339,53 @@ weights_conservtive_tabulated
 ```{r echo = F, results='hide', message=FALSE, warning=FALSE}
 weight_conservative.plot
 ```
+\newpage
+  
+**\huge IPUMS 1940 Census Variable**
+\normalsize
+
+
+\vspace{12pt}
+
+The variables below are from the IPUMS-USA 1940 1% census sample. We recommend looking at the terrific documentation on the IPUMS-USA website: \hyperlink{https://usa.ipums.org/usa/index.shtml}{https://usa.ipums.org/usa/index.shtml.} 
+
+| Variable     | Label                                        |
+|:-------------|:---------------------------------------------|
+| pernum |Person number in sample weight|
+|perwt |IPUMS person weight[^2] |
+|   age |Age in 1940|
+|   sex |Sex in 1940|
+|   bpl |Place of birth|
+|   mbpl |Mother's place of birth|
+|   fbpl |Father's place of birth|
+|   educd |Educational attainment (detailed)|
+|   empstatd |Employment status (detailed)|
+|   hispan |Hispanic/Spanish/Latino origin|
+|   inconwg |Had non-wage/salary income over $50|
+|   marst |Marital status|
+|   nativity |Foreign birthplace or parentage|
+|   occ |Occupation|
+|   occscore |Occupational income score|
+|   ownership |Ownership of dwelling (tenure)|
+|   race |Race|
+|   rent |Montly contract rent|
+|   serial |Household serial number|
+|   statefip |State of residence 1940|
+|   urban |Urban/rural status|  
+
+[^2]: The `perweight` accounts for the 1940 sampling procedure to construct the 1% sample, and thus is only available in the 1940 1% sample. For analysis, we recommend using both the IPUMS `perweight` and the CenSoc `weight.` A final weight can be constructed by multiplying the two weights together
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -10,52 +10,35 @@ header-includes:
 
 \captionsetup[table]{labelformat=empty}
 
-
 | Page| Variable     | Label                                        |
 |----:|:-----------------------|:---------------------------------------------|
-|   \hyperlink{page.3}{3}  | \hyperlink{page.3}{HISTID}        |Historical unique identifier                  |
-|   \hyperlink{page.4}{4}  | \hyperlink{page.4}{byear}         |Year of birth                                 |
-|   \hyperlink{page.5}{5}  | \hyperlink{page.5}{bmonth}        |Month of birth                                |
-|   \hyperlink{page.6}{6}  | \hyperlink{page.6}{dyear}         |Year of death                                 |
-|   \hyperlink{page.7}{7}  | \hyperlink{page.7}{dmonth}        |Month of death                                |
-|   \hyperlink{page.8}{8}  | \hyperlink{page.8}{death\_age}    |Age at death (years)                          |
-|  \hyperlink{page.9}{9}   |\hyperlink{page.9}{sex}              |Sex                                        |
-|  \hyperlink{page.10}{10}   |\hyperlink{page.10}{race\_first}       |Race on First Application                  |
-|  \hyperlink{page.11}{11} |\hyperlink{page.11}{race\_first\_cyear} |First Race: Application Year               |
-|  \hyperlink{page.12}{12} |\hyperlink{page.12}{race\_first\_cmonth}|First Race: Application Month              |
-|  \hyperlink{page.13}{13} |\hyperlink{page.13}{race\_last}        |Race on Last Application                   |
-|  \hyperlink{page.14}{14} |\hyperlink{page.14}{race\_last\_cyear}  |Last Race: Application Year                |
-|  \hyperlink{page.15}{15} |\hyperlink{page.15}{race\_last\_cmonth} |Last Race: Application Month               |
-|  \hyperlink{page.16}{16} |\hyperlink{page.16}{bpl}              |Place of Birth                             |
-|  \hyperlink{page.18}{18} |\hyperlink{page.18}{zip\_residence}    |ZIP Code of Residence at Time of Death     |
-|  \hyperlink{page.19}{19} |\hyperlink{page.19}{socstate}         |State where Social Security Number Issued  |
-|  \hyperlink{page.20}{20} |\hyperlink{page.20}{age\_first\_application}    |Age at First Social Security Application   |
-|   \hyperlink{page.21}{21}  | \hyperlink{page.21}{link\_abe\_exact\_conservative} |Flag for conservative ABE match |
-|   \hyperlink{page.22}{22}  | \hyperlink{page.22}{weight}        |CenSoc weight                                 |
-|   \hyperlink{page.23}{23}  | \hyperlink{page.23}{weight\_conservative} |CenSoc weight (Conservative Sample)  |
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{pernum} |Person number in sample weight|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{perwt} |IPUMS person weight|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{age} |Age in 1940|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{mbpl} |Mother's place of birth|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{fbpl} |Father's place of birth|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{educd} |Educational attainment (detailed)|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{empstatd} |Employment status (detailed)|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{hispan} |Hispanic/Spanish/Latino origin|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{inconwg} |Had non-wage/salary income over $50|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{marst} |Marital status|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{nativity} |Foreign birthplace or parentage|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{occ} |Occupation|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{occscore} |Occupational income score|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{ownership} |Ownership of dwelling (tenure)|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{race} |Race|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{rent} |Montly contract rent|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{serial} |Household serial number|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{statefip} |State of residence 1940|
-|   \hyperlink{page.24}{24}  | \hyperlink{page.24}{urban} |Urban/rural status|
+|   \hyperlink{page.2}{2}  | \hyperlink{page.2}{HISTID}        |Historical unique identifier                  |
+|   \hyperlink{page.3}{3}  | \hyperlink{page.3}{byear}         |Year of birth                                 |
+|   \hyperlink{page.4}{4}  | \hyperlink{page.4}{bmonth}        |Month of birth                                |
+|   \hyperlink{page.5}{5}  | \hyperlink{page.5}{dyear}         |Year of death                                 |
+|   \hyperlink{page.6}{6}  | \hyperlink{page.6}{dmonth}        |Month of death                                |
+|   \hyperlink{page.7}{7}  | \hyperlink{page.7}{death\_age}    |Age at death (years)                          |
+|  \hyperlink{page.8}{8}   |\hyperlink{page.8}{sex}              |Sex                                        |
+|  \hyperlink{page.9}{9}   |\hyperlink{page.9}{race\_first}       |Race on First Application                  |
+|  \hyperlink{page.10}{10} |\hyperlink{page.10}{race\_first\_cyear} |First Race: Application Year               |
+|  \hyperlink{page.11}{11} |\hyperlink{page.11}{race\_first\_cmonth}|First Race: Application Month              |
+|  \hyperlink{page.12}{12} |\hyperlink{page.12}{race\_last}        |Race on Last Application                   |
+|  \hyperlink{page.13}{13} |\hyperlink{page.13}{race\_last\_cyear}  |Last Race: Application Year                |
+|  \hyperlink{page.14}{14} |\hyperlink{page.14}{race\_last\_cmonth} |Last Race: Application Month               |
+|  \hyperlink{page.15}{15} |\hyperlink{page.15}{bpl}              |Place of Birth                             |
+|  \hyperlink{page.17}{17} |\hyperlink{page.17}{zip\_residence}    |ZIP Code of Residence at Time of Death     |
+|  \hyperlink{page.18}{18} |\hyperlink{page.18}{socstate}         |State where Social Security Number Issued  |
+|  \hyperlink{page.19}{19} |\hyperlink{page.19}{age\_first\_application}    |Age at First Social Security Application   |
+|   \hyperlink{page.20}{20}  | \hyperlink{page.20}{link\_abe\_exact\_conservative} |Flag for conservative ABE match |
+|   \hyperlink{page.21}{21}  | \hyperlink{page.21}{weight}        |CenSoc weight                                 |
+|   \hyperlink{page.22}{22}  | \hyperlink{page.22}{weight\_conservative} |CenSoc weight (Conservative Sample)  |
+|   \hyperlink{page.23}{23}  | \hyperlink{page.23}{Additional IPUMS variables}| Additional variables include `pernum`, `perwt`, `age`, `mbpl`, `fbpl`, `educd`, `empstatd`, `hispan`, `inconwg`, `marst`, `nativity`, `occ`, `occscore`, `ownership`, `race`, `rent`, `serial`, `statefip`, `urban`|  
 
-\vspace{150pt}
 
-**Summary:** The CenSoc-Numident file (N = 9,398,581) links the full-count 1940 Census to the National Archives’ public release of the Social Security Numident file. Records were linked using the standard and conservative variants of the ABE method developed by Abramitzky, Boustan, and Eriksson (2012, 2014, 2017). To merge 1940 Census variables with this dataset, researchers can obtain a copy of the 1940 Census from IPUMS-USA and link on the individual-level, unique identifier HISTID variable.
+\vspace{100pt}
+
+**Summary:** The CenSoc-Numident Demo dataset (N = 85,865) was constructed by (i) linking the CenSoc-Numident dataset to the IPUMS 1940 1% census sample and (ii) selecting a set of 20 mortality covariates from the 1940 census. The smaller size of the file — approximately 1% of the records in the full CenSoc-Numident dataset — makes it easier to work with. However, the demo file isn’t conducive to high-resolution mortality research, and we recommend working with the complete CenSoc-Numident file for any final analysis.  
+
 
 \newpage 
 
@@ -86,6 +69,9 @@ library(kableExtra)
 ## read in censoc_numident_v2.1 data file
 # censoc_numident_v2.1 <- read_csv("/data/josh/CenSoc/data_release_v2.1/numident_v2.1/censoc_numident_v2.1.csv")
 censoc_numident_v2.1<-read_csv("~/censoc_numident_demo_v2.1.csv") # Numident file I created in codebook demo
+
+censoc_numident_v2.1 %>% 
+  count(bpl, bpl_string)
 ```
 
 ```{r, include = F}
@@ -101,7 +87,7 @@ byear_plot <- censoc_numident_v2.1 %>%
   xlab("title") + 
   labs(x = "Year", 
        y = "Count") + 
-  scale_y_continuous(labels = scales::comma, limits = c(0, 500000)) +
+  # scale_y_continuous(labels = scales::comma, limits = c(0, 5000)) +
   scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
 ```
 
@@ -162,8 +148,9 @@ dyear_plot <- censoc_numident_v2.1 %>%
   labs(x = "Year", 
        y = "Count") + 
   scale_y_continuous(labels = scales::comma) + 
-  scale_y_continuous(labels = scales::comma, limits = c(0, 800000)) + 
+ # scale_y_continuous(labels = scales::comma, limits = c(0, 7000)) +
   scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+#The minimum y is 3000 deaths a year when the scale is removed
 ```
 
 \vspace{75pt}
@@ -325,12 +312,13 @@ race_first_tabulated
 **Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. They also removed the Other category.
 
 ```{r, include = F}
-race_last_tabulated <- knitr::kable(censoc_numident_v2.1 %>%
+race_last_tabulated <- censoc_numident_v2.1 %>%
     group_by(race_last) %>%
     tally() %>%
     mutate(freq = signif(n*100 / sum(n), 3)) %>%
     mutate(label = c("White", "Black", "Other", "Asian", "Hispanic", "North American Native", "Missing")) %>%
-    select(race_last, label, n, `freq %` = freq))
+    select(race_last, label, n, `freq %` = freq) %>% 
+  knitr::kable(format = "pipe")
 ```
 
 \vspace{30pt}
@@ -382,14 +370,26 @@ bpl_tabulation <- censoc_numident_v2.1 %>%
 
 rows <- seq_len(nrow(bpl_tabulation) %/% 2)
 
-knitr::kable(list(bpl_tabulation[rows,1:4],
+bpltable<-knitr::kable(list(bpl_tabulation[rows,1:4],
            matrix(numeric(), nrow=0, ncol=1),
            bpl_tabulation[-rows, 1:4]),
       caption = "BPL Tabulation (Native born only)",
-      label = "tables", format = "latex", longtable = T, booktabs = TRUE) %>% 
-      add_header_above(c("bpl",  "bpl_string", "n",  "freq")) %>% 
-  kableExtra::kable_styling(latex_options = c("repeat_header"))
+      label = "tables", format = "latex", booktabs = TRUE)  %>%
+      # add_header_above(c("bpl",  "bpl_string", "n",  "freq")) %>% 
+  kableExtra::kable_styling(latex_options = c("HOLD_position"))
+
+# knitr::kable(list(socstate_tabulation[rows,1:4],
+#            matrix(numeric(), nrow=0, ncol=1),
+#            socstate_tabulation[-rows, 1:4]),
+#       caption = "Tabulation of socstate (Native born only)",
+#       label = "tables", format = "latex", booktabs = TRUE)  %>%
+#   kableExtra::kable_styling(latex_options = "HOLD_position")
 # %>%  kableExtra::kable_styling(latex_options = c("HOLD_position")) #doesn't go past one page
+```
+\newpage  
+
+```{r echo = F, message=FALSE, warning=FALSE, fig.pos="H"}
+bpltable
 ```
 
 
