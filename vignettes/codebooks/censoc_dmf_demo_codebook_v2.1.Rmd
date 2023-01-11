@@ -8,7 +8,7 @@ header-includes: \usepackage{hyperref}
 
 
 | Page| Variable     | Label                                        |
-|----:|:-------------|:---------------------------------------------|
+|----:|:------------------------|:---------------------------------------------|
 |   \hyperlink{page.2}{2}  | \hyperlink{page.2}{HISTID}        |Historical unique identifier                  |
 |   \hyperlink{page.3}{3}  | \hyperlink{page.3}{byear}         |Year of birth                                 |
 |   \hyperlink{page.4}{4}  | \hyperlink{page.4}{bmonth}        |Month of birth                                |
