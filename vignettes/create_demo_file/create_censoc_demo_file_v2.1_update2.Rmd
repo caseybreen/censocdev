@@ -1,5 +1,7 @@
 ---
+author: "Benjamin Shapiro"
 title: "Make CenSoc Demo File"
+date: "01-12-2023"
 ---
 
 Summary: In this Notebook, I make the CenSoc-DMF and CenSoc-Numident Demo files. 
