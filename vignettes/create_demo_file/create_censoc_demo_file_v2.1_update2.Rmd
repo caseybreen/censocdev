@@ -22,11 +22,12 @@ Library the Packages for analysis
 library(tidyverse)
 library(data.table)
 library(ipumsr)
+library(styler)
 ```
 
 ## Read in the 1 percent file and the crosswalk from IPUMS
 ```{r}
-# Read in 15 IPUMS 1940 Census Extract
+# Read in 1% IPUMS 1940 Census Extract
 ipums1pct<-fread("/data/josh/CenSoc/censoc_data/sampleIPUMS.csv") %>% rename_all(tolower)
 
 
@@ -45,7 +46,6 @@ demo_file<-
 ```{r}
 numidentdata<-read_csv("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
 
-numidentdata$sex
 
 # Join numident to demo by histid
 numidentdemo<-demo_file %>% 
@@ -75,7 +75,7 @@ demo_file_numident<-numident2.1 %>%
   mutate_at(vars_convert_to_labels, as_factor) %>% 
   rename_all(tolower)
 
-write_csv(demo_file_numident, "/censoc/data/censoc_files_for_website/censoc_numident_demo_v2.1.csv")
+write_csv(demo_file_numident, "/data/josh/CenSoc/data_release_v2.1/censoc_numident_demo_v2.1.csv")
   
 ```
 
@@ -105,12 +105,14 @@ dmf2.1<-
 
 vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "link_abe_exact_conservative", "weight", "weight_conservative","PERWT", "AGE", "SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHP", "PERNUM", "RACE", "RENT", "SERIAL", "STATEFIP", "URBAN")
 
+glimpse(dmf2.1)
+
 demo_file_dmf<-dmf2.1 %>% 
   select(vars_to_keep_dmf) %>% 
   mutate_at(vars_convert_to_labels, as_factor) %>% 
   rename_all(tolower)
 
-write_csv(demo_file_dmf, "/censoc/data/censoc_files_for_website/censoc_dmf_demo_v2.1.csv")
+write_csv(demo_file_dmf, "/data/josh/CenSoc/data_release_v2.1/dmf_v2.1/censoc_dmf_demo_v2.1.csv")
 ```
 
 
