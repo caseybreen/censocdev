@@ -26,7 +26,7 @@ library(ipumsr)
 
 ## Read in the 1 percent file and the crosswalk from IPUMS
 ```{r}
-# Read in 1$ IPUMS 1940 Census Extract
+# Read in 15 IPUMS 1940 Census Extract
 ipums1pct<-fread("/data/josh/CenSoc/censoc_data/sampleIPUMS.csv") %>% rename_all(tolower)
 
 
