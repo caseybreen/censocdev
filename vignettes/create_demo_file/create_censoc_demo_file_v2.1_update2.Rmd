@@ -27,10 +27,12 @@ library(ipumsr)
 ## Read in the 1 percent file and the crosswalk from IPUMS
 ```{r}
 # Read in 1$ IPUMS 1940 Census Extract
-ipums1pct<-read_csv("~/sampleIPUMS.csv") %>% rename_all(tolower)
+ipums1pct<-fread("/data/josh/CenSoc/censoc_data/sampleIPUMS.csv") %>% rename_all(tolower)
+
 
 # Read crosswalk (Histid)
 xwalk<-fread("/data/josh/CenSoc/crosswalks/1940_histid_cc_1p_xwalk.txt")
+
 
          
 #Join histid to ipums1pct
