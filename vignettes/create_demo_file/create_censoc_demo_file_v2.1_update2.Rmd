@@ -1,0 +1,125 @@
+---
+title: "Make CenSoc Demo File"
+---
+
+Summary: In this Notebook, I make the CenSoc-DMF and CenSoc-Numident Demo files. 
+
+Steps to make CenSoc Demo File:
+
+(1) Read in IPUMS 1940 1% Extract
+(2) Link Crosswalk 
+(2) Link to CenSoc-DMF 
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Library the Packages for analysis 
+```{r}
+library(tidyverse)
+library(data.table)
+library(ipumsr)
+```
+
+## Read in the 1 percent file and the crosswalk from IPUMS
+```{r}
+# Read in 1$ IPUMS 1940 Census Extract
+ipums1pct<-read_csv("~/sampleIPUMS.csv") %>% rename_all(tolower)
+
+# Read crosswalk (Histid)
+xwalk<-fread("/data/josh/CenSoc/crosswalks/1940_histid_cc_1p_xwalk.txt")
+
+
+# glimpse(ipums1pct)
+ipums1pct<-ipums1pct %>% 
+  rename_all(tolower)
+         
+#Join histid to ipums1pct
+demo_file<-
+  ipums1pct %>% 
+  inner_join(xwalk, by = c("serial", "pernum")) %>% relocate(histid)
+```
+
+## Construct Censoc-Numident Demo
+```{r}
+numidentdata<-read_csv("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
+
+numidentdata$sex
+
+# Join numident to demo by histid
+numidentdemo<-demo_file %>% 
+  rename(sex.demo = "sex") %>% 
+  inner_join(numidentdata, by = c("histid"="HISTID")) #93917 remaining observations
+
+
+#match sex, age and race from demo to numident data
+glimpse(numident2.1)
+numidentdemo$age
+numident2.1<-
+  numidentdemo %>% 
+  filter(AGE == age,
+         RACE == race,
+         SEX == sex.demo) #85865 remaining observations
+
+```
+
+## Select numident variables for v2.1
+```{r}
+vars_to_keep_num <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "race_first", "race_first_cyear", "race_last", "bpl_string", "zip_residence", "socstate", "socstate_string", "age_first_application", "link_abe_exact_conservative", "weight", "weight_conservative","PERWT", "AGE", "SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHP", "PERNUM", "RACE", "RENT", "SERIAL", "STATEFIP", "URBAN")
+
+vars_convert_to_labels <- c("SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "MARST", "NATIVITY", "OCC", "OWNERSHP", "RACE", "STATEFIP", "URBAN", "INCNONWG")
+
+demo_file_numident<-numident2.1 %>% 
+  select(vars_to_keep_num) %>% 
+  mutate_at(vars_convert_to_labels, as_factor) %>% 
+  rename_all(tolower)
+
+write_csv(demo_file_numident, "/censoc/data/censoc_files_for_website/censoc_numident_demo_v2.1.csv")
+  
+```
+
+
+## Consturct CenSoc-DMF Demo
+```{r}
+dmfdata<-read_csv("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
+
+
+
+# Join dmf to demo by histid
+dmfdata_demo<-demo_file %>% 
+  inner_join(dmfdata, by = c("histid"="HISTID")) #76,496
+
+
+# Match sex, age, and race from demo to dmf data
+dmf2.1<-
+  dmfdata_demo %>% 
+  filter(AGE == age,
+         SEX == sex,
+         RACE == race) #70,211 remaining obs
+
+```
+
+## Select DMF variables for v2.1
+```{r}
+
+vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "link_abe_exact_conservative", "weight", "weight_conservative","PERWT", "AGE", "SEX", "BPL", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHP", "PERNUM", "RACE", "RENT", "SERIAL", "STATEFIP", "URBAN")
+
+demo_file_dmf<-dmf2.1 %>% 
+  select(vars_to_keep_dmf) %>% 
+  mutate_at(vars_convert_to_labels, as_factor) %>% 
+  rename_all(tolower)
+
+write_csv(demo_file_dmf, "/censoc/data/censoc_files_for_website/censoc_dmf_demo_v2.1.csv")
+```
+
+
+## Extra chunk so that I can include the new datasets in my directory
+```{r}
+write_csv(demo_file_numident, "~/censoc_numident_demo_v2.1.csv")
+write_csv(demo_file_dmf, "~/censoc_dmf_demo_v2.1.csv")
+```
+
+
+
+
