@@ -30,10 +30,6 @@ ipums1pct<-read_csv("~/sampleIPUMS.csv") %>% rename_all(tolower)
 # Read crosswalk (Histid)
 xwalk<-fread("/data/josh/CenSoc/crosswalks/1940_histid_cc_1p_xwalk.txt")
 
-
-# glimpse(ipums1pct)
-ipums1pct<-ipums1pct %>% 
-  rename_all(tolower)
          
 #Join histid to ipums1pct
 demo_file<-
