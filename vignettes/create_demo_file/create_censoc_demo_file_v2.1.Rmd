@@ -51,7 +51,7 @@ numidentdemo <- ipums1pct %>%
 # match sex, age and race from demo to numident data
 numident2.1 <- numidentdemo %>%
   filter(
-    AGE == age,
+    AGE == age, 
     RACE == race,
     SEX == sex.demo
   ) # 85865 remaining observations
