@@ -1,5 +1,5 @@
 ---
-title: CenSoc-Numident Codebook[^updated]
+title: CenSoc-Numident (2.1) Demo Codebook[^updated]
 output:
   pdf_document: default
 header-includes:
@@ -37,7 +37,7 @@ header-includes:
 
 \vspace{100pt}
 
-**Summary:** The CenSoc-Numident Demo dataset (N = 85,865) was constructed by (i) linking the CenSoc-Numident dataset to the IPUMS 1940 1% census sample and (ii) selecting a set of 20 mortality covariates from the 1940 census. The smaller size of the file — approximately 1% of the records in the full CenSoc-Numident dataset — makes it easier to work with. However, the demo file isn’t conducive to high-resolution mortality research, and we recommend working with the complete CenSoc-Numident file for any final analysis.  
+**Summary:** The CenSoc-Numident Version 2.1 Demo dataset (N = 85,865) links the IPUMS 1940 1% census sample to the National Archives' public release of the Social Security Numident file. Records were linked using the standard and conservative variants of the ABE method developed by Abramitzky, Boustan, and Eriksson (2012, 2014, 2017). Note that the demo file isn't conductive to high-resolution mortality research, and we recommend researchers obtain a  copy of the 1940 Census from IPUMS-USA and link on the individual-level, unique identifier HISTID variable. 
 
 
 \newpage 
@@ -67,7 +67,7 @@ library(data.table)
 library(kableExtra)
 
 ## read in censoc_numident_v2.1 data file
-censoc_numident_v2.1<-read_csv("/data/josh/CenSoc/data_release_v2.1/numident_v2.1/censoc_numident_demo_v2.1.csv")
+censoc_numident_v2.1<-read_csv("/data/josh/CenSoc/data_release_demo_v2.1/censoc_numident_demo_v2.1.csv")
 ```
 
 ```{r, include = F}

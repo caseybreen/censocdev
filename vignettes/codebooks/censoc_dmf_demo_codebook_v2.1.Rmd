@@ -1,5 +1,5 @@
 ---
-title: "CenSoc-DMF Codebook[^updated]"
+title: "CenSoc-DMF (2.1) Demo Codebook[^updated]"
 output:
   pdf_document: default
 header-includes: \usepackage{hyperref}
@@ -43,7 +43,7 @@ header-includes: \usepackage{hyperref}
 
 \vspace{50pt}
 
-**Summary**: The CenSoc-DMF Version 2.1 dataset (N = 70,211) links the full-count 1940 Census to the Death Master File (DMF), a collection of death records reported to the Social Security Administration. Records were linked using the standard and conservative ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/return-migrants.pdf)). To merge 1940 Census variables with this dataset, researchers can obtain a copy of the 1940 Census from IPUMS-USA and link on the individual-level, unique identifier HISTID variable.
+**Summary**: The CenSoc-DMF Version 2.1 Demo dataset (N = 70,211) links the IPUMS 1940 1% census sample to the Death Master File (DMF) dataset, a collection of death records reported to the Social Security Administration.  Records were linked using the standard and conservative ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/return-migrants.pdf)). Note, the demo file isn’t conducive to high-resolution mortality research, and we recommend researchers obtain a copy of the 1940 Census from IPUMS-USA and link on the individual-level, unique identifier HISTID variable. 
 
 \newpage 
 
@@ -72,7 +72,7 @@ library(data.table)
 
 ## read in censoc_dmf_v2.1 data file
 
-censoc_dmf_v2.1<-read_csv("/data/josh/CenSoc/data_release_v2.1/dmf_v2.1/censoc_dmf_demo_v2.1.csv")
+censoc_dmf_v2.1<-read_csv("/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv")
 ```
 
 ```{r, include = F}

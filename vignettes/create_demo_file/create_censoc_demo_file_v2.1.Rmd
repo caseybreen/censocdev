@@ -67,6 +67,8 @@ demo_file_numident <- numident2.1 %>%
 
 ## write out csv file 
 write_csv(demo_file_numident, "/data/josh/CenSoc/data_release_demo_v2.1/censoc_numident_demo_v2.1.csv")
+
+
 ```
 
 ## Construct CenSoc-DMF Demo
