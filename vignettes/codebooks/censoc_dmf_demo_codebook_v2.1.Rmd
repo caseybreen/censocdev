@@ -26,6 +26,7 @@ header-includes: \usepackage{hyperref}
 |   \hyperlink{page.11}{11}  | \hyperlink{page.11}{mbpl} |Mother's place of birth|
 |   \hyperlink{page.11}{11}  | \hyperlink{page.11}{fbpl} |Father's place of birth|
 |   \hyperlink{page.11}{11}  | \hyperlink{page.11}{educd} |Educational attainment (detailed)|
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{educ\_yrs} |Educational attainment in years (constructed)|
 |   \hyperlink{page.11}{11}  | \hyperlink{page.11}{empstatd} |Employment status (detailed)|
 |   \hyperlink{page.11}{11}  | \hyperlink{page.11}{hispan} |Hispanic/Spanish/Latino origin|
 |   \hyperlink{page.11}{11}  | \hyperlink{page.11}{inconwg} |Had non-wage/salary income over $50|
@@ -359,6 +360,7 @@ The variables below are from the IPUMS-USA 1940 1% census sample. We recommend l
 |   mbpl |Mother's place of birth|
 |   fbpl |Father's place of birth|
 |   educd |Educational attainment (detailed)|
+|   educ_yrs |Educational attainment in years (constructed)|
 |   empstatd |Employment status (detailed)|
 |   hispan |Hispanic/Spanish/Latino origin|
 |   inconwg |Had non-wage/salary income over $50|

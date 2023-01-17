@@ -32,7 +32,7 @@ header-includes:
 |   \hyperlink{page.19}{19}  | \hyperlink{page.19}{link\_abe\_exact\_conservative} |Flag for conservative ABE match |
 |   \hyperlink{page.20}{20}  | \hyperlink{page.20}{weight}        |CenSoc weight                                 |
 |   \hyperlink{page.21}{21}  | \hyperlink{page.21}{weight\_conservative} |CenSoc weight (Conservative Sample)  |
-|   \hyperlink{page.22}{22}  | \hyperlink{page.22}{Additional IPUMS variables}| Additional variables include pernum, perwt, age, mbpl, fbpl, educd, empstatd, hispan, inconwg, marst, nativity, occ, occscore, ownership, race, rent, serial, statefip, urban|  
+|   \hyperlink{page.22}{22}  | \hyperlink{page.22}{Additional IPUMS variables}| Additional variables include pernum, perwt, age, mbpl, fbpl, educd, educ_yrs, empstatd, hispan, inconwg, marst, nativity, occ, occscore, ownership, race, rent, serial, statefip, urban|  
 
 
 \vspace{100pt}
@@ -652,6 +652,7 @@ The variables below are from the IPUMS-USA 1940 1% census sample. We recommend l
 |   mbpl |Mother's place of birth|
 |   fbpl |Father's place of birth|
 |   educd |Educational attainment (detailed)|
+|   educ_yrs |Educational attainment in years (constructed)|
 |   empstatd |Employment status (detailed)|
 |   hispan |Hispanic/Spanish/Latino origin|
 |   inconwg |Had non-wage/salary income over $50|
