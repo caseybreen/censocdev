@@ -38,7 +38,7 @@ ipums1pct <- ipums1pct %>%
 ## Construct Censoc-Numident Demo
 ```{r}
 ## Read in linked Numident 
-numidentdata <- read_csv("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
+numidentdata <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
 
 # Join numident to demo by histid
 numidentdemo <- ipums1pct %>%
@@ -76,7 +76,7 @@ write_csv(demo_file_numident, "/data/josh/CenSoc/data_release_demo_v2.1/censoc_n
 ## Construct CenSoc-DMF Demo
 ```{r}
 ## Read in linked demo file 
-dmfdata <- read_csv("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
+dmfdata <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
 
 # Join dmf to demo by histid
 dmfdata_demo <- ipums1pct %>%
