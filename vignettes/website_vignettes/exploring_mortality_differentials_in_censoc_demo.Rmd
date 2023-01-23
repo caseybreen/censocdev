@@ -22,7 +22,8 @@ Before getting started with the vignette, make sure to:
     - `brooms`
     - `knitr`
     
-The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website). 
+The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website_vignettes). 
+\textbf{Update: changed website address from /website to /website_vignettes}
 
 ```{r Library packages, warning=FALSE, message=FALSE}
 ## Library Packages
@@ -32,7 +33,7 @@ library(broom)
 library(knitr)
 
 ## make sure to update the path to your CenSoc file
-censoc_demo <- read_csv("~/Downloads/censoc_dmf_demo_v1/censoc_dmf_demo_v1.csv")
+censoc_demo <- read_csv("/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv") #Update (previous path: ~/Downloads/censoc_dmf_demo_v1/censoc_dmf_demo_v1.csv)
 
 ## set seed for reproducibility 
 set.seed(16)
@@ -44,6 +45,23 @@ censoc_demo %>%
   filter(incwage < 99999) %>% 
   kable()
 ```
+```{r, `results  = FALSE`, echo = FALSE}
+library(datasets)
+
+censoc_demo %>% 
+  count(statefip) %>% 
+  add_row(statefip = c(2,15), n = c(0,0)) %>% 
+  arrange(statefip)->a
+
+statenew<-tibble(state.name) %>% 
+  rbind("District of Columbia") %>% 
+  arrange(state.name) %>% 
+  mutate(statefip = a$statefip)
+  
+censoc_demo2<-censoc_demo %>% 
+  inner_join(statenew, by = "statefip")
+```
+
 
 **Note**: For the CenSoc-Demo dataset, we converted the IPUMS numeric codes into meaningful character value labels (e.g., “Male” = 1, “Female” = 2). Before using a variable in your analysis, it is a good idea to learn more about its coding schema. Check out the terrific documentation from the IPUMS-USA [website](https://usa.ipums.org/usa/).  
 
@@ -59,9 +77,10 @@ As the truncated window of deaths excludes the tails of the mortality distributi
 
 ## Mortality Differentials by State
 
-Geographic heterogeneity in levels of health and mortality have been been well studied. Can we see any state-level variation in life expectancy at age 65 in the CenSoc-DMF Demo dataset? 
+Geographic heterogeneity in levels of health and mortality is well documented (\textbf{Update: parallel's phrasing later in vignettte}). Can we see any state-level variation in life expectancy at age 65 in the CenSoc-DMF Demo dataset? 
 
-The code below runs an OLS model with year fixed effects. It then extracts the regression coefficient for each state and plots it using the [*statebins*](https://github.com/hrbrmstr/statebins) package, which provides an alternative to state-level choropleth maps. We use the state of Maine and the birth cohort of 1910 as the reference group for this regression, but we could have chosen a different reference group. 
+The code below runs an OLS model with year fixed effects. It then extracts the regression coefficient for each state and plots it using the [*statebins*](https://github.com/hrbrmstr/statebins) package, which provides an alternative to state-level choropleth maps. For the example below, we use Maine's 1910 birth cohort as the reference group, although the example will work with other state/birth cohort parameters.  
+\textbf{Update: Adjusted phrasing at the end of the paragraph}  
 
 The CenSoc-DMF file is already restricted to deaths occurring in the "high-coverage" period of 1975-2005. We further restrict this analysis to the birth cohorts of 1900 to 1920 and deaths for persons 65+ (these are the birth cohorts and ages at death for which we have the best death coverage). 
 
@@ -69,13 +88,15 @@ The CenSoc-DMF file is already restricted to deaths occurring in the "high-cover
 ## Prepare dataset for modeling
 ## Restrict to birth cohorts of 1900-1920
 ## Years of death already restricted to "high-coverage" period of 1975-2005
-censoc_state_model <- censoc_demo %>%
+censoc_state_model <-
+  censoc_demo2 %>%
   filter(byear %in% c(1900:1920)) %>% 
   filter(dyear >= 65) %>% 
   mutate(byear = as.factor(byear)) %>% 
   mutate(byear = relevel(byear, ref = "1910")) %>% 
+  select(-statefip) %>% rename(statefip = "state.name") %>% 
   mutate(statefip = as.factor(statefip)) %>% 
-  mutate(statefip = relevel(statefip, ref = "Maine")) 
+  mutate(statefip = relevel(statefip, ref = "Maine")) #Update: Statefip is the numerical-code for each state, with 23 representing Maine. I don't know if we should change this on the demo file.
 
 ## Linear model predicting age at death from State and byear 
 ## Use both IPUMS and CenSoc weights
@@ -110,13 +131,15 @@ mortality_differentials_by_state
 ```
 
 
-Our figure shows the Mountain States to have a relative mortality advantage and the Southern States to have a relative mortality disadvantage. While these patterns may be real, we should keep in mind disaggregating by state significantly reduces our sample size. This introduces a lot of noise and uncertainty into our regression model — which our visualization does not capture. 
+Our figure indicates that the Mountain and Southwest States have a relative mortality advantage while the Southern States have a relative mortality disadvantage. While these patterns may be real, we should keep in mind disaggregating by state significantly reduces our sample size. This introduces a lot of noise and uncertainty into our regression model — which our visualization does not capture. 
 
 ## Mortality Differentials by Relative Wage Income
 
-The association between relative income and mortality in the United States has been well documented. Can we see this association in our CenSoc-DMF Demo dataset? 
+The association between relative income and mortality in the United States is well documented, as well. Can we see this association in our CenSoc-DMF Demo dataset? 
 
-To answer this question, we will use the `INCWAGE` variable. This is an imperfect measure of income, as it was only collected for salary and wage workers. Census enumerators in 1940 were explicitly instructed to "not include earnings of businessmen, farmers, or professional persons who depend upon business profits, sales of crops, or fees for income and who do not work for wages or salaries." (See [instructions to enumeration](https://usa.ipums.org/usa/voliii/inst1940.shtml#584) for more detail). In this analysis, we account for this by only including persons with non-zero wages — other researchers may take a different approach. 
+\textbf{Update: made some changes to this paragraph. Maybe we want an in text citation for the "instructions to enumeration"}  
+To answer this question, we will use the `INCWAGE` variable. The variable is limited: census enumerators in 1940 were instructed to "not include earnings of businessmen, farmers, or professional persons who depend upon business profits, sales of crops, or fees for income and who do not work for wages or salaries," leaving only salary and wage workers in the dataset. For more information, check out the 1940 census' [instructions to enumerators](https://usa.ipums.org/usa/voliii/inst1940.shtml#584). We will account for the discrepancy in our analysis by only including persons with non-zero wages — other researchers may take a different approach. 
+
 
 The CenSoc-DMF file is already restricted to deaths occurring in the "high-coverage" period of 1975-2005. We further restrict this analysis to the birth cohorts of 1900 to 1920 and deaths for persons 65+ (these are the birth cohorts and ages at death for which we have the best death coverage). 
 
