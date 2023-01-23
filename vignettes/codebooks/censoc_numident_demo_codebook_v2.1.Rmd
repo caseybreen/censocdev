@@ -1,5 +1,5 @@
 ---
-title: CenSoc-Numident (2.1) Demo Codebook[^updated]
+title: CenSoc-Numident Demo Codebook (V2.1)[^updated]
 output:
   pdf_document: default
 header-includes:

@@ -1,5 +1,5 @@
 ---
-title: "CenSoc-DMF (2.1) Demo Codebook[^updated]"
+title: "CenSoc-DMF Demo Codebook (V2.1)[^updated]"
 output:
   pdf_document: default
 header-includes: \usepackage{hyperref}
