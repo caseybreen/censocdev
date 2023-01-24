@@ -23,7 +23,7 @@ Before getting started with the vignette, make sure to:
     - `knitr`
     
 The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website_vignettes). 
-\textbf{Update: changed website address from /website to /website_vignettes}
+**Update: changed website address from /website to /website_vignettes**
 
 ```{r Library packages, warning=FALSE, message=FALSE}
 ## Library Packages
@@ -77,10 +77,10 @@ As the truncated window of deaths excludes the tails of the mortality distributi
 
 ## Mortality Differentials by State
 
-Geographic heterogeneity in levels of health and mortality is well documented (\textbf{Update: parallel's phrasing later in vignettte}). Can we see any state-level variation in life expectancy at age 65 in the CenSoc-DMF Demo dataset? 
+Geographic heterogeneity in levels of health and mortality is well documented (**Update: parallel's phrasing later in vignettte**). Can we see any state-level variation in life expectancy at age 65 in the CenSoc-DMF Demo dataset? 
 
 The code below runs an OLS model with year fixed effects. It then extracts the regression coefficient for each state and plots it using the [*statebins*](https://github.com/hrbrmstr/statebins) package, which provides an alternative to state-level choropleth maps. For the example below, we use Maine's 1910 birth cohort as the reference group, although the example will work with other state/birth cohort parameters.  
-\textbf{Update: Adjusted phrasing at the end of the paragraph}  
+**Update: Adjusted phrasing at the end of the paragraph**  
 
 The CenSoc-DMF file is already restricted to deaths occurring in the "high-coverage" period of 1975-2005. We further restrict this analysis to the birth cohorts of 1900 to 1920 and deaths for persons 65+ (these are the birth cohorts and ages at death for which we have the best death coverage). 
 
@@ -137,7 +137,7 @@ Our figure indicates that the Mountain and Southwest States have a relative mort
 
 The association between relative income and mortality in the United States is well documented, as well. Can we see this association in our CenSoc-DMF Demo dataset? 
 
-\textbf{Update: made some changes to this paragraph. Maybe we want an in text citation for the "instructions to enumeration"}  
+**Update: made some changes to this paragraph. Maybe we want an in text citation for the "instructions to enumeration"}**  
 To answer this question, we will use the `INCWAGE` variable. The variable is limited: census enumerators in 1940 were instructed to "not include earnings of businessmen, farmers, or professional persons who depend upon business profits, sales of crops, or fees for income and who do not work for wages or salaries," leaving only salary and wage workers in the dataset. For more information, check out the 1940 census' [instructions to enumerators](https://usa.ipums.org/usa/voliii/inst1940.shtml#584). We will account for the discrepancy in our analysis by only including persons with non-zero wages — other researchers may take a different approach. 
 
 

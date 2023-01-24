@@ -373,7 +373,8 @@ the CenSoc DMF Demo File</li>
 </ul>
 <p>The original R notebook (.Rmd file) for this vignette can be
 downloaded <a href="https://github.com/caseybreen/censocdev/tree/master/vignettes/website_vignettes">here</a>.
-</p>
+<strong>Update: changed website address from /website to
+/website_vignettes</strong></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Library Packages</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statebins)</span>
@@ -499,8 +500,9 @@ Berkeley Unified Numident Mortality Database”</a> working paper.</p>
 <div id="mortality-differentials-by-state" class="section level2">
 <h2>Mortality Differentials by State</h2>
 <p>Geographic heterogeneity in levels of health and mortality is well
-documented (). Can we see any state-level variation in life expectancy
-at age 65 in the CenSoc-DMF Demo dataset?</p>
+documented (<strong>Update: parallel’s phrasing later in
+vignettte</strong>). Can we see any state-level variation in life
+expectancy at age 65 in the CenSoc-DMF Demo dataset?</p>
 <p>The code below runs an OLS model with year fixed effects. It then
 extracts the regression coefficient for each state and plots it using
 the <a href="https://github.com/hrbrmstr/statebins"><em>statebins</em></a>
@@ -508,7 +510,8 @@ package, which provides an alternative to state-level choropleth maps.
 For the example below, we use Maine’s 1910 birth cohort as the reference
 group, although the example will work with other state/birth cohort
 parameters.<br />
-</p>
+<strong>Update: Adjusted phrasing at the end of the
+paragraph</strong></p>
 <p>The CenSoc-DMF file is already restricted to deaths occurring in the
 “high-coverage” period of 1975-2005. We further restrict this analysis
 to the birth cohorts of 1900 to 1920 and deaths for persons 65+ (these
@@ -570,7 +573,8 @@ This introduces a lot of noise and uncertainty into our regression model
 <p>The association between relative income and mortality in the United
 States is well documented, as well. Can we see this association in our
 CenSoc-DMF Demo dataset?</p>
-<p><br />
+<p><strong>Update: made some changes to this paragraph. Maybe we want an
+in text citation for the “instructions to enumeration”}</strong><br />
 To answer this question, we will use the <code>INCWAGE</code> variable.
 The variable is limited: census enumerators in 1940 were instructed to
 “not include earnings of businessmen, farmers, or professional persons
