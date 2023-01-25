@@ -34,7 +34,9 @@ library(gridExtra)
 library(ggpubr)
 library(broom)
 
-censoc <- fread("/censoc/data/censoc_linked_with_census/1940/censoc_dmf_all_vars_v1.csv")
+censoc <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")# This is the path in the demo file, now using v2.1. Path below didn't go anywhere
+  
+# fread("/censoc/data/censoc_linked_with_census/1940/censoc_dmf_all_vars_v1.csv") 
 
 ## Restrict to cohort of 1910
 censoc <- censoc %>% 
@@ -53,48 +55,54 @@ IPUMS variables often have value labels, which are text that corresponds to nume
 The `IPUMSR` package includes helpful functions for assigning values labels (see the [ipumsr website](http://tech.popdata.org/ipumsr/index.html) for more information and tutorials). In this vignette, for simplicity, we will manually code our value labels. 
 
 ```{r, eval = F}
+
 ## recode educ_yrs var to years of education
 censoc <- censoc %>%
   mutate(educ_yrs = case_when(
-  EDUC == 2 ~ 0,
-  EDUC == 14 ~ 1,
-  EDUC == 15 ~ 2,
-  EDUC == 16 ~ 3,
-  EDUC == 17 ~ 4,
-  EDUC == 22 ~ 5,
-  EDUC == 23 ~ 6,
-  EDUC == 25 ~ 7,
-  EDUC == 26 ~ 8,
-  EDUC == 30 ~ 9,
-  EDUC == 40 ~ 10,
-  EDUC == 50 ~ 11,
-  EDUC == 60 ~ 12,
-  EDUC == 70 ~ 13,
-  EDUC == 80 ~ 14,
-  EDUC == 90 ~ 15,
-  EDUC == 100 ~ 16,
-  EDUC == 110 ~ 17
-))
+    HIGRADE == 3~ 1,
+  HIGRADE == 4 ~ 2,
+  HIGRADE == 5 ~ 3,
+  HIGRADE == 6 ~ 4,
+  HIGRADE == 7 ~ 5,
+  HIGRADE == 8 ~ 6,
+  HIGRADE == 9 ~ 7,
+  HIGRADE == 10 ~ 8,
+  HIGRADE == 11 ~ 9,
+  HIGRADE == 12 ~ 10,
+  HIGRADE == 13 ~ 11,
+  HIGRADE == 14 ~ 12,
+  HIGRADE == 15 ~ 13,
+  HIGRADE == 16 ~ 14,
+  HIGRADE == 17 ~ 15,
+  HIGRADE == 18 ~ 16,
+  HIGRADE == 19 ~ 17,
+  HIGRADE == 20 ~ 18,
+  HIGRADE == 21 ~ 19,
+  HIGRADE == 22 ~ 20,
+  HIGRADE == 23 ~ 21,
+  TRUE ~ 0,
+)) 
 
 ## Recode RACE var to string
 censoc <- censoc %>% 
   mutate(race_string = case_when(
-    RACE == 100 & HISPAN == 0 ~ "White",
-    RACE == 200 & HISPAN == 0 ~ "Black", 
+    RACE == 1 & HISPAN == 0 ~ "White",
+    RACE == 2 & HISPAN == 0 ~ "Black", 
     TRUE ~ "Other"
   ))
+
 
 ## Recode OWNERSHP var to string
 censoc <- censoc %>% 
   mutate(ownership_string = case_when(
-    OWNERSHP == 10 ~ "Owner",
-    OWNERSHP == 20 ~ "Renter"))
+    OWNERSHP == 1 ~ "Owner",
+    OWNERSHP == 2 ~ "Renter"))
 ```
 
 
-## Quick Exploratory Data Analysis 
+## Quick Exploratory Data Analysis  
 
-Exploratory data analysis is an important part of the modeling process. Exploratory data analysis can help us understand the main characteristics of the data and their relationship with our dependent variable, age at death. Here, we will briefly explore some associations between our independent and dependent variables.
+Exploratory data analysis is an important part of the modeling process and can help us understand the main characteristics of the data and their relationship with our dependent variable, age at death. Here, we will briefly explore some associations between our independent and dependent variables.
 
 ```{r, eval = F}
 ## additional years of life expectancy 
@@ -108,7 +116,7 @@ educ_df <- censoc %>%
 educ_plot <- ggplot(data = educ_df, mapping = aes(x = educ_yrs, y = add_yrs_life)) +
   geom_pointrange(aes(ymin = add_yrs_life - 1.96*sd, ymax = add_yrs_life + 1.96*sd)) +
   theme_minimal() + 
-  scale_x_continuous(breaks=seq(0,17,2)) +
+  scale_x_continuous(breaks=seq(0,23,2)) +
   geom_vline(xintercept = c(8, 12, 16), lwd = .7, lty = 2, color = "grey") + 
   labs(title = "Educational pattern of longevity at age 65",
        x = "Years of Education",
@@ -130,20 +138,20 @@ income_plot <- ggplot(data = income_df, mapping = aes(x = wage_decile, y = add_y
   labs(title = "Income pattern of longevity at age 65",
        x = "Income Decile",
        y = "Additional years of life")+ 
-  ylim(-2, 2)
+  ylim(-1, 1.5)
 
 ## Display Plots
-ggarrange(educ_plot, income_plot)
+plotlong<-ggarrange(educ_plot, income_plot)
 ```
-![](figures/income_educational_pattern_longevity.png){width=100%}
+![](figures/income_educational_pattern_longevity2.png){width=100%}
 
 ## OLS Regression
 
-There are two specific considerations for using regression on age of death to analyze the CenSoc Mortality data. First, we are only observing deaths for a narrow window. As the left and right truncation ages vary by birth cohort, it is important to include fixed effect terms for each year of birth. Models of the form:
+There are two specific considerations for using regression on age of death to analyze the CenSoc Mortality data. First, we are only observing deaths for a narrow window. As the left and right truncation ages vary by birth cohort, it is important to include fixed effect terms for each year of birth. Models of the form
 
 $$ Age\_at\_death = birth\_year\_dummy + covariates\_of\_interest $$
 
-provide estimates of the effect of the covariates on the age of death in the sample, controlling for birth cohort truncation effects.
+provide estimates for the effect of the covariates on the age of death in the sample, controlling for birth cohort truncation effects.
 
 In this case, we are only looking at the cohort of 1910, so we do not need to include a fixed effect term for year of birth. 
 
@@ -162,27 +170,29 @@ summary(model)
 
 #> Call:
 #> lm(formula = death_age ~ INCWAGE + educ_yrs + ownership_string + 
-#>     race_string, data = censoc)
+#>     race_string, data = censoc, weights = weight)
 #> 
-#> Residuals:
-#>      Min       1Q   Median       3Q      Max 
-#> -16.7031  -6.5771  -0.1929   6.3567  19.2876 
+#> Weighted Residuals:
+#>     Min      1Q  Median      3Q     Max 
+#> -32.680 -12.117   0.242  12.282  36.085 
 #> 
 #> Coefficients:
-#>                          Estimate Std. Error t value Pr(>|t|)    
-#> (Intercept)             7.580e+01  1.354e-01 559.923  < 2e-16 ***
-#> INCWAGE                 3.988e-04  3.534e-05  11.283  < 2e-16 ***
-#> educ_yrs                1.879e-01  8.177e-03  22.984  < 2e-16 ***
-#> ownership_stringRenter -3.545e-01  4.856e-02  -7.301 2.86e-13 ***
-#> race_stringWhite        1.746e-01  1.240e-01   1.408    0.159    
-#> race_stringOther        1.521e+00  2.109e-01   7.213 5.52e-13 ***
+#>                          Estimate Std. Error  t value Pr(>|t|)    
+#> (Intercept)             7.626e+01  7.610e-02 1002.085   <2e-16 ***
+#> INCWAGE                 3.931e-04  3.028e-05   12.984   <2e-16 ***
+#> educ_yrs                1.451e-01  6.515e-03   22.267   <2e-16 ***
+#> ownership_stringRenter -2.759e-01  4.199e-02   -6.571    5e-11 ***
+#> race_stringBlack       -9.881e-03  9.881e-02   -0.100     0.92    
+#> race_stringOther        1.250e+00  1.444e-01    8.656   <2e-16 ***
 #> ---
 #> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
-#> Residual standard error: 7.99 on 123876 degrees of freedom
-#>   (3013 observations deleted due to missingness)
-#> Multiple R-squared:  0.00963,	Adjusted R-squared:  0.00959 
-#> F-statistic: 240.9 on 5 and 123876 DF,  p-value: < 2.2e-16
+#> Residual standard error: 15.09 on 160009 degrees of freedom
+#>   (5794 observations deleted due to missingness)
+#> Multiple R-squared:  0.007268,	Adjusted R-squared:  0.007237 
+#> F-statistic: 234.3 on 5 and 160009 DF,  p-value: < 2.2e-16
+
+
 ```
 
 
@@ -205,11 +215,11 @@ ggplot(tidy.model, mapping = aes(x = term, y = estimate, ymax = conf.high, ymin 
   labs(y = "OLS Estimate")
 ```
 
-![](figures/coefficient_plot.png){width=100%}
+![](figures/coefficient_plot2.png){width=100%}
 
 ## Interpretation of Regression Coefficients
 
-The right truncation will tend to downwardly bias the estimated effects of any covariates. Right truncation excludes the right tail of the distribution, thus reducing the average difference between groups. The effect of these coefficients would be even larger, and the appropriate regression coefficient adjustment factors can be found through simulating a Gompertz mortality schedule. For more information on regression coefficient adjustment factors, see our [BUNMD Working Paper](https://censoc.berkeley.edu/wp-content/uploads/2020/04/bunmd_working_paper.pdf). 
+By excluding the right tail of the distribution, the right truncation generally creates a downward bias on the estimated effects of any covariates. The effect of these coefficients would be even larger, and the appropriate regression coefficient adjustment factors can be found through simulating a Gompertz mortality schedule. For more information on regression coefficient adjustment factors, see our [BUNMD Working Paper](https://censoc.berkeley.edu/wp-content/uploads/2022/02/bunmd_paper_feb10_2022.pdf). 
 
 
 
