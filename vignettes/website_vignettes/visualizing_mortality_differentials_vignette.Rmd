@@ -9,9 +9,9 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-This tutorial will walk through the steps of visualizing differentials in e(65) — life expectancy conditional on surviving to age 65 — by ZIP Code using the Berkeley Unified Numident Mortality Database 
+This tutorial will walk through the steps of visualizing differences in $e_{65}$ — life expectancy conditional on surviving to age 65 — by ZIP Code using the Berkeley Unified Numident Mortality Database 
 
-Specifically, this vignette will walk through the steps of (1) calculating differentials by ZIP Code and (2) creating a choropleth map in R using the `choroplethr` package. Choropleths are thematic maps where each geographic region is colored or shaded according to some metric.
+Specifically, this vignette will walk through the steps of (1) calculating differences by ZIP Code and (2) creating a choropleth map in R using the `choroplethr` package. Choropleths are thematic maps where each geographic region is colored or shaded according to some metric.
 
 Though this analysis focuses on the New York City borough of Manhattan, the approach can be replicated for other regions to similar effect. 
 
@@ -19,7 +19,7 @@ Though this analysis focuses on the New York City borough of Manhattan, the appr
 
 There are several geographic variables in the Berkeley Unified Numident Mortality Database (BUNMD).
 
-- `bpl` variable reports birthplace. For persons born in the United States, the geographic resolution is state-level, and for persons born outside the United States, the geographic resolution is country-level. 
+- `bpl` variable reports birthplace. The variable is coded on the state-level for persons born in the United States and country level for those born outside the United States.  
 
 - `zip_residence` variable reports the 9-digit ZIP Code of residence at the time of death for a portion of records. ZIP Codes, while not the most robust geographic unit of analysis, can offer insights into a variety of spatial questions.
 
@@ -33,7 +33,7 @@ library(broom)
 library(viridis)
 
 ## Read in data
-bunmd <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv")
+bunmd <- fread("/data/josh/CenSoc/censoc_data/bunmd_v2/bunmd_v2.csv")
 ```
 
 ### Preparing Data for Analysis 
@@ -53,7 +53,8 @@ manhattan.zipcodes <- zip.regions %>%
 
 ## Select first 5 digits of zip_residence variable
 ## filter to only include high coverage Manhattan ZIP Codes
-bunmd.manhattan <- bunmd %>% 
+bunmd.manhattan <- 
+  bunmd %>% 
   mutate(zip5 = as.numeric(substr(zip_residence, 1, 5))) %>% 
   filter(zip5 %in% manhattan.zipcodes$region) %>% 
   filter(byear %in% c(1910:1919)) %>% 
@@ -79,9 +80,9 @@ $$ Age\_at\_death = birth\_year\_dummy + covariates\_of\_interest$$
 provide estimates of the effect of the covariates on the age of death in the sample, controlling
 for birth cohort truncation effects.
 
-The code below first fits a linear regression using fixed-effect terms for each year of birth. It then extracts the regression coefficients for each ZIP code.
+The code below first fits a linear regression with fixed-effect terms for each year of birth. It then extracts the regression coefficients for each ZIP code.
 
-Note: When running the regression, we weight each observation using the `ccweight` variable — a post-stratification weight to Human Mortality Database death totals by age, period, and sex.
+Note: When running the regression, we weight each observation via the `ccweight` variable — a post-stratification weight to Human Mortality Database death totals by age, period, and sex.
 
 ```{r, eval = F}
 ## Linear model predicting age at death from ZIP and byear 
@@ -116,10 +117,10 @@ manhattan.plot <- choro$render() +
   scale_fill_viridis(option="magma", discrete = "true", name="Difference in E65")
 ```
 
-![](figures/manhattan_e65.png){width=100%}
+![](figures/manhattan_e65_2.1.png){width=100%}
 
 ### Interpretation
 
-When interpreting these mortality differentials, it is important to remember that we are only observing deaths for a truncated window. This truncation will tend to downwardly bias the estimated effects of any covariates, as it excludes the tails of the distribution, thus reducing the average difference between groups. The average differences between groups will be measured to be smaller if we exclude the tails of the distribution.
+When interpreting these mortality differentials, it is important to remember that we are only observing deaths for a truncated window. This truncation excludes the tails of the distribution and reduces the average difference between groups, likely creating a downward bias on the estimated effects of any covariates.  
 
-Appropriate regression coefficient adjustments can be found through simulation. Please see [BUNMD working paper](https://censoc.berkeley.edu/wp-content/uploads/2020/04/bunmd_paper.pdf) for more information. 
+Appropriate regression coefficient adjustments can be found through simulation. Please see [BUNMD working paper](https://censoc.berkeley.edu/wp-content/uploads/2022/02/bunmd_paper_feb10_2022.pdf) for more information. 
