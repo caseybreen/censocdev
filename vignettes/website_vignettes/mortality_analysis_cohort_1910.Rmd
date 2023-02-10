@@ -98,6 +98,10 @@ censoc <- censoc %>%
     OWNERSHP == 1 ~ "Owner",
     OWNERSHP == 2 ~ "Renter"))
 ```
+```{r}
+censoc %>% 
+  select(EDUCD)
+```
 
 
 ## Quick Exploratory Data Analysis  

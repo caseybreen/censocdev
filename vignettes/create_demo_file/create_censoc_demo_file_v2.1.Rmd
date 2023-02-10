@@ -19,6 +19,7 @@ library(tidyverse)
 library(data.table)
 library(ipumsr)
 library(styler)
+library(datasets)
 ```
 
 ## Read in the 1 percent file and the crosswalk from IPUMS
@@ -64,13 +65,6 @@ demo_file_numident <- numident2.1 %>%
   select(vars_to_keep_num) %>% 
   rename_all(tolower) %>% 
   censocdev::recode_education(educ_var = educd) 
-
-
-
-## write out csv file 
-write_csv(demo_file_numident, "/data/josh/CenSoc/data_release_demo_v2.1/censoc_numident_demo_v2.1.csv")
-
-
 ```
 
 ## Construct CenSoc-DMF Demo
@@ -99,8 +93,36 @@ demo_file_dmf <- dmf2.1 %>%
   rename(bpl = "BPLD") %>%
   rename_all(tolower) %>% 
   censocdev::recode_education(educ_var = educd) 
+```
+
+statefip_string function
+```{r}
+statefip_string_fun<-function(numident_dmf){
+#Create separate data.frame for statefip values and add Alaska and Hawaii 
+  numident_dmf %>% 
+    mutate(statefip = as.numeric(statefip)) %>% 
+    count(statefip) %>% 
+    add_row(statefip= c(2,15), n = c(0,0)) %>% arrange(statefip)->statenum
+  
+#Create another data.frame with `state.name` character values and add Washington D.C.
+state_new<-tibble(state.name) %>% 
+  rbind("District of Columbia") %>% 
+  arrange(state.name) %>% 
+  mutate(statefip = as_factor(statenum$statefip))
+
+# Integrate state.name
+return(numident_dmf %>% 
+         inner_join(state_new, by = "statefip") %>% 
+         rename(statefip_string = "state.name"))
+}
+
+#Update numident and demo
+demo_file_numident<-statefip_string_fun(demo_file_numident)
+demo_file_dmf<-statefip_string_fun(demo_file_dmf)
 
 ## Write out csv file 
 write_csv(demo_file_dmf, "/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv")
+write_csv(demo_file_numident, "/data/josh/CenSoc/data_release_demo_v2.1/censoc_numident_demo_v2.1.csv")
 ```
+
 
