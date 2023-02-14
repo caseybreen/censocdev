@@ -12,7 +12,7 @@
 
 <meta name="author" content="Casey Breen (caseybreen@berkeley.edu)" />
 
-<meta name="date" content="2023-01-23" />
+<meta name="date" content="2023-02-14" />
 
 <title>Exploring Mortality Differentials in the CenSoc-DMF Demo Dataset</title>
 
@@ -341,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Exploring Mortality Differentials in the
 CenSoc-DMF Demo Dataset</h1>
 <h4 class="author">Casey Breen (<a href="mailto:caseybreen@berkeley.edu" class="email">caseybreen@berkeley.edu</a>)</h4>
-<h4 class="date">2023-01-23</h4>
+<h4 class="date">2023-02-14</h4>
 
 
 
@@ -521,13 +521,13 @@ coverage).</p>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Restrict to birth cohorts of 1900-1920</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Years of death already restricted to &quot;high-coverage&quot; period of 1975-2005</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>censoc_state_model <span class="ot">&lt;-</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  censoc_demo2 <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  censoc_demo <span class="sc">%&gt;%</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(byear <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1900</span><span class="sc">:</span><span class="dv">1920</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(dyear <span class="sc">&gt;=</span> <span class="dv">65</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">byear =</span> <span class="fu">as.factor</span>(byear)) <span class="sc">%&gt;%</span> </span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">byear =</span> <span class="fu">relevel</span>(byear, <span class="at">ref =</span> <span class="st">&quot;1910&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>statefip) <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">statefip =</span> <span class="st">&quot;state.name&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">statefip =</span> <span class="fu">as.factor</span>(statefip)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># select(-statefip) %&gt;% rename(statefip = &quot;state.name&quot;) %&gt;% </span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">statefip =</span> <span class="fu">as.factor</span>(statefip_string)) <span class="sc">%&gt;%</span> </span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">statefip =</span> <span class="fu">relevel</span>(statefip, <span class="at">ref =</span> <span class="st">&quot;Maine&quot;</span>)) <span class="co">#Update: Statefip is the numerical-code for each state, with 23 representing Maine. I don&#39;t know if we should change this on the demo file.</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Linear model predicting age at death from State and byear </span></span>
