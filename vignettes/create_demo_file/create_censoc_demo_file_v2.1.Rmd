@@ -20,6 +20,8 @@ library(data.table)
 library(ipumsr)
 library(styler)
 library(datasets)
+library(readxl)
+library(censocdev)
 ```
 
 ## Read in the 1 percent file and the crosswalk from IPUMS
@@ -88,6 +90,7 @@ dmf2.1 <- dmfdata_demo %>%
 vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "link_abe_exact_conservative", "weight", "weight_conservative", "PERWT", "AGE", "SEX", "BPLD", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHP", "PERNUM", "RACE", "RENT", "SERIAL", "STATEFIP", "URBAN")
 
 ## Write out demo file 
+
 demo_file_dmf <- dmf2.1 %>%
   select(vars_to_keep_dmf) %>%
   rename(bpl = "BPLD") %>%
@@ -95,26 +98,33 @@ demo_file_dmf <- dmf2.1 %>%
   censocdev::recode_education(educ_var = educd) 
 ```
 
-statefip_string function
+statefip_string and bpl_string function
 ```{r}
+# bpl_string_code<-read_csv("/data/josh/CenSoc/censoc_data/bpl_string_code.csv") %>%
+#   mutate(Code= as.factor(Code))
+
 statefip_string_fun<-function(numident_dmf){
 #Create separate data.frame for statefip values and add Alaska and Hawaii 
-  numident_dmf %>% 
+statenum<- numident_dmf %>% 
     mutate(statefip = as.numeric(statefip)) %>% 
     count(statefip) %>% 
-    add_row(statefip= c(2,15), n = c(0,0)) %>% arrange(statefip)->statenum
+    add_row(statefip= c(2,15), n = c(0,0)) %>% arrange(statefip)
   
 #Create another data.frame with `state.name` character values and add Washington D.C.
 state_new<-tibble(state.name) %>% 
   rbind("District of Columbia") %>% 
   arrange(state.name) %>% 
-  mutate(statefip = as_factor(statenum$statefip))
+  mutate(statefip = statenum$statefip)
 
 # Integrate state.name
 return(numident_dmf %>% 
          inner_join(state_new, by = "statefip") %>% 
-         rename(statefip_string = "state.name"))
+         # inner_join(bpl_string_code, by = c("bpl" = "Code")) %>% 
+         rename(statefip_string = "state.name") %>% 
+         mutate(statefip = as.factor(statefip),
+                bpl = as.factor(bpl))) 
 }
+
 
 #Update numident and demo
 demo_file_numident<-statefip_string_fun(demo_file_numident)

@@ -45,23 +45,6 @@ censoc_demo %>%
   filter(incwage < 99999) %>% 
   kable()
 ```
-```{r, `results  = FALSE`, echo = FALSE}
-library(datasets)
-
-censoc_demo %>% 
-  count(statefip) %>% 
-  add_row(statefip = c(2,15), n = c(0,0)) %>% 
-  arrange(statefip)->a
-
-statenew<-tibble(state.name) %>% 
-  rbind("District of Columbia") %>% 
-  arrange(state.name) %>% 
-  mutate(statefip = a$statefip)
-  
-censoc_demo2<-censoc_demo %>% 
-  inner_join(statenew, by = "statefip")
-```
-
 
 **Note**: For the CenSoc-Demo dataset, we converted the IPUMS numeric codes into meaningful character value labels (e.g., “Male” = 1, “Female” = 2). Before using a variable in your analysis, it is a good idea to learn more about its coding schema. Check out the terrific documentation from the IPUMS-USA [website](https://usa.ipums.org/usa/).  
 
@@ -89,13 +72,13 @@ The CenSoc-DMF file is already restricted to deaths occurring in the "high-cover
 ## Restrict to birth cohorts of 1900-1920
 ## Years of death already restricted to "high-coverage" period of 1975-2005
 censoc_state_model <-
-  censoc_demo2 %>%
+  censoc_demo %>%
   filter(byear %in% c(1900:1920)) %>% 
   filter(dyear >= 65) %>% 
   mutate(byear = as.factor(byear)) %>% 
   mutate(byear = relevel(byear, ref = "1910")) %>% 
-  select(-statefip) %>% rename(statefip = "state.name") %>% 
-  mutate(statefip = as.factor(statefip)) %>% 
+  # select(-statefip) %>% rename(statefip = "state.name") %>% 
+  mutate(statefip = as.factor(statefip_string)) %>% 
   mutate(statefip = relevel(statefip, ref = "Maine")) #Update: Statefip is the numerical-code for each state, with 23 representing Maine. I don't know if we should change this on the demo file.
 
 ## Linear model predicting age at death from State and byear 
