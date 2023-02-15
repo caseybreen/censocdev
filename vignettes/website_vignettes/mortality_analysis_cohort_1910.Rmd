@@ -57,30 +57,30 @@ The `IPUMSR` package includes helpful functions for assigning values labels (see
 ```{r, eval = F}
 
 ## recode educ_yrs var to years of education
+
 censoc <- censoc %>%
   mutate(educ_yrs = case_when(
-    HIGRADE == 3~ 1,
-  HIGRADE == 4 ~ 2,
-  HIGRADE == 5 ~ 3,
-  HIGRADE == 6 ~ 4,
-  HIGRADE == 7 ~ 5,
-  HIGRADE == 8 ~ 6,
-  HIGRADE == 9 ~ 7,
-  HIGRADE == 10 ~ 8,
-  HIGRADE == 11 ~ 9,
-  HIGRADE == 12 ~ 10,
-  HIGRADE == 13 ~ 11,
-  HIGRADE == 14 ~ 12,
-  HIGRADE == 15 ~ 13,
-  HIGRADE == 16 ~ 14,
-  HIGRADE == 17 ~ 15,
-  HIGRADE == 18 ~ 16,
-  HIGRADE == 19 ~ 17,
-  HIGRADE == 20 ~ 18,
-  HIGRADE == 21 ~ 19,
-  HIGRADE == 22 ~ 20,
-  HIGRADE == 23 ~ 21,
-  TRUE ~ 0,
+  EDUCD == 14 ~ 2,
+  EDUCD == 15 ~ 3,
+  EDUCD == 16 ~ 4,
+  EDUCD == 17 ~ 5,
+  EDUCD == 22 ~ 6,
+  EDUCD == 23 ~ 7,
+  EDUCD == 25 ~ 8,
+  EDUCD == 26 ~ 9,
+  EDUCD == 30 ~ 10,
+  EDUCD == 40 ~ 11,
+  EDUCD == 50 ~ 12,
+  EDUCD == 60 ~ 13,
+  EDUCD == 70 ~ 14,
+  EDUCD == 80 ~ 15,
+  EDUCD == 90 ~ 16,
+  EDUCD == 100 ~ 17,
+  EDUCD == 110 ~ 18,
+  EDUCD == 111 ~ 19,
+  EDUCD == 112 ~ 20,
+  EDUCD == 113 ~ 21,
+  TRUE ~ 0
 )) 
 
 ## Recode RACE var to string
@@ -98,11 +98,6 @@ censoc <- censoc %>%
     OWNERSHP == 1 ~ "Owner",
     OWNERSHP == 2 ~ "Renter"))
 ```
-```{r}
-censoc %>% 
-  select(EDUCD)
-```
-
 
 ## Quick Exploratory Data Analysis  
 

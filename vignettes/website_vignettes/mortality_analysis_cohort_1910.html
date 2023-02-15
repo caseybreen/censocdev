@@ -12,7 +12,7 @@
 
 <meta name="author" content="Casey Breen (caseybreen@berkeley.edu)" />
 
-<meta name="date" content="2023-01-25" />
+<meta name="date" content="2023-02-14" />
 
 <title>Mortality Analysis of the 1910 Cohort</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Mortality Analysis of the 1910 Cohort</h1>
 <h4 class="author">Casey Breen (<a href="mailto:caseybreen@berkeley.edu" class="email">caseybreen@berkeley.edu</a>)</h4>
-<h4 class="date">2023-01-25</h4>
+<h4 class="date">2023-02-14</h4>
 
 
 
@@ -398,30 +398,30 @@ assigning values labels (see the <a href="http://tech.popdata.org/ipumsr/index.h
 more information and tutorials). In this vignette, for simplicity, we
 will manually code our value labels.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## recode educ_yrs var to years of education</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> censoc <span class="sc">%&gt;%</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">educ_yrs =</span> <span class="fu">case_when</span>(</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    HIGRADE <span class="sc">==</span> <span class="dv">3</span><span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">6</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">7</span> <span class="sc">~</span> <span class="dv">5</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">8</span> <span class="sc">~</span> <span class="dv">6</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">9</span> <span class="sc">~</span> <span class="dv">7</span>,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">10</span> <span class="sc">~</span> <span class="dv">8</span>,</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">11</span> <span class="sc">~</span> <span class="dv">9</span>,</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">12</span> <span class="sc">~</span> <span class="dv">10</span>,</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">13</span> <span class="sc">~</span> <span class="dv">11</span>,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">14</span> <span class="sc">~</span> <span class="dv">12</span>,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">15</span> <span class="sc">~</span> <span class="dv">13</span>,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">16</span> <span class="sc">~</span> <span class="dv">14</span>,</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">17</span> <span class="sc">~</span> <span class="dv">15</span>,</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">18</span> <span class="sc">~</span> <span class="dv">16</span>,</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">19</span> <span class="sc">~</span> <span class="dv">17</span>,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">20</span> <span class="sc">~</span> <span class="dv">18</span>,</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">21</span> <span class="sc">~</span> <span class="dv">19</span>,</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">22</span> <span class="sc">~</span> <span class="dv">20</span>,</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  HIGRADE <span class="sc">==</span> <span class="dv">23</span> <span class="sc">~</span> <span class="dv">21</span>,</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> censoc <span class="sc">%&gt;%</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">educ_yrs =</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">14</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">15</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">16</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">17</span> <span class="sc">~</span> <span class="dv">5</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">22</span> <span class="sc">~</span> <span class="dv">6</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">23</span> <span class="sc">~</span> <span class="dv">7</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">25</span> <span class="sc">~</span> <span class="dv">8</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">26</span> <span class="sc">~</span> <span class="dv">9</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">30</span> <span class="sc">~</span> <span class="dv">10</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">40</span> <span class="sc">~</span> <span class="dv">11</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">50</span> <span class="sc">~</span> <span class="dv">12</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">60</span> <span class="sc">~</span> <span class="dv">13</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">70</span> <span class="sc">~</span> <span class="dv">14</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">80</span> <span class="sc">~</span> <span class="dv">15</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">90</span> <span class="sc">~</span> <span class="dv">16</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">100</span> <span class="sc">~</span> <span class="dv">17</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">110</span> <span class="sc">~</span> <span class="dv">18</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">111</span> <span class="sc">~</span> <span class="dv">19</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">112</span> <span class="sc">~</span> <span class="dv">20</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">113</span> <span class="sc">~</span> <span class="dv">21</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span></span>
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>)) </span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Recode RACE var to string</span></span>
