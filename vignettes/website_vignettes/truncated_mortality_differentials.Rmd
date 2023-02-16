@@ -25,7 +25,7 @@ Before getting started with the vignette, make sure to:
     - `devtools`
     - `data.table` 
     
-The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website).
+The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website_vignettes).
 
 ## Setup
 
@@ -36,12 +36,15 @@ library(ipumsr)    ## Reads in IPUMS data
 library(broom)     ## Cleans regression output 
 library(devtools)  ## R package development tools
 library(data.table)## Tools for working with big data
+library(devtools)
 
 ## Set seed for reproducibility 
 set.seed(0.4886)
 
 ## Source some files from a GitHub Repository
-devtools::source_url("https://github.com/caseybreen/numident_paper/blob/master/code/00_helper_functions.R?raw=TRUE")
+devtools::source_url("https://github.com/caseybreen/numident_paper/tree/master/code/helper_functions.R?raw=TRUE")
+
+devtools::source_url("https://github.com/caseybreen/bunmd/blob/master/code/helper_functions.R")
 ```
 
 ## OLS Regression Truncation
@@ -63,10 +66,12 @@ To account for this, we can calculate adjustment factors to help us more accurat
 
 We will step through calculating regression adjustment coefficients. First, we'll decide upon the appropriate parameters for the Gompertz model — a popular old age mortality model. In general, we can just use default values to calculate our mortality parameters. The Gompertz parameters can be left at their default values of $\beta = 0.1$ and $M = 84$ unless there is a reason to override these values based on external estimates.
 
-For demonstration purposes, in this vignette, we'll use maximum likelihood estimation to calculate new Gompertz parameters from the birth cohort of 1910. We'll then use simulation to calculate adjustment factors for this data set. For a more detailed discussion of this maximum likelihood estimation method, see the [“The Berkeley Unified Numident Mortality Database"](https://censoc.berkeley.edu/wp-content/uploads/2020/04/bunmd_paper.pdf) working paper. 
+For demonstration purposes, in this vignette, we'll use maximum likelihood estimation to calculate new Gompertz parameters from the birth cohort of 1910. We'll then use simulation to calculate adjustment factors for this data set. For a more detailed discussion of this maximum likelihood estimation method, see the [“The Berkeley Unified Numident Mortality Database"](https://censoc.berkeley.edu/wp-content/uploads/2022/02/bunmd_paper_feb10_2022.pdf) working paper. 
 
 ```{r, eval = F}
 ## Format data for maximum likelihood estimation
+censoc_numident_demo<-fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
+
 deaths_tabulated <- censoc_numident_demo %>%
   filter(byear %in% 1910) %>%
   group_by(death_age) %>%
@@ -97,12 +102,12 @@ adjust.factor <- get.bunmd.adjust.factor(1905:1915,
 #> [1] 84.30276
 #> [1] "simulating: please be patient"
 #> [1] "regressing: please continue to be patient"
-#> [1] 3.1
+#> [1] 3.44
 ```
 
 ## Mortality Differentials by Relative Wage Income
 
-The association between relative wage income and mortality has been well-documented in the US. Can we see this association in our CenSoc-Numident dataset?
+The association between relative wage income and mortality in the US has been well-documented. Can we see this association in our CenSoc-Numident dataset?
 
 To answer this question, we'll use the `INCWAGE` variable. This is an imperfect measure of income, as it was only collected for salary and wage workers. Census enumerators in 1940 were explicitly instructed to "not include earnings of businessmen, farmers, or professional persons who depend upon business profits, sales of crops, or fees for income and who do not work for wages or salaries." (See [instructions to enumeration](https://usa.ipums.org/usa/voliii/inst1940.shtml#584) for more detail). In this analysis, we account for this by only including persons with non-zero wages — other researchers may take a different approach. 
 
@@ -118,7 +123,7 @@ censoc_incwage <- censoc_numident_demo %>%
   mutate(wage_decile = ntile(INCWAGE, 10)) %>% 
   mutate(wage_decile = as.factor(wage_decile)) %>%
   mutate(educ_yrs = case_when(
-  EDUCD== 2 ~ 0,
+  #EDUCD== 2 ~ 0,
   EDUCD== 14 ~ 1,
   EDUCD== 15 ~ 2,
   EDUCD== 16 ~ 3,
@@ -135,7 +140,11 @@ censoc_incwage <- censoc_numident_demo %>%
   EDUCD== 80 ~ 14,
   EDUCD== 90 ~ 15,
   EDUCD== 100 ~ 16,
-  EDUCD== 110 ~ 17
+  EDUCD== 110 ~ 17,
+  EDUCD == 111 ~ 19,
+  EDUCD == 112 ~ 20,
+  EDUCD == 113 ~ 21,
+  TRUE ~ 0
 ))
 
 ## Prepare data for model
@@ -162,6 +171,7 @@ censoc_incwage %>%
 
 
 Here, we'll run our regression and inflate our regression coefficients and standard errors by our adjustment factor of 3.1. 
+
 
 
 ```{r, eval = F}
