@@ -55,8 +55,6 @@ Choose variables for your analysis. For example, to include `RACE`, slide over t
 
 #### Select Cases  
 
-**NOTE: I can't actually find this feature on IPUMS**
-
 The IPUMS "select cases" feature allows users to conditionally choose which states to include in an extract. This can be helpful if you are only interested in a subset of the Census. For example, if you are working with the CenSoc-DMF file, which includes only men, it makes sense to restrict your cases to men-only. 
 
 ### Downloading the IPUMS extract

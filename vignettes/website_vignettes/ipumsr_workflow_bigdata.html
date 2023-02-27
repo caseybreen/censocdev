@@ -12,7 +12,7 @@
 
 <meta name="author" content="Casey Breen (caseybreen@berkeley.edu)" />
 
-<meta name="date" content="2023-01-25" />
+<meta name="date" content="2023-02-17" />
 
 <title>An ipumsr Workflow for Big CenSoc Data</title>
 
@@ -341,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">An <code>ipumsr</code> Workflow for Big
 CenSoc Data</h1>
 <h4 class="author">Casey Breen (<a href="mailto:caseybreen@berkeley.edu" class="email">caseybreen@berkeley.edu</a>)</h4>
-<h4 class="date">2023-01-25</h4>
+<h4 class="date">2023-02-17</h4>
 
 
 
@@ -465,14 +465,15 @@ the datasets on the <code>HISTID</code> variable is straightforward.</p>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ipumsr) <span class="do">## reads in IPUMS data and associated metadata</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="do">## read in censoc file</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;~/path/to/censoc/censoc_numident_v1.csv&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;~/path/to/censoc/censoc_numident_v2.1.csv&quot;</span>)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="do">## read in census file with ipumsr package</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>census <span class="ot">&lt;-</span> <span class="fu">read_ipums_micro</span>(<span class="at">data_file =</span> <span class="st">&#39;~/path/to/ipums/usa_00036.csv.gz&#39;</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                           <span class="at">ddi =</span> <span class="st">&#39;~/path/to/ipums/usa_00036.xml&#39;</span>)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="do">## join the census files by HISTID</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>censoc_numident_linked <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(censoc, census, <span class="at">by =</span> <span class="st">&quot;HISTID&quot;</span>)</span></code></pre></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>censoc_numident_linked <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(censoc, census, <span class="at">by =</span> <span class="st">&quot;HISTID&quot;</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>censoc_numident_linked<span class="ot">&lt;-</span><span class="fu">read_csv</span>(<span class="st">&quot;/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv&quot;</span>) <span class="co"># Ben</span></span></code></pre></div>
 </div>
 <div id="chunked-strategy-for-overcoming-memory-limitations" class="section level3">
 <h3>“Chunked” strategy for overcoming memory limitations</h3>
@@ -490,7 +491,7 @@ took approximately 50 minutes on a 2018 base Macbook Pro with 16 GB of
 memory. The good news is that you only need to do this once — see the
 instructions below on how to save your merged data file.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## set paths to censoc file </span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;~/path/to/censoc/censoc_numident_v1.csv&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;~/path/to/censoc/censoc_numident_v2.1.csv&quot;</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Set paths to IPUMS data file — .csv or .dat file! </span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ipums_data <span class="ot">&lt;-</span> <span class="st">&#39;~/path/to/census/usa_00033.csv&#39;</span></span>

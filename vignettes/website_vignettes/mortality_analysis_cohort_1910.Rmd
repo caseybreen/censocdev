@@ -34,7 +34,7 @@ library(gridExtra)
 library(ggpubr)
 library(broom)
 
-censoc <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")# This is the path in the demo file, now using v2.1. Path below didn't go anywhere
+censoc <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
   
 # fread("/censoc/data/censoc_linked_with_census/1940/censoc_dmf_all_vars_v1.csv") 
 
