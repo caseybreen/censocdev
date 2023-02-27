@@ -1,0 +1,223 @@
+---
+title: "6-clean-socioeco-enlistment"
+output: html_document
+---
+
+#This rmd recodes race, branch_codes,source, branch_alpha, grade_alpha,
+# term_or_enlistment, and component
+
+```{r}
+library(dplyr)   # %>%, group_by, tally, print
+library(ipumsr)  # read_ipums_ddi, ipums_val_labels
+library(readr)   # read_csv, write_csv
+library(stringr) # str_trim, str_split
+
+
+```
+
+
+```{r }
+path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/aw enlistment code/temp5.csv"
+out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/aw enlistment code"
+race_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/aw enlistment code/titlesnicknames/cl_2059.csv"
+```
+
+#READ IN TEMP 5
+```{r}
+
+data_combined <- read_csv(path_to_temp_data, 
+                          col_types = cols(
+                            empty_field = col_character(),
+                            term_or_enlistment = col_character(),
+                            longevity = col_character(),
+                            education = col_character(),
+                            marital_status = col_character(),
+                            component = col_character(),
+                            educ_spec = col_character(),
+                            defer_date_mmyy = col_character(),
+                            mname_clean = col_character(),
+                            sex = col_integer(),
+                            sex_r = col_integer(),
+                            fname_std = col_character()
+                            )
+                          )
+```
+
+#Clean Race
+
+#Load csv with NARA AAD codes
+```{r}
+race_codes <- read_csv(race_path)
+```
+
+#View race fields
+```{r}
+data_combined %>% 
+  count(race) 
+```
+
+```{r}
+recode_race_enlistment <- function(df){
+  
+  ## recode race variable using IPUM codes
+  df <- df %>% 
+    mutate(race_recode = case_when(
+      race == "1" ~ 1, #white citizens/noncitizens
+      race == "J" ~ 1, #white citizens/noncitizens
+      race == "2" ~ 2, #Black/African American citizens/noncitizens
+      race == "K" ~ 2, #Black/African American citizens/noncitizens
+      race == "6" ~ 3, #American Indian citizens/noncitizens
+      race == "O" ~ 3, #American Indian citizens/noncitizens
+      race == "3" ~ 4, #Chinese citizen/noncitizen
+      race == "L" ~ 4, #Chinese citizen/noncitizen
+      race == "4" ~ 5, #Japanese citizen/noncitizen
+      race == "M" ~ 5, #Japanese citizen/noncitizen
+      race == "7" ~ 6, #Other Asian/Pacific Islander citizen/noncitizen
+      race == "P" ~ 6, #Other Asian/Pacific Islander citizen/noncitizen
+      race == "5" ~ 6, #Other Asian/Pacific Islander citizen/noncitizen
+      race == "N" ~ 6, #Other Asian/Pacific Islander citizen/noncitizen
+      race == "8" ~ 7, #Other + Puerto Ricans
+      race == "Q" ~ 7, #Other + Puerto Ricans
+      race == "9" ~ 7, #Other + Puerto Ricans
+      race == "R" ~ 7, #Other + Puerto Ricans
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+```
+
+```{r}
+race_recode <- recode_race_enlistment(df = data_combined) %>% 
+  select(race, race_recode)
+```
+
+#recode citizenship
+
+```{r}
+recode_citizenship_enlistment <- function(df){
+  
+  ## recode citizenship variable using IPUM codes
+  df <- df %>% 
+    mutate(citizenship_recode = case_when(
+      race == "1" ~ 1,
+      race == "J" ~ 0, #white citizens/noncitizens
+      race == "2" ~ 1,
+      race == "K" ~ 0, #Black/African American citizens/noncitizens
+      race == "6" ~ 1,
+      race == "O" ~ 0, #American Indian citizens/noncitizens
+      race == "3" ~ 1,
+      race == "L" ~ 0, #Chinese citizen/noncitizen
+      race == "4" ~ 1,
+      race == "M" ~ 0, #Japanese citizen/noncitizen
+      race == "7" ~ 1,
+      race == "P" ~ 0,
+      race == "5" ~ 1,
+      race == "N" ~ 0, #Other Asian/Pacific Islander citizen/noncitizen
+      race == "8" ~ 1,
+      race == "Q" ~ 0,
+      race == "9" ~ 1,
+      race == "R" ~ 0, #Other + Puerto Ricans
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+```
+
+```{r}
+citizenship_recode <- recode_citizenship_enlistment(df = data_combined) %>% 
+  select(race, citizenship_recode)
+```
+
+## Recode education
+```{r}
+data_combined %>% 
+  count(education) 
+```
+
+## write a function to recode education codes to better match ipums codes 
+
+```{r}
+recode_education_enlistment <- function(df){
+  
+  ## recode education variable
+  df <- df %>% 
+    mutate(education_recode = case_when(
+      education == 0 ~ 0,
+      education == 1 ~ 3,
+      education == 2 ~ 4,
+      education == 3 ~ 5,
+      education == 4 ~ 6,
+      education == 5 ~ 7,
+      education == 6 ~ 8,
+      education == 7 ~ 9,
+      education == 8 ~ 10,
+      education == 9 ~ 11,
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+    ))
+  
+  ## return data.frame   
+  return(df)
+}
+```
+
+```{r}
+education_recode <- recode_education_enlistment(df = data_combined) %>% 
+  select(education, education_recode)
+```
+
+#Recode marital_status from NARA AAD TO IPUMS CODES
+
+```{r}
+data_combined %>% 
+  count(marital_status) 
+```
+#Create a function to recode marital status to IPUMs codes
+## no delineation of 1. married, spouse present & 2.married, spouse absent so all
+## married are coded as 1
+```{r}
+recode_marital_status_enlistment <- function(df){
+  
+  ## recode grade variable using IPUM codes
+  df <- df %>% 
+    mutate(marital_status_recode = case_when(
+      marital_status == "1" ~ 6, #single w dependents
+      marital_status == "2" ~ 1, #married
+      marital_status == "3" ~ 3, #separated w dependents
+      marital_status == "4" ~ 4, #divorced w dependents
+      marital_status == "5" ~ 5, #widowed w dependents
+      marital_status == "6" ~ 6, #single
+      marital_status == "7" ~ 3, #separated 
+      marital_status == "8" ~ 4, #divorced 
+      marital_status == "9" ~ 5, #widowed without dep
+
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+```
+
+#Recode marital status
+```{r}
+marital_status_recode <- recode_marital_status_enlistment(df = data_combined) %>% 
+  select(marital_status, marital_status_recode)
+```
+
+
+#Add columns with recoded data to data_combined
+```{r}
+data_combined <- cbind(data_combined, race_recode$race_recode, education_recode$education_recode, marital_status_recode$marital_status_recode)
+```
+
+#Save dataset
+```{r}
+write_csv(data_combined, paste0(out_path, "/temp6.csv"))
+rm(list = ls())
+```
+
+
