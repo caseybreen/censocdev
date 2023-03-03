@@ -1,0 +1,885 @@
+---
+title: "CenSoc-Numident-WW2-Army-Enlistment File Codebook[^updated]"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+  word_document: default
+header-includes: \usepackage{hyperref}
+---
+[^updated]: Last updated: `r format(Sys.time(), '%d %B, %Y')`
+
+
+| Page| Variable     | Label                                        |
+|----:|:-------------|:---------------------------------------------|
+|   \hyperlink{page.2}{2}  | \hyperlink{page.2}{HISTID}                   |Historical unique identifier          |
+|   \hyperlink{page.3}{3}  | \hyperlink{page.3}{byear\_numident}           |Year of birth                       |
+|   \hyperlink{page.4}{4}  | \hyperlink{page.4}{bmonth\_numident}           |Month of birth                       |
+|   \hyperlink{page.5}{5}  |\hyperlink{page.5}{dyear\_numident}            |Year of birth                      |
+|   \hyperlink{page.6}{6}  | \hyperlink{page.6}{dmonth\_numident}          |Month of birth                    |
+|   \hyperlink{page.7}{7}  |\hyperlink{page.7}{death\_age\_numident}          |Age at death (years)               |
+|   \hyperlink{page.8}{8}  | \hyperlink{page.8}{sex\_numident}                   |Sex                                |
+|  \hyperlink{page.9}{9}   |\hyperlink{page.9}{race\_first\_numident}          |Race on first application                  |
+|  \hyperlink{page.10}{10} |\hyperlink{page.10}{race\_first\_cyear\_numident}     |First race: application year               |
+|  \hyperlink{page.11}{11} |\hyperlink{page.11}{race\_first\_cmonth\_numident}    |First race: application month              |
+|  \hyperlink{page.12}{12} |\hyperlink{page.12}{race\_last\_numident}           |Race on last application                   |
+|  \hyperlink{page.13}{13} |\hyperlink{page.13}{race\_last\_cyear\_numident}      |Last race: application year                |
+|  \hyperlink{page.14}{14} |\hyperlink{page.14}{race\_last\_cmonth\_numident}     |Last Race: application month               |
+|  \hyperlink{page.15}{15}  | \hyperlink{page.15}{bpld\_numident}                  |Place of birth                     |
+|  \hyperlink{page.16}{16} |\hyperlink{page.16}{zip\_residence\_numident}       |ZIP code of residence at time of death     |
+|  \hyperlink{page.17}{17} |\hyperlink{page.17}{socstate\_numident}                |State where social security number issued  |
+|  \hyperlink{page.18}{18} |\hyperlink{page.18}{age\_first\_application\_numident}  |Age at first social security application |
+|  \hyperlink{page.19}{19} |\hyperlink{page.19}{residence\_state\_enlistment}         |State of residence at enlistment |
+|  \hyperlink{page.20}{20} |\hyperlink{page.20}{residence\_county\_enlistment}        |County of residence at enlistment|
+|  \hyperlink{page.21}{21} |\hyperlink{page.21}{place\_of\_enlistment\_enlistment}         |Place of enlistment|
+|  \hyperlink{page.22}{22} |\hyperlink{page.22}{date\_of\_enlistment\_enlistment} |Date of enlistment |
+|  \hyperlink{page.23}{23} |\hyperlink{page.23}{grade\_code\_enlistment}                    |Army grade (rank)|
+|  \hyperlink{page.24}{24} |\hyperlink{page.24}{branch\_code\_enlistment}                     |Army branch |
+|  \hyperlink{page.25}{25} |\hyperlink{page.25}{term\_of\_enlistment\_enlistment}            |Term of enlistment |
+|  \hyperlink{page.26}{26} |\hyperlink{page.26}{source\_enlistment}                          |Source of army personnel|
+|  \hyperlink{page.27}{27} |\hyperlink{page.27}{race\_and\_citizenship\_enlistment}    |Race and citizenship  |
+|  \hyperlink{page.28}{28} |\hyperlink{page.28}{education\_enlistment}                 |Education  |
+|  \hyperlink{page.29}{29} |\hyperlink{page.29}{civ\_occupation\_enlistment}            |Civilian occupation |
+|  \hyperlink{page.30}{30} |\hyperlink{page.30}{marital\_status\_enlistment}            |Marital status at enlistment |
+|  \hyperlink{page.31}{31} |\hyperlink{page.31}{height\_enlistment}                |Height at enlistment (inches) |
+|  \hyperlink{page.32}{32} |\hyperlink{page.32}{weight\_or\_AGCT\_enlistment}                |Weight (pounds) at enlistment or AGCT score|
+|  \hyperlink{page.33}{33} |\hyperlink{page.33}{component\_enlistment}             |Army component |
+
+
+
+**Summary:** The CenSoc-Numident-WW2-Army-Enlistment (N = 1,163,739) links the full-count 1940 Census to the National Archives’ public release of the Social Security Numident file and the National Archives’ public release of the United States World War II Army Enlistment Records, circa 1938-1946. Records were linked using the standard variant of the ABE method developed by Abramitzky, Boustan, and Eriksson (2012, 2014, 2017). Variables ending in '_numident' are from the Numident file, and those ending in '_enlistment' are from the Army Enlistment file. To merge 1940 Census data with this data set, researchers can obtain a copy of the 1940 Census from IPUMS-USA and link on the individual-level, unique identifier HISTID variable.
+
+
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+options(kableExtra.auto_format = FALSE, scipen=999)
+```
+
+```{r echo = F, results='hide', message=FALSE, warning=FALSE}
+## Packages
+library(tidyverse)
+library(data.table)
+library(stringi)
+library(kableExtra)
+
+data_path <- '/data/josh/CenSoc/data_release_military_records/'
+resource_file_path <- '/hdir/0/mariaosborne/censoc/army enlistment files/'
+
+test_file_path <- '/hdir/0/mariaosborne/censoc/army enlistment files/'
+enlistment_numident <- fread('censoc_numident_enlistment_v1_copy.csv')
+
+## read in data file
+#setwd(data_path)
+#enlistment_numident <- fread('censoc_numident_ww2_army_enlistment_v1.csv')
+
+setwd(resource_file_path)
+
+```
+
+
+\newpage
+
+**\huge HISTID**
+\normalsize
+\vspace{12pt}
+
+**Label**: Historical Unique Identifier
+
+**Description**: HISTID is a unique individual-level identifier. It can be used to merge the CenSoc-Numident-WW2-Army-Enlistment file with the 1940 Full-Count Census from IPUMS. 
+
+
+
+
+\newpage 
+
+**\huge byear_numident **
+\normalsize
+\vspace{12pt}
+
+**Label**: Birth Year
+
+**Description**: byear_numident reports a person's year of birth, as recorded in the Numident death records.  
+
+```{r, include = F}
+byear_plot <- enlistment_numident %>%
+    group_by(byear_numident) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = byear_numident, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) + #replace with a different theme (theme_bw()) if the bbplot package isn't downloaded 
+  ggtitle("Year of Birth") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Year", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma, limits = c(0, 150000)) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+byear_plot
+```
+
+
+
+
+\newpage 
+**\huge bmonth_numident **
+\normalsize
+\vspace{12pt}
+
+**Label:** Birth Month
+
+**Description:** bmonth_numident reports a person's month of birth, as recorded in the Numident death records.  
+
+```{r, include = F}
+## run in the console and copy and paste into documentation
+bmonth_tabulated <- knitr::kable(enlistment_numident %>%
+    group_by(bmonth_numident) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
+    select(bmonth_numident, label, n, `freq %` = freq))
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+bmonth_tabulated
+```
+
+
+
+
+
+\newpage 
+
+**\huge dyear_numident **
+\normalsize
+\vspace{12pt}
+
+**Label**: Death Year
+
+**Description**: dyear_numident reports a person's year of death, as recorded in the Numident death records.     
+
+```{r, include = F, message = F}
+dyear_plot <- enlistment_numident %>%
+    group_by(dyear_numident) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = dyear_numident, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) +  
+  ggtitle("Year of Death") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Year", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) +
+  ylim(0,78000)
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+dyear_plot
+```
+
+
+
+
+\newpage 
+
+**\huge dmonth_numident **
+\normalsize
+\vspace{12pt}
+
+**Label**: Death Month
+
+**Description**: dmonth_numident reports a person's month of death, as recorded in the Numident death records.  
+
+```{r, include = F}
+dmonth_tabulated <- knitr::kable(enlistment_numident %>%
+    group_by(dmonth_numident) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
+    select(dmonth_numident, label, n, `freq %` = freq))
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+dmonth_tabulated
+```
+
+
+\newpage
+**\huge death\_age\_numident **
+\normalsize
+\vspace{12pt}
+
+**Label**: Age at Death (Years)
+
+**Description**: death_age_numident reports a person's age at death in years, calculated using the birth and death information recorded in the Numident death records.    
+
+```{r, include = F}
+death_age_plot <- enlistment_numident %>%
+    group_by(death_age_numident) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = death_age_numident, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) + #replace with a different theme (theme_bw()) if the bbplot package isn't downloaded 
+  ggtitle("Age at Death") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Age at Death", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+death_age_plot
+```
+
+\newpage
+
+
+**\huge sex_numident **
+\normalsize
+\vspace{12pt}
+
+**Label:** Sex
+
+**Description**: sex_numident reports a person's sex, as recorded in the Numident death, application, or claim records. 
+
+```{r, include = F}
+sex_tabulated <- knitr::kable(enlistment_numident %>%
+    group_by(sex_numident) %>%
+     tally() %>%
+     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(label = c("Men")) %>%
+     select(sex_numident, label, n, `freq %` = freq))
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+sex_tabulated
+```
+
+
+
+\newpage 
+
+**\huge race\_first\_numident **
+\normalsize
+\vspace{12pt}
+
+**Label**: race first
+
+**Description**: race_first_numident reports a person's race, as recorded on their first application entry.
+
+**Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. The Other category was also removed. 
+
+```{r, include = F}
+race_first_tabulated <- knitr::kable(enlistment_numident %>%
+    group_by(race_first_numident) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 3)) %>%
+    mutate(label = c("White", "Black", "Other", "Asian", "Hispanic", "Missing")) %>%
+    select(race_first_numident, label, n, `freq %` = freq))
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+race_first_tabulated
+```
+
+
+
+
+\newpage
+
+**\huge race_first_cyear_numident **
+\normalsize
+\vspace{12pt}
+
+**Label:** First Race: Application Year
+
+**Description**: race_first_cyear_numident is a numeric variable reporting the year of the application on which a person reported their first race.
+
+\vspace{12pt}
+
+
+
+
+\newpage 
+
+**\huge race_first_cmonth_numident **
+\normalsize
+\vspace{12pt}
+
+**Label:** First Race: Application Month
+
+**Description**: race_first_cmonth_numident is a numeric variable reporting the month of the application on which a person reported their first race. 
+
+
+
+
+\newpage
+
+**\huge race\_last_numident **
+\normalsize
+\vspace{12pt}
+
+**Label**: race last
+
+**Description**: race_last_numident reports a person's race, as recorded on their most recent application entry.
+
+**Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. They also removed the Other category.
+
+```{r, include = F}
+race_last_tabulated <- knitr::kable(enlistment_numident %>%
+    group_by(race_last_numident) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 3)) %>%
+    mutate(label = c("White", "Black", "Other", "Asian", "Hispanic", "Missing")) %>%
+    select(race_last_numident, label, n, `freq %` = freq))
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+race_last_tabulated
+```
+
+
+
+\newpage
+
+**\huge race_last_cyear_numident **
+\normalsize
+\vspace{12pt}
+
+**Label:** First Race: Application Year
+
+**Description**: race_last_cyear_numident reports the year of the application on which a person reported their last race. 
+
+
+
+
+\newpage 
+
+**\huge race_last_cmonth_numident **
+\normalsize
+\vspace{12pt}
+
+**Label:** Last Race: Application Month
+
+**Description**: race_last_cmonth_numident is a numeric variable reporting the month of the application on which a person reported their last race.
+
+
+
+
+\newpage
+
+**\huge bpld_numident **
+\normalsize
+\vspace{12pt}
+
+**Label**: Birthplace
+
+**Description**: bpld_numident is a numeric variable reporting a person's place of birth, as recorded in the Numident application or claims records. The coding schema matches the **detailed** IPUMS-USA Birthplace coding schema.  
+
+For a complete list of IPUMS Birthplace codes, please see: https://usa.ipums.org/usa-action/variables/BPL
+
+
+
+
+\newpage 
+
+**\huge zip\_residence_numident **
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: ZIP Code of Residence at Time of Death
+
+**Description**: zip_residence_numident is a string variable (9-characters) reporting a person's ZIP Code of residence at time of death, as recorded in the Numident death records.
+
+
+
+
+\newpage 
+**\huge socstate_numident**
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: State where Social Security Number Issued
+
+**Description**: The state in which a person's social security card was issued. Determined by first three (3) digits of Social Security number, as recorded in Numident death records. The coding schema matches the detailed IPUMS-USA Birthplace coding schema. 
+
+
+
+
+
+\newpage 
+
+**\huge age\_first\_app_numident **
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: Age at First Social Security Application 
+
+**Description**: age_first_application_numident reports the age at which a person submitted their first Social Security Application. 
+
+```{r, include = F}
+age_first_app_plot <- enlistment_numident %>%
+  group_by(age_first_application_numident) %>%
+  filter(age_first_application_numident %in% c(0:110)) %>% 
+  summarise(n = n()) %>%
+  ggplot(aes(x = age_first_application_numident, y = n)) + 
+  geom_point() +
+  geom_line() + 
+  theme_minimal(15) + 
+  theme(legend.position="bottom") +
+  labs(title = "Age of First Application",
+       x = "Age of First Application", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+
+```{r, echo = F}
+age_first_app_plot
+```
+
+
+\newpage 
+
+**\huge residence_state_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: state of residence
+
+**Description**: residence_state_enlistment is an string variable that reports a person's state of residence at time of enlistment, as reported in the World War II Army Enlistment Records. "State" can refer to a US states or a foreign nation. This variable may encode additional information about a person's enlistment, including conscientious objector or limited service status.
+
+For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2046&dt=893&c_id=24996
+
+
+
+\newpage 
+
+**\huge residence_county_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: county of residence
+
+**Description**: residence_county_enlistment is a numeric variable that reports a person's county of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable only exists for those enlistees residing in the US.
+
+For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2057&dt=893&c_id=24998
+
+
+
+\newpage 
+
+**\huge place_of_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: place of enlistment
+
+**Description**: place_of_enlistment_enlistment is a numeric variable that reports where an person enlisted, as reported in the World War II Army Enlistment Records. 
+
+For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=4123&dt=893&c_id=24997
+
+
+
+
+\newpage 
+
+**\huge date_of_enlistment_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: Date of enlistment, yyyy-mm-dd format
+
+**Description**: date_of_enlistment_enlistment reports a person's date of enlistment in yyyy-mm-dd format, as reported in the World War II Army Enlistment Records. 
+
+
+```{r}
+enlist_date_plot <- enlistment_numident %>%
+  mutate(date_short = format(as.Date(date_of_enlistment_enlistment), "%Y-%m")) %>% 
+    group_by(date_short) %>% 
+    tally() %>% 
+    filter(!is.na(date_short)) %>%
+  ggplot(aes(x=date_short, y=n, group=1)) +
+  geom_line() +
+  geom_point() +
+  scale_x_discrete(breaks = paste0(seq(1938, 1947, 1), "-01")) +
+  theme_minimal(base_size = 15) +
+  ggtitle("Enlistment Records Per Month") +
+  labs(x = "Date (yyyy-mm)", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) +
+  theme(axis.text.x = element_text(angle = 90))
+  
+```
+
+
+\vspace{75pt}
+
+```{r, echo = F}
+enlist_date_plot
+```
+
+
+
+
+\newpage 
+
+**\huge grade_code_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: army grade (alphanumeric code)
+
+**Description**: grade_code_enlistment is a string variable that records a person's grade (rank), as reported in the World War II Army Enlistment Records. 
+
+
+```{r}
+grades <- fread('nara_grade_code_codes.csv')
+grade_tabulated <- knitr::kable(enlistment_numident %>%
+                          group_by(grade_code_enlistment) %>% 
+                          tally() %>% 
+                          left_join(grades, by=c('grade_code_enlistment' = 'Code')) %>%
+                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
+                          select(grade_code_enlistment, 'label' = Meaning, n, `freq %` = freq))
+```
+
+\vspace{30pt}
+
+```{r}
+grade_tabulated
+```
+
+
+Code list also is availible at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2072&dt=893&c_id=24999
+
+
+
+\newpage 
+
+**\huge branch_code_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: army branch (alphanumeric code)
+
+**Description**: branch_code_enlistment is a numeric variable that records the army branch in which the enlistee served, as reported in the World War II Army Enlistment Records. 
+
+```{r}
+branches <- fread('nara_branch_code_codes.csv')
+branch_tabulated <- knitr::kable(enlistment_numident %>%
+                          group_by(branch_code_enlistment) %>% 
+                          tally() %>% 
+                          left_join(branches, by=c('branch_code_enlistment' = 'Code')) %>%
+                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
+                          select('branch_code'=branch_code_enlistment, 'label' = Meaning, n, `freq %` = freq),
+                          format='latex', booktabs=T) %>% 
+  kable_styling(position = "center") %>% 
+  column_spec(column=2, width = '8cm')
+```
+
+\vspace{30 pt}
+
+```{r}
+# check type of codes vs. enlistment data -- may be mismatched
+branch_tabulated
+```
+
+
+\newpage 
+
+**\huge term_of_enlistment_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: term of enlistment
+
+**Description**: term_of_enlistment_enlistment is a numeric variable that reports the length of a person's enlistment or their department of enlistment, as reported in the World War II Army Enlistment Records. 
+
+```{r}
+term <- fread('nara_term_of_enlistment.csv')
+toe_tabulated <- knitr::kable(enlistment_numident %>%
+                          group_by(term_of_enlistment_enlistment) %>% 
+                          tally() %>% 
+                          left_join(term, by=c('term_of_enlistment_enlistment' = 'Code')) %>%
+                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
+                          select(term_of_enlistment_enlistment, 'label' = Meaning, n, `freq %` = freq),
+                          format='latex', booktabs=T) %>% 
+  kable_styling(position = "center") %>% 
+  column_spec(column=2, width = '7cm')
+```
+
+\vspace{30 pt}
+
+```{r}
+toe_tabulated
+```
+
+Codes also availible at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2076&dt=893&c_id=24979
+
+
+
+
+
+
+\newpage 
+
+**\huge source_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: source of army personnel
+
+**Description**: source_enlistment is a string variable that reports where the enlisted person was recruited from, as reported in the World War II Army Enlistment Records. 
+
+
+```{r}
+source_codes <- fread('nara_source_codes.csv')
+source_tabulated <- knitr::kable(enlistment_numident %>%
+                          group_by(source_enlistment) %>% 
+                          tally() %>% 
+                          left_join(source_codes, by=c('source_enlistment' = 'Code')) %>%
+                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
+                          select(source_enlistment, 'label' = Meaning, n, `freq %` = freq),
+                          format='latex', booktabs=T) %>% 
+  kable_styling(position = "center") %>% 
+  column_spec(column=2, width = '7cm')
+```
+
+\vspace{30 pt}
+
+```{r}
+source_tabulated
+```
+
+Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2077&dt=893&c_id=24981
+
+
+
+\newpage 
+
+**\huge race_and_citizenship_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Race and Citizenship
+
+**Description**: race_and_citizenship_enlistment is a string variable that reports an individual's race and citizenship at time of enlistment, as reported in the World War II Army Enlistment Records.
+
+```{r}
+races <- fread('nara_race_codes.csv')
+race_cit_tabulated <- knitr::kable(enlistment_numident %>%
+                          group_by(race_and_citizenship_enlistment) %>% 
+                          tally() %>% 
+                          left_join(races, by=c('race_and_citizenship_enlistment' = 'Code')) %>%
+                          mutate(freq = signif(n*100 / sum(n), 3)) %>%
+                            select(race_and_citizenship_enlistment, 'label' = Meaning, n, `freq %` = freq))
+```
+\vspace{30 pt}
+```{r}
+race_cit_tabulated
+```
+
+Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2059&dt=893&c_id=24984
+
+
+
+\newpage 
+
+**\huge education_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: education
+
+**Description**: education_enlistment is a numeric variable that reports an individual's educational attainment at time of enlistment, as reported in the World War II Army Enlistment Records. 
+
+```{r}
+educ_codes <- fread('nara_education_codes.csv')
+educ_tabulated <- knitr::kable(enlistment_numident %>%
+                          group_by(education_enlistment) %>% 
+                          tally() %>% 
+                          left_join(educ_codes, by=c('education_enlistment' = 'Code')) %>%
+                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
+                          select(education_enlistment, 'label' = Meaning, n, `freq %` = freq))
+```
+
+\vspace{30 pt}
+
+```{r}
+educ_tabulated
+```
+
+Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2058&dt=893&c_id=24985
+
+
+
+\newpage 
+
+**\huge civ_occupation_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: civilian occupation
+
+**Description**: civ_occupation_enlistment is a string variable that reports a person's occupation at time of enlistment, as reported in the World War II Army Enlistment Records. 
+
+For complete codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=3323&dt=893&c_id=24986
+
+
+
+
+\newpage 
+
+**\huge marital_status_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: marital status
+
+**Description**: marital_status_enlistment is a string variable that reports a person's marital status at time of enlistment, as reported in the World War II Army Enlistment Records. 
+
+```{r}
+ms_codes <- fread('nara_marital_status_codes.csv')
+marital_status_tabulated <- knitr::kable(enlistment_numident %>%
+                          group_by(marital_status_enlistment) %>% 
+                          tally() %>% 
+                          left_join(ms_codes, by=c('marital_status_enlistment' = 'Code')) %>%
+                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
+                          select(marital_status_enlistment, 'label' = Meaning, n, `freq %` = freq))
+```
+
+\vspace{30pt}
+
+```{r}
+marital_status_tabulated
+```
+
+Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2081&dt=893&c_id=25001
+
+
+
+
+\newpage
+**\huge height_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Height
+
+**Description**: height_enlistment is a numeric variable that reports a person's height in inches at time of enlistment, as reported in the World War II Army Enlistment Records. 
+
+**Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field may encode military occupation or other information. Height may have been recorded through about 1943, but height data recorded after February 1943 are likely unreliable. See the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/OpaAPI/media/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1ND_NC.pdf?download=false) for further information.
+
+```{r, include = F}
+height_plot <- enlistment_numident %>%
+  ggplot(aes(x = height_enlistment)) +
+  geom_histogram(breaks = seq(0,100,1)) +
+  theme_minimal(base_size = 15) +
+  ggtitle("Height") +
+  scale_y_continuous(labels = scales::comma)
+  
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+height_plot
+```
+
+
+
+\newpage
+**\huge weight\_or\_AGCT\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Weight (pounds) at enlistment or AGCT score
+
+**Description**: weight_or_AGCT_enlistment is a numeric variable that reports a person's weight in pounds at time of enlistment or their Army General Classification Test (AGCT) score, as reported in the World War II Army Enlistment Records.
+
+**Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field was explicitly used for both weight and AGCT scores, but may also encode military occupation or other information. Weight may have been recorded through about 1943 at some enlistment sites, but the recording of AGCT score instead of weight at some enlistment sites likely began in March 1943. Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/OpaAPI/media/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1ND_NC.pdf?download=false) for further information.
+
+```{r, include = F}
+weight_plot <- enlistment_numident %>%
+  ggplot(aes(x = weight_or_AGCT_enlistment)) +
+  geom_histogram(breaks = seq(0,1000,10)) +
+  theme_minimal(base_size = 15) +
+  ggtitle("Weight or AGCT Score") +
+  scale_y_continuous(labels = scales::comma)
+
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+weight_plot
+```
+
+
+
+\newpage
+**\huge component_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Component
+
+**Description**:  component_enlistment is a numeric variable that records the component of the army in which an individual served, as recorded in the World War II Army Enlistment Records. 
+
+
+```{r}
+component_codes <- fread('nara_component_codes.csv')
+component_tabulated <- knitr::kable(enlistment_numident %>%
+                          group_by(component_enlistment) %>% 
+                          tally() %>% 
+                          left_join(component_codes, by=c('component_enlistment' = 'Code')) %>%
+                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
+                          select(component_enlistment, 'label' = Meaning, n, `freq %` = freq),
+                          format='latex', booktabs=T) %>% 
+  kable_styling(position = "center") %>% 
+  column_spec(column=2, width = '7cm')
+```
+
+\vspace{30 pt}
+
+```{r}
+component_tabulated
+```
+
+Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2078&dt=929&c_id=25014
