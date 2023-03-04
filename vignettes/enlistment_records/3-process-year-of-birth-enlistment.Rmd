@@ -1,0 +1,110 @@
+---
+title: "3-process-year-of-birth-enlistment"
+output: html_document
+---
+
+
+```{r}
+library(dplyr) # %>%, group_by, tally, print
+library(readr) # read_csv, write_csv
+```
+
+#Set path to temp data & outpath
+```{r}
+path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp2.csv"
+out_path          <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+
+```
+
+
+# Read in temp2
+```{r}
+data_combined <- read_csv(path_to_temp_data, 
+                          col_types = cols(
+                            empty_field = col_character(),
+                            term_or_enlistment = col_character(),
+                            longevity = col_character(),
+                            education = col_character(),
+                            marital_status = col_character(),
+                            component = col_character(),
+                            educ_spec = col_character(),
+                            defer_date_mmyy = col_character(),
+                            mname_clean = col_character(),
+                            sex = col_integer(),
+                            sex_r = col_integer(),
+                            fname_std = col_character()
+                            )
+                          )
+
+```
+
+
+
+# Process year_of_birth
+
+```{r}
+min(data_combined$year_of_birth, na.rm=T) # "00"
+max(data_combined$year_of_birth, na.rm=T) # "99"
+
+data_combined %>%
+  group_by(year_of_birth) %>%
+  tally() %>%
+  print(n=101)
+
+split_date_of_enlistment_ddmmyy <- function(row) {
+  dd <- substr(row, 1, 2)
+  mm <- substr(row, 3, 4)
+  yy <- substr(row, 5, 6)
+  return(list(dd=dd, mm=mm, yy=yy))
+}
+```
+
+#Process Date of Enlistment DD MM YY
+```{r}
+res <- lapply(data_combined$date_of_enlistment_ddmmyy, split_date_of_enlistment_ddmmyy) # SLOW
+data_combined$date_of_enlistment_dd <- unlist(res)[attr(unlist(res), "names") == "dd"]
+data_combined$date_of_enlistment_mm <- unlist(res)[attr(unlist(res), "names") == "mm"]
+data_combined$date_of_enlistment_yy <- unlist(res)[attr(unlist(res), "names") == "yy"]
+rm(res)
+
+min(data_combined$date_of_enlistment_yy, na.rm=T) # "00"
+max(data_combined$date_of_enlistment_yy, na.rm=T) # "99"
+
+data_combined %>%
+  group_by(date_of_enlistment_yy) %>%
+  tally() %>%
+  print(n=100)
+
+nrow(subset(data_combined, date_of_enlistment_yy < "38" | date_of_enlistment_yy > "46")) # 41896
+
+determine_yob <- function(row) {
+  yob <- row["year_of_birth"]
+  doe <- row["date_of_enlistment_yy"]
+  if (!is.na(yob) & !is.na(doe)) {
+    yob18 <- as.integer(paste0("18", yob))
+    yob19 <- as.integer(paste0("19", yob))
+    doe18 <- as.integer(paste0("18", doe))
+    doe19 <- as.integer(paste0("19", doe))
+    diff1918 <- doe19 - yob18
+    diff1919 <- doe19 - yob19
+    possible <- c()
+    if (diff1918 > 16 & diff1918 < 65) {possible <- c(possible, yob18)}
+    if (diff1919 > 16 & diff1919 < 65) {possible <- c(possible, yob19)}
+    if (length(possible) != 0) {return(max(possible))}
+    else {return(NA)}
+  } else {
+    return(NA)
+  }
+}
+
+data_combined$yob_precise <- apply(data_combined, 1, determine_yob) # SLOW
+
+sum(is.na(data_combined$yob_precise)) # 98742
+```
+
+# Save processed dataset
+```{r}
+write_csv(data_combined, paste0(out_path, "/temp3.csv"))
+rm(list = ls())
+
+```

@@ -1,0 +1,54 @@
+---
+title: "9-final-clean-enlistment"
+output: html_document
+date: "2023-03-02"
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)   # %>%, group_by, tally, print
+library(ipumsr)  # read_ipums_ddi, ipums_val_labels
+library(readr)   # read_csv, write_csv
+library(stringr) # str_trim, str_split
+```
+
+#update path
+```{r}
+path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp6.csv"
+```
+
+```{r}
+data_combined <- read_csv(path_to_temp_data, 
+                          col_types = cols(
+                            empty_field = col_character(),
+                            term_or_enlistment = col_character(),
+                            longevity = col_character(),
+                            education = col_character(),
+                            marital_status = col_character(),
+                            component = col_character(),
+                            educ_spec = col_character(),
+                            defer_date_mmyy = col_character(),
+                            mname_clean = col_character(),
+                            sex = col_integer(),
+                            sex_r = col_integer(),
+                            fname_std = col_character()
+                            )
+                          )
+```
+
+#Create final df using the subset function and rename columns
+```{r}
+colnames(data_combined)
+
+enlistment_records_final_v1 <- subset(data_combined, "unique_id", "")
+
+#TO DO: pick which name, sex variable to include, rename cols
+```
+#test df by looking at the first 200 rows
+```{r}
+head(df, 200)
+```
+

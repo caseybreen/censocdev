@@ -1,0 +1,185 @@
+---
+title: "4-process-nativity-enlistment"
+output: html_document
+---
+#Adapted from code written by Ugur Yildirim
+
+# Library packages, set paths
+```{r}
+library(dplyr)   # %>%, group_by, tally, print
+library(ipumsr)  # read_ipums_ddi, ipums_val_labels
+library(readr)   # read_csv, write_csv
+library(stringr) # str_trim, str_split
+```
+
+```{r}
+path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp3.csv"
+out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+# This file can be downloaded from #https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2079&dt=893&c_id=24982
+nativity_codes_path <-"/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/cl_2079.csv"
+path_to_ipums_ddi   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/fullcount.ddi.xml"
+```
+
+
+
+
+# Read in temp3
+```{r}
+data_combined <- read_csv(path_to_temp_data, 
+                          col_types = cols(
+                            empty_field = col_character(),
+                            term_or_enlistment = col_character(),
+                            longevity = col_character(),
+                            education = col_character(),
+                            marital_status = col_character(),
+                            component = col_character(),
+                            educ_spec = col_character(),
+                            defer_date_mmyy = col_character(),
+                            mname_clean = col_character(),
+                            sex = col_integer(),
+                            sex_r = col_integer(),
+                            fname_std = col_character()
+                            )
+                          )
+```
+
+
+
+
+# Convert nativity to place_of_birth to bpld
+
+# Reference: 
+# https://censoc.berkeley.edu/wp-content/uploads/2020/08/ipumsr_workflow_bigdata.html
+# Emails from Casey on 2020-10-07, 2020-10-08
+# https://usa.ipums.org/usa-action/variables/BPL#codes_section
+
+```{r}
+ddi_extract <- read_ipums_ddi(path_to_ipums_ddi)
+
+#table_bpl  <- ipums_val_labels(ddi_extract, BPL)
+#colnames(table_bpl) <- c("bpl", "place_of_birth_ipums")
+#table_bpl$place_of_birth_ipums <- toupper(table_bpl$place_of_birth_ipums)
+
+table_bpld <- ipums_val_labels(ddi_extract, BPLD)
+colnames(table_bpld) <- c("bpld", "place_of_birth_ipums")
+table_bpld$place_of_birth_ipums <- toupper(table_bpld$place_of_birth_ipums)
+
+nativity_codes <- read_csv(nativity_codes_path)
+nativity_codes <- nativity_codes[,c("Code", "Meaning")]
+colnames(nativity_codes) <- c("nativity", "place_of_birth")
+
+#get_first_place_before_or <- function(row) {return(str_split(row, " or ", 2)[[1]][1])}
+#nativity_codes$place_of_birth_r <- as.character(lapply(nativity_codes$place_of_birth, get_first_place_before_or))
+
+merged_bpld <- merge(nativity_codes, table_bpld, by.x = "place_of_birth", by.y = "place_of_birth_ipums", all.x = T)
+merged_bpld <- merged_bpld[order(merged_bpld$bpld),]
+
+merged_bpld$place_of_birth_uncertain <- ifelse(is.na(merged_bpld$bpld), 1, 0)
+
+subset(merged_bpld, is.na(bpld))$place_of_birth
+```
+
+``` {r}
+fill_in_missing_bplds <- function(row) {
+  if (row["place_of_birth"] == "ABYSSINIA") {return(60044)}
+  else if (row["place_of_birth"] == "ALGERIA or CAMEROONS or CHAD or COMOROS or DAHOMEY or FRENCH AFRICAN POSSESSIONS or FRENCH EQUATORIAL AFRICA or FRENCH GUINEA or FRENCH MOROCCO or FRENCH SOMALILAND or FRENCH SOUDAN or FRENCH WEST AFRICA or GABON or IVORY COAST or MADAGASCAR or MAURITANIA or MIDDLE CONGO or REUNION or SAHARA or SENEGAL or SOMALI COAST or TERRITORY OF NIGER or TOGO or TUNISIA or UBANGI SARI or UPPER VOLTA") {return(60011)} # Algeria
+  else if (row["place_of_birth"] == "ANDORRA or PORTUGAL") {return(43600)} # Portugal
+  else if (row["place_of_birth"] == "ANGLO-EGYPTIAN SUDAN or BRITISH CAMEROONS or BRITISH NORTH AFRICA or GAMBIA or GOLD COAST or NIGERIA or SIERRA LEONE or TOGOLAND or TONGA") {return(60015)} # Sudan
+  else if (row["place_of_birth"] == "ANGOLA or CAPE VERDE ISLANDS or MOZAMBIQUE or PORTUGESE AFRICAN POSSESSIONS or PORTUGESE GUINEA or PRINCIPE or ST THOME") {return(60071)} # Angola
+  else if (row["place_of_birth"] == "ARABIA or ASIR or HEJAZ or JABEL SHAMMAR or KUWEIT or NEJD or OMAN or TRANSJORDANIA or YEMEN") {return(54000)} # Saudi Arabia
+  else if (row["place_of_birth"] == "ASCENSION or BASUTOLAND or BECHUANALAND or BRITISH SOMALILAND or BRITISH SOUTH AFRICA or CAPE OF GOOD HOPE or KENYA or MAURITIUS or NATAL or NORTH RHODESIA or NYASSALAND or ORANGE FREE STATE or PEMBA or SOUTH RHODESIA or SOUTH WEST AFRICA or ST HELENA or SWAZILAND or TANGANYIKA or TRANSVAAL or UGANDA or UNION OF SOUTH AFRICA or ZANZIBAR") {return(60094)} # South Africa (Union of)
+  else if (row["place_of_birth"] == "AUSTRALIA or BISMARK ISLANDS or BRITISH AUSTRALASIA AND OCEANIA or FIJI ISLANDS or NEW GUINEA or NEW ZEALAND or OTHER PACIFIC BRITISH ISLANDS or PAPUA or SOLOMON ISLANDS or TASMANIA") {return(70010)} # Australia
+  else if (row["place_of_birth"] == "BAHAMAS or BARBADOS or BERMUDA or BRITISH CENTRAL AMERICA or BRITISH HONDURAS or BRITISH WEST INDIES or CAYMAN ISLANDS or JAMAICA or LEEWARD ISLANDS or TOBAGO or TRINIDAD or TURKS AND CAICOS ISLANDS or WINDWARD ISLANDS") {return(26043)} # Bahamas
+  else if (row["place_of_birth"] == "BALUCHISTAN or BRITISH EAST INDIES AND FAR EAST or BRITISH NORTH BORNEO or BRUNEI or FEDERATED MALAY STATES or HONG KONG or SARAWAK or STRAITS SETTLEMENTS") {return(50010)} # Hong Kong
+  else if (row["place_of_birth"] == "BELGIAN AFRICAN POSSESSIONS or BELGIAN CONGO") {return(60075)} # Congo
+  else if (row["place_of_birth"] == "BELGIUM or LUXEMBURG" ) {return(42000)} # Belgium
+  else if (row["place_of_birth"] == "BRITISH GUIANA or BRITISH SOUTH AMERICA or FALKLAND ISLANDS or GEORGIA") {return(30040)} # Guyana/British Guiana
+  else if (row["place_of_birth"] == "BRITISH MEDITERRANEAN POSSESSIONS or CYPRUS or GIBRALTER or MALTA or PALESTINE") {return(53100)} # Cyprus
+  else if (row["place_of_birth"] == "BRITISH NORTH AMERICA or CANADA or LABRADOR or NEWFOUNDLAND") {return(15000)} # Canada
+  else if (row["place_of_birth"] == "CEYLON or INDIA or MALDIVE ISLANDS") {return(52100)} # India
+  else if (row["place_of_birth"] == "CHANNEL ISLANDS or ENGLAND or GREAT BRITAIN or ISLE OF MAN or NORTHERN IRELAND or SCOTLAND or WALES") {return(41000)} # England
+  else if (row["place_of_birth"] == "CHINA or MONGOLIA or SINKIAN or TIBET") {return(50000)} # China
+  else if (row["place_of_birth"] == "CHOSEN or FORMOSA or JAPANESE ASIATIC POSSESSIONS or JAPANESE PACIFIC ISLANDS or KWANGTUNG or KOREA") {return(50200)} # Korea
+  else if (row["place_of_birth"] == "CURACAO or DUTCH AMERICAN POSSESSIONS or DUTCH GUIANA") {return(26074)} # Curacao
+  else if (row["place_of_birth"] == "CYRENAICA or ERITREA or ITALIAN AFRICAN POSSESSIONS or ITALIAN SOMALILAND or TRIPOLITANIA") {return(60065)} # Eritrea
+  else if (row["place_of_birth"] == "DANISH ISLAND POSSESSIONS or FAROE ISLANDS or GREENLAND or ICELAND") {return(40200)} # Iceland
+  else if (row["place_of_birth"] == "DANZIG or GERMANY") {return(45300)} # Germany
+  else if (row["place_of_birth"] == "DIST OF COLUMBIA") {return(1100)} # District of Columbia
+  else if (row["place_of_birth"] == "DOMINICAN REPUBLIC or SANTO DOMINGO") {return(26010)} # Dominican Republic
+  else if (row["place_of_birth"] == "DUTCH ASIATIC POSSESSIONS or DUTCH EAST INDIES") {return(51200)} # Indonesia
+  else if (row["place_of_birth"] == "EGYPT") {return(60012)} # Egypt/United Arab Rep.
+  else if (row["place_of_birth"] == "ESTHONIA") {return(46000)} # Estonia
+  else if (row["place_of_birth"] == "FRANCE or MONACO") {return(42100)} # France
+  else if (row["place_of_birth"] == "FRENCH AMERICAN POSSESSIONS or FRENCH GUIANA or GUADELOUPE or MARTINIQUE or ST PIERRE AND MIQUELON" ) {return(30035)} # French Guiana
+  else if (row["place_of_birth"] == "FRENCH ASIATIC POSSESSIONS or FRENCH INDIA or FRENCH INDO-CHINA or SYRIA") {return(54100)} # Syria
+  else if (row["place_of_birth"] == "FRENCH PACIFIC ISLANDS or NEW CALEDONIA or TAHITI") {return(71010)} # New Caledonia
+  else if (row["place_of_birth"] == "HAWAIIAN ISLANDS") {return(1500)} # Hawaii
+  else if (row["place_of_birth"] == "HOLLAND or NETHERLANDS") {return(42500)} # Netherlands
+  else if (row["place_of_birth"] == "IFNI or RIO DE ORO or SPANISH AFRICAN POSSESSIONS or SPANISH GUINEA or SPANISH MOROCCO") {return(60014)} # Morocco
+  else if (row["place_of_birth"] == "IRAQ or MESOPOTAMIA") {return(53200)} # Iraq
+  else if (row["place_of_birth"] == "IRISH FREE STATE") {return(41400)} # Ireland
+  else if (row["place_of_birth"] == "ITALY or SAN MARINO") {return(43400)} # Italy
+  else if (row["place_of_birth"] == "JUGOSLAVIA or MONTENEGRO or YUGOSLAVIA") {return(45700)} # Yugoslavia
+  else if (row["place_of_birth"] == "LICHTENSTEIN or SWITZERLAND") {return(42600)} # Switzerland
+  else if (row["place_of_birth"] == "MACAO or PORTUGESE ASIATIC POSSESSIONS or PORTUGESE INDIA or PORTUGESE TIMOR") {return(50020)} # Macau
+  else if (row["place_of_birth"] == "MANCHOUKUO") {return(50000)} # China
+  else if (row["place_of_birth"] == "NORWAY or SPITZBERGEN") {return(40400)} # Norway
+  else if (row["place_of_birth"] == "PANAMA CANAL") {return(21071)} # Panama Canal Zone
+  else if (row["place_of_birth"] == "PANAMA CANAL ZONE") {return(21071)} # Panama Canal Zone
+  else if (row["place_of_birth"] == "PERSIA") {return(52200)} # Iran
+  else if (row["place_of_birth"] == "PHILIPPINE ISLANDS") {return(51500)} # Philippines
+  else if (row["place_of_birth"] == "PUERTO RICO (INCLUDING VIRGIN ISLANDS AND CUBA)") {return(11000)} # Puerto Rico
+  else if (row["place_of_birth"] == "ROUMANIA") {return(45600)} # Romania
+  else if (row["place_of_birth"] == "RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS") {return(46500)} # Other USSR/"Russia"
+  else if (row["place_of_birth"] == "SALVADOR") {return(21030)} # El Salvador
+  else if (row["place_of_birth"] == "SIAM") {return(51700)} # Thailand
+  else if (row["place_of_birth"] == "UNITED STATES") {return(9900)} # United States, n.s. US OUTLYING AREAS/TERRITORIES
+  else {return(row["bpld"])}
+}
+
+merged_bpld$bpld_r <- apply(merged_bpld, 1, fill_in_missing_bplds)
+```
+
+
+# Process nativity
+```{r}
+data_combined$nativity_clean <- data_combined$nativity
+data_combined$nativity_clean <- str_trim(data_combined$nativity_clean)
+
+data_combined <- merge(data_combined, merged_bpld, by = "nativity", all.x = T)
+
+data_combined %>% group_by(place_of_birth) %>% tally(sort = T) %>% print(n=144)
+```
+
+
+# Reorder columns
+``` {r}
+data_combined$unique_id <- 1:nrow(data_combined)
+
+core_vars <- c("unique_id", 
+               "fname_clean_std", "mname_clean", "lname_clean", "fname_std", "fname_clean", "name_clean", "name", 
+               "sex_r", "sex", "sex_r_NA", "sex_NA", 
+               "yob_precise", "year_of_birth", 
+               "date_of_enlistment_yy", "date_of_enlistment_mm", "date_of_enlistment_dd", "date_of_enlistment_ddmmyy", 
+               "bpld_r", "place_of_birth", "nativity_clean", "bpld", "place_of_birth_uncertain", "nativity")
+
+other_vars <- c("serial_number", 
+                "residence_state", "residence_county", 
+                "place_of_enlistment", 
+                "grade_alpha", "grade_code", 
+                "branch_alpha", "branch_code", 
+                "empty_field", "term_or_enlistment", "longevity", "educ_spec", "defer_date_mmyy", 
+                "source", 
+                "race", "education", "civ_occupation", "marital_status", "height", "weight", 
+                "component", "card_number", 
+                "erc1", "erc2")
+
+data_combined <- data_combined[,c(core_vars, other_vars)]
+```
+
+
+# Save processed dataset
+```{r}
+write_csv(data_combined, paste0(out_path, "/temp4.csv"))
+rm(list = ls())
+```
