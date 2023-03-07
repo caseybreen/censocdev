@@ -123,4 +123,4 @@ manhattan.plot <- choro$render() +
 
 When interpreting these mortality differentials, it is important to remember that we are only observing deaths for a truncated window. This truncation excludes the tails of the distribution and reduces the average difference between groups, likely creating a downward bias on the estimated effects of any covariates.  
 
-Appropriate regression coefficient adjustments can be found through simulation. Please see [BUNMD working paper](https://censoc.berkeley.edu/wp-content/uploads/2022/02/bunmd_paper_feb10_2022.pdf) for more information. 
+Appropriate regression coefficient adjustments can be found through simulation. Please see [BUNMD working paper](https://www.jstor.org/stable/pdf/48708275.pdf?refreqid=excelsior%3Af4df6d1cc6ad3f1a95ac831919ab7d8f&ab_segments=&origin=&initiator=&acceptTC=1) for more information. 

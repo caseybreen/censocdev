@@ -54,7 +54,7 @@ This will take you back to the variable selection page.
 
 All extracts will, by default, include `HISTID`, the variable used to link the census file to the CenSoc file.
 
-Choose variables for your analysis. For example, you could select `RACE`, which is under PERSONAL &rarr; RACE, ETHNICITY, AND NATIVITY.
+Choose variables for your analysis. For example, you could select `RACE`, which is under PERSONAL & RACE, ETHNICITY, AND NATIVITY.
 
 #### Select Cases
 

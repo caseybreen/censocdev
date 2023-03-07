@@ -17,7 +17,7 @@ This vignette is written in the style of the "tidyverse." There are many other w
 
 ## Getting Started 
 
-Before starting on the tutorial, please follow the instructions in this vignette to extract the 1940 census from IPUMS and match it onto your CenSoc file. Make sure to add the following variables to your cart while making your IPUMS extract: 
+Before starting on the tutorial, please follow the instructions (add link to getting_started_with_censoc) vignette to extract the 1940 census from IPUMS and match it onto your CenSoc file. Make sure to add the following variables to your cart while making your IPUMS extract: 
 
 - `HISTID` 
 - `EDUCD`
@@ -55,12 +55,14 @@ IPUMS variables often have value labels, which are text that corresponds to nume
 The `IPUMSR` package includes helpful functions for assigning values labels (see the [ipumsr website](http://tech.popdata.org/ipumsr/index.html) for more information and tutorials). In this vignette, for simplicity, we will manually code our value labels. 
 
 ```{r, eval = F}
-
+censoc %>% 
+  count(EDUC)
 ## recode educ_yrs var to years of education
 
 censoc <- censoc %>%
   mutate(educ_yrs = case_when(
-  EDUCD == 14 ~ 2,
+  EDUCD == 999 ~ 0,
+    EDUCD == 14 ~ 2,
   EDUCD == 15 ~ 3,
   EDUCD == 16 ~ 4,
   EDUCD == 17 ~ 5,
@@ -75,12 +77,7 @@ censoc <- censoc %>%
   EDUCD == 70 ~ 14,
   EDUCD == 80 ~ 15,
   EDUCD == 90 ~ 16,
-  EDUCD == 100 ~ 17,
-  EDUCD == 110 ~ 18,
-  EDUCD == 111 ~ 19,
-  EDUCD == 112 ~ 20,
-  EDUCD == 113 ~ 21,
-  TRUE ~ 0
+  TRUE ~ 17
 )) 
 
 ## Recode RACE var to string
@@ -97,6 +94,9 @@ censoc <- censoc %>%
   mutate(ownership_string = case_when(
     OWNERSHP == 1 ~ "Owner",
     OWNERSHP == 2 ~ "Renter"))
+
+censoc %>% 
+  count(EDUCD)
 ```
 
 ## Quick Exploratory Data Analysis  
@@ -216,9 +216,6 @@ ggplot(tidy.model, mapping = aes(x = term, y = estimate, ymax = conf.high, ymin 
 
 ![](figures/coefficient_plot2.png){width=100%}
 
-## Interpretation of Regression Coefficients
-
-By excluding the right tail of the distribution, the right truncation generally creates a downward bias on the estimated effects of any covariates. The effect of these coefficients would be even larger, and the appropriate regression coefficient adjustment factors can be found through simulating a Gompertz mortality schedule. For more information on regression coefficient adjustment factors, see our [BUNMD Working Paper](https://censoc.berkeley.edu/wp-content/uploads/2022/02/bunmd_paper_feb10_2022.pdf). 
 
 
 

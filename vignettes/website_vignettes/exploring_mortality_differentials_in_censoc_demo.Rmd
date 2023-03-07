@@ -23,7 +23,6 @@ Before getting started with the vignette, make sure to:
     - `knitr`
     
 The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website_vignettes). 
-**Update: changed website address from /website to /website_vignettes**
 
 ```{r Library packages, warning=FALSE, message=FALSE}
 ## Library Packages
@@ -33,7 +32,7 @@ library(broom)
 library(knitr)
 
 ## make sure to update the path to your CenSoc file
-censoc_demo <- read_csv("/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv") #Update (previous path: ~/Downloads/censoc_dmf_demo_v1/censoc_dmf_demo_v1.csv)
+censoc_demo <- read_csv("/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv")
 
 ## set seed for reproducibility 
 set.seed(16)
@@ -56,14 +55,13 @@ $$ Age\_at\_death = birth\_year\_dummy + covariates\_of\_interest $$
 
 provide estimates of the effect of the covariates on the age of death in the sample, controlling for birth cohort truncation effects. In this example, we work with the cohorts of 1900-1920, so we need to include a fixed effect term for year of birth. 
 
-As the truncated window of deaths excludes the tails of the mortality distribution, any measurement of the average difference between groups will be downwardly biased. The coefficients in our OLS regression model will underestimate the size of the true effect. For a more detailed discussion of mortality estimation with truncated data, see the [“The Berkeley Unified Numident Mortality Database"](https://censoc.berkeley.edu/wp-content/uploads/2022/02/bunmd_paper_feb10_2022.pdf) working paper. 
+As the truncated window of deaths excludes the tails of the mortality distribution, any measurement of the average difference between groups will be downwardly biased. The coefficients in our OLS regression model will underestimate the size of the true effect. For a more detailed discussion of mortality estimation with truncated data, see the [“The Berkeley Unified Numident Mortality Database"](https://www.jstor.org/stable/pdf/48708275.pdf?refreqid=excelsior%3Af4df6d1cc6ad3f1a95ac831919ab7d8f&ab_segments=&origin=&initiator=&acceptTC=1) working paper. 
 
 ## Mortality Differentials by State
 
-Geographic heterogeneity in levels of health and mortality is well documented (**Update: parallel's phrasing later in vignettte**). Can we see any state-level variation in life expectancy at age 65 in the CenSoc-DMF Demo dataset? 
+Geographic heterogeneity in levels of health and mortality is well documented. Can we see any state-level variation in life expectancy at age 65 in the CenSoc-DMF Demo dataset? 
 
 The code below runs an OLS model with year fixed effects. It then extracts the regression coefficient for each state and plots it using the [*statebins*](https://github.com/hrbrmstr/statebins) package, which provides an alternative to state-level choropleth maps. For the example below, we use Maine's 1910 birth cohort as the reference group, although the example will work with other state/birth cohort parameters.  
-**Update: Adjusted phrasing at the end of the paragraph**  
 
 The CenSoc-DMF file is already restricted to deaths occurring in the "high-coverage" period of 1975-2005. We further restrict this analysis to the birth cohorts of 1900 to 1920 and deaths for persons 65+ (these are the birth cohorts and ages at death for which we have the best death coverage). 
 

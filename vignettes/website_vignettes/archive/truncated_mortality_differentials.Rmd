@@ -43,8 +43,6 @@ set.seed(0.4886)
 
 ## Source some files from a GitHub Repository
 devtools::source_url("https://github.com/caseybreen/numident_paper/tree/master/code/helper_functions.R?raw=TRUE")
-
-devtools::source_url("https://github.com/caseybreen/bunmd/blob/master/code/helper_functions.R")
 ```
 
 ## OLS Regression Truncation

@@ -80,7 +80,7 @@ library(tidyverse)
 censoc <- read_csv('path/to/censoc/file.csv')
 
 ## read in census file
-census <- read_csv('path/to/census/file.csv') # Question
+census <- read_csv('path/to/census/file.csv') 
 
 ## join the census files by HISTID
 merged_df <- censoc %>%
