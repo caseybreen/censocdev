@@ -100,7 +100,6 @@ census <- read_ipums_micro(data_file = '~/path/to/ipums/usa_00036.csv.gz',
 
 ## join the census files by HISTID
 censoc_numident_linked <- inner_join(censoc, census, by = "HISTID")
-censoc_numident_linked<-read_csv("/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv") # Ben
 ```
 
 ### "Chunked" strategy for overcoming memory limitations 
@@ -118,7 +117,6 @@ ipums_data <- '~/path/to/census/usa_00033.csv'
 
 ## set path to IPUMS DDI file 
 ipums_ddi <- '~/path/to/census/ddi/usa_00033.xml'
-ipums_ddi<-"https://live.usa.datadownload.ipums.org/web/extracts/usa/1919330/usa_00005.xml"
 
 ## Read in data in chunks and merge with censoc
 censoc_numident_linked <- read_ipums_micro_chunked(ddi = ipums_ddi,
@@ -129,8 +127,7 @@ censoc_numident_linked <- read_ipums_micro_chunked(ddi = ipums_ddi,
   chunk_size = 500000,
 )
 
-# censoc_numident_linked <- 
-  read_ipums_micro_chunked(ddi = ipums_ddi,
+censoc_numident_linked <- read_ipums_micro_chunked(ddi = ipums_ddi,
                                            data_file = ipums1pct, 
   callback = IpumsDataFrameCallback$new(function(x, pos) {
     inner_join(x, censoc, by = "HISTID")
@@ -206,7 +203,7 @@ censoc_numident_linked$BPL_string = as_factor(censoc_numident_linked$BPL)
 
 ## alternative method to create new string variable for birth place (style of tidyverse)
 censoc_numident_linked <- censoc_numident_linked %>% 
-  mutate(BPL_string = as_factor(bpl))
+  mutate(BPL_string = as_factor(BPL))
 
 ## look at a few rows
 censoc_numident_linked %>%
