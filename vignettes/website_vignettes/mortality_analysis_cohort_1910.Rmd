@@ -36,7 +36,6 @@ library(broom)
 
 censoc <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
   
-# fread("/censoc/data/censoc_linked_with_census/1940/censoc_dmf_all_vars_v1.csv") 
 
 ## Restrict to cohort of 1910
 censoc <- censoc %>% 
@@ -142,7 +141,7 @@ income_plot <- ggplot(data = income_df, mapping = aes(x = wage_decile, y = add_y
 ## Display Plots
 plotlong<-ggarrange(educ_plot, income_plot)
 ```
-![](figures/income_educational_pattern_longevity2.png){width=100%}
+![](figures/income_educational_pattern_longevity.png){width=100%}
 
 ## OLS Regression
 
@@ -214,7 +213,7 @@ ggplot(tidy.model, mapping = aes(x = term, y = estimate, ymax = conf.high, ymin 
   labs(y = "OLS Estimate")
 ```
 
-![](figures/coefficient_plot2.png){width=100%}
+![](figures/coefficient_plot.png){width=100%}
 
 
 

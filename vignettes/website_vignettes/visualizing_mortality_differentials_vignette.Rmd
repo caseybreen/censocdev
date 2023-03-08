@@ -117,7 +117,7 @@ manhattan.plot <- choro$render() +
   scale_fill_viridis(option="magma", discrete = "true", name="Difference in E65")
 ```
 
-![](figures/manhattan_e65_2.1.png){width=100%}
+![](figures/manhattan_e65.png){width=100%}
 
 ### Interpretation
 
