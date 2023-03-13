@@ -153,3 +153,30 @@ data_combined %>%
   count(place_of_enlistment, sort = TRUE) %>% 
   mutate(freq = round(n / sum(n), 2))
 ```
+
+#filter out reasonable heights
+```{r}
+ht_recode_enlistment <-function(df){
+  df <- df %>% mutate(height = as.numeric(height)) %>% mutate(ht_recode = case_when(
+  height > 60 & height < 109 ~ height,
+        TRUE ~ NA_real_ 
+))
+return(df)}
+```
+
+```{r}
+height_recode1 <- ht_recode_enlistment(df = data_combined) %>% 
+  select(height, ht_recode)
+
+```
+
+
+```{r}
+data_combined <- cbind(data_combined, height_recode1)
+```
+
+
+```{r}
+write_csv(data_combined, paste0(out_path, "/temp7.csv"))
+rm(list = ls())
+```

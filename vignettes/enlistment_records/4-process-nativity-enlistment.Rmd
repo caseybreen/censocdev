@@ -14,7 +14,7 @@ library(stringr) # str_trim, str_split
 
 ```{r}
 path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp3.csv"
-out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+out_path <- "//data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
 # This file can be downloaded from #https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2079&dt=893&c_id=24982
 nativity_codes_path <-"/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/cl_2079.csv"
 path_to_ipums_ddi   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/fullcount.ddi.xml"
@@ -43,7 +43,9 @@ data_combined <- read_csv(path_to_temp_data,
                           )
 ```
 
-
+```{r}
+data_combined %>% count(nativity)
+```
 
 
 # Convert nativity to place_of_birth to bpld

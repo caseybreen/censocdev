@@ -3,8 +3,7 @@ title: "6-clean-socioeco-enlistment"
 output: html_document
 ---
 
-#This rmd recodes race, branch_codes,source, branch_alpha, grade_alpha,
-# term_or_enlistment, and component
+#This rmd recodes race, citizenship, education, and marital status
 
 ```{r}
 library(dplyr)   # %>%, group_by, tally, print
@@ -17,9 +16,9 @@ library(stringr) # str_trim, str_split
 
 
 ```{r }
-path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/aw enlistment code/temp5.csv"
-out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/aw enlistment code"
-race_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/aw enlistment code/titlesnicknames/cl_2059.csv"
+path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp5.csv"
+out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+race_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2059.csv"
 ```
 
 #READ IN TEMP 5
@@ -146,16 +145,16 @@ recode_education_enlistment <- function(df){
   ## recode education variable
   df <- df %>% 
     mutate(education_recode = case_when(
-      education == 0 ~ 0,
-      education == 1 ~ 3,
-      education == 2 ~ 4,
-      education == 3 ~ 5,
-      education == 4 ~ 6,
-      education == 5 ~ 7,
-      education == 6 ~ 8,
-      education == 7 ~ 9,
-      education == 8 ~ 10,
-      education == 9 ~ 11,
+      education == 0 ~ 00,
+      education == 1 ~ 01,
+      education == 2 ~ 02,
+      education == 3 ~ 03,
+      education == 4 ~ 04,
+      education == 5 ~ 05,
+      education == 6 ~ 06,
+      education == 7 ~ 07,
+      education == 8 ~ 08,
+      education == 9 ~ 09,
       TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
     ))
   
@@ -211,7 +210,7 @@ marital_status_recode <- recode_marital_status_enlistment(df = data_combined) %>
 
 #Add columns with recoded data to data_combined
 ```{r}
-data_combined <- cbind(data_combined, race_recode$race_recode, education_recode$education_recode, marital_status_recode$marital_status_recode)
+data_combined <- cbind(data_combined, race_recode$race_recode, citizenship_recode$citizenship_recode, education_recode$education_recode, marital_status_recode$marital_status_recode)
 ```
 
 #Save dataset

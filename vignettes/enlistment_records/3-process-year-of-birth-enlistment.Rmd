@@ -11,7 +11,7 @@ library(readr) # read_csv, write_csv
 
 #Set path to temp data & outpath
 ```{r}
-path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp2.csv"
+path_to_temp_data <- "//data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp2.csv"
 out_path          <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
 
 ```

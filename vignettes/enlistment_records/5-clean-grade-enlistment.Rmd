@@ -2,8 +2,7 @@
 title: "5-clean-grade-enlistment"
 output: html_document
 ---
-#This rmd recodes grade_codes, branch_codes,source, branch_alpha, grade_alpha,
-# term_or_enlistment, and component
+#This rmd recodes grade_codes, branch_codes,source,term_or_enlistment, and component
 
 #Load libraries
 ```{r}
@@ -216,62 +215,6 @@ source_recode <- recode_source_enlistment(df = data_combined) %>%
   select(source, source_recode)
 ```
 
-
-#RECODING branch_alpha
-#read in csv of NARA AAD source
-```{r}
-branch_alpha_codes <- read_csv(branch_alpha_path)
-```
-#Count of branch_alpha
-
-```{r}
-data_combined %>% 
-  count(branch_alpha) %>%
-  arrange(desc(n))
-```
-
-#Create function to recode branch_alpha 
-```{r}
-recode_branch_alpha_enlistment <- function(df){
-  
-  ## recode grade variable
-  df <- df %>% 
-    mutate(branch_alpha_recode = case_when(
-      branch_alpha == "0" ~ 0,
-      branch_alpha == "6" ~ 6,
-      branch_alpha == "2" ~ 2,
-      branch_alpha == "1" ~ 1,
-      branch_alpha == "7" ~ 7,
-      branch_alpha == "5" ~ 5,
-      branch_alpha == "4" ~ 4,
-      branch_alpha == "8" ~ 8,
-      branch_alpha == "9" ~ 9,
-      branch_alpha == "3" ~ 3,
-      branch_alpha == "&" ~ 12,
-      branch_alpha == "-" ~ 11,
-      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
-      ))
-  
-  ## return data.frame   
-  return(df)
-}
-
-```
-
-#RECODE grade_alpha
-
-
-#read in csv of NARA AAD source
-```{r}
-grade_alpha_codes <- read_csv(grade_alpha_path)
-```
-#Count of grade_alpha
-```{r}
-data_combined %>% 
-  count(grade_alpha) %>%
-  arrange(desc(n))
-
-```
 #RECODE term_or_enlistment
 #read in csv of NARA AAD term_or_enlistment
 ```{r}

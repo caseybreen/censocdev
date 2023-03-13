@@ -23,7 +23,7 @@ library(genderdata)
 
 ```{r}
 path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp1.csv"
-outpath <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+outpath <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/"
 tan_path   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/titles-and-nicknames"
 ```
 

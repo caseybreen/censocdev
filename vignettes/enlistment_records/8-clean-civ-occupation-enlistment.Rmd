@@ -13,7 +13,7 @@ library(stringr) # str_trim, str_split
 
 #NEED TO UPDATE PATH_TO_TEMP_DATA BEFORE FINAL RELEASE
 ```{r}
-path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp5.csv"
+path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp6.csv"
 out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
 civ_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_3323.csv"
 ```
@@ -643,4 +643,16 @@ recode_civ_occupation_enlistment <- function(df){
 ```{r}
 civ_occupation_recode <- recode_civ_occupation_enlistment(df = data_combined) %>% 
   select(civ_occupation, civ_occupation_recode)
+```
+
+#add civ_occupation_recode to data_combined
+```{r}
+data_combined <- cbind(data_combined, civ_occupation_recode$civ_occupation_recode)
+
+```
+
+#save dataset as temp7
+```{r}
+write_csv(data_combined, paste0(out_path, "/temp7.csv"))
+rm(list = ls())
 ```

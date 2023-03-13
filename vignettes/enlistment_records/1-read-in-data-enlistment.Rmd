@@ -14,7 +14,7 @@ library(readr) # read_fwf, write_csv
 ```{r}
 raw_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/raw/ASNEF.FIN.DAT"
 
-outpath <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+outpath <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code"
 
 ```
 
