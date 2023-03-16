@@ -1,5 +1,5 @@
 ---
-title: "Mortality Analysis of the 1910 Cohort"
+title: "Socioeconomic impacts on mortality for the 1910 Cohort"
 author: "Casey Breen (caseybreen@berkeley.edu)"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -11,7 +11,7 @@ vignette: >
 
 ## Summary 
 
-In this vignette, we explore the association between early life characteristics and longevity for the 1910 cohort of males using the CenSoc-DMF data. Ordinary Least Squares (OLS) Regression on age of death is an easy and effective way to analyze the CenSoc mortality data.
+In this vignette, we explore the association between socioeconomic indicators and longevity for the 1910 cohort of males using the CenSoc-DMF data. Ordinary Least Squares (OLS) Regression on age of death is an easy and effective way to analyze the CenSoc mortality data.
 
 This vignette is written in the style of the "tidyverse." There are many other ways to analyze data in R, including base R and `data.table`.
 
