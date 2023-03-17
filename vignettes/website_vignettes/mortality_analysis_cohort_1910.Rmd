@@ -9,21 +9,21 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-## Summary 
+## Summary
 
 In this vignette, we explore the association between socioeconomic indicators and longevity for the 1910 cohort of males using the CenSoc-DMF data. Ordinary Least Squares (OLS) Regression on age of death is an easy and effective way to analyze the CenSoc mortality data.
 
 This vignette is written in the style of the "tidyverse." There are many other ways to analyze data in R, including base R and `data.table`.
 
-## Getting Started 
+## Getting Started
 
-Before starting on the tutorial, please follow the instructions (add link to getting_started_with_censoc) vignette to extract the 1940 census from IPUMS and match it onto your CenSoc file. Make sure to add the following variables to your cart while making your IPUMS extract: 
+Before starting on the tutorial, please follow the instructions (add link to getting_started_with_censoc) vignette to extract the 1940 census from IPUMS and match it onto your CenSoc file. Make sure to add the following variables to your cart while making your IPUMS extract:
 
-- `HISTID` 
-- `EDUCD`
-- `RACE`
-- `OWNERSHP`
-- `INCWAGE`
+-   `HISTID`
+-   `EDUCD`
+-   `RACE`
+-   `OWNERSHP`
+-   `INCWAGE`
 
 ```{r, eval = F}
 ## Library Packages
@@ -42,20 +42,24 @@ censoc <- censoc %>%
   filter(byear == 1910) 
 
 ## Restrict to men with a non-missing value of income and education
-censoc <- censoc %>% 
-  filter(INCWAGE > 0 & INCWAGE < 5500) %>% ## Income is topcoded at 5500
-  filter((EDUC > 0 & EDUC < 999)) ## Education is topcoded at 999
+# censoc <- censoc %>% 
+#   filter(INCWAGE > 0 & INCWAGE < 5500) %>% ## Income is topcoded at 5500
+#   filter((EDUC > 0 & EDUC < 999)) ## Education is topcoded at 999
 ```
 
 ## Data Preparation
 
 IPUMS variables often have value labels, which are text that corresponds to numeric codes (e.g., the `SEX` variable has value labels: 1 = "Male", 2 = "Female").
 
-The `IPUMSR` package includes helpful functions for assigning values labels (see the [ipumsr website](http://tech.popdata.org/ipumsr/index.html) for more information and tutorials). In this vignette, for simplicity, we will manually code our value labels. 
+The `IPUMSR` package includes helpful functions for assigning values labels (see the [ipumsr website](http://tech.popdata.org/ipumsr/index.html) for more information and tutorials). In this vignette, for simplicity, we will manually code our value labels.
+
+Note that `incwage` only measures salaried or wage earners (non-agricultural/business owners) and is topcoded at 5001; all incomes over \$5000 (\$93,000 today) are added to the 5001 value. Values listed as "999998" and "999999" represent missing values. Additionally, several `incwage` values are 0. For this vignette, we will ignore those values, but the implications are important to consider for your own research. In addition to the aforementioned non-wage earners, "0" could also represent those outside of the labor force due to injury or school.
 
 ```{r, eval = F}
-censoc %>% 
-  count(EDUC)
+censoc <- censoc %>%
+  filter(INCWAGE > 0 & INCWAGE < 5002) %>%
+  filter((EDUC > 0 & EDUC < 999)) ## Education is topcoded at 999
+
 ## recode educ_yrs var to years of education
 
 censoc <- censoc %>%
@@ -94,11 +98,9 @@ censoc <- censoc %>%
     OWNERSHP == 1 ~ "Owner",
     OWNERSHP == 2 ~ "Renter"))
 
-censoc %>% 
-  count(EDUCD)
 ```
 
-## Quick Exploratory Data Analysis  
+## Quick Exploratory Data Analysis
 
 Exploratory data analysis is an important part of the modeling process and can help us understand the main characteristics of the data and their relationship with our dependent variable, age at death. Here, we will briefly explore some associations between our independent and dependent variables.
 
@@ -141,7 +143,8 @@ income_plot <- ggplot(data = income_df, mapping = aes(x = wage_decile, y = add_y
 ## Display Plots
 plotlong<-ggarrange(educ_plot, income_plot)
 ```
-![](figures/income_educational_pattern_longevity.png){width=100%}
+
+![](figures/income_educational_pattern_longevity.png){width="100%"}
 
 ## OLS Regression
 
@@ -151,7 +154,7 @@ $$ Age\_at\_death = birth\_year\_dummy + covariates\_of\_interest $$
 
 provide estimates for the effect of the covariates on the age of death in the sample, controlling for birth cohort truncation effects.
 
-In this case, we are only looking at the cohort of 1910, so we do not need to include a fixed effect term for year of birth. 
+In this case, we are only looking at the cohort of 1910, so we do not need to include a fixed effect term for year of birth.
 
 ```{r, eval = F}
 ## Prepare for Regression
@@ -193,12 +196,11 @@ summary(model)
 
 ```
 
-
 ## Visualizing Model Coefficients
 
-The `broom` package takes the results from the model we ran in R and conveniently formats it as a data.frame representation. Using this package, we both extract and plot our coefficients and associated confidence intervals. 
+The `broom` package takes the results from the model we ran in R and conveniently formats it as a data.frame representation. Using this package, we both extract and plot our coefficients and associated confidence intervals.
 
-For a more comprehensive review of working with model-based graphics in `R`, we recommend Kieran Healy's [Data Visualization: A Practical Introduction](https://socviz.co/). 
+For a more comprehensive review of working with model-based graphics in `R`, we recommend Kieran Healy's [Data Visualization: A Practical Introduction](https://socviz.co/).
 
 ```{r, eval = F}
 ## construct a data.frame of the results of our statistical model
@@ -213,11 +215,4 @@ ggplot(tidy.model, mapping = aes(x = term, y = estimate, ymax = conf.high, ymin 
   labs(y = "OLS Estimate")
 ```
 
-![](figures/coefficient_plot.png){width=100%}
-
-
-
-
-
-
-
+![](figures/coefficient_plot.png){width="100%"}

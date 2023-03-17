@@ -384,9 +384,9 @@ following variables to your cart while making your IPUMS extract:</p>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(byear <span class="sc">==</span> <span class="dv">1910</span>) </span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Restrict to men with a non-missing value of income and education</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> censoc <span class="sc">%&gt;%</span> </span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(INCWAGE <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> INCWAGE <span class="sc">&lt;</span> <span class="dv">5500</span>) <span class="sc">%&gt;%</span> <span class="do">## Income is topcoded at 5500</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>((EDUC <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> EDUC <span class="sc">&lt;</span> <span class="dv">999</span>)) <span class="do">## Education is topcoded at 999</span></span></code></pre></div>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># censoc &lt;- censoc %&gt;% </span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(INCWAGE &gt; 0 &amp; INCWAGE &lt; 5500) %&gt;% ## Income is topcoded at 5500</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter((EDUC &gt; 0 &amp; EDUC &lt; 999)) ## Education is topcoded at 999</span></span></code></pre></div>
 </div>
 <div id="data-preparation" class="section level2">
 <h2>Data Preparation</h2>
@@ -397,48 +397,56 @@ value labels: 1 = “Male”, 2 = “Female”).</p>
 assigning values labels (see the <a href="http://tech.popdata.org/ipumsr/index.html">ipumsr website</a> for
 more information and tutorials). In this vignette, for simplicity, we
 will manually code our value labels.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>censoc <span class="sc">%&gt;%</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(EDUC)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="do">## recode educ_yrs var to years of education</span></span>
+<p>Note that <code>incwage</code> only measures salaried or wage earners
+(non-agricultural/business owners) and is topcoded at 5001; all incomes
+over $5000 ($93,000 today) are added to the 5001 value. Values listed as
+“999998” and “999999” represent missing values. Additionally, several
+<code>incwage</code> values are 0. For this vignette, we will ignore
+those values, but the implications are important to consider for your
+own research. In addition to the aforementioned non-wage earners, “0”
+could also represent those outside of the labor force due to injury or
+school.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> censoc <span class="sc">%&gt;%</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(INCWAGE <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> INCWAGE <span class="sc">&lt;</span> <span class="dv">5002</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>((EDUC <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> EDUC <span class="sc">&lt;</span> <span class="dv">999</span>)) <span class="do">## Education is topcoded at 999</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> censoc <span class="sc">%&gt;%</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">educ_yrs =</span> <span class="fu">case_when</span>(</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">999</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    EDUCD <span class="sc">==</span> <span class="dv">14</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">15</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">16</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">17</span> <span class="sc">~</span> <span class="dv">5</span>,</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">22</span> <span class="sc">~</span> <span class="dv">6</span>,</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">23</span> <span class="sc">~</span> <span class="dv">7</span>,</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">25</span> <span class="sc">~</span> <span class="dv">8</span>,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">26</span> <span class="sc">~</span> <span class="dv">9</span>,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">30</span> <span class="sc">~</span> <span class="dv">10</span>,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">40</span> <span class="sc">~</span> <span class="dv">11</span>,</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">50</span> <span class="sc">~</span> <span class="dv">12</span>,</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">60</span> <span class="sc">~</span> <span class="dv">13</span>,</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">70</span> <span class="sc">~</span> <span class="dv">14</span>,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">80</span> <span class="sc">~</span> <span class="dv">15</span>,</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">90</span> <span class="sc">~</span> <span class="dv">16</span>,</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">17</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>)) </span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="do">## Recode RACE var to string</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> censoc <span class="sc">%&gt;%</span> </span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">race_string =</span> <span class="fu">case_when</span>(</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    RACE <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> HISPAN <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">&quot;White&quot;</span>,</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    RACE <span class="sc">==</span> <span class="dv">2</span> <span class="sc">&amp;</span> HISPAN <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">&quot;Black&quot;</span>, </span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;Other&quot;</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="do">## Recode OWNERSHP var to string</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> censoc <span class="sc">%&gt;%</span> </span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ownership_string =</span> <span class="fu">case_when</span>(</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    OWNERSHP <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;Owner&quot;</span>,</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    OWNERSHP <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;Renter&quot;</span>))</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>censoc <span class="sc">%&gt;%</span> </span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(EDUCD)</span></code></pre></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="do">## recode educ_yrs var to years of education</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> censoc <span class="sc">%&gt;%</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">educ_yrs =</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">999</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    EDUCD <span class="sc">==</span> <span class="dv">14</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">15</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">16</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">17</span> <span class="sc">~</span> <span class="dv">5</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">22</span> <span class="sc">~</span> <span class="dv">6</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">23</span> <span class="sc">~</span> <span class="dv">7</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">25</span> <span class="sc">~</span> <span class="dv">8</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">26</span> <span class="sc">~</span> <span class="dv">9</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">30</span> <span class="sc">~</span> <span class="dv">10</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">40</span> <span class="sc">~</span> <span class="dv">11</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">50</span> <span class="sc">~</span> <span class="dv">12</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">60</span> <span class="sc">~</span> <span class="dv">13</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">70</span> <span class="sc">~</span> <span class="dv">14</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">80</span> <span class="sc">~</span> <span class="dv">15</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  EDUCD <span class="sc">==</span> <span class="dv">90</span> <span class="sc">~</span> <span class="dv">16</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">17</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>)) </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Recode RACE var to string</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> censoc <span class="sc">%&gt;%</span> </span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">race_string =</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    RACE <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> HISPAN <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">&quot;White&quot;</span>,</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    RACE <span class="sc">==</span> <span class="dv">2</span> <span class="sc">&amp;</span> HISPAN <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">&quot;Black&quot;</span>, </span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;Other&quot;</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="do">## Recode OWNERSHP var to string</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>censoc <span class="ot">&lt;-</span> censoc <span class="sc">%&gt;%</span> </span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ownership_string =</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    OWNERSHP <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;Owner&quot;</span>,</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    OWNERSHP <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;Renter&quot;</span>))</span></code></pre></div>
 </div>
 <div id="quick-exploratory-data-analysis" class="section level2">
 <h2>Quick Exploratory Data Analysis</h2>
