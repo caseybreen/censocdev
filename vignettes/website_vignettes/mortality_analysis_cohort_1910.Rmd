@@ -1,5 +1,5 @@
 ---
-title: "Socioeconomic impacts on mortality for the 1910 Cohort"
+title: "Investigating Socioeconomic Disparities in Longevity for the 1910 Cohort"
 author: "Casey Breen (caseybreen@berkeley.edu)"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
