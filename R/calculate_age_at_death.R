@@ -57,7 +57,7 @@ calculate_age_at_death <- function(data) {
        death_age := dyear - byear -1]
 
   data <- data %>%
-    select(-c(dmonth_hat, bmonth_hat, dday_hat, bday_hat))
+    dplyr::select(-c(dmonth_hat, bmonth_hat, dday_hat, bday_hat))
 
   return(data)
 }
