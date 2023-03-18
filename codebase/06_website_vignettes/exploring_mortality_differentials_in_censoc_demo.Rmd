@@ -22,7 +22,7 @@ Before getting started with the vignette, make sure to:
     - `brooms`
     - `knitr`
     
-The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website_vignettes). 
+The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/codebase/06_website_vignettes). 
 
 ```{r Library packages, warning=FALSE, message=FALSE}
 ## Library Packages

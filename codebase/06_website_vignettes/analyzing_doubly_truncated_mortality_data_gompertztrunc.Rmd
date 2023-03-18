@@ -107,8 +107,6 @@ simulated_example <- gompertz_mle(formula = aod ~ temp + as.factor(sex) + as.fac
                                                  data = sim_data)
 ```
 
-
-
 The `gompertz_mle()` function returns a list which contains three elements:
 
 1. The initial starting parameters for the MLE routine. Unless specified by the user, these are found using OLS regression on age at death.
@@ -293,14 +291,14 @@ bpl_results_1915_cohort$results
 
 The first diagnostic graph, `diagnostic_plot()`, compares the empirical distribution of deaths to the modeled distribution. 
 
-```{r}
+```{r, fig.width = 7, fig.height = 3.5}
 diagnostic_plot(object = bpl_results_1915_cohort, data = bunmd_1915_cohort,
                 covar = "bpl_string", death_var = "death_age")
 ```
 
 Additionally, we can compare modeled and "observed" hazards with the `diagnostic_plot_hazard()` function. This function can be used both to assess model fit and to check the proportional hazards assumption of the model. However, these plots should be interpreted with some caution: because there are no population denominators, true hazard rates are unknown. Since we do not know the actual number of survivors to the observable death window, this value is inferred from the *modeled* Gompertz distribution. Refer to the `diagnostic_plot_hazard()` documentation for more details.
 
-```{r}
+```{r, fig.width = 7, fig.height = 4}
 diagnostic_plot_hazard(object = bpl_results_1915_cohort, data = bunmd_1915_cohort,
                 covar = "bpl_string", death_var = "death_age", xlim=c(65,95))
 ```
@@ -414,8 +412,6 @@ education_plot <- ols_results %>%
 
 education_plot
 ```
-
-
 
 
 ## Summary and Limitations 
