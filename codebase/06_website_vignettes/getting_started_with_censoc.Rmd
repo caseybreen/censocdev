@@ -1,6 +1,6 @@
 ---
 title: "Getting Started with CenSoc"
-author: "CenSoc Project"
+author: "Casey Breen (caseybreen@berkeley.edu)"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -9,21 +9,28 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-
 ## CenSoc Roadmap 
 
-1. Download CenSoc File
-2. Download 1940 census data from IPUMS
-3. Merge CenSoc and census Files on `HISTID` variable
+The CenSoc datasets link the complete-count 1940 U.S. Census to Social Security mortality records. The unprecedented size and richness of CenSoc allows investigators to make new discoveries into geographic, racial, and class-based disparities in mortality in the United States. In order to work with a full CenSoc dataset, researchers will need to:  
 
-**Note**: The 1940 census file is large (10+ GB) — we recommend having an appropriate workflow for handling large datasets in R before getting started.   
+1. Download CenSoc File [[Link](https://censoc.berkeley.edu/data/)]
+2. Download 1940 Census data from IPUMS-USA [[Link](https://usa.ipums.org/usa/)]
+3. Merge CenSoc and 1940 Census files on `HISTID` variable
+
+The figure below gives an overview of how researchers merge together the CenSoc file and the 1940 Census file on the unique identifier variable  `HISTID` to create their final dataset for analysis.  
+```{r echo = F, fig.align = 'center', out.width = "100%", fig.cap = "**Figure 1:** Illustration of merging the CenSoc-DMF to an IPUMS 1940 Census data extract."}
+knitr::include_graphics("figures/censoc_overview_figure.png")
+```
+
+
+**Note**: The 1940 Census file is large (10+ GB) — we recommend having an appropriate workflow for handling large datasets in R before getting started.  
+
 
 ## Downloading CenSoc File
 
 Download the CenSoc-DMF or CenSoc-Numident file from: [https://censoc-download.demog.berkeley.edu](https://censoc-download.demog.berkeley.edu/)
 
 Whether the CenSoc-DMF or CenSoc-Numident file is a better choice for your analysis will depend on the research question. See the [data](https://censoc.org/data/) page for more information. 
-
 
 ## Downloading 1940 Full-Count Census from IPUMS
 
@@ -82,7 +89,7 @@ censoc <- read_csv('path/to/censoc/file.csv')
 ## read in census file
 census <- read_csv('path/to/census/file.csv') 
 
-## join the census files by HISTID
-merged_df <- censoc %>%
+## Join the census files by HISTID
+merged_analysis_file <- censoc %>%
   inner_join(census, by = "HISTID")
 ```
