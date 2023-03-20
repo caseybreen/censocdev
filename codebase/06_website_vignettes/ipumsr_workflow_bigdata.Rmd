@@ -23,7 +23,7 @@ Before getting started with the vignette, you'll need to:
 3. [Download](https://usa.ipums.org/usa/) the 1940 full count census and accompanying DDI from IPUMS (instructions below)
 
 
-The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/vignettes/website).
+The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/codebase/06_website_vignettes).
 
 ## IPUMS and the `ipumsr` package
 

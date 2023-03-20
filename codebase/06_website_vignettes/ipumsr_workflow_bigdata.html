@@ -12,7 +12,7 @@
 
 <meta name="author" content="Casey Breen (caseybreen@berkeley.edu)" />
 
-<meta name="date" content="2023-02-17" />
+<meta name="date" content="2023-03-20" />
 
 <title>An ipumsr Workflow for Big CenSoc Data</title>
 
@@ -341,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">An <code>ipumsr</code> Workflow for Big
 CenSoc Data</h1>
 <h4 class="author">Casey Breen (<a href="mailto:caseybreen@berkeley.edu" class="email">caseybreen@berkeley.edu</a>)</h4>
-<h4 class="date">2023-02-17</h4>
+<h4 class="date">2023-03-20</h4>
 
 
 
@@ -366,7 +366,7 @@ count census and accompanying DDI from IPUMS (instructions
 below)</p></li>
 </ol>
 <p>The original R notebook (.Rmd file) for this vignette can be
-downloaded <a href="https://github.com/caseybreen/censocdev/tree/master/vignettes/website">here</a>.</p>
+downloaded <a href="https://github.com/caseybreen/censocdev/tree/master/codebase/06_website_vignettes">here</a>.</p>
 <div id="ipums-and-the-ipumsr-package" class="section level2">
 <h2>IPUMS and the <code>ipumsr</code> package</h2>
 <p><a href="https://ipums.org/what-is-ipums">IPUMS</a> provides
@@ -408,7 +408,7 @@ all possible census and ACS data available.</li>
 <p>All extracts will, by default, include <code>HISTID</code>, the
 variable used to link the census file to the CenSoc file.</p>
 <p>Choose variables for your analysis. For example, you could select
-<code>RACE</code>, which is under PERSONAL → RACE, ETHNICITY, AND
+<code>RACE</code>, which is under PERSONAL &amp; RACE, ETHNICITY, AND
 NATIVITY.</p>
 </div>
 <div id="select-cases" class="section level4">
@@ -472,8 +472,7 @@ the datasets on the <code>HISTID</code> variable is straightforward.</p>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                           <span class="at">ddi =</span> <span class="st">&#39;~/path/to/ipums/usa_00036.xml&#39;</span>)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="do">## join the census files by HISTID</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>censoc_numident_linked <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(censoc, census, <span class="at">by =</span> <span class="st">&quot;HISTID&quot;</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>censoc_numident_linked<span class="ot">&lt;-</span><span class="fu">read_csv</span>(<span class="st">&quot;/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv&quot;</span>) <span class="co"># Ben</span></span></code></pre></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>censoc_numident_linked <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(censoc, census, <span class="at">by =</span> <span class="st">&quot;HISTID&quot;</span>)</span></code></pre></div>
 </div>
 <div id="chunked-strategy-for-overcoming-memory-limitations" class="section level3">
 <h3>“Chunked” strategy for overcoming memory limitations</h3>
@@ -507,12 +506,20 @@ instructions below on how to save your merged data file.</p>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  }), </span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">chunk_size =</span> <span class="dv">500000</span>,</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="do">## This is slow -- it takes ~an hour. </span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use of data from IPUMS USA is subject to conditions including that users should</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cite the data appropriately. Use command `ipums_conditions()` for more details.</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; |========================================================   | 90% 16963 MB</span></span></code></pre></div>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>censoc_numident_linked <span class="ot">&lt;-</span> <span class="fu">read_ipums_micro_chunked</span>(<span class="at">ddi =</span> ipums_ddi,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">data_file =</span> ipums1pct, </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">callback =</span> IpumsDataFrameCallback<span class="sc">$</span><span class="fu">new</span>(<span class="cf">function</span>(x, pos) {</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">inner_join</span>(x, censoc, <span class="at">by =</span> <span class="st">&quot;HISTID&quot;</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  }), </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">chunk_size =</span> <span class="dv">500000</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="do">## This is slow -- it takes ~an hour. </span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Use of data from IPUMS USA is subject to conditions including that users should</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cite the data appropriately. Use command `ipums_conditions()` for more details.</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; |========================================================   | 90% 16963 MB</span></span></code></pre></div>
 <p>There are a few other strategies for handling datasets too large for
 memory in R:</p>
 <ul>
