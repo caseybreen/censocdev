@@ -35,7 +35,9 @@ library(cowplot)
 library(broom)
 
 ## Read in CenSoc-DMF file 
-censoc_dmf <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
+## Restrict to conservative matches (fewer false matches)
+censoc_dmf <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv") %>% 
+  filter(link_abe_exact_conservative == 1)
   
 ## Restrict to cohort of 1910
 censoc_dmf <- censoc_dmf %>% 
@@ -48,10 +50,9 @@ IPUMS variables often have value labels, which are text that corresponds to nume
 
 The `IPUMSR` package includes helpful functions for assigning values labels (see the [ipumsr website](http://tech.popdata.org/ipumsr/index.html) for more information and tutorials). In this vignette, for simplicity, we will manually code our value labels.
 
-Note that `incwage` only measures salaried or wage earners (non-agricultural/business owners) and is topcoded at 5001; all incomes over \$5000 (\$93,000 today) are added to the 5001 value. Values listed as "999998" and "999999" represent missing values. Additionally, several `incwage` values are 0. For this vignette, we will ignore those values, but the implications are important to consider for your own research. In addition to the aforementioned non-wage earners, "0" could also represent those outside of the labor force due to injury or school.
+Note that `incwage` only measures salaried or wage earners (non-agricultural/business owners) and is topcoded at \$5001; all reported wage and salary incomes over \$5000 are coded to the 5001 value. Values listed as "999998" and "999999" represent missing values. Additionally, several `incwage` values are 0. For this vignette, we will ignore those values, but the implications are important to consider for your own research. In addition to the aforementioned non-wage earners, "0" could also represent those outside of the labor force due to injury or school.
 
 ```{r, warning=FALSE, message=FALSE}
-
 ## Restrict to men with a non-missing value of income and education
 censoc_dmf <- censoc_dmf %>%
   filter(INCWAGE > 0 & INCWAGE < 5002) %>%
@@ -60,23 +61,28 @@ censoc_dmf <- censoc_dmf %>%
 ## Recode EDUCD (education, detailed) variable to years of education
 censoc_dmf <- censoc_dmf %>%
   mutate(educ_yrs = case_when(
-  EDUCD == 999 ~ 0,
-  EDUCD == 14 ~ 2,
-  EDUCD == 15 ~ 3,
-  EDUCD == 16 ~ 4,
-  EDUCD == 17 ~ 5,
-  EDUCD == 22 ~ 6,
-  EDUCD == 23 ~ 7,
-  EDUCD == 25 ~ 8,
-  EDUCD == 26 ~ 9,
-  EDUCD == 30 ~ 10,
-  EDUCD == 40 ~ 11,
-  EDUCD == 50 ~ 12,
-  EDUCD == 60 ~ 13,
-  EDUCD == 70 ~ 14,
-  EDUCD == 80 ~ 15,
-  EDUCD == 90 ~ 16,
-  TRUE ~ 17
+   EDUCD == 2 ~ 0,
+   EDUCD == 12 ~ 0,
+   EDUCD == 14 ~ 1,
+   EDUCD == 15 ~ 2,
+   EDUCD == 16 ~ 3,
+   EDUCD == 17 ~ 4,
+   EDUCD == 22 ~ 5,
+   EDUCD == 23 ~ 6,
+   EDUCD == 25 ~ 7,
+   EDUCD == 26 ~ 8,
+   EDUCD == 30 ~ 9,
+   EDUCD == 40 ~ 10,
+   EDUCD == 50 ~ 11,
+   EDUCD == 60 ~ 12,
+   EDUCD == 70 ~ 13,
+   EDUCD == 80 ~ 14,
+   EDUCD == 90 ~ 15,
+   EDUCD == 100 ~ 16,
+   EDUCD == 110 ~ 17,
+   EDUCD == 111 ~ 17,
+   EDUCD == 112 ~ 17,
+   EDUCD == 113 ~ 17
 )) 
 
 ## Recode RACE var to string
@@ -98,7 +104,7 @@ censoc_dmf <- censoc_dmf %>%
 
 Exploratory data analysis is an important part of the modeling process and can help us understand the main characteristics of the data and their relationship with our dependent variable, age at death. Here, we will briefly explore some associations between our independent and dependent variables.
 
-```{r, fig.height = 4, fig.width = 11, out.width = "100%", fig.align = "center", warning = F}
+```{r, fig.height = 5, fig.width = 11, out.width = "100%", fig.align = "center", warning = F}
 ## Additional years of life expectancy by education
 educ_df <- censoc_dmf %>% 
   group_by(educ_yrs) %>% 
@@ -108,10 +114,10 @@ educ_df <- censoc_dmf %>%
 
 ## Education Plot
 educ_plot <- ggplot(data = educ_df, mapping = aes(x = educ_yrs, y = add_yrs_life)) +
+  geom_vline(xintercept = c(12, 16), lwd = .7, lty = 2, color = "grey", alpha = .5) + 
   geom_pointrange(aes(ymin = add_yrs_life - 1.96*sd, ymax = add_yrs_life + 1.96*sd)) +
   theme_cowplot() + 
   scale_x_continuous(breaks = seq(0, 23, 2)) +
-  geom_vline(xintercept = c(8, 12, 16), lwd = .7, lty = 2, color = "grey") + 
   labs(title = "Educational pattern of longevity at age 65",
        x = "Years of Education",
        y = "Additional years of life") 
@@ -123,7 +129,7 @@ income_df <- censoc_dmf %>%
   mutate(wage_decile = ntile(INCWAGE,10)) %>% 
   group_by(wage_decile) %>% 
   summarize(death_age_decile = mean(death_age), sd = sd(death_age) * (1/sqrt(n())) ) %>% 
-  mutate(add_yrs_life = death_age_decile - mean(death_age_decile))
+  mutate(add_yrs_life = death_age_decile - mean(death_age_decile)) 
 
 ## Income Plot
 income_plot <- ggplot(data = income_df, mapping = aes(x = wage_decile, y = add_yrs_life)) +
@@ -132,7 +138,7 @@ income_plot <- ggplot(data = income_df, mapping = aes(x = wage_decile, y = add_y
        x = "Income Decile",
        y = "Additional years of life") + 
   theme_cowplot() + 
-  ylim(-1, 1.5)
+  scale_x_continuous(breaks = seq(0, 10, 2))
 
 ## Display Plots
 plot_grid(educ_plot, income_plot, labels = "auto")
