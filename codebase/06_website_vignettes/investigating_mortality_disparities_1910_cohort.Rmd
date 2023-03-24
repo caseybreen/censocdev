@@ -17,7 +17,7 @@ This vignette is written in the style of the "tidyverse." There are many other w
 
 ## Getting Started
 
-Before starting on the tutorial, please follow the instructions (add link to getting_started_with_censoc) vignette to extract the 1940 census from IPUMS and match it onto your CenSoc file. Make sure to add the following variables to your cart while making your IPUMS extract:
+Before starting on the tutorial, please follow the instructions in the [Getting Started with CenSoc vignette](https://censoc.berkeley.edu/wp-content/uploads/2020/07/getting_started_with_censoc.html) to extract the 1940 census from IPUMS and match it onto your CenSoc file. Make sure to add the following variables to your cart while making your IPUMS extract:
 
 -   `HISTID`
 -   `EDUCD`
