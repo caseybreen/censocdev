@@ -1,0 +1,50 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(data.table)
+library(tidyverse)
+```
+
+
+```{r}
+test <- fread("/data/josh/CenSoc/censoc_data/middle_initial/numident_v2.1_middle_initials.csv")
+```
+
+
+```{r}
+test %>% 
+  filter(middle_name_numident != "" & middle_name_census != "") %>% 
+  mutate(middle_agree = case_when(
+    middle_name_numident == middle_name_census ~ 1,
+    TRUE ~ 0
+  )) %>% 
+  group_by(link_abe_exact_conservative) %>%
+  summarize(mean(middle_agree))
+```
+
+```{r}
+data <- test %>% 
+  filter(middle_name_numident != "" & middle_name_census != "") %>% 
+  mutate(middle_agree = case_when(
+    middle_name_numident == middle_name_census ~ 1,
+    TRUE ~ 0
+  )) %>% 
+  filter(link_abe_exact_conservative == 1) %>% 
+  filter(byear %in% 1910:1920) %>% 
+  group_by(educ_yrs) %>% 
+  summarize(agreement_rate = mean(middle_agree))
+
+ggplot(data, aes(x = educ_yrs, y = agreement_rate)) + 
+  geom_point(size = 3) + 
+  geom_line(linetype = "dashed") + 
+  cowplot::theme_cowplot() + 
+  scale_y_continuous(labels = scales::percent, limits = c(0.75, .9)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0.75, .9)) + 
+  labs(y = "Middle Initial Agree",
+       x = "Years of Education") + 
+  scale_x_continuous(breaks=seq(0,17,2))
+```
+
