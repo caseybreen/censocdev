@@ -1,0 +1,138 @@
+---
+title: "Make CenSoc Demo File"
+author: "Benjamin Shapiro (shapiro_ben1729@berkeley.edu)"
+date: "01-12-2023"
+---
+
+Summary: In this Notebook, I make the CenSoc-DMF and CenSoc-Numident Demo files. 
+
+Steps to make CenSoc Demo File:
+
+(1) Read in IPUMS 1940 1% Extract
+(2) Link Crosswalk 
+(2) Link to CenSoc-DMF 
+
+Library the Packages for analysis 
+```{r}
+## library packages
+library(tidyverse)
+library(data.table)
+library(ipumsr)
+library(styler)
+library(datasets)
+library(readxl)
+library(censocdev)
+```
+
+## Read in the 1 percent file and the crosswalk from IPUMS
+```{r}
+# Read in 1% IPUMS 1940 Census Extract
+ipums1pct <- fread("/data/josh/CenSoc/censoc_data/sampleIPUMS.csv") %>% rename_all(tolower)
+
+# Read crosswalk (Histid)
+xwalk <- fread("/data/josh/CenSoc/crosswalks/1940_histid_cc_1p_xwalk.txt")
+
+# Join histid to ipums1pct
+ipums1pct <- ipums1pct %>%
+  inner_join(xwalk, by = c("serial", "pernum")) %>%
+  relocate(histid)
+```
+
+## Construct Censoc-Numident Demo
+```{r}
+## Read in linked Numident 
+numidentdata <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
+
+# Join numident to demo by histid
+numidentdemo <- ipums1pct %>%
+  rename(
+    sex.demo = "sex",
+    bpl.demo = "bpl"
+  ) %>%
+  inner_join(numidentdata, by = c("histid" = "HISTID")) # 93917 remaining observations
+
+# match sex, age and race from demo to numident data
+numident2.1 <- numidentdemo %>%
+  filter(
+    AGE == age, 
+    RACE == race,
+    SEX == sex.demo
+  ) # 85865 remaining observations
+
+## Select numident variables for v2.1
+vars_to_keep_num <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "race_first", "race_first_cyear", "race_last", "bpl_string", "zip_residence", "socstate", "socstate_string", "age_first_application", "link_abe_exact_conservative", "weight", "weight_conservative", "PERWT", "AGE", "SEX", "bpl", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHP", "PERNUM", "RACE", "RENT", "SERIAL", "STATEFIP", "URBAN")
+
+## keep variables and rename to lower case 
+demo_file_numident <- numident2.1 %>%
+  select(vars_to_keep_num) %>% 
+  rename_all(tolower) %>% 
+  censocdev::recode_education(educ_var = educd) 
+```
+
+## Construct CenSoc-DMF Demo
+```{r}
+## Read in linked demo file 
+dmfdata <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
+
+# Join dmf to demo by histid
+dmfdata_demo <- ipums1pct %>%
+  inner_join(dmfdata, by = c("histid" = "HISTID")) # 76,496
+
+# Match sex, age, and race from demo to dmf data
+dmf2.1 <- dmfdata_demo %>%
+  filter(
+    AGE == age,
+    SEX == sex,
+    RACE == race
+  ) # 70,211 remaining obs
+
+## Select DMF variables for v2.1
+vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "link_abe_exact_conservative", "weight", "weight_conservative", "PERWT", "AGE", "SEX", "BPLD", "MBPL", "FBPL", "EDUCD", "EMPSTATD", "HISPAN", "INCNONWG", "INCWAGE", "MARST", "NATIVITY", "OCC", "OCCSCORE", "OWNERSHP", "PERNUM", "RACE", "RENT", "SERIAL", "STATEFIP", "URBAN")
+
+## Write out demo file 
+
+demo_file_dmf <- dmf2.1 %>%
+  select(vars_to_keep_dmf) %>%
+  rename(bpl = "BPLD") %>%
+  rename_all(tolower) %>% 
+  censocdev::recode_education(educ_var = educd) 
+```
+
+statefip_string and bpl_string function
+```{r}
+# bpl_string_code<-read_csv("/data/josh/CenSoc/censoc_data/bpl_string_code.csv") %>%
+#   mutate(Code= as.factor(Code))
+
+statefip_string_fun<-function(numident_dmf){
+#Create separate data.frame for statefip values and add Alaska and Hawaii 
+statenum<- numident_dmf %>% 
+    mutate(statefip = as.numeric(statefip)) %>% 
+    count(statefip) %>% 
+    add_row(statefip= c(2,15), n = c(0,0)) %>% arrange(statefip)
+  
+#Create another data.frame with `state.name` character values and add Washington D.C.
+state_new<-tibble(state.name) %>% 
+  rbind("District of Columbia") %>% 
+  arrange(state.name) %>% 
+  mutate(statefip = statenum$statefip)
+
+# Integrate state.name
+return(numident_dmf %>% 
+         inner_join(state_new, by = "statefip") %>% 
+         # inner_join(bpl_string_code, by = c("bpl" = "Code")) %>% 
+         rename(statefip_string = "state.name") %>% 
+         mutate(statefip = as.factor(statefip),
+                bpl = as.factor(bpl))) 
+}
+
+
+#Update numident and demo
+demo_file_numident<-statefip_string_fun(demo_file_numident)
+demo_file_dmf<-statefip_string_fun(demo_file_dmf)
+
+## Write out csv file 
+write_csv(demo_file_dmf, "/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv")
+write_csv(demo_file_numident, "/data/josh/CenSoc/data_release_demo_v2.1/censoc_numident_demo_v2.1.csv")
+```
+
+

@@ -1,0 +1,311 @@
+---
+title: "5-clean-grade-enlistment"
+output: html_document
+---
+#This rmd recodes grade_codes, branch_codes,source,term_or_enlistment, and component
+
+#Load libraries
+```{r}
+library(dplyr)   
+library(tidyverse) 
+library(readr)  
+library(data.table) 
+```
+
+#Set paths to data & csvs of NARA AAD codes
+```{r}
+path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp4.csv"
+out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+grade_codes_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2072.csv"
+branch_codes_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2075.csv"
+source_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2077.csv"
+branch_alpha_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2074 (1).csv"
+grade_alpha_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2073.csv"
+term_or_enlistment_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/aw enlistment code/titlesnicknames/cl_2076.csv"
+component_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/aw enlistment code/titlesnicknames/cl_2078.csv"
+
+```
+
+#READ IN TEMP 4
+```{r}
+
+data_combined <- read_csv(path_to_temp_data, 
+                          col_types = cols(
+                            empty_field = col_character(),
+                            term_or_enlistment = col_character(),
+                            longevity = col_character(),
+                            education = col_character(),
+                            marital_status = col_character(),
+                            component = col_character(),
+                            educ_spec = col_character(),
+                            defer_date_mmyy = col_character(),
+                            mname_clean = col_character(),
+                            sex = col_integer(),
+                            sex_r = col_integer(),
+                            fname_std = col_character()
+                            )
+                          )
+```
+
+#RECODING GRADE_CODE
+
+#read in csv of NARA AAD grade codes
+```{r}
+grade_codes <- read_csv(grade_codes_path)
+```
+#Count of grade codes
+```{r}
+data_combined %>% 
+  count(grade_code) 
+
+```
+
+#Create function to recode grade codes
+```{r}
+recode_grade_code_enlistment <- function(df){
+  
+  ## recode grade variable
+  df <- df %>% 
+    mutate(grade_code_recode = case_when(
+      grade_code == "9" ~ 9, #Aviation Cadet
+      grade_code == "6" ~ 6, #Corporal
+      grade_code == "2" ~ 2, #First Sergeant
+      grade_code == "1" ~ 1, #Master Sergeant
+      grade_code == "8" ~ 8, #Private
+      grade_code == "7" ~ 7, #Private First Class
+      grade_code == "5" ~ 5, #Sergeant
+      grade_code == "4" ~ 4, #Staff Sergeant
+      grade_code == "3" ~ 3, #Technical Sergeant
+      grade_code == "M" ~ 4, #Technician 3d Grade Equivalent to Grade 4: Staff Sergeant
+      grade_code == "N" ~ 5, #Technician 4th Grade Equivalent to Code 5: Sergeant
+      grade_code == "O" ~ 6, #Technician 5th Grade Equivalent to Code 6: Corporal
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+
+
+```
+
+#Apply recode_grade_code_enlistment function on DF
+```{r}
+grade_recode <- recode_grade_code_enlistment(df = data_combined) %>% 
+  select(grade_code, grade_code_recode)
+
+```
+
+#RECODING BRANCH_CODES
+
+#Read in csv with NARA AAD branch codes
+``` {r}
+branch_codes <- read_csv(branch_codes_path)
+
+```
+
+#maybe use ranges for this formula depending on what other numbers mean
+#Count of branch codes
+```{r}
+data_combined %>% 
+  count(branch_code) 
+```
+
+#Create function to recode branch codes
+```{r}
+recode_branch_code_enlistment <- function(df){
+  
+  ## recode grade variable
+  df <- df %>% 
+    mutate(branch_code_recode = case_when(
+      branch_code == "78" ~ 78, #Adjutant General's Department	
+      branch_code == "20" ~ 20, #Air Corps	
+      branch_code == "00" ~ 00, #Branch Immaterial - Warrant Officers, USA	
+      branch_code == "93" ~ 93, #Cavalry
+      branch_code == "96" ~ 96, #Chaplains
+      branch_code == "80" ~ 80, #Chemical Warfare Service	
+      branch_code == "40" ~ 40, #Coast Artillery Corps or Army Mine Planter Service	
+      branch_code == "82" ~ 82, #Corps of Engineers	
+      branch_code == "06" ~ 06, #Corps of Military Police	
+      branch_code == "74" ~ 74, #Dental Corps - For Officers only	
+      branch_code == "08" ~ 08, #Detached Enlisted Men's List	
+      branch_code == "30" ~ 30, #Field Artillery	
+      branch_code == "97" ~ 97, #Finance Department	
+      branch_code == "01" ~ 01, #General Staff Corps	
+      branch_code == "72" ~ 72, #Hospital Dietitians	
+      branch_code == "09" ~ 09, #Inactive Reserve	
+      branch_code == "10" ~ 10, #Infantry	
+      branch_code == "98" ~ 98, #Inspector General's Department	
+      branch_code == "99" ~ 99, #Judge Advocate General's Department	
+      branch_code == "77" ~ 77, #Medical Administrative Corps - For Officers only	
+      branch_code == "71" ~ 71, #Medical Corps - For Officers only	
+      branch_code == "70" ~ 70, #Medical Department - For Enlisted Men of the Medical Department (includes Enlisted Men of the Medical Department on Duty with the Dental Corps) or Army Nurse Corps	
+      branch_code == "05" ~ 05, #Military Intelligence	
+      branch_code == "02" ~ 02, #No branch assignment	
+      branch_code == "87" ~ 87, #Ordnance Department	
+      branch_code == "79" ~ 79, #Pharmacy Corps	
+      branch_code == "03" ~ 03, #Philippine Scouts	
+      branch_code == "73" ~ 73, #Physical Therapy Aides	
+      branch_code == "04" ~ 04, #Professor US Military Academy	
+      branch_code == "50" ~ 50, #Quartermaster Corps	
+       branch_code == "90" ~ 90, #Signal Corps	
+      branch_code == "07" ~ 07, #Specialist Reserve	
+      branch_code == "38" ~ 38, #Transportation Corps	
+      branch_code == "75" ~ 75, #Veterinary Corps or Service - For Officers of the Veterinary Corps and for Enlisted Men of the Veterinary Service	
+      branch_code == "18" ~ 18, #Women's Army Corps	
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+
+```
+
+#Apply recode_branch_code_enlistment function to df
+```{r}
+branch_recode <- recode_branch_code_enlistment(df = data_combined) %>% 
+  select(branch_code, branch_code_recode)
+
+```
+
+#RECODING source
+#read in csv of NARA AAD source
+```{r}
+source_codes <- read_csv(source_path)
+```
+#Count of source
+
+```{r}
+data_combined %>% 
+  count(source) 
+```
+
+#Create function to recode source codes
+```{r}
+recode_source_enlistment <- function(df){
+  
+  ## recode source variable
+  df <- df %>% 
+    mutate(source_recode = case_when(
+      source == "0" ~ 0, #Civil Life	
+      source == "6" ~ 6, #Enlisted Man, Philippine Scout or recall to AD of an enlisted man who had been transferred to the ERC	
+      source == "2" ~ 2, #Enlisted Man, Regular Army, after 3 months of Discharge	
+      source == "1" ~ 1, #Enlisted Man, Regular Army, within 3 months of Discharge or former WAAC Auxiliary	
+      source == "7" ~ 7, #National Guard	
+      source == "5" ~ 5, #Enlisted Reserve or Medical Administrative Corps (MAC) Officer
+      source == "4" ~ 4, #National Guard in Federal Service, after 3 months of Discharge
+      source == "8" ~ 8, #Returned to Military Control, Surrendered	
+      source == "9" ~ 9, #Returned to Military Control, Apprehended	
+      source == "3" ~ 3, #National Guard in Federal Service, within 3 months of Discharge
+      source == "&" ~ 12, #Selective Service after 3 months of Discharge	
+      source == "-" ~ 11, #Selective Service within 3 months of Discharge	
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+
+```
+
+#Apply recode_source_enlistment function to df
+```{r}
+source_recode <- recode_source_enlistment(df = data_combined) %>% 
+  select(source, source_recode)
+```
+
+#RECODE term_or_enlistment
+#read in csv of NARA AAD term_or_enlistment
+```{r}
+term_or_enlistment_codes <- read_csv(term_or_enlistment_path)
+```
+#Count of term_or_enlistment
+```{r}
+data_combined %>% 
+  count(term_or_enlistment) 
+```
+
+#Create function to recode term_or_enlistment 
+```{r}
+recode_term_or_enlistment_enlistment <- function(df){
+  
+  ## recode grade variable
+  df <- df %>% 
+    mutate(term_or_enlistment_recode = case_when(
+      term_or_enlistment == "1" ~ 1, #One year enlistment
+      term_or_enlistment == "2" ~ 2, #Enlistment for Alaska
+      term_or_enlistment == "3" ~ 3, #Enlistment for Hawaiian Department
+      term_or_enlistment == "4" ~ 4, #Enlistment for assignment to another corps area
+      term_or_enlistment == "5" ~ 5, #Enlistment for the duration of the War or..
+      term_or_enlistment == "6" ~ 6, #Enlistment for the Panama Canal Department
+      term_or_enlistment == "7" ~ 7, #Enlistment for the Philippine Department
+      term_or_enlistment == "8" ~ 8, #Enlistment for the Puerto Rican Department
+      term_or_enlistment == "9" ~ 9, #Three year enlistment
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+
+```
+
+#Apply recode_term_or_enlistment_enlistment function to df
+```{r}
+term_or_enlistment_recode <- recode_term_or_enlistment_enlistment(df = data_combined) %>% 
+  select(term_or_enlistment, term_or_enlistment_recode)
+```
+
+#RECODE component
+#read in csv of NARA AAD component
+```{r}
+component_codes <- read_csv(component_path)
+```
+#Count of component
+
+```{r}
+data_combined %>% 
+  count(component) 
+```
+#Create function to recode component 
+```{r}
+recode_component_enlistment <- function(df){
+  
+  ## recode grade variable
+  df <- df %>% 
+    mutate(component_recode = case_when(
+      component == "1" ~ 1, # Regular Army 
+      component == "2" ~ 2, #	Regular Army Reserve
+      component == "3" ~ 3, # Reserves - exclusive of Regular Army Reserve
+      component == "4" ~ 4, # National Guard
+      component == "5" ~ 5, # Philippine Scouts
+      component == "6" ~ 6, # Army of the United States
+      component == "7" ~ 7, # Selectees
+      component == "9" ~ 9, # Women's Army Corps
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+
+```
+#Apply function to df
+```{r}
+component_recode <- recode_component_enlistment(df = data_combined) %>% 
+  select(component, component_recode)
+```
+
+#Add columns with recoded data to data_combined
+```{r}
+data_combined <- cbind(data_combined, source_recode$source_recode, grade_recode$grade_code_recode,term_or_enlistment_recode$term_or_enlistment_recode, branch_recode$branch_code_recode, component_recode$component_recode)
+```
+
+
+#Save dataset
+```{r}
+write_csv(data_combined, paste0(out_path, "/temp5.csv"))
+rm(list = ls())
+```
+

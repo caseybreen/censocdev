@@ -1,0 +1,176 @@
+---
+title: "Exploring Mortality Differentials in the CenSoc-DMF Demo Dataset"
+author: "Casey Breen (caseybreen@berkeley.edu)"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+**Summary**: This vignette gives an overview of the CenSoc-DMF Demo dataset and presents two stylized examples on state variation in longevity and wage income. The goal of this vignette is to give users a high-level overview of working with CenSoc data, including the use of weights, the specification and visualization of regression models, and the use of the `WAGEINC` variable in the 1940 census. 
+
+The CenSoc-DMF Demo dataset was constructed by (i) linking the CenSoc-DMF dataset to the IPUMS 1940 1% census sample and (ii) selecting a set of 20 mortality covariates from the 1940 census. The smaller size of the file — approximately 1% of the records in the full CenSoc-DMF dataset — makes it easier to work with but precludes the high-resolution mortality research possible with the full CenSoc-DMF dataset. 
+
+Before getting started with the vignette, make sure to: 
+
+- [Download](https://censoc-download.demog.berkeley.edu/) the CenSoc DMF Demo File 
+- Install packages if necessary (use the `install.packages()` function)
+    - `tidyverse`
+    - `statebins`
+    - `brooms`
+    - `knitr`
+    
+The original R notebook (.Rmd file) for this vignette can be downloaded [here](https://github.com/caseybreen/censocdev/tree/master/codebase/06_website_vignettes). 
+
+```{r Library packages, warning=FALSE, message=FALSE}
+## Library Packages
+library(tidyverse)
+library(statebins)
+library(broom)
+library(knitr)
+
+## make sure to update the path to your CenSoc file
+censoc_demo <- read_csv("/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv")
+
+## set seed for reproducibility 
+set.seed(16)
+
+## Look at a handful of people with a non-missing wage
+censoc_demo %>% 
+  select(byear, dyear, death_age, race, educd, bpl, incwage, urban) %>% 
+  sample_n(6) %>% 
+  filter(incwage < 99999) %>% 
+  kable()
+```
+
+**Note**: For the CenSoc-Demo dataset, we converted the IPUMS numeric codes into meaningful character value labels (e.g., “Male” = 1, “Female” = 2). Before using a variable in your analysis, it is a good idea to learn more about its coding schema. Check out the terrific documentation from the IPUMS-USA [website](https://usa.ipums.org/usa/).  
+
+## Examples with OLS Regression
+
+Using OLS Regression on age of death with fixed effect terms for each year of birth is a straightforward method for analyzing CenSoc mortality data. There are a few specific considerations for using regression on age of death to analyze the CenSoc Mortality data. The CenSoc-DMF file only includes deaths occurring in the window of 1975-2005 (the period with high death coverage). As the left and right truncation ages vary by birth cohort, it is important to include fixed effect terms for each year of birth. Models of the form:
+
+$$ Age\_at\_death = birth\_year\_dummy + covariates\_of\_interest $$
+
+provide estimates of the effect of the covariates on the age of death in the sample, controlling for birth cohort truncation effects. In this example, we work with the cohorts of 1900-1920, so we need to include a fixed effect term for year of birth. 
+
+As the truncated window of deaths excludes the tails of the mortality distribution, any measurement of the average difference between groups will be downwardly biased. The coefficients in our OLS regression model will underestimate the size of the true effect. For a more detailed discussion of mortality estimation with truncated data, see the [“The Berkeley Unified Numident Mortality Database"](https://www.jstor.org/stable/pdf/48708275.pdf?refreqid=excelsior%3Af4df6d1cc6ad3f1a95ac831919ab7d8f&ab_segments=&origin=&initiator=&acceptTC=1) working paper. 
+
+## Mortality Differentials by State
+
+Geographic heterogeneity in levels of health and mortality is well documented. Can we see any state-level variation in life expectancy at age 65 in the CenSoc-DMF Demo dataset? 
+
+The code below runs an OLS model with year fixed effects. It then extracts the regression coefficient for each state and plots it using the [*statebins*](https://github.com/hrbrmstr/statebins) package, which provides an alternative to state-level choropleth maps. For the example below, we use Maine's 1910 birth cohort as the reference group, although the example will work with other state/birth cohort parameters.  
+
+The CenSoc-DMF file is already restricted to deaths occurring in the "high-coverage" period of 1975-2005. We further restrict this analysis to the birth cohorts of 1900 to 1920 and deaths for persons 65+ (these are the birth cohorts and ages at death for which we have the best death coverage). 
+
+```{r, fig.height = 6, fig.width = 8, fig.align = "center", warning = F}
+## Prepare dataset for modeling
+## Restrict to birth cohorts of 1900-1920
+## Years of death already restricted to "high-coverage" period of 1975-2005
+censoc_state_model <-
+  censoc_demo %>%
+  filter(byear %in% c(1900:1920)) %>% 
+  filter(dyear >= 65) %>% 
+  mutate(byear = as.factor(byear)) %>% 
+  mutate(byear = relevel(byear, ref = "1910")) %>%
+  mutate(statefip = as.factor(statefip_string)) %>% 
+  mutate(statefip = relevel(statefip, ref = "Maine")) 
+
+## Linear model predicting age at death from State and byear 
+## Use both IPUMS and CenSoc weights
+state.lm <- lm(death_age ~ statefip +  byear,
+                     data = censoc_state_model,
+                     weight = weight*perwt) 
+
+## Put model results into a data.frame 
+state.lm.df <- tidy(state.lm)
+
+## Select coefficients and ZIP Codes
+state.lm.df <- state.lm.df %>%
+  select(term, estimate) %>% 
+  filter(str_detect(term, "statefip")) %>% 
+  mutate(state = substr(term, 9, 35)) %>% 
+  select(state = state, estimate) %>% 
+  add_row(state = "Maine", estimate = 0) ## add Maine as zero value 
+
+## Plot using State Bins Package
+mortality_differentials_by_state <- ggplot(state.lm.df, aes(state=state, fill=estimate)) +
+  geom_statebins() +
+  coord_equal() +
+  scale_fill_distiller(palette = "RdYlBu", 
+                       direction = 1,
+                       name = "Mortality Differential (Yrs)")+
+  labs(title="Mortality Differentials By State") +
+  theme_statebins() +
+  theme(plot.title=element_text(size=17, hjust=0)) 
+
+## Display Plot
+mortality_differentials_by_state
+```
+
+
+Our figure indicates that the Mountain and Southwest States have a relative mortality advantage while the Southern States have a relative mortality disadvantage. While these patterns may be real, we should keep in mind disaggregating by state significantly reduces our sample size. This introduces a lot of noise and uncertainty into our regression model — which our visualization does not capture. 
+
+## Mortality Differentials by Relative Wage Income
+
+The association between relative income and mortality in the United States is well documented, as well. Can we see this association in our CenSoc-DMF Demo dataset? 
+
+To answer this question, we will use the `INCWAGE` variable. The variable is limited: census enumerators in 1940 were instructed to "not include earnings of businessmen, farmers, or professional persons who depend upon business profits, sales of crops, or fees for income and who do not work for wages or salaries," leaving only salary and wage workers in the dataset. For more information, check out the 1940 census' [instructions to enumerators](https://usa.ipums.org/usa/voliii/inst1940.shtml#584). We will account for the discrepancy in our analysis by only including persons with non-zero wages — other researchers may take a different approach. 
+
+
+The CenSoc-DMF file is already restricted to deaths occurring in the "high-coverage" period of 1975-2005. We further restrict this analysis to the birth cohorts of 1900 to 1920 and deaths for persons 65+ (these are the birth cohorts and ages at death for which we have the best death coverage). 
+
+```{r mortality differentials by occupation, fig.height = 5.5, fig.width = 5.5, fig.align = "center"}
+
+## Calculate income deciles
+## Restrict to cohorts of 1900-1920
+censoc_incwage <- censoc_demo %>% 
+  filter(byear %in% c(1900:1920)) %>% 
+  filter(dyear >= 65) %>% 
+  filter(incwage > 0 & incwage <= 5001) %>% ## INCWAGE is topcoded at $5001; higher values denote NA/Missing
+  mutate(wage_decile = ntile(incwage, 10)) %>% 
+  
+  mutate(wage_decile = as.factor(wage_decile))
+
+## Run linear model 
+## Use both IPUMS and CenSoc weights
+test <- lm(death_age ~  wage_decile +  byear + as.factor(race),
+                     data = censoc_incwage,
+                     weight = weight*perwt) 
+
+## Put model results into a data.frame 
+test.df <- tidy(test, conf.int = T)
+  
+## Select coefficients and standard errors from OLS model
+test.df <- test.df %>%
+  select(term, estimate, se = std.error) %>% 
+  filter(str_detect(term, "wage_decile")) %>% 
+  mutate(quantile = as.numeric(substr(term, 12, 15))) %>% 
+  select(quantile, value = estimate, se)
+
+## Plot 
+income_decile_ols_coefficients <- ggplot(data = test.df) + 
+  geom_pointrange(aes(ymin = value - se, ymax = value + se, y = value, x = quantile)) + 
+  theme_bw(base_size = 15) + 
+  labs(title = "Income pattern of Longevity at Age 65",
+       x = "Wage Income Decile",
+       y = "Additional Years of Life")
+
+## Display Plot
+income_decile_ols_coefficients
+```
+
+
+The plot shows an association between relative wage income and longevity. The reference group for this plot is the first income decile. When interpreting these mortality differentials, we should keep in mind that they are calculated from a truncated window of deaths and understate the differences in life expectancy at age 65. 
+
+## Conclusion
+
+The CenSoc-Demo dataset allows researchers to explore broad patterns of mortality differentials in the United States quickly. However, it is not conducive to high-resolution mortality research, and we recommend working with the complete CenSoc-DMF file for any final analysis.  
+
+
+
+
+
+

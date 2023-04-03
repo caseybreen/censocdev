@@ -1,0 +1,246 @@
+---
+title: "2-process-name-enlistment"
+output: html_document
+---
+#Adapted from code written by Ugur Yildirim
+
+# Library packages, source functions, set paths
+```{r}
+library(dplyr)     # %>%, group_by, distinct, tally
+
+library(readr)     # read_csv, write_csv
+library(stringr)   # str_trim, str_split
+library(tidyverse) # add_row
+library(data.table)
+packageurl <- "https://cran.r-project.org/src/contrib/Archive/gender/gender_0.5.4.tar.gz"
+install.packages(packageurl, repos=NULL, type="source") #gender package not available on this 
+#r software so must use different method to install gender & gender data packages
+library(gender)
+library(genderdata)
+
+```
+#Set paths to temp data, outpath, and tan path to titles
+
+```{r}
+path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp1.csv"
+outpath <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/"
+tan_path   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/titles-and-nicknames"
+```
+
+
+# Read in temp1
+```{r}
+data_combined <- read_csv(path_to_temp_data, 
+                          col_types = cols(
+                            empty_field = col_character(),
+                            term_or_enlistment = col_character(),
+                            longevity = col_character(),
+                            education = col_character(),
+                            marital_status = col_character(),
+                            component = col_character(),
+                            educ_spec = col_character(),
+                            defer_date_mmyy = col_character()
+                            )
+                          )
+```
+
+# Process name
+
+# Keep original name as is for future reference
+```{r}
+data_combined$name_clean <- data_combined$name
+
+# Do some preliminary cleaning in line with abeclean
+data_combined$name_clean <- iconv(data_combined$name_clean, to="ASCII//TRANSLIT")
+data_combined$name_clean <- tolower(data_combined$name_clean)
+data_combined$name_clean <- str_trim(data_combined$name_clean)
+data_combined$name_clean <- gsub("\\.", " ", data_combined$name_clean)
+data_combined$name_clean <- gsub("[^a-z ]", "", data_combined$name_clean)
+
+# Prefixes in abeclean
+data_combined$name_clean <- gsub("^st ",    "st",    data_combined$name_clean)
+data_combined$name_clean <- gsub("^ste ",   "ste",   data_combined$name_clean)
+data_combined$name_clean <- gsub("^saint ", "saint", data_combined$name_clean)
+data_combined$name_clean <- gsub("^virg ",  "virg",  data_combined$name_clean)
+data_combined$name_clean <- gsub("^mac ",   "mac",   data_combined$name_clean)
+data_combined$name_clean <- gsub("^mc ",    "mc",    data_combined$name_clean)
+
+# Additional prefixes
+data_combined$name_clean <- gsub("^la ",    "la",   data_combined$name_clean)
+data_combined$name_clean <- gsub("^van ",   "van",  data_combined$name_clean)
+data_combined$name_clean <- gsub("^du ",    "du",   data_combined$name_clean)
+data_combined$name_clean <- gsub("^de ",    "de",   data_combined$name_clean)
+data_combined$name_clean <- gsub("^del ",   "del",  data_combined$name_clean)
+data_combined$name_clean <- gsub("^o ",     "o",    data_combined$name_clean)
+data_combined$name_clean <- gsub("^le ",    "le",   data_combined$name_clean)
+data_combined$name_clean <- gsub("^dela ",  "dela", data_combined$name_clean)
+data_combined$name_clean <- gsub("^de la ", "dela", data_combined$name_clean)
+data_combined$name_clean <- gsub("^di ",    "di",   data_combined$name_clean)
+data_combined$name_clean <- gsub("^von ",   "von",  data_combined$name_clean)
+data_combined$name_clean <- gsub("^pal ",   "pal",  data_combined$name_clean)
+```
+
+
+# Split name into fname and lname
+``` {r}
+split_name <- function(row) {
+  name_split <- str_split(row, " ", 2)[[1]]
+  lname <- name_split[1]
+  fname <- name_split[2]
+  return(list(lname=lname, fname=fname))
+}
+
+res <- lapply(data_combined$name_clean, split_name) # SLOW (~5 minutes with ~9 million observations)
+data_combined$lname_clean <- unlist(res)[attr(unlist(res), "names") == "lname"]
+data_combined$fname_clean <- unlist(res)[attr(unlist(res), "names") == "fname"]
+rm(res)
+
+data_combined$lname_clean <- str_trim(data_combined$lname_clean)
+data_combined$fname_clean <- str_trim(data_combined$fname_clean)
+```
+
+#Define functions for name cleaning
+``` {r}
+# Define remove_titles
+#' @export
+remove_titles <- function(row) {
+  fname_clean <- row
+  for (title in titles$title) {
+    pattern <- paste0(" ", title, " ")
+    fname_clean <- stringi::stri_replace_all_regex(fname_clean, pattern, "")
+  }
+  return(fname_clean)
+}
+
+# Define split_first_name
+#' @export
+split_first_name <- function(row) {
+  fname_split <- strsplit(row, " ")[[1]]
+  fname_split <- fname_split[fname_split != ""]
+  if (is.na(fname_split[1])) {
+    first <- NA
+    middle <- NA
+  } else if (is.na(fname_split[2])) {
+    first <- fname_split[1]
+    middle <- NA
+  } else if (stringr::str_length(fname_split[1]) > 1) {
+    if (length(unique(fname_split)) != length(fname_split)) {
+      fname_split <- rle(fname_split)$values
+    }
+    first <- fname_split[1]
+    middle <- fname_split[2]
+  } else if (stringr::str_length(fname_split[2]) > 1) {
+    if (length(unique(fname_split)) != length(fname_split)) {
+      fname_split <- rle(fname_split)$values
+    }
+    first <- fname_split[2]
+    middle <- fname_split[3]
+  } else {
+    first <- row
+    middle <- fname_split[2]
+  }
+  return(list(first=first, middle=middle))
+}
+
+```
+
+#ABECLEAN Method for name cleaning
+```{r}
+# Titles in abeclean
+titles <- read_csv(paste(tan_path, "titles.csv", sep="/"))
+
+# Additional titles
+titles <- titles %>% add_row(title = "trd")
+titles <- titles %>% add_row(title = "ii")
+titles <- titles %>% add_row(title = "iii")
+
+# Remove titles from fname
+#data_combined$fname_clean <- paste0(" ", data_combined$fname_clean) # this is how abeclean does it
+data_combined$fname_clean <- paste0(" ", data_combined$fname_clean, " ")
+data_combined$fname_clean <- remove_titles(data_combined$fname_clean) # SLOW (~11 minutes with ~9 million observations)
+data_combined$fname_clean <- str_trim(data_combined$fname_clean)
+
+# Split fname_clean into fname_clean and mname_clean
+res <- lapply(data_combined$fname_clean, split_first_name) # SLOW (~6 minutes with ~9 million obs)
+data_combined$fname_clean <- unlist(res)[attr(unlist(res),"names") == "first"]
+data_combined$mname_clean <- unlist(res)[attr(unlist(res),"names") == "middle"]
+rm(res)
+```
+#Sex determination
+```{r}
+# Determine sex from fname_clean
+sex_temp <- gender(data_combined$fname_clean)
+sex_temp <- sex_temp %>% group_by(name) %>% distinct()
+
+sex_temp %>% group_by(gender) %>% tally() # 1 either
+sex_temp$gender <- ifelse(sex_temp$gender == "either", NA, sex_temp$gender) 
+sex_temp %>% group_by(gender) %>% tally() # 1 NA
+
+sex_temp$sex <- ifelse(is.na(sex_temp$gender), NA, ifelse(sex_temp$gender == "male", 1, 2))
+sex_temp %>% group_by(sex) %>% tally()
+  
+sex_temp <- sex_temp[,c("name", "sex")]
+colnames(sex_temp) <- c("fname_clean", "sex")
+
+data_combined <- merge(data_combined, sex_temp, by = "fname_clean", all.x = T)
+
+nrow(subset(data_combined, sex == 1)) / 
+  (nrow(subset(data_combined, sex == 1)) + nrow(subset(data_combined, sex == 2))) # 0.9625251
+
+data_combined$sex_NA <- ifelse(is.na(data_combined$sex), 1, 0)
+
+sum(data_combined$sex_NA) # 447140
+
+# Use branch_alpha and branch_code to get a more precise sex value
+# branch_alpha == "WAC" --> Women's Army Corps
+# branch_code  == "18"  --> Women's Army Corps
+
+data_combined$branch_alpha <- str_trim(data_combined$branch_alpha)
+data_combined$branch_code  <- str_trim(data_combined$branch_code)
+
+nrow(subset(data_combined, branch_alpha == "WAC" | branch_code == "18")) # 133056
+nrow(subset(data_combined, sex == 2))                                    # 322011
+
+get_gender_from_branch <- function(row) {
+  if (is.na(row["branch_alpha"]) & is.na(row["branch_code"])) {return(row["sex"])}
+  else if (is.na(row["branch_alpha"])) {if (row["branch_code"]  == "18")  {return(2)} else {return(1)}}
+  else if (is.na(row["branch_code"]))  {if (row["branch_alpha"] == "WAC") {return(2)} else {return(1)}}
+  else {if (row["branch_alpha"] == "WAC" | row["branch_code"] == "18") {return(2)} else {return(1)}}
+}
+
+data_combined$sex_r <- apply(data_combined, 1, get_gender_from_branch) # SLOW
+
+nrow(subset(data_combined, sex_r == 2)) # 133056
+
+nrow(subset(data_combined, sex_r == 1)) / 
+  (nrow(subset(data_combined, sex_r == 1)) + nrow(subset(data_combined, sex_r == 2))) # 0.9852812
+
+data_combined$sex_r_NA <- ifelse(is.na(data_combined$sex_r), 1, 0) # 0 NA's!
+```
+
+# Standardize names
+```{r}
+male_nicknames   <- read_csv(paste(tan_path, "male_nicknames.csv",   sep="/"))
+female_nicknames <- read_csv(paste(tan_path, "female_nicknames.csv", sep="/"))
+nicknames        <- as.data.frame(rbind(male_nicknames, female_nicknames))
+
+colnames(nicknames) <- c("sex", "fname_std", "nickname")
+
+data_combined <- merge(data_combined, nicknames, by.x = c("fname_clean", "sex_r"),
+                       by.y = c("nickname", "sex"), all.x = TRUE)
+
+merge_names <- function(row) {
+  if (is.na(row["fname_std"])) {first <- row["fname_clean"]}
+  else {first <- row["fname_std"]}
+  return(first)
+}
+
+data_combined$fname_clean_std <- apply(data_combined, 1, merge_names) # SLOW
+
+```
+
+# Save processed dataset
+``` {r}
+write_csv(data_combined, paste0(outpath, "/temp2.csv"))
+rm(list = ls())
+```

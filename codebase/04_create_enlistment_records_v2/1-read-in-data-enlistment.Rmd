@@ -1,0 +1,107 @@
+---
+title: "1-read-in-data-enlistment"
+output: html_document
+---
+#Adapted from code written by Ugur Yildirim
+
+```{r}
+library(plyr)  # rbind.fill
+library(readr) # read_fwf, write_csv
+
+```
+
+#Set paths to raw data and outpath
+```{r}
+raw_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/raw/ASNEF.FIN.DAT"
+
+outpath <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code"
+
+```
+
+#Read everything as enlistment
+```{r}
+enlistment_col <- c("serial_number", "name", "residence_state", "residence_county", "place_of_enlistment", 
+                          "date_of_enlistment_ddmmyy", "grade_alpha", "grade_code", "branch_alpha", "branch_code", 
+                          "empty_field", "term_or_enlistment", "longevity", 
+                          "source", "nativity", "year_of_birth", "race", "education", "civ_occupation", 
+                          "marital_status", "height", "weight", "component", "card_number")
+
+
+width_enlistment = c(8, 24, 2, 3, 4, 6, 4, 1, 3, 2, 
+                      1, 1, 3, 
+                      1, 2, 2, 1, 1, 3, 1, 2, 3, 1, 10)
+
+data_enlistment <- read_fwf(raw_data, 
+                            fwf_widths(width_enlistment, col_names = enlistment_col), 
+                            col_types = cols(empty_field        = col_character(), 
+                                             term_or_enlistment = col_character(), 
+                                             longevity          = col_character(), 
+                                             education          = col_character(), 
+                                             marital_status     = col_character()),
+                            trim_ws = F)
+```
+
+# Read data as if everything is E.R.C. Statistical (see p. 46 in 100.1ND_NC.pdf)
+``` {r}
+widths_erc = c(8, 24, 2, 3, 4, 6, 4, 1, 3, 2, 
+               2, 4, 
+               1, 2, 2, 1, 1, 3, 1, 2, 3, 1, 9)
+
+col_names_erc <- c("serial_number", "name", "residence_state", "residence_county", "place_of_enlistment", 
+                   "date_of_enlistment_ddmmyy", "grade_alpha", "grade_code", "branch_alpha", "branch_code", 
+                   "educ_spec", "defer_date_mmyy", 
+                   "source", "nativity", "year_of_birth", "race", "education", "civ_occupation", 
+                   "marital_status", "height", "weight", "component", "card_number")
+
+data_erc <- read_fwf(raw_data, 
+                     fwf_widths(widths_erc, col_names = col_names_erc), 
+                     col_types = cols(educ_spec      = col_character(), 
+                                      race           = col_character(), 
+                                      education      = col_character(), 
+                                      marital_status = col_character()),
+                     trim_ws = F)
+
+data_erc <- subset(data_erc, serial_number != "ONE OR M") # 9,200,232 --> 9,039,840
+
+```
+
+
+
+# Separate Enlistment from E.R.C. Statistical
+
+# Paragraph on p. 46 in 100.1ND_NC.pdf says:
+
+# "Nevertheless, the format of this category of cards changes beginning in 
+# column 58. Two new fields are introduced which cause the remaining fields 
+# to be off one column when compared to the Enlistment cards. Fortunately, 
+# for future interpretation purposes, the E.R.C. cards can be identified by a 
+# 3-punch in column 80. Column 80 on the Enlistment cards is not punched."
+``` {r}
+
+data_enlistment$erc1 <- ifelse(substr(data_enlistment$card_number, 1, 1) == "3", 1, 0)
+data_enlistment$erc2 <- ifelse(substr(data_enlistment$card_number, 1, 1) != " ", 1, 0)
+sum(data_enlistment$erc1) / nrow(data_enlistment) # 0.03688627
+sum(data_enlistment$erc2) / nrow(data_enlistment) # 0.09166788
+enlistment_cards <- subset(data_enlistment, erc1 == 0)
+
+data_erc$erc1 <- ifelse(data_erc$component == "3", 1, 0)
+data_erc$erc2 <- ifelse(data_erc$component != " ", 1, 0)
+sum(data_erc$erc1) / nrow(data_erc) # 0.03688627
+sum(data_erc$erc2) / nrow(data_erc) # 0.09166788
+erc_statistical_cards <- subset(data_erc, erc1 == 1)
+```
+
+# Merge records back together
+```{r}
+data_combined <- rbind.fill(enlistment_cards, erc_statistical_cards)
+rm(data_enlistment, data_erc, enlistment_cards, erc_statistical_cards)
+
+```
+
+# Save processed dataset
+```{r}
+write_csv(data_combined, paste0(outpath, "/temp1.csv"))
+rm(list = ls())
+```
+
+```

@@ -1,0 +1,182 @@
+---
+title: "7-clean-weight-enlistment"
+output: html_document
+---
+
+```{r}
+library(dplyr)   # %>%, group_by, tally, print
+library(ipumsr)  # read_ipums_ddi, ipums_val_labels
+library(readr)   # read_csv, write_csv
+library(stringr) # str_trim, str_split
+library(ggplot2)
+library(scales)
+```
+
+
+```{r}
+path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp6.csv"
+out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+```
+
+```{r}
+data_combined <- read_csv(path_to_temp_data, 
+                          col_types = cols(
+                            empty_field = col_character(),
+                            term_or_enlistment = col_character(),
+                            longevity = col_character(),
+                            education = col_character(),
+                            marital_status = col_character(),
+                            component = col_character(),
+                            educ_spec = col_character(),
+                            defer_date_mmyy = col_character(),
+                            mname_clean = col_character(),
+                            sex = col_integer(),
+                            sex_r = col_integer(),
+                            fname_std = col_character()
+                            )
+                          )
+```
+
+#LOOKING AT ALL VARS FOR HT AND WEIGHT
+USER NOTE FROM 100.1ND_NC.pdf PG 11.
+TM 12-305 (1 May 1943) states "Height in inches (field use as desired) 74-75."
+Direction for the Weight field reads, "Weight (AGCT [Army General Classification Test] will be
+punched in this field) 76-78." TM 12-305 (1 November 1945) reads "Height in inches (not punched)"
+and states "Weight (not punched). Neither set of instructions allows us to fix a date when, if ever, height
+and weight were punched into the Enlistment cards. They do tell us that the fields might be used for other
+purposes. Height and Weight fields were printed on Enlistment card (WO, AGO Form No. 317), but instructions
+for their use or disuse changed during the war. Some versions of the Enlistment card and instructions
+indicate that the same fields (columns 74-78) were used for Military Occupation. None of the
+instructions clearly allows us to fix a date when, if ever, height and weight or Military Occupation were
+punched into the Enlistment cards. For this reason, the data recorded in positions 74-78 are not displayed
+in the Access to Archival Databases (AAD) implementation of the Electronic Army Serial Number
+Merged File. The raw data electronic records that NARA preserves retains whatever values were
+punched in these positions
+
+#visualize data variables 
+#create weight histogram and overlay with height and remove 0s
+
+```{r}
+
+weight_hist <- data_combined %>% filter(weight < 250) %>% ggplot(mapping = aes(x = weight)) +                           # Modify title & axis labels
+  geom_histogram(stat="count") +
+  labs(title = "Weight/IQ",
+       x = "Weight/IQ",
+       y = "Count of Values") + stat_count() +  scale_y_continuous(labels = scales::comma)
+print(weight_hist)
+```
+
+#PLOT HEIGHT/IQ W XLIM
+
+```{r}
+height_hist <- data_combined %>% ggplot(mapping =  aes(x = height)) +                           # Modify title & axis labels geom_histogram(stat="count") +
+  labs(title = "Height",
+       x = "Height",
+       y = "Count of Values") + stat_count() +  scale_y_continuous(labels = scales::comma)
+
+print(height_hist)
+```
+#OVERLAY HEIGHT AND WEIGHT/IQ GRAPHS
+```{r}
+set.seed(42)
+plot( weight_hist, col=rgb(0,0,1,1/4), xlim=c(0,10))  # first histogram
+plot( height_hist, col=rgb(1,0,0,1/4), xlim=c(0,10), add=TRUE)  # second
+
+```
+#clean height
+```{r}
+data_combined %>% count(height)
+```
+```{r}
+recode_height_enlistment <- data_combined %>% function(df){
+df <- df %>% filter(height => 60 & height <= 100 )
+return(df)}
+```
+
+```{r}
+height_recode <- recode_height_enlistment(df = data_combined) %>% 
+  select(height)
+```
+
+
+#Filter column by people with enlistment dates prior to March 1943– all those will be weights
+
+#look at height and weight/AGCT vars
+```{r}
+data_combined %>% 
+  count(date_of_enlistment_mm) 
+
+data_combined %>% 
+  count(date_of_enlistment_yy) 
+```
+
+#filter data_combined to cases with enlistment dates prior to March 1943
+```{r}
+recode_weight_pre_43 <- function(df){
+df <- df %>% filter(date_of_enlistment_mm <= 03 & date_of_enlistment_yy <= 43 ) %>%
+  mutate(weight_pre_43 = case_when(
+    date_of_enlistment_mm <= 03 & date_of_enlistment_yy <= 43 ~ "weight",
+     TRUE ~ NA_character_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+
+return(df)
+}
+```
+
+```{r}
+wt_recode <- recode_weight_pre_43(df = data_combined) %>% 
+  select(weight, weight_pre_43)
+```
+#Classify all people with a variable lower than 97 as an AGCT score and higher than 147 as weight 
+```{r}
+recode_AGCT_wt <- function(df){
+  df <- df%>% mutate(AGCT_wt = case_when(
+    weight <= 97 ~ "weight",
+    weight >= 147 ~ "AGCT Score",
+    TRUE ~ NA_character_
+  ))
+  return(df)
+}
+```
+
+```{r}
+AGCT_wt_recode <- recode_AGCT_wt(df = data_combined) %>% 
+  select(weight, AGCT_wt)
+```
+
+#plot weight/AGCT with Date_of_enlistment_ddmmyy faceted by place_of_enlistment
+
+
+```{r}
+data_combined %>%
+  count(place_of_enlistment, sort = TRUE) %>% 
+  mutate(freq = round(n / sum(n), 2))
+```
+
+#filter out reasonable heights
+```{r}
+ht_recode_enlistment <-function(df){
+  df <- df %>% mutate(height = as.numeric(height)) %>% mutate(ht_recode = case_when(
+  height > 60 & height < 109 ~ height,
+        TRUE ~ NA_real_ 
+))
+return(df)}
+```
+
+```{r}
+height_recode1 <- ht_recode_enlistment(df = data_combined) %>% 
+  select(height, ht_recode)
+
+```
+
+
+```{r}
+data_combined <- cbind(data_combined, height_recode1)
+```
+
+
+```{r}
+write_csv(data_combined, paste0(out_path, "/temp7.csv"))
+rm(list = ls())
+```
