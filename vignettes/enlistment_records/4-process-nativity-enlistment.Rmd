@@ -56,130 +56,195 @@ data_combined %>% count(nativity)
 # https://usa.ipums.org/usa-action/variables/BPL#codes_section
 
 ```{r}
-ddi_extract <- read_ipums_ddi(path_to_ipums_ddi)
+nativity_enlistment_recode <- function(df){
+  
+  ## recode grade variable
+  df <- df %>% 
+    mutate(nativity_recode = case_when(
+      nativity == "P4" ~ 52000, #AFGHANISTAN
+      nativity == "41" ~ 00100, #ALABAMA
+      nativity == "02" ~ 00200, #ALASKA
+      nativity == "R0" ~ 00200, #ALASKA
+      nativity == "N0" ~ 43000, #ALBANIA
+      nativity == "Q3" ~ 60044, #ABYSSINIA aka Ethiopia
+      nativity == "N9" ~ 43000, #ALBANIA	
+      nativity == "L4" ~ 60039, #ALGERIA or CAMEROONS or CHAD or COMOROS or DAHOMEY or FRENCH AFRICAN POSSESSIONS or FRENCH EQUATORIAL AFRICA or FRENCH GUINEA or FRENCH MOROCCO or FRENCH SOMALILAND or FRENCH SOUDAN or FRENCH WEST AFRICA or GABON or IVORY COAST or MADAGASCAR or MAURITANIA or MIDDLE CONGO or REUNION or SAHARA or SENEGAL or SOMALI COAST or TERRITORY OF NIGER or TOGO or TUNISIA or UBANGI SARI or UPPER VOLTA	coded as French West Africa
+      nativity == "O7" ~ 43600, #ANDORRA or PORTUGAL	
+      nativity == "K8" ~ 60031, #ANGLO-EGYPTIAN SUDAN or BRITISH CAMEROONS or BRITISH NORTH AFRICA or GAMBIA or GOLD COAST or NIGERIA or SIERRA LEONE or TOGOLAND or TONGA	 coded as Nigeria
+      nativity == "O7" ~ 60071, #ANGOLA or CAPE VERDE ISLANDS or MOZAMBIQUE or PORTUGESE AFRICAN POSSESSIONS or PORTUGESE GUINEA or PRINCIPE or ST THOME	coded as angola
+      nativity == "P2" ~ 54000, #ARABIA or ASIR or HEJAZ or JABEL SHAMMAR or KUWEIT or NEJD or OMAN or TRANSJORDANIA or YEMEN
+      #coded as Saudia Arabia
+      nativity == "J9" ~ 30005, #ARGENTINA
+      nativity == "P4" ~ 52000, #AFGHANISTAN
+      nativity == "98" ~ 00400, #ARIZONA  
+      nativity == "87" ~ 00500, #ARKANSAS
+      nativity == "K7" ~ 60000, #ASCENSION or BASUTOLAND or BECHUANALAND or BRITISH SOMALILAND or BRITISH SOUTH AFRICA or CAPE OF GOOD HOPE or KENYA or MAURITIUS or NATAL or NORTH RHODESIA or NYASSALAND or ORANGE FREE STATE or PEMBA or SOUTH RHODESIA or SOUTH WEST AFRICA or ST HELENA or SWAZILAND or TANGANYIKA or TRANSVAAL or UGANDA or UNION OF SOUTH AFRICA or ZANZIBAR	coded as Africa
+      nativity == "R8" ~ 90020, #AT SEA	
+      nativity == "K6" ~ 70000, #AUSTRALIA or BISMARK ISLANDS or BRITISH AUSTRALASIA AND OCEANIA or FIJI ISLANDS or NEW GUINEA or NEW ZEALAND or OTHER PACIFIC BRITISH ISLANDS or PAPUA or SOLOMON ISLANDS or TASMANIA	coded as Australia
+      nativity == "N2" ~ 45000, #AUSTRIA	
+      nativity == "L0" ~ 26043, #BAHAMAS or BARBADOS or BERMUDA or BRITISH CENTRAL AMERICA or BRITISH HONDURAS or BRITISH WEST INDIES or CAYMAN ISLANDS or JAMAICA or LEEWARD ISLANDS or TOBAGO or TRINIDAD or TURKS AND CAICOS ISLANDS or WINDWARD ISLANDS	   coded as Bahamas
+      nativity == "K5" ~ 26040, #BALUCHISTAN or BRITISH EAST INDIES AND FAR EAST or BRITISH NORTH BORNEO or BRUNEI or FEDERATED MALAY STATES or HONG KONG or SARAWAK or STRAITS SETTLEMENTS	coded as british west indies
+      nativity == "L8" ~ 60075, #BELGIAN AFRICAN POSSESSIONS or BELGIAN CONGO	coded as Congo
+      nativity == "L7" ~ 42000, #BELGIUM or LUXEMBURG	 coded as Belgium
+      nativity == "P6" ~ 52120, #BHUTAN
+      nativity == "J5" ~ 30010, #BOLIVIA
+      nativity == "J6" ~ 30015, #BRAZIL
+      nativity == "L1" ~ 46542, #BRITISH GUIANA or BRITISH SOUTH AMERICA or FALKLAND ISLANDS or GEORGIA	 coded to Georgia
+      nativity == "K4" ~ 53100, #BRITISH MEDITERRANEAN POSSESSIONS or CYPRUS or GIBRALTER or MALTA or PALESTINE	coded to Cyprus
+      nativity == "K9" ~ 15000, #BRITISH NORTH AMERICA or CANADA or LABRADOR or NEWFOUNDLAND	 coded as Canada
+      nativity == "N6" ~ 45100, #BULGARIA
+      nativity == "91" ~ 00600, #CALIFORNIA
+      nativity == "K3" ~ 52100, #CEYLON or INDIA or MALDIVE ISLANDS	  CODED TO India
+      nativity == "K1" ~ 41000, #CHANNEL ISLANDS or ENGLAND or GREAT BRITAIN or ISLE OF MAN or NORTHERN IRELAND or SCOTLAND or WALES	coded as England
+      nativity == "J8" ~ 30020, #CHILE
+      nativity == "P8" ~ 50000, #CHINA or MONGOLIA or SINKIAN or TIBET	
+      nativity == "Q1" ~ 50200, #CHOSEN or FORMOSA or JAPANESE ASIATIC POSSESSIONS or JAPANESE PACIFIC ISLANDS or KWANGTUNG or KOREA	 coded to Korea
+      nativity == "J1" ~ 30025, #COLOMBIA
+      nativity == "11" ~ 00900, #CONNECTICUT	
+      nativity == "!6" ~ 21020, #COSTA RICA	
+      nativity == "X6" ~ 21020, #COSTARICA
+      nativity == "!8" ~ 25000, #CUBA
+      nativity == "X8" ~ 25000, #CUBA
+      nativity == "M1" ~ 26074, #CURACAO or DUTCH AMERICAN POSSESSIONS or DUTCH GUIANA	  
+      nativity == "O1" ~ 60065, #CYRENAICA or ERITREA or ITALIAN AFRICAN POSSESSIONS or ITALIAN SOMALILAND or TRIPOLITANIA
+      #coded to eritria
+      nativity == "N4" ~ 45200, #CZECHOSLOVAKIA
+      nativity == "M3" ~ 40200, #DANISH ISLAND POSSESSIONS or FAROE ISLANDS or GREENLAND or ICELAND	
+      #coded to iceland
+      nativity == "N1" ~ 45300, #DANZIG or GERMANY	coded to Germany
+      nativity == "21" ~ 01000, #DELAWARE
+      nativity == "M2" ~ 40000, #DENMARK
+      nativity == "34" ~ 01100, #DIST OF COLUMBIA	
+      nativity == "J0" ~ 26010, #DOMINICAN REPUBLIC or SANTO DOMINGO	  coded to DR 
+      nativity == "M0" ~ 26070, #DUTCH ASIATIC POSSESSIONS or DUTCH EAST INDIES	coded to dutch west indies
+      nativity == "J3" ~ 30030, #ECUADOR
+      nativity == "Q2" ~ 60012, #EGYPT
+      nativity == "M7" ~ 46000, #ESTHONIA
+      nativity == "Q4" ~ 60044, #ETHIOPIA
+      nativity == "M6" ~ 40100, #FINLAND
+      nativity == "42" ~ 01200, #FLORIDA
+      nativity == "L2" ~ 42100, #FRANCE or MONACO	coded to france  
+      nativity == "L5" ~ 30035, #FRENCH AMERICAN POSSESSIONS or FRENCH GUIANA or GUADELOUPE or MARTINIQUE or ST PIERRE AND MIQUELON	 coded to french guiana
+    nativity == "L3" ~ 54100, #FRENCH ASIATIC POSSESSIONS or FRENCH INDIA or FRENCH INDO-CHINA or SYRIA	 coded to syria
+      nativity == "L6" ~ 71022, #FRENCH PACIFIC ISLANDS or NEW CALEDONIA or TAHITI	coded to French Polynesia 
+      nativity == "43" ~ 01300, #GEORGIA
+      nativity == "N7" ~ 43300, #GREECE
+      nativity == "!2" ~ 21040, #GUATEMALA
+      nativity == "X2" ~ 21040, #GUATEMALA
+      nativity == "X9" ~ 26020, #HAITI
+      nativity == "!9" ~ 26020, #HAITI  
+      nativity == "03" ~ 01500, #HAWAII
+      nativity == "R2" ~ 01500, #HAWAIIAN ISLANDS	
+      nativity == "L9" ~ 42500, #HOLLAND or NETHERLANDS	
+      nativity == "X3" ~ 21050, #HONDURAS
+      nativity == "!3" ~ 21050, #HONDURAS
+      nativity == "N3" ~ 45400, #HUNGARY
+      nativity == "92" ~ 01600, #IDAHO
+      nativity == "P4" ~ 52000, #AFGHANISTAN
+      nativity == "O4" ~ 60014, #IFNI or RIO DE ORO or SPANISH AFRICAN POSSESSIONS or SPANISH GUINEA or SPANISH MOROCCO	coded to morocco 
+      nativity == "61" ~ 01700, #ILLINOIS
+      nativity == "51" ~ 01800, #INDIANA
+      nativity == "72" ~ 01900, #IOWA
+      nativity == "P1" ~ 53200, #IRAQ or MESOPOTAMIA	coded to iraq
+      nativity == "K2" ~ 41400, #IRISH FREE STATE	coded to ireland
+      nativity == "O0" ~ 43400, #ITALY or SAN MARINO	 coded to italy
+      nativity == "QO" ~ 50100, #JAPAN
+      nativity == "N8" ~ 45700, #JUGOSLAVIA or MONTENEGRO or YUGOSLAVIA	 coded to yugoslavia
+      nativity == "73" ~ 02000, #KANSAS
+      nativity == "52" ~ 02100, #KENTUCKY
+      nativity == "M8" ~ 46100, #LATVIA
+      nativity == "O8" ~ 60027, #LIBERIA  
+      nativity == "O2" ~ 42600, #LICHTENSTEIN or SWITZERLAND	
+      nativity == "M9" ~ 46200, #LITHUANIA
+      nativity == "88" ~ 02200, #LOUISIANA
+      nativity == "O6" ~ 50020, #MACAO or PORTUGESE ASIATIC POSSESSIONS or PORTUGESE INDIA or PORTUGESE TIMOR	coded to Macau
+      nativity == "12" ~ 02300, #MAINE
+      nativity == "P9" ~ 50100, #MANCHOUKUO coded to JAPAN
+      nativity == "13" ~ 02500, #MASSACHUSETTS   
+      nativity == "X1" ~ 20000, #MEXICO
+      nativity == "!1" ~ 20000, #MEXICO
+      nativity == "62" ~ 02600, #MICHIGAN
+      nativity == "74" ~ 02700, #MINNESOTA
+      nativity == "45" ~ 02800, #MISSISSIPPI
+      nativity == "75" ~ 02900, #MISSOURI
+      nativity == "93" ~ 03000, #MONTANA   
+      nativity == "76" ~ 03100, #NEBRASKA
+      nativity == "P5" ~ 52400, #NEPAL
+      nativity == "94" ~ 03200, #NEVADA
+      nativity == "14" ~ 03300, #NEW HAMPSHIRE	
+      nativity == "22" ~ 03400, #NEW JERSEY	
+      nativity == "83" ~ 03500, #NEW MEXICO	   
+      nativity == "23" ~ 03600, #NEW YORK	
+      nativity == "X5" ~ 21060, #NICARAGUA
+      nativity == "!5" ~ 21060, #NICARAGUA
+      nativity == "46" ~ 52000, #North Carolina	
+      nativity == "77" ~ 03800, #NORTH DAKOTA	
+      nativity == "M4" ~ 40400, #NORWAY or SPITZBERGEN	coded to norway
+      nativity == "53" ~ 03900, #OHIO   
+      nativity == "84" ~ 04000, #OKLAHOMA
+      nativity == "95" ~ 04100, #OREGON
+      nativity == "X7" ~ 21070, #PANAMA
+      nativity == "!7" ~ 21070, #PANAMA
+      nativity == "R1" ~ 21070, #PANAMA
+      nativity == "41" ~ 21070, #PANAMA
+      nativity == "06" ~ 21070, #PANAMA
+      nativity == "J7" ~ 30060, #PARAGUAY   
+      nativity == "32" ~ 042, #PENNSYLVANIA
+      nativity == "P3" ~ 52200, #PERSIA
+      nativity == "J4" ~ 30050, #PERU
+      nativity == "R3" ~ 51500, #PHILIPPINE ISLANDS
+      nativity == "07" ~ 51500, #PHILIPPINE ISLANDS	
+      nativity == "N0" ~ 45500, #POLAND   
+      nativity == "08" ~ 25000, #PUERTO RICO (INCLUDING VIRGIN ISLANDS AND CUBA)	
+      nativity == "R4" ~ 11000, #PUERTO RICO 	
+      nativity == "15" ~ 04400, #RHODE ISLAND	
+      nativity == "N5" ~ 45600, #ROUMANIA
+      nativity == "O9" ~ 46530, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS 
+      nativity == "O9" ~ 46200, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
+      nativity == "O9" ~ 46100, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
+      nativity == "O9" ~ 46000, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
+      nativity == "O9" ~ 45900, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS	
+      nativity == "O9" ~ 46500, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS	   
+      nativity == "X4" ~ 21030, #SALVADOR
+      nativity == "!4" ~ 21030, #SALVADOR
+      nativity == "P7" ~ 51700, #SIAM aka THAILAND
+      nativity == "47" ~ 04500, #SOUTH CAROLINA	
+      nativity == "78" ~ 00100, #SOUTH DAKOTA	   
+      nativity == "O3" ~ 43800, #SPAIN
+      nativity == "M5" ~ 40500, #SWEDEN
+      nativity == "48" ~ 04700, #TENNESSEE
+      nativity == "85" ~ 04800, #TEXAS
+      nativity == "P0" ~ 54200, #TURKEY   
+      nativity == "R5" ~ 09900, #UNITED STATES	
+      nativity == "P4" ~ 52000, #AFGHANISTAN
+      nativity == "K0" ~ 30060, #URUGUAY
+      nativity == "96" ~ 04900, #UTAH
+      nativity == "J2" ~ 30065, #VENEZUELA   
+      nativity == "16" ~ 05000, #VERMONT
+      nativity == "33" ~ 05100, #VIRGINIA
+      nativity == "97" ~ 05300, #WASHINGTON
+      nativity == "54" ~ 05400, #WEST VIRGINIA	
+      nativity == "63" ~ 05500, #WISCONSIN   
+      nativity == "79" ~ 05600, #WYOMING
 
-#table_bpl  <- ipums_val_labels(ddi_extract, BPL)
-#colnames(table_bpl) <- c("bpl", "place_of_birth_ipums")
-#table_bpl$place_of_birth_ipums <- toupper(table_bpl$place_of_birth_ipums)
-
-table_bpld <- ipums_val_labels(ddi_extract, BPLD)
-colnames(table_bpld) <- c("bpld", "place_of_birth_ipums")
-table_bpld$place_of_birth_ipums <- toupper(table_bpld$place_of_birth_ipums)
-
-nativity_codes <- read_csv(nativity_codes_path)
-nativity_codes <- nativity_codes[,c("Code", "Meaning")]
-colnames(nativity_codes) <- c("nativity", "place_of_birth")
-
-#get_first_place_before_or <- function(row) {return(str_split(row, " or ", 2)[[1]][1])}
-#nativity_codes$place_of_birth_r <- as.character(lapply(nativity_codes$place_of_birth, get_first_place_before_or))
-
-merged_bpld <- merge(nativity_codes, table_bpld, by.x = "place_of_birth", by.y = "place_of_birth_ipums", all.x = T)
-merged_bpld <- merged_bpld[order(merged_bpld$bpld),]
-
-merged_bpld$place_of_birth_uncertain <- ifelse(is.na(merged_bpld$bpld), 1, 0)
-
-subset(merged_bpld, is.na(bpld))$place_of_birth
-```
-
-``` {r}
-fill_in_missing_bplds <- function(row) {
-  if (row["place_of_birth"] == "ABYSSINIA") {return(60044)}
-  else if (row["place_of_birth"] == "ALGERIA or CAMEROONS or CHAD or COMOROS or DAHOMEY or FRENCH AFRICAN POSSESSIONS or FRENCH EQUATORIAL AFRICA or FRENCH GUINEA or FRENCH MOROCCO or FRENCH SOMALILAND or FRENCH SOUDAN or FRENCH WEST AFRICA or GABON or IVORY COAST or MADAGASCAR or MAURITANIA or MIDDLE CONGO or REUNION or SAHARA or SENEGAL or SOMALI COAST or TERRITORY OF NIGER or TOGO or TUNISIA or UBANGI SARI or UPPER VOLTA") {return(60011)} # Algeria
-  else if (row["place_of_birth"] == "ANDORRA or PORTUGAL") {return(43600)} # Portugal
-  else if (row["place_of_birth"] == "ANGLO-EGYPTIAN SUDAN or BRITISH CAMEROONS or BRITISH NORTH AFRICA or GAMBIA or GOLD COAST or NIGERIA or SIERRA LEONE or TOGOLAND or TONGA") {return(60015)} # Sudan
-  else if (row["place_of_birth"] == "ANGOLA or CAPE VERDE ISLANDS or MOZAMBIQUE or PORTUGESE AFRICAN POSSESSIONS or PORTUGESE GUINEA or PRINCIPE or ST THOME") {return(60071)} # Angola
-  else if (row["place_of_birth"] == "ARABIA or ASIR or HEJAZ or JABEL SHAMMAR or KUWEIT or NEJD or OMAN or TRANSJORDANIA or YEMEN") {return(54000)} # Saudi Arabia
-  else if (row["place_of_birth"] == "ASCENSION or BASUTOLAND or BECHUANALAND or BRITISH SOMALILAND or BRITISH SOUTH AFRICA or CAPE OF GOOD HOPE or KENYA or MAURITIUS or NATAL or NORTH RHODESIA or NYASSALAND or ORANGE FREE STATE or PEMBA or SOUTH RHODESIA or SOUTH WEST AFRICA or ST HELENA or SWAZILAND or TANGANYIKA or TRANSVAAL or UGANDA or UNION OF SOUTH AFRICA or ZANZIBAR") {return(60094)} # South Africa (Union of)
-  else if (row["place_of_birth"] == "AUSTRALIA or BISMARK ISLANDS or BRITISH AUSTRALASIA AND OCEANIA or FIJI ISLANDS or NEW GUINEA or NEW ZEALAND or OTHER PACIFIC BRITISH ISLANDS or PAPUA or SOLOMON ISLANDS or TASMANIA") {return(70010)} # Australia
-  else if (row["place_of_birth"] == "BAHAMAS or BARBADOS or BERMUDA or BRITISH CENTRAL AMERICA or BRITISH HONDURAS or BRITISH WEST INDIES or CAYMAN ISLANDS or JAMAICA or LEEWARD ISLANDS or TOBAGO or TRINIDAD or TURKS AND CAICOS ISLANDS or WINDWARD ISLANDS") {return(26043)} # Bahamas
-  else if (row["place_of_birth"] == "BALUCHISTAN or BRITISH EAST INDIES AND FAR EAST or BRITISH NORTH BORNEO or BRUNEI or FEDERATED MALAY STATES or HONG KONG or SARAWAK or STRAITS SETTLEMENTS") {return(50010)} # Hong Kong
-  else if (row["place_of_birth"] == "BELGIAN AFRICAN POSSESSIONS or BELGIAN CONGO") {return(60075)} # Congo
-  else if (row["place_of_birth"] == "BELGIUM or LUXEMBURG" ) {return(42000)} # Belgium
-  else if (row["place_of_birth"] == "BRITISH GUIANA or BRITISH SOUTH AMERICA or FALKLAND ISLANDS or GEORGIA") {return(30040)} # Guyana/British Guiana
-  else if (row["place_of_birth"] == "BRITISH MEDITERRANEAN POSSESSIONS or CYPRUS or GIBRALTER or MALTA or PALESTINE") {return(53100)} # Cyprus
-  else if (row["place_of_birth"] == "BRITISH NORTH AMERICA or CANADA or LABRADOR or NEWFOUNDLAND") {return(15000)} # Canada
-  else if (row["place_of_birth"] == "CEYLON or INDIA or MALDIVE ISLANDS") {return(52100)} # India
-  else if (row["place_of_birth"] == "CHANNEL ISLANDS or ENGLAND or GREAT BRITAIN or ISLE OF MAN or NORTHERN IRELAND or SCOTLAND or WALES") {return(41000)} # England
-  else if (row["place_of_birth"] == "CHINA or MONGOLIA or SINKIAN or TIBET") {return(50000)} # China
-  else if (row["place_of_birth"] == "CHOSEN or FORMOSA or JAPANESE ASIATIC POSSESSIONS or JAPANESE PACIFIC ISLANDS or KWANGTUNG or KOREA") {return(50200)} # Korea
-  else if (row["place_of_birth"] == "CURACAO or DUTCH AMERICAN POSSESSIONS or DUTCH GUIANA") {return(26074)} # Curacao
-  else if (row["place_of_birth"] == "CYRENAICA or ERITREA or ITALIAN AFRICAN POSSESSIONS or ITALIAN SOMALILAND or TRIPOLITANIA") {return(60065)} # Eritrea
-  else if (row["place_of_birth"] == "DANISH ISLAND POSSESSIONS or FAROE ISLANDS or GREENLAND or ICELAND") {return(40200)} # Iceland
-  else if (row["place_of_birth"] == "DANZIG or GERMANY") {return(45300)} # Germany
-  else if (row["place_of_birth"] == "DIST OF COLUMBIA") {return(1100)} # District of Columbia
-  else if (row["place_of_birth"] == "DOMINICAN REPUBLIC or SANTO DOMINGO") {return(26010)} # Dominican Republic
-  else if (row["place_of_birth"] == "DUTCH ASIATIC POSSESSIONS or DUTCH EAST INDIES") {return(51200)} # Indonesia
-  else if (row["place_of_birth"] == "EGYPT") {return(60012)} # Egypt/United Arab Rep.
-  else if (row["place_of_birth"] == "ESTHONIA") {return(46000)} # Estonia
-  else if (row["place_of_birth"] == "FRANCE or MONACO") {return(42100)} # France
-  else if (row["place_of_birth"] == "FRENCH AMERICAN POSSESSIONS or FRENCH GUIANA or GUADELOUPE or MARTINIQUE or ST PIERRE AND MIQUELON" ) {return(30035)} # French Guiana
-  else if (row["place_of_birth"] == "FRENCH ASIATIC POSSESSIONS or FRENCH INDIA or FRENCH INDO-CHINA or SYRIA") {return(54100)} # Syria
-  else if (row["place_of_birth"] == "FRENCH PACIFIC ISLANDS or NEW CALEDONIA or TAHITI") {return(71010)} # New Caledonia
-  else if (row["place_of_birth"] == "HAWAIIAN ISLANDS") {return(1500)} # Hawaii
-  else if (row["place_of_birth"] == "HOLLAND or NETHERLANDS") {return(42500)} # Netherlands
-  else if (row["place_of_birth"] == "IFNI or RIO DE ORO or SPANISH AFRICAN POSSESSIONS or SPANISH GUINEA or SPANISH MOROCCO") {return(60014)} # Morocco
-  else if (row["place_of_birth"] == "IRAQ or MESOPOTAMIA") {return(53200)} # Iraq
-  else if (row["place_of_birth"] == "IRISH FREE STATE") {return(41400)} # Ireland
-  else if (row["place_of_birth"] == "ITALY or SAN MARINO") {return(43400)} # Italy
-  else if (row["place_of_birth"] == "JUGOSLAVIA or MONTENEGRO or YUGOSLAVIA") {return(45700)} # Yugoslavia
-  else if (row["place_of_birth"] == "LICHTENSTEIN or SWITZERLAND") {return(42600)} # Switzerland
-  else if (row["place_of_birth"] == "MACAO or PORTUGESE ASIATIC POSSESSIONS or PORTUGESE INDIA or PORTUGESE TIMOR") {return(50020)} # Macau
-  else if (row["place_of_birth"] == "MANCHOUKUO") {return(50000)} # China
-  else if (row["place_of_birth"] == "NORWAY or SPITZBERGEN") {return(40400)} # Norway
-  else if (row["place_of_birth"] == "PANAMA CANAL") {return(21071)} # Panama Canal Zone
-  else if (row["place_of_birth"] == "PANAMA CANAL ZONE") {return(21071)} # Panama Canal Zone
-  else if (row["place_of_birth"] == "PERSIA") {return(52200)} # Iran
-  else if (row["place_of_birth"] == "PHILIPPINE ISLANDS") {return(51500)} # Philippines
-  else if (row["place_of_birth"] == "PUERTO RICO (INCLUDING VIRGIN ISLANDS AND CUBA)") {return(11000)} # Puerto Rico
-  else if (row["place_of_birth"] == "ROUMANIA") {return(45600)} # Romania
-  else if (row["place_of_birth"] == "RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS") {return(46500)} # Other USSR/"Russia"
-  else if (row["place_of_birth"] == "SALVADOR") {return(21030)} # El Salvador
-  else if (row["place_of_birth"] == "SIAM") {return(51700)} # Thailand
-  else if (row["place_of_birth"] == "UNITED STATES") {return(9900)} # United States, n.s. US OUTLYING AREAS/TERRITORIES
-  else {return(row["bpld"])}
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+  ## return data.frame   
+  return(df)
 }
-
-merged_bpld$bpld_r <- apply(merged_bpld, 1, fill_in_missing_bplds)
 ```
 
-
-# Process nativity
+#apply function to df
 ```{r}
-data_combined$nativity_clean <- data_combined$nativity
-data_combined$nativity_clean <- str_trim(data_combined$nativity_clean)
-
-data_combined <- merge(data_combined, merged_bpld, by = "nativity", all.x = T)
-
-data_combined %>% group_by(place_of_birth) %>% tally(sort = T) %>% print(n=144)
+nativity_recode <- nativity_enlistment_recode(df = data_combined) %>% 
+  select(nativity, nativity_recode)
 ```
 
-
-# Reorder columns
-``` {r}
-data_combined$unique_id <- 1:nrow(data_combined)
-
-core_vars <- c("unique_id", 
-               "fname_clean_std", "mname_clean", "lname_clean", "fname_std", "fname_clean", "name_clean", "name", 
-               "sex_r", "sex", "sex_r_NA", "sex_NA", 
-               "yob_precise", "year_of_birth", 
-               "date_of_enlistment_yy", "date_of_enlistment_mm", "date_of_enlistment_dd", "date_of_enlistment_ddmmyy", 
-               "bpld_r", "place_of_birth", "nativity_clean", "bpld", "place_of_birth_uncertain", "nativity")
-
-other_vars <- c("serial_number", 
-                "residence_state", "residence_county", 
-                "place_of_enlistment", 
-                "grade_alpha", "grade_code", 
-                "branch_alpha", "branch_code", 
-                "empty_field", "term_or_enlistment", "longevity", "educ_spec", "defer_date_mmyy", 
-                "source", 
-                "race", "education", "civ_occupation", "marital_status", "height", "weight", 
-                "component", "card_number", 
-                "erc1", "erc2")
-
-data_combined <- data_combined[,c(core_vars, other_vars)]
+#Add columns with recoded data to data_combined
+```{r}
+data_combined <- cbind(data_combined, nativity_recode$nativity_recode)
 ```
-
-
 # Save processed dataset
 ```{r}
 write_csv(data_combined, paste0(out_path, "/temp4.csv"))

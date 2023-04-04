@@ -7,6 +7,7 @@ output: html_document
 ```{r}
 library(dplyr) # %>%, group_by, tally, print
 library(readr) # read_csv, write_csv
+library(lubridate) #as_date
 ```
 
 #Set path to temp data & outpath
@@ -37,8 +38,6 @@ data_combined <- read_csv(path_to_temp_data,
                           )
 
 ```
-
-
 
 # Process year_of_birth
 
@@ -100,6 +99,22 @@ determine_yob <- function(row) {
 data_combined$yob_precise <- apply(data_combined, 1, determine_yob) # SLOW
 
 sum(is.na(data_combined$yob_precise)) # 98742
+```
+
+#takes a very long time to run
+
+```{r}
+data_combined %>% count(date_of_enlistment_ddmmyy)
+```
+
+```{r}
+ date_enlistment_recode <- data_combined %>% 
+  mutate(date_enlistment_recode = as_date(date_of_enlistment_ddmmyy, format = "%d%m%y"))
+```
+
+```{r}
+date_enlistment_recode %>% count(date_enlistment_recode)
+
 ```
 
 # Save processed dataset
