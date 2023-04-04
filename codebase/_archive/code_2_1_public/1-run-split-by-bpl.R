@@ -13,7 +13,7 @@ source("/censocdev/R/create_weights_censoc_dmf.R")
 # Load libraries
 library(data.table)
 library(dplyr)
-library(readr)
+library(readr).
 
 # Paths
 census_raw      <- "/ipums-repo2022/1940/TSV/P.tsv"
