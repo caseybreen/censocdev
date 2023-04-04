@@ -109,7 +109,7 @@ data_combined %>% count(date_of_enlistment_ddmmyy)
 
 ```{r}
  date_enlistment_recode <- data_combined %>% 
-  mutate(date_enlistment_recode = as_date(date_of_enlistment_ddmmyy, format = "%d%m%y"))
+  mutate(date_enlistment_recode = as_date(date_of_enlistment_ddmmyy, format = "%d%m%Y"))
 ```
 
 ```{r}
