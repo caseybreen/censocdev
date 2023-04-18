@@ -18,7 +18,7 @@ header-includes: \usepackage{hyperref}
 
 | Page| Variable     | Label                                        |
 |----:|:-------------|:---------------------------------------------|
-|   \hyperlink{page.2}{2}  | \hyperlink{page.2}{serial\_number}                   |Army Serial Number  |
+|   \hyperlink{page.2}{2}  | \hyperlink{page.2}{serial\_number}         |Army Serial Number  |
 |   \hyperlink{page.3}{3}  | \hyperlink{page.3}{yob}           |Year of Birth    |
 |   \hyperlink{page.4}{4}  | \hyperlink{page.4}{fname}           |First Name                      |
 |   \hyperlink{page.5}{5}  |\hyperlink{page.5}{mname}            |Middle Name                      |
@@ -57,11 +57,14 @@ options(kableExtra.auto_format = FALSE, scipen=999)
 library(tidyverse)
 library(data.table)
 library(stringi)
+library(lubridate)
 library(kableExtra)
 
 data_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/finalenlistment.csv'
 resource_file_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode'
-
+path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp2.csv"
+out_path          <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+codebook_path <- "/censoc_new/censocdev/codebase/04_create_enlistment_records_v2/10-enlistment-codebook_files"
 ## read in data file
 #setwd(data_path)
 #enlistment_dmf <- fread('finalenlistment.csv')
@@ -69,9 +72,29 @@ resource_file_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/c
 
 setwd(resource_file_path)
 test_file_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode'
-enlistment_dmf <- fread('finalenlistment.csv')
+enlistment_records_final <- fread('finalenlistment.csv')
 
 
+
+```
+```{r}
+#read in temp2
+data_combined <- read_csv(path_to_temp_data, 
+                          col_types = cols(
+                            empty_field = col_character(),
+                            term_or_enlistment = col_character(),
+                            longevity = col_character(),
+                            education = col_character(),
+                            marital_status = col_character(),
+                            component = col_character(),
+                            educ_spec = col_character(),
+                            defer_date_mmyy = col_character(),
+                            mname_clean = col_character(),
+                            sex = col_integer(),
+                            sex_r = col_integer(),
+                            fname_std = col_character()
+                            )
+                          )
 
 ```
 
@@ -85,7 +108,7 @@ enlistment_dmf <- fread('finalenlistment.csv')
 
 **Label**: Army Serial Number
 
-**Description**: Army Serial Number is an assigned number.
+**Description**: serial_number is an assigned number.
 
 
 
@@ -101,7 +124,7 @@ enlistment_dmf <- fread('finalenlistment.csv')
 **Description**: yob reports a person's year of birth, as recorded in the Social Security Death Master File.  
 
 ```{r, include = F}
-byear_plot <- enlistment_records_final_v1 %>%
+byear_plot <- enlistment_records_final %>%
     group_by(yob) %>%
     summarise(n = n()) %>%
     ggplot(aes(x = yob, y = n)) + 
@@ -181,7 +204,7 @@ byear_plot
 **Description**: sex reports a person's sex, as recorded in the Social Security Death Master File.    
 
 ```{r, include = F}
-sex_tabulated <- knitr::kable(enlistment_records_final_v1 %>%
+sex_tabulated <- knitr::kable(enlistment_records_final %>%
     group_by(sex) %>%
      tally() %>%
      mutate(freq = signif(n*100 / sum(n), 3)) %>%
@@ -202,7 +225,64 @@ sex_tabulated <- knitr::kable(enlistment_records_final_v1 %>%
 **Label:** Date of Enlistment 
 
 **Description**: date_of_enlistment_ddmmyyyy reports a person's date of enlistment in dd-mm-yyyy format, as reported in the World War II Army Enlistment Records. 
+```{r}
+min(data_combined$year_of_birth, na.rm=T) # "00"
+max(data_combined$year_of_birth, na.rm=T) # "99"
 
+data_combined %>%
+  group_by(year_of_birth) %>%
+  tally() %>%
+  print(n=101)
+
+split_date_of_enlistment_ddmmyy <- function(row) {
+  dd <- substr(row, 1, 2)
+  mm <- substr(row, 3, 4)
+  yy <- substr(row, 5, 6)
+  return(list(dd=dd, mm=mm, yy=yy))}
+res <- lapply(data_combined$date_of_enlistment_ddmmyy, split_date_of_enlistment_ddmmyy) # SLOW
+data_combined$date_of_enlistment_dd <- unlist(res)[attr(unlist(res), "names") == "dd"]
+data_combined$date_of_enlistment_mm <- unlist(res)[attr(unlist(res), "names") == "mm"]
+data_combined$date_of_enlistment_yy <- unlist(res)[attr(unlist(res), "names") == "yy"]
+rm(res)
+
+min(data_combined$date_of_enlistment_yy, na.rm=T) # "00"
+max(data_combined$date_of_enlistment_yy, na.rm=T) # "99"
+
+data_combined %>%
+  group_by(date_of_enlistment_yy) %>%
+  tally() %>%
+  print(n=100)
+
+nrow(subset(data_combined, date_of_enlistment_yy < "38" | date_of_enlistment_yy > "46")) # 41896
+
+## create new date variable 
+data_combined <- data_combined %>% 
+  mutate(date_of_enlistment_yy = as.numeric(date_of_enlistment_yy) + 1900) %>% 
+  mutate(date_enlistment_recode = make_date(date_of_enlistment_yy, date_of_enlistment_mm, date_of_enlistment_dd))
+
+## check dates look reasonable and are in yyyy-mm-dd format (match v1 release)
+data_combined %>%
+  count(date_enlistment_recode) %>% 
+  arrange(desc(n))
+
+## visualize distribution (loooks reasonable - identical pattern to v1 release)
+data_combined %>%
+  filter(date_of_enlistment_yy %in% c(1938:1947)) %>% ## restrict to years around WWII 
+  mutate(date_short = format(as.Date(date_enlistment_recode), "%Y-%m")) %>% 
+    group_by(date_short) %>% 
+    tally() %>% 
+    filter(!is.na(date_short)) %>%
+  ggplot(aes(x=date_short, y=n, group=1)) +
+  geom_line() +
+  geom_point() +
+  scale_x_discrete(breaks = paste0(seq(1938, 1947, 1), "-01")) +
+  theme_minimal(base_size = 15) +
+  ggtitle("Enlistment Date (Month and Year Only)") +
+  labs(x = "Date (yyyy-mm)", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) +
+  theme(axis.text.x = element_text(angle = 45))
+```
 \vspace{30pt}
 
 
@@ -288,8 +368,8 @@ For a complete list of codes, please see: https://usa.ipums.org/usa-action/varia
 
 
 ```{r}
-grades <- fread('nara_grade_code_codes.csv')
-grade_tabulated <- knitr::kable(enlistment_records_final_v1 %>%
+grades <- fread('cl_2072.csv')
+grade_tabulated <- knitr::kable(enlistment_records_final %>%
                           group_by(grade_code) %>% 
                           tally() %>% 
                           left_join(grades, by=c('grade_code' = 'Code')) %>%
@@ -319,8 +399,8 @@ Code list also is available at: https://aad.archives.gov/aad/popup-codelist.jsp?
 **Description**: branch_code is a numeric variable that records the army branch in which the enlistee served, as reported in the World War II Army Enlistment Records. 
 
 ```{r}
-branches <- fread('nara_branch_code_codes.csv')
-branch_tabulated <- knitr::kable(enlistment_dmf %>%
+branches <- fread('cl_2075.csv')
+branch_tabulated <- knitr::kable(enlistment_records_final %>%
                           group_by(branch_code) %>% 
                           tally() %>% 
                           left_join(branches, by=c('branch_code' = 'Code')) %>%
@@ -351,8 +431,8 @@ branch_tabulated
 **Description**: term_of_enlistment_enlistment is a numeric variable that reports the length of a person's enlistment or their department of enlistment, as reported in the World War II Army Enlistment Records. 
 
 ```{r}
-term <- fread('nara_term_of_enlistment.csv')
-toe_tabulated <- knitr::kable(enlistment_dmf %>%
+term <- fread('cl_2076.csv')
+toe_tabulated <- knitr::kable(enlistment_records_final %>%
                           group_by(term_of_enlistment) %>% 
                           tally() %>% 
                           left_join(term, by=c('term_of_enlistment' = 'Code')) %>%
@@ -388,8 +468,8 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 **Description**: race is a string variable that reports an individual's race, as reported in the World War II Army Enlistment Records.
 
 ```{r}
-races <- fread('nara_race_codes.csv')
-race_cit_tabulated <- knitr::kable(enlistment_records_final_v1 %>%
+races <- fread('cl_2059.csv')
+race_cit_tabulated <- knitr::kable(enlistment_records_final %>%
                           group_by(race) %>% 
                           tally() %>% 
                           left_join(races, by=c('race' = 'Code')) %>%
@@ -416,7 +496,7 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 **Description**: citizenship is a string variable that reports an individual's citizenship, as reported in the World War II Army Enlistment Records.
 
 ```{r}
-races <- fread('nara_race_codes.csv')
+races <- fread('cl_2059.csv')
 race_cit_tabulated <- knitr::kable(enlistment_records_final_v1 %>%
                           group_by(citizenship) %>% 
                           tally() %>% 
@@ -459,8 +539,8 @@ For complete codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?
 **Description**: marital_status is a string variable that reports a person's marital status at time of enlistment, as reported in the World War II Army Enlistment Records. 
 
 ```{r}
-ms_codes <- fread('nara_marital_status_codes.csv')
-marital_status_tabulated <- knitr::kable(enlistment_dmf %>%
+ms_codes <- fread('cl_2081.csv')
+marital_status_tabulated <- knitr::kable(enlistment_records_final %>%
                           group_by(marital_status) %>% 
                           tally() %>% 
                           left_join(ms_codes, by=c('marital_status' = 'Code')) %>%
@@ -491,8 +571,8 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 **Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field may encode military occupation or other information. Height may have been recorded through about 1943, but height data recorded after February 1943 are likely unreliable. See the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/OpaAPI/media/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1ND_NC.pdf?download=false) for further information.
 
 ```{r, include = F}
-height_plot <- enlistment_dmf %>%
-  ggplot(aes(x = height_enlistment)) +
+height_plot <- enlistment_records_final %>%
+  ggplot(aes(x = height)) +
   geom_histogram(breaks = seq(0,100,1)) +
   theme_minimal(base_size = 15) +
   ggtitle("Height") +
@@ -520,8 +600,8 @@ height_plot
 **Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field was explicitly used for both weight and AGCT scores, but may also encode military occupation or other information. Weight may have been recorded through about 1943 at some enlistment sites, but the recording of AGCT score instead of weight at some enlistment sites likely began in March 1943. Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/OpaAPI/media/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1ND_NC.pdf?download=false) for further information.
 
 ```{r, include = F}
-weight_plot <- enlistment_dmf %>%
-  ggplot(aes(x = weight_or_AGCT_enlistment)) +
+weight_plot <- enlistment_records_final %>%
+  ggplot(aes(x = weight_or_AGCT)) +
   geom_histogram(breaks = seq(0,1000,10)) +
   theme_minimal(base_size = 15) +
   ggtitle("Weight or AGCT Score") +
@@ -548,13 +628,13 @@ weight_plot
 
 
 ```{r}
-component_codes <- fread('nara_component_codes.csv')
-component_tabulated <- knitr::kable(enlistment_dmf %>%
-                          group_by(component_enlistment) %>% 
+component_codes <- fread('cl_2078.csv')
+component_tabulated <- knitr::kable(enlistment_records_final %>%
+                          group_by(component) %>% 
                           tally() %>% 
                           left_join(component_codes, by=c('component_enlistment' = 'Code')) %>%
                           mutate(freq = signif(n*100 / sum(n), 3)) %>% 
-                          select(component_enlistment, 'label' = Meaning, n, `freq %` = freq),
+                          select(component, 'label' = Meaning, n, `freq %` = freq),
                           format='latex', booktabs=T) %>% 
   kable_styling(position = "center") %>% 
   column_spec(column=2, width = '7cm')
@@ -582,8 +662,8 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 
 
 ```{r}
-source_codes <- fread('nara_source_codes.csv')
-source_tabulated <- knitr::kable(enlistment_dmf %>%
+source_codes <- fread('cl_2077.csv')
+source_tabulated <- knitr::kable(enlistment_records_final %>%
                           group_by(source) %>% 
                           tally() %>% 
                           left_join(source, by=c('source_enlistment' = 'Code')) %>%

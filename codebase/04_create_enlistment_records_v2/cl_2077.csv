@@ -1,0 +1,13 @@
+Code,Meaning,Comments
+"0","Civil Life",""
+"6","Enlisted Man, Philippine Scout or recall to AD of an enlisted man who had been transferred to the ERC",""
+"2","Enlisted Man, Regular Army, after 3 months of Discharge",""
+"1","Enlisted Man, Regular Army, within 3 months of Discharge or former WAAC Auxiliary",""
+"5","Enlisted Reserve or Medical Administrative Corps (MAC) Officer ",""
+"7","National Guard",""
+"4","National Guard in Federal Service, after 3 months of Discharge",""
+"3","National Guard in Federal Service, within 3 months of Discharge",""
+"9","Returned to Military Control, Apprehended",""
+"8","Returned to Military Control, Surrendered",""
+"&","Selective Service after 3 months of Discharge","12 punch"
+"-","Selective Service within 3 months of Discharge","11 punch"
