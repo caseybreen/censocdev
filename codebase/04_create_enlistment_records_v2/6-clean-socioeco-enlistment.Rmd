@@ -56,24 +56,24 @@ recode_race_enlistment <- function(df){
   ## recode race variable using IPUM codes
   df <- df %>% 
     mutate(race_recode = case_when(
-      race == "1" ~ 1, #white citizens/noncitizens
-      race == "J" ~ 1, #white citizens/noncitizens
-      race == "2" ~ 2, #Black/African American citizens/noncitizens
-      race == "K" ~ 2, #Black/African American citizens/noncitizens
-      race == "6" ~ 3, #American Indian citizens/noncitizens
-      race == "O" ~ 3, #American Indian citizens/noncitizens
-      race == "3" ~ 4, #Chinese citizen/noncitizen
-      race == "L" ~ 4, #Chinese citizen/noncitizen
-      race == "4" ~ 5, #Japanese citizen/noncitizen
-      race == "M" ~ 5, #Japanese citizen/noncitizen
-      race == "7" ~ 6, #Other Asian/Pacific Islander citizen/noncitizen
-      race == "P" ~ 6, #Other Asian/Pacific Islander citizen/noncitizen
-      race == "5" ~ 6, #Other Asian/Pacific Islander citizen/noncitizen
-      race == "N" ~ 6, #Other Asian/Pacific Islander citizen/noncitizen
-      race == "8" ~ 7, #Other + Puerto Ricans
-      race == "Q" ~ 7, #Other + Puerto Ricans
-      race == "9" ~ 7, #Other + Puerto Ricans
-      race == "R" ~ 7, #Other + Puerto Ricans
+      race == "1" ~ 100, #white citizens/noncitizens
+      race == "J" ~ 100, #white citizens/noncitizens
+      race == "2" ~ 200, #Black/African American citizens/noncitizens
+      race == "K" ~ 200, #Black/African American citizens/noncitizens
+      race == "6" ~ 300, #American Indian citizens/noncitizens
+      race == "O" ~ 300, #American Indian citizens/noncitizens
+      race == "3" ~ 400, #Chinese citizen/noncitizen
+      race == "L" ~ 400, #Chinese citizen/noncitizen
+      race == "4" ~ 500, #Japanese citizen/noncitizen
+      race == "M" ~ 500, #Japanese citizen/noncitizen
+      race == "7" ~ 600, #filipino
+      race == "P" ~ 600, #filipino citizen/noncitizen
+      race == "5" ~ 630, #native hawaiian citizen/noncitizen
+      race == "N" ~ 630, #native hawaiianr citizen/noncitizen
+      race == "8" ~ 150, #Puerto Ricans
+      race == "Q" ~ 150, # Puerto Ricans
+      race == "9" ~ 991, #Other
+      race == "R" ~ 991, #Other
       TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
       ))
   
@@ -164,7 +164,6 @@ education_recode <- recode_education_enlistment(df = data_combined) %>%
 ```
 
 #Recode marital_status from NARA AAD TO IPUMS CODES
-
 ```{r}
 data_combined %>% 
   count(marital_status) 

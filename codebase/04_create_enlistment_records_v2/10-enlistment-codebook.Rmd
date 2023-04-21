@@ -1,8 +1,4 @@
----
-title: "10-enlistment-codebook"
-output: html_document
-date: "2023-03-17"
----
+
 title: "CenSoc-DMF-WW2-Army-Enlistment File Codebook[^updated]"
 output:
   pdf_document: default
@@ -366,16 +362,19 @@ For a complete list of codes, please see: https://usa.ipums.org/usa-action/varia
 
 **Description**: grade_code is a string variable that records a person's grade (rank), as reported in the World War II Army Enlistment Records. 
 
-
 ```{r}
 grades <- fread('cl_2072.csv')
-grade_tabulated <- knitr::kable(enlistment_records_final %>%
-                          group_by(grade_code) %>% 
-                          tally() %>% 
-                          left_join(grades, by=c('grade_code' = 'Code')) %>%
-                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
-                          select(grade_code, 'label' = Meaning, n, `freq %` = freq))
+grade_tabulated <- enlistment_records_final %>%
+  group_by(grade_code) %>%
+  tally() %>%
+  left_join(grades %>% mutate(Code = as.integer(Code)), by = c('grade_code' = 'Code')) %>%
+  mutate(freq = signif(n * 100 / sum(n), 3), `freq %` = paste0(freq, "%")) %>%
+  select(grade_code, label = Meaning, n, `freq %`)
+
+# print the resulting table
+knitr::kable(grade_tabulated)
 ```
+
 
 \vspace{30pt}
 
@@ -467,20 +466,6 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 
 **Description**: race is a string variable that reports an individual's race, as reported in the World War II Army Enlistment Records.
 
-```{r}
-races <- fread('cl_2059.csv')
-race_cit_tabulated <- knitr::kable(enlistment_records_final %>%
-                          group_by(race) %>% 
-                          tally() %>% 
-                          left_join(races, by=c('race' = 'Code')) %>%
-                          mutate(freq = signif(n*100 / sum(n), 3)) %>%
-                            select(race, 'label' = Meaning, n, `freq %` = freq))
-```
-\vspace{30 pt}
-```{r}
-race_cit_tabulated
-```
-
 Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2059&dt=893&c_id=24984
 
 
@@ -493,21 +478,9 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 
 **Label**: Citizenship
 
-**Description**: citizenship is a string variable that reports an individual's citizenship, as reported in the World War II Army Enlistment Records.
+**Description**: citizenship is a string variable that reports an individual's citizenship, as reported in the World War II Army Enlistment Records. 1 indicates the individual was a US citizen, 0 indicates a noncitizen.
 
-```{r}
-races <- fread('cl_2059.csv')
-race_cit_tabulated <- knitr::kable(enlistment_records_final_v1 %>%
-                          group_by(citizenship) %>% 
-                          tally() %>% 
-                          left_join(races, by=c('citizenship' = 'Code')) %>%
-                          mutate(freq = signif(n*100 / sum(n), 3)) %>%
-                            select(citizenship, 'label' = Meaning, n, `freq %` = freq))
-```
-\vspace{30 pt}
-```{r}
-race_cit_tabulated
-```
+
 
 Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2059&dt=893&c_id=24984
 
@@ -632,7 +605,7 @@ component_codes <- fread('cl_2078.csv')
 component_tabulated <- knitr::kable(enlistment_records_final %>%
                           group_by(component) %>% 
                           tally() %>% 
-                          left_join(component_codes, by=c('component_enlistment' = 'Code')) %>%
+                          left_join(component_codes, by=c('component' = 'Code')) %>%
                           mutate(freq = signif(n*100 / sum(n), 3)) %>% 
                           select(component, 'label' = Meaning, n, `freq %` = freq),
                           format='latex', booktabs=T) %>% 
@@ -659,26 +632,6 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 **Label**: Source of army personnel
 
 **Description**: source is a string variable that reports the source of the enlisted person, as reported in the World War II Army Enlistment Records. 
-
-
-```{r}
-source_codes <- fread('cl_2077.csv')
-source_tabulated <- knitr::kable(enlistment_records_final %>%
-                          group_by(source) %>% 
-                          tally() %>% 
-                          left_join(source, by=c('source_enlistment' = 'Code')) %>%
-                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
-                          select(source, 'label' = Meaning, n, `freq %` = freq),
-                          format='latex', booktabs=T) %>% 
-  kable_styling(position = "center") %>% 
-  column_spec(column=2, width = '7cm')
-```
-
-\vspace{30 pt}
-
-```{r}
-source_tabulated
-```
 
 Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2077&dt=893&c_id=24981
 

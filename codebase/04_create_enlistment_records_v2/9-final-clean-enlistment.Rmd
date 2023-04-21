@@ -54,10 +54,8 @@ head(enlistment_records_final_v1, 200)
 ```
 #rename columns
 ```{r}
-enlistment_records_final_v1 <- enlistment_records_final_v1 %>% 
-        rename("sex" ="sex_r" , 
-              "date_of_enlistment_yyyymmdd"= "date_enlistment_recode",
-               "yob" = "yob_precise" ,
+enlistment_records_final <- enlistment_records_final_v1 %>% 
+        rename(  
                "fname" = "fname_clean",
                "mname" = "mname_clean",
                "lname" = "lname_clean",
