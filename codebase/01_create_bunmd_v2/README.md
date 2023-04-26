@@ -5,5 +5,5 @@ This subdirectory contains code to create the Berkeley Unified Numident Mortalit
 - `1_read_numident_fwf.Rmd` - reads in the original fixed-width files from the National Archive for the death records, application records, 
 - `2_clean_numident_files.Rmd` - cleans and harmonizes the original NARA Numident records 
 - `3_condense_numident_application_and_claims.Rmd` - picks the "best" value for variable when individuals have multiple entires (e.g., 4 application records with alternative spellings of last name) 
-- `4_create_bunmd.Rmd` - combines the cleaned, harmonized, and condensed records into one single file, the BUNMD. 
+- `4_create_bunmd.Rmd` - combines the cleaned, harmonized, and condensed records into one single file (BUNMD). 
 
