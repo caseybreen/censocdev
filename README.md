@@ -1,4 +1,14 @@
-## censocdev
+## CenSoc Development Repository
+
+> A repository for storing all code for creating CenSoc linkages, codebooks, vignettes, and more. 
+
+__Contributors:__ [Casey Breen](https://caseybreen.com),
+[Monica Alexander](https://www.monicaalexander.com/),
+[Won-tak Joo](https://1takjoo.github.io/),
+[Ugur Yildrim](https://uguryildirim.org/), and
+Maria Osborne
+
+---
 
 This repository contains the source code to construct the CenSoc data products. 
 
@@ -9,11 +19,11 @@ In the `codebase/` directory, each subfolder contains code to:
 - `01_create_bunmd_v2` — construct the BUNMD 
 - `02_create_censoc_v2_1`— create both the CenSoc-DMF and CenSoc-Numident files  
 - `03_create_demo_files_v2_1`— create the CenSoc-DMF and CenSoc-Numident demo files 
-- `04_create_enlistment_records_v2` — create a cleaned and harmonized version of the military enlistment records and link to the 1940 Census / mortality records [In progress]
+- `04_create_enlistment_records_v2` — create a cleaned and harmonized version of the military enlistment records and link to the 1940 Census / mortality records [in progress]
 - `05_create_censoc_codebooks` — create the codebooks for all CenSoc datasets 
-- `06_website_vignettes`— All CenSoc website vignettes (.Rmd files and 
+- `06_website_vignettes`— all CenSoc website vignettes (.Rmd files and 
 - `07_replication_assess_match_quality` — replication code for the assess match quality 
-- `08_track_censoc_users` — Code to keep track of  the number of total CenSoc users 
+- `08_track_censoc_users` — code to keep track of the number of new and total CenSoc users 
 
 Contributors: 
 
