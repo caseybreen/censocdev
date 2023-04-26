@@ -1,6 +1,6 @@
 ---
 title: "Clean Numapplication Files"
-output: html_notebook
+author: Casey Breen 
 ---
 
 In this notebook, we take the Numident files with the three .csv files (apps, claims, deaths) with the original NARA variable names and take several steps to clean and harmonize te data:
