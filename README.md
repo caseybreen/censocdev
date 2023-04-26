@@ -6,10 +6,10 @@ The [CenSoc project]([https://censoc.berkeley.edu/](https://censoc.berkeley.edu/
 
 Contributors: 
 
-Casey Breen
-Maria Osborne 
-Monica Alexander 
-Ugur Yildrim 
-Joshua Goldstein (PI)
+- Casey Breen
+- Maria Osborne 
+- Monica Alexander 
+- Ugur Yildrim 
+- Joshua Goldstein (PI)
 
 
