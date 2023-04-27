@@ -1,3 +1,8 @@
+## CenSoc Codebase 
+
+The code in these each subdirectory contains the source code to create CenSoc datasets and accompanying documentation. 
+
+
 - `01_create_bunmd_v2` — construct the BUNMD 
 - `02_create_censoc_v2_1`— create both the CenSoc-DMF and CenSoc-Numident files  
 - `03_create_demo_files_v2_1`— create the CenSoc-DMF and CenSoc-Numident demo files 

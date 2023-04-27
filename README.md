@@ -5,6 +5,7 @@
 __Contributors:__ [Casey Breen](https://caseybreen.com),
 [Monica Alexander](https://www.monicaalexander.com/),
 [Won-tak Joo](https://1takjoo.github.io/),
+[Joshua R. Goldstein](https://vcresearch.berkeley.edu/faculty/joshua-goldstein),
 [Ugur Yildrim](https://uguryildirim.org/), and
 Maria Osborne
 
