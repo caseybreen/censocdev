@@ -4,7 +4,7 @@
 **Summary**: Run the codes  in this subdirectory sequentially to create the (1) CenSoc-DMF and (2) CenSoc-Numident datasets. The objecrtive of each code is described below: 
 
 
-01_run_split_by_bpl.R
+`01_run_split_by_bpl.R`
 
 -   Time: ~ 1 hour
 
@@ -18,7 +18,7 @@
 
     - The 1940 Census collected ages at the time of the survey (i.e., 1940 April) and did not ask for exact birth year and date. Therefore, we make a new variable (census_age) using birthdate records in Numident and DMF files (i.e., 1940 minus birth year for those whose birth month is January through March; otherwise, 1939 minus birth year), based on which we match Census data to Numident and DMF files. For DMF, this variable is automatically generated when applying the function load_dmf_deaths.
 
-2_run_parse_titles_and_nicknames.R
+`2_run_parse_titles_and_nicknames.R`
 
 -   Time: ~ 1 minute
 
@@ -26,7 +26,7 @@
 
     -   Make dictionaries for cleaning errors in first names and converting nicknames to formal first names.
 
-3_run_clean_names.R
+`3_run_clean_names.R`
 
 -   Time: ~12 hours
 
@@ -38,7 +38,7 @@
 
     -   It takes the longest time among the five application codes since it deals with large string variables.
 
-4_run_match_records.R
+`4_run_match_records.R`
 
 -   Time: ~ 6 hours
 
@@ -66,7 +66,7 @@
 
     -   Conservative matches are defined by two variables, uniquestub_fileN (i.e., first & last names are unique within ±N age within the dataset) and uniquestub_matchN (i.e., matched to one person within ±N age in the corresponding dataset). For example, you can identify conservative matches within ±N years by taking those with uniquestub_file2==1 and unique_stubmatch==1.
 
-05_generate_final_matched_datasets.R
+`05_generate_final_matched_datasets.R`
 
 -   Time: ~ 5 minutes
 
