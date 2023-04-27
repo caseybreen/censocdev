@@ -1,5 +1,5 @@
 ---
-title: "Condense Numident Entries"
+title: "Condense numident entries"
 author: Casey Breen 
 ---
 

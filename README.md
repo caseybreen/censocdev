@@ -25,12 +25,4 @@ In the `codebase/` directory, each subfolder contains code to:
 - `07_replication_assess_match_quality` — replication code for the assess match quality 
 - `08_track_censoc_users` — code to keep track of the number of new and total CenSoc users 
 
-Contributors: 
-
-- Casey Breen
-- Maria Osborne 
-- Monica Alexander 
-- Ugur Yildrim 
-- Joshua Goldstein (PI)
-
 

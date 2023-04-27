@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)   # %>%, group_by, tally, print
 library(ipumsr)  # read_ipums_ddi, ipums_val_labels
 library(readr)   # read_csv, write_csv
-
 library(stringr) # str_trim, str_split
 ```
 
