@@ -11,10 +11,8 @@
 ## function for recoding education
 recode_education <- function(df, educ_var) {
 
-  educ_var <- enquo(educ_var)
-
   df <- df  %>%
-    mutate(educ_variable = !!educ_var) %>%
+    mutate(educ_variable = !!sym(educ_var)) %>%
     mutate(educ_yrs = case_when(
       educ_variable == 2 ~ 0,
       educ_variable == 12 ~ 0,

@@ -2,9 +2,9 @@
 % Please edit documentation in R/create_weights_bunmd_complete.R
 \name{create_weights_bunmd_complete}
 \alias{create_weights_bunmd_complete}
-\title{Create weights
+\title{Create weights for BUNMD
 This function will weight the numident file up to HMD lexis triangles
-Restrict data to deaths from 1988 - 2005 with age_at_death between}
+Restrict data to deaths from 1988 - 2005 with age_at_death between 65 and 100.}
 \usage{
 create_weights_bunmd_complete(
   bunmd.file,
@@ -21,8 +21,8 @@ create_weights_bunmd_complete(
 data.frame
 }
 \description{
-Create weights
+Create weights for BUNMD
 This function will weight the numident file up to HMD lexis triangles
-Restrict data to deaths from 1988 - 2005 with age_at_death between
+Restrict data to deaths from 1988 - 2005 with age_at_death between 65 and 100.
 }
 \keyword{internal}

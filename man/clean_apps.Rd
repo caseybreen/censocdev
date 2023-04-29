@@ -5,8 +5,8 @@
 \title{Load Application Files}
 \usage{
 clean_apps(
- 
-    numapp.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/applications_original.csv"
+  numapp.file.path =
+    "/censoc/data/numident/1_numident_files_with_original_varnames/applications_original.csv"
 )
 }
 \arguments{

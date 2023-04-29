@@ -9,7 +9,9 @@ Restrict data to deaths from 1988 - 2005 with age_at_death between}
 create_weights_censoc_numident(
   censoc.numident,
   cohorts = c(1895:1939),
-  death_ages = c(65:100)
+  death_ages = c(65:100),
+  hmd_path =
+    "/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt"
 )
 }
 \arguments{
