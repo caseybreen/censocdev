@@ -27,10 +27,10 @@ library(censocdev)
 ## Read in the 1 percent file and the crosswalk from IPUMS
 ```{r}
 # Read in 1% IPUMS 1940 Census Extract
-ipums1pct <- fread("/data/josh/CenSoc/censoc_data/sampleIPUMS.csv") %>% rename_all(tolower)
+ipums1pct <- fread("/data/censoc/workspace/sampleIPUMS.csv") %>% rename_all(tolower)
 
 # Read crosswalk (Histid)
-xwalk <- fread("/data/josh/CenSoc/crosswalks/1940_histid_cc_1p_xwalk.txt")
+xwalk <- fread("/data/censoc/crosswalks/1940_histid_cc_1p_xwalk.txt")
 
 # Join histid to ipums1pct
 ipums1pct <- ipums1pct %>%
@@ -41,7 +41,7 @@ ipums1pct <- ipums1pct %>%
 ## Construct Censoc-Numident Demo
 ```{r}
 ## Read in linked Numident 
-numidentdata <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
+numidentdata <- fread("/data/censoc/censoc_data_releases/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
 
 # Join numident to demo by histid
 numidentdemo <- ipums1pct %>%
@@ -65,14 +65,14 @@ vars_to_keep_num <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age
 ## keep variables and rename to lower case 
 demo_file_numident <- numident2.1 %>%
   select(vars_to_keep_num) %>% 
-  rename_all(tolower) %>% 
+  rename_all(tolower) #%>% 
   censocdev::recode_education(educ_var = educd) 
 ```
 
 ## Construct CenSoc-DMF Demo
 ```{r}
 ## Read in linked demo file 
-dmfdata <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
+dmfdata <- fread("/data/censoc/censoc_data_releases/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
 
 # Join dmf to demo by histid
 dmfdata_demo <- ipums1pct %>%
@@ -94,7 +94,7 @@ vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age
 demo_file_dmf <- dmf2.1 %>%
   select(vars_to_keep_dmf) %>%
   rename(bpl = "BPLD") %>%
-  rename_all(tolower) %>% 
+  rename_all(tolower) #%>% 
   censocdev::recode_education(educ_var = educd) 
 ```
 
@@ -102,6 +102,14 @@ statefip_string and bpl_string function
 ```{r}
 # bpl_string_code<-read_csv("/data/josh/CenSoc/censoc_data/bpl_string_code.csv") %>%
 #   mutate(Code= as.factor(Code))
+
+
+
+demo_file_numident %>% 
+  mutate(statefip = as.numeric(statefip)) %>% 
+  count(statefip) %>% 
+  add_row(statefip = c(2,15), n = c(0,0))
+
 
 statefip_string_fun<-function(numident_dmf){
 #Create separate data.frame for statefip values and add Alaska and Hawaii 
@@ -131,8 +139,8 @@ demo_file_numident<-statefip_string_fun(demo_file_numident)
 demo_file_dmf<-statefip_string_fun(demo_file_dmf)
 
 ## Write out csv file 
-write_csv(demo_file_dmf, "/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv")
-write_csv(demo_file_numident, "/data/josh/CenSoc/data_release_demo_v2.1/censoc_numident_demo_v2.1.csv")
+write_csv(demo_file_dmf, "/data/censoc/censoc_data_releases/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv")
+write_csv(demo_file_numident, "/data/censoc/censoc_data_releases/data_release_demo_v2.1/censoc_numident_demo_v2.1.csv")
 ```
 
 

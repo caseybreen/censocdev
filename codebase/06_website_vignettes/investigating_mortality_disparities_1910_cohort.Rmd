@@ -36,7 +36,7 @@ library(broom)
 
 ## Read in CenSoc-DMF file 
 ## Restrict to conservative matches (fewer false matches)
-censoc_dmf <- fread("/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv") %>% 
+censoc_dmf <- fread("/data/censoc/censoc_data_releases/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv") %>% 
   filter(link_abe_exact_conservative == 1)
   
 ## Restrict to cohort of 1910
