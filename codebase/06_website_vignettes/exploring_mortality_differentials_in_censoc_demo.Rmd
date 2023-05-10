@@ -32,7 +32,7 @@ library(broom)
 library(knitr)
 
 ## make sure to update the path to your CenSoc file
-censoc_demo <- read_csv("/data/josh/CenSoc/data_release_demo_v2.1/censoc_dmf_demo_v2.1.csv")
+censoc_demo <- read_csv("/data/censoc/censoc_data_releases/censoc_dmf_demo/censoc_dmf_demo_v2.1/censoc_dmf_demo_v2.1.csv")
 
 ## set seed for reproducibility 
 set.seed(16)

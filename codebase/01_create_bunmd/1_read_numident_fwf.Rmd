@@ -1,6 +1,6 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Read in Original Numident Files"
+author: Casey Breen
 ---
 
 Background: In 2013, the Social Security Administration transferred a set of Numident records to the

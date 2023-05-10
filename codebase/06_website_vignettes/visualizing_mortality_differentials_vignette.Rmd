@@ -34,7 +34,7 @@ library(viridis)
 library(data.table)
 
 ## Read in data
-bunmd <- fread("/data/josh/CenSoc/censoc_data/bunmd_v2/bunmd_v2.csv")
+bunmd <- fread("/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv")
 ```
 
 ### Preparing Data for Analysis 

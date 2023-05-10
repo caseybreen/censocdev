@@ -1,9 +1,9 @@
 ---
-title: "Create BUNMD "
-output: html_notebook
+title: "Create Final BUNMD File"
+author: Casey Breen 
 ---
 
-Create the BUNMD file from the cleaned and "condensed" Numident files. 
+Summary: In this notebook, we create the BUNMD file by unifying the cleaned and "condensed" Numident (deaths, applications, and claims) into a single file.  
 
 The function `unify_numident` combines the information from the deaths, applications, and claims files into a file with one record per person: the Berkeley Unified Numident Mortality Database (BUNMD).
 

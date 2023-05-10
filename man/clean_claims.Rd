@@ -5,8 +5,8 @@
 \title{Load claims file}
 \usage{
 clean_claims(
- 
-    numclaim.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv"
+  numclaim.file.path =
+    "/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv"
 )
 }
 \arguments{
