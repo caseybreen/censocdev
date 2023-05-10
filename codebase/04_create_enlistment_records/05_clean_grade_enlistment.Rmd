@@ -49,10 +49,6 @@ data_combined <- read_csv(path_to_temp_data,
 
 #RECODING GRADE_CODE
 
-#read in csv of NARA AAD grade codes
-```{r}
-grade_codes <- read_csv(grade_codes_path)
-```
 #Count of grade codes
 ```{r}
 data_combined %>% 
@@ -97,14 +93,6 @@ grade_recode <- recode_grade_code_enlistment(df = data_combined) %>%
 ```
 
 #RECODING BRANCH_CODES
-
-#Read in csv with NARA AAD branch codes
-``` {r}
-branch_codes <- read_csv(branch_codes_path)
-
-```
-
-#maybe use ranges for this formula depending on what other numbers mean
 #Count of branch codes
 ```{r}
 data_combined %>% 
@@ -170,10 +158,7 @@ branch_recode <- recode_branch_code_enlistment(df = data_combined) %>%
 ```
 
 #RECODING source
-#read in csv of NARA AAD source
-```{r}
-source_codes <- read_csv(source_path)
-```
+
 #Count of source
 
 ```{r}
@@ -216,10 +201,7 @@ source_recode <- recode_source_enlistment(df = data_combined) %>%
 ```
 
 #RECODE term_or_enlistment
-#read in csv of NARA AAD term_or_enlistment
-```{r}
-term_or_enlistment_codes <- read_csv(term_or_enlistment_path)
-```
+
 #Count of term_or_enlistment
 ```{r}
 data_combined %>% 
@@ -258,10 +240,6 @@ term_or_enlistment_recode <- recode_term_or_enlistment_enlistment(df = data_comb
 ```
 
 #RECODE component
-#read in csv of NARA AAD component
-```{r}
-component_codes <- read_csv(component_path)
-```
 #Count of component
 
 ```{r}

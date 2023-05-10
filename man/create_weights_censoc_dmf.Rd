@@ -9,7 +9,9 @@ Restrict data to certain cohorts and ages at deaths}
 create_weights_censoc_dmf(
   censoc.dmf,
   cohorts = c(1895:1939),
-  death_ages = c(65:100)
+  death_ages = c(65:100),
+  hmd_path =
+    "/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt"
 )
 }
 \arguments{

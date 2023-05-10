@@ -1,0 +1,252 @@
+---
+title: "4-process-nativity-enlistment"
+output: html_document
+---
+#Adapted from code written by Ugur Yildirim
+
+# Library packages, set paths
+```{r}
+library(dplyr)   # %>%, group_by, tally, print
+library(ipumsr)  # read_ipums_ddi, ipums_val_labels
+library(readr)   # read_csv, write_csv
+library(stringr) # str_trim, str_split
+```
+
+```{r}
+path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp3.csv"
+out_path <- "//data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+# This file can be downloaded from #https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2079&dt=893&c_id=24982
+nativity_codes_path <-"/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/cl_2079.csv"
+path_to_ipums_ddi   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/fullcount.ddi.xml"
+```
+
+
+
+
+# Read in temp3
+```{r}
+data_combined <- read_csv(path_to_temp_data, 
+                          col_types = cols(
+                            empty_field = col_character(),
+                            term_or_enlistment = col_character(),
+                            longevity = col_character(),
+                            education = col_character(),
+                            marital_status = col_character(),
+                            component = col_character(),
+                            educ_spec = col_character(),
+                            defer_date_mmyy = col_character(),
+                            mname_clean = col_character(),
+                            sex = col_integer(),
+                            sex_r = col_integer(),
+                            fname_std = col_character()
+                            )
+                          )
+```
+
+```{r}
+data_combined %>% count(nativity)
+```
+
+
+# Convert nativity to place_of_birth to bpld
+
+# Reference: 
+# https://censoc.berkeley.edu/wp-content/uploads/2020/08/ipumsr_workflow_bigdata.html
+# Emails from Casey on 2020-10-07, 2020-10-08
+# https://usa.ipums.org/usa-action/variables/BPL#codes_section
+
+```{r}
+nativity_enlistment_recode <- function(df){
+  
+  ## recode grade variable
+  df <- df %>% 
+    mutate(nativity_recode = case_when(
+      nativity == "P4" ~ 52000, #AFGHANISTAN
+      nativity == "41" ~ 00100, #ALABAMA
+      nativity == "02" ~ 00200, #ALASKA
+      nativity == "R0" ~ 00200, #ALASKA
+      nativity == "N0" ~ 43000, #ALBANIA
+      nativity == "Q3" ~ 60044, #ABYSSINIA aka Ethiopia
+      nativity == "N9" ~ 43000, #ALBANIA	
+      nativity == "L4" ~ 60039, #ALGERIA or CAMEROONS or CHAD or COMOROS or DAHOMEY or FRENCH AFRICAN POSSESSIONS or FRENCH EQUATORIAL AFRICA or FRENCH GUINEA or FRENCH MOROCCO or FRENCH SOMALILAND or FRENCH SOUDAN or FRENCH WEST AFRICA or GABON or IVORY COAST or MADAGASCAR or MAURITANIA or MIDDLE CONGO or REUNION or SAHARA or SENEGAL or SOMALI COAST or TERRITORY OF NIGER or TOGO or TUNISIA or UBANGI SARI or UPPER VOLTA	coded as French West Africa
+      nativity == "O7" ~ 43600, #ANDORRA or PORTUGAL	
+      nativity == "K8" ~ 60031, #ANGLO-EGYPTIAN SUDAN or BRITISH CAMEROONS or BRITISH NORTH AFRICA or GAMBIA or GOLD COAST or NIGERIA or SIERRA LEONE or TOGOLAND or TONGA	 coded as Nigeria
+      nativity == "O7" ~ 60071, #ANGOLA or CAPE VERDE ISLANDS or MOZAMBIQUE or PORTUGESE AFRICAN POSSESSIONS or PORTUGESE GUINEA or PRINCIPE or ST THOME	coded as angola
+      nativity == "P2" ~ 54000, #ARABIA or ASIR or HEJAZ or JABEL SHAMMAR or KUWEIT or NEJD or OMAN or TRANSJORDANIA or YEMEN
+      #coded as Saudia Arabia
+      nativity == "J9" ~ 30005, #ARGENTINA
+      nativity == "P4" ~ 52000, #AFGHANISTAN
+      nativity == "98" ~ 00400, #ARIZONA  
+      nativity == "87" ~ 00500, #ARKANSAS
+      nativity == "K7" ~ 60000, #ASCENSION or BASUTOLAND or BECHUANALAND or BRITISH SOMALILAND or BRITISH SOUTH AFRICA or CAPE OF GOOD HOPE or KENYA or MAURITIUS or NATAL or NORTH RHODESIA or NYASSALAND or ORANGE FREE STATE or PEMBA or SOUTH RHODESIA or SOUTH WEST AFRICA or ST HELENA or SWAZILAND or TANGANYIKA or TRANSVAAL or UGANDA or UNION OF SOUTH AFRICA or ZANZIBAR	coded as Africa
+      nativity == "R8" ~ 90020, #AT SEA	
+      nativity == "K6" ~ 70000, #AUSTRALIA or BISMARK ISLANDS or BRITISH AUSTRALASIA AND OCEANIA or FIJI ISLANDS or NEW GUINEA or NEW ZEALAND or OTHER PACIFIC BRITISH ISLANDS or PAPUA or SOLOMON ISLANDS or TASMANIA	coded as Australia
+      nativity == "N2" ~ 45000, #AUSTRIA	
+      nativity == "L0" ~ 26043, #BAHAMAS or BARBADOS or BERMUDA or BRITISH CENTRAL AMERICA or BRITISH HONDURAS or BRITISH WEST INDIES or CAYMAN ISLANDS or JAMAICA or LEEWARD ISLANDS or TOBAGO or TRINIDAD or TURKS AND CAICOS ISLANDS or WINDWARD ISLANDS	   coded as Bahamas
+      nativity == "K5" ~ 26040, #BALUCHISTAN or BRITISH EAST INDIES AND FAR EAST or BRITISH NORTH BORNEO or BRUNEI or FEDERATED MALAY STATES or HONG KONG or SARAWAK or STRAITS SETTLEMENTS	coded as british west indies
+      nativity == "L8" ~ 60075, #BELGIAN AFRICAN POSSESSIONS or BELGIAN CONGO	coded as Congo
+      nativity == "L7" ~ 42000, #BELGIUM or LUXEMBURG	 coded as Belgium
+      nativity == "P6" ~ 52120, #BHUTAN
+      nativity == "J5" ~ 30010, #BOLIVIA
+      nativity == "J6" ~ 30015, #BRAZIL
+      nativity == "L1" ~ 46542, #BRITISH GUIANA or BRITISH SOUTH AMERICA or FALKLAND ISLANDS or GEORGIA	 coded to Georgia
+      nativity == "K4" ~ 53100, #BRITISH MEDITERRANEAN POSSESSIONS or CYPRUS or GIBRALTER or MALTA or PALESTINE	coded to Cyprus
+      nativity == "K9" ~ 15000, #BRITISH NORTH AMERICA or CANADA or LABRADOR or NEWFOUNDLAND	 coded as Canada
+      nativity == "N6" ~ 45100, #BULGARIA
+      nativity == "91" ~ 00600, #CALIFORNIA
+      nativity == "K3" ~ 52100, #CEYLON or INDIA or MALDIVE ISLANDS	  CODED TO India
+      nativity == "K1" ~ 41000, #CHANNEL ISLANDS or ENGLAND or GREAT BRITAIN or ISLE OF MAN or NORTHERN IRELAND or SCOTLAND or WALES	coded as England
+      nativity == "J8" ~ 30020, #CHILE
+      nativity == "P8" ~ 50000, #CHINA or MONGOLIA or SINKIAN or TIBET	
+      nativity == "Q1" ~ 50200, #CHOSEN or FORMOSA or JAPANESE ASIATIC POSSESSIONS or JAPANESE PACIFIC ISLANDS or KWANGTUNG or KOREA	 coded to Korea
+      nativity == "J1" ~ 30025, #COLOMBIA
+      nativity == "11" ~ 00900, #CONNECTICUT	
+      nativity == "!6" ~ 21020, #COSTA RICA	
+      nativity == "X6" ~ 21020, #COSTARICA
+      nativity == "!8" ~ 25000, #CUBA
+      nativity == "X8" ~ 25000, #CUBA
+      nativity == "M1" ~ 26074, #CURACAO or DUTCH AMERICAN POSSESSIONS or DUTCH GUIANA	  
+      nativity == "O1" ~ 60065, #CYRENAICA or ERITREA or ITALIAN AFRICAN POSSESSIONS or ITALIAN SOMALILAND or TRIPOLITANIA
+      #coded to eritria
+      nativity == "N4" ~ 45200, #CZECHOSLOVAKIA
+      nativity == "M3" ~ 40200, #DANISH ISLAND POSSESSIONS or FAROE ISLANDS or GREENLAND or ICELAND	
+      #coded to iceland
+      nativity == "N1" ~ 45300, #DANZIG or GERMANY	coded to Germany
+      nativity == "21" ~ 01000, #DELAWARE
+      nativity == "M2" ~ 40000, #DENMARK
+      nativity == "34" ~ 01100, #DIST OF COLUMBIA	
+      nativity == "J0" ~ 26010, #DOMINICAN REPUBLIC or SANTO DOMINGO	  coded to DR 
+      nativity == "M0" ~ 26070, #DUTCH ASIATIC POSSESSIONS or DUTCH EAST INDIES	coded to dutch west indies
+      nativity == "J3" ~ 30030, #ECUADOR
+      nativity == "Q2" ~ 60012, #EGYPT
+      nativity == "M7" ~ 46000, #ESTHONIA
+      nativity == "Q4" ~ 60044, #ETHIOPIA
+      nativity == "M6" ~ 40100, #FINLAND
+      nativity == "42" ~ 01200, #FLORIDA
+      nativity == "L2" ~ 42100, #FRANCE or MONACO	coded to france  
+      nativity == "L5" ~ 30035, #FRENCH AMERICAN POSSESSIONS or FRENCH GUIANA or GUADELOUPE or MARTINIQUE or ST PIERRE AND MIQUELON	 coded to french guiana
+    nativity == "L3" ~ 54100, #FRENCH ASIATIC POSSESSIONS or FRENCH INDIA or FRENCH INDO-CHINA or SYRIA	 coded to syria
+      nativity == "L6" ~ 71022, #FRENCH PACIFIC ISLANDS or NEW CALEDONIA or TAHITI	coded to French Polynesia 
+      nativity == "43" ~ 01300, #GEORGIA
+      nativity == "N7" ~ 43300, #GREECE
+      nativity == "!2" ~ 21040, #GUATEMALA
+      nativity == "X2" ~ 21040, #GUATEMALA
+      nativity == "X9" ~ 26020, #HAITI
+      nativity == "!9" ~ 26020, #HAITI  
+      nativity == "03" ~ 01500, #HAWAII
+      nativity == "R2" ~ 01500, #HAWAIIAN ISLANDS	
+      nativity == "L9" ~ 42500, #HOLLAND or NETHERLANDS	
+      nativity == "X3" ~ 21050, #HONDURAS
+      nativity == "!3" ~ 21050, #HONDURAS
+      nativity == "N3" ~ 45400, #HUNGARY
+      nativity == "92" ~ 01600, #IDAHO
+      nativity == "P4" ~ 52000, #AFGHANISTAN
+      nativity == "O4" ~ 60014, #IFNI or RIO DE ORO or SPANISH AFRICAN POSSESSIONS or SPANISH GUINEA or SPANISH MOROCCO	coded to morocco 
+      nativity == "61" ~ 01700, #ILLINOIS
+      nativity == "51" ~ 01800, #INDIANA
+      nativity == "72" ~ 01900, #IOWA
+      nativity == "P1" ~ 53200, #IRAQ or MESOPOTAMIA	coded to iraq
+      nativity == "K2" ~ 41400, #IRISH FREE STATE	coded to ireland
+      nativity == "O0" ~ 43400, #ITALY or SAN MARINO	 coded to italy
+      nativity == "QO" ~ 50100, #JAPAN
+      nativity == "N8" ~ 45700, #JUGOSLAVIA or MONTENEGRO or YUGOSLAVIA	 coded to yugoslavia
+      nativity == "73" ~ 02000, #KANSAS
+      nativity == "52" ~ 02100, #KENTUCKY
+      nativity == "M8" ~ 46100, #LATVIA
+      nativity == "O8" ~ 60027, #LIBERIA  
+      nativity == "O2" ~ 42600, #LICHTENSTEIN or SWITZERLAND	
+      nativity == "M9" ~ 46200, #LITHUANIA
+      nativity == "88" ~ 02200, #LOUISIANA
+      nativity == "O6" ~ 50020, #MACAO or PORTUGESE ASIATIC POSSESSIONS or PORTUGESE INDIA or PORTUGESE TIMOR	coded to Macau
+      nativity == "12" ~ 02300, #MAINE
+      nativity == "P9" ~ 50100, #MANCHOUKUO coded to JAPAN
+      nativity == "13" ~ 02500, #MASSACHUSETTS   
+      nativity == "X1" ~ 20000, #MEXICO
+      nativity == "!1" ~ 20000, #MEXICO
+      nativity == "62" ~ 02600, #MICHIGAN
+      nativity == "74" ~ 02700, #MINNESOTA
+      nativity == "45" ~ 02800, #MISSISSIPPI
+      nativity == "75" ~ 02900, #MISSOURI
+      nativity == "93" ~ 03000, #MONTANA   
+      nativity == "76" ~ 03100, #NEBRASKA
+      nativity == "P5" ~ 52400, #NEPAL
+      nativity == "94" ~ 03200, #NEVADA
+      nativity == "14" ~ 03300, #NEW HAMPSHIRE	
+      nativity == "22" ~ 03400, #NEW JERSEY	
+      nativity == "83" ~ 03500, #NEW MEXICO	   
+      nativity == "23" ~ 03600, #NEW YORK	
+      nativity == "X5" ~ 21060, #NICARAGUA
+      nativity == "!5" ~ 21060, #NICARAGUA
+      nativity == "46" ~ 52000, #North Carolina	
+      nativity == "77" ~ 03800, #NORTH DAKOTA	
+      nativity == "M4" ~ 40400, #NORWAY or SPITZBERGEN	coded to norway
+      nativity == "53" ~ 03900, #OHIO   
+      nativity == "84" ~ 04000, #OKLAHOMA
+      nativity == "95" ~ 04100, #OREGON
+      nativity == "X7" ~ 21070, #PANAMA
+      nativity == "!7" ~ 21070, #PANAMA
+      nativity == "R1" ~ 21070, #PANAMA
+      nativity == "41" ~ 21070, #PANAMA
+      nativity == "06" ~ 21070, #PANAMA
+      nativity == "J7" ~ 30060, #PARAGUAY   
+      nativity == "32" ~ 042, #PENNSYLVANIA
+      nativity == "P3" ~ 52200, #PERSIA
+      nativity == "J4" ~ 30050, #PERU
+      nativity == "R3" ~ 51500, #PHILIPPINE ISLANDS
+      nativity == "07" ~ 51500, #PHILIPPINE ISLANDS	
+      nativity == "N0" ~ 45500, #POLAND   
+      nativity == "08" ~ 25000, #PUERTO RICO (INCLUDING VIRGIN ISLANDS AND CUBA)	
+      nativity == "R4" ~ 11000, #PUERTO RICO 	
+      nativity == "15" ~ 04400, #RHODE ISLAND	
+      nativity == "N5" ~ 45600, #ROUMANIA
+      nativity == "O9" ~ 46530, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS 
+      nativity == "O9" ~ 46200, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
+      nativity == "O9" ~ 46100, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
+      nativity == "O9" ~ 46000, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
+      nativity == "O9" ~ 45900, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS	
+      nativity == "O9" ~ 46500, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS	   
+      nativity == "X4" ~ 21030, #SALVADOR
+      nativity == "!4" ~ 21030, #SALVADOR
+      nativity == "P7" ~ 51700, #SIAM aka THAILAND
+      nativity == "47" ~ 04500, #SOUTH CAROLINA	
+      nativity == "78" ~ 00100, #SOUTH DAKOTA	   
+      nativity == "O3" ~ 43800, #SPAIN
+      nativity == "M5" ~ 40500, #SWEDEN
+      nativity == "48" ~ 04700, #TENNESSEE
+      nativity == "85" ~ 04800, #TEXAS
+      nativity == "P0" ~ 54200, #TURKEY   
+      nativity == "R5" ~ 09900, #UNITED STATES	
+      nativity == "P4" ~ 52000, #AFGHANISTAN
+      nativity == "K0" ~ 30060, #URUGUAY
+      nativity == "96" ~ 04900, #UTAH
+      nativity == "J2" ~ 30065, #VENEZUELA   
+      nativity == "16" ~ 05000, #VERMONT
+      nativity == "33" ~ 05100, #VIRGINIA
+      nativity == "97" ~ 05300, #WASHINGTON
+      nativity == "54" ~ 05400, #WEST VIRGINIA	
+      nativity == "63" ~ 05500, #WISCONSIN   
+      nativity == "79" ~ 05600, #WYOMING
+
+      TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+```
+
+#apply function to df
+```{r}
+nativity_recode <- nativity_enlistment_recode(df = data_combined) %>% 
+  select(nativity, nativity_recode)
+```
+
+#Add columns with recoded data to data_combined
+```{r}
+data_combined <- cbind(data_combined, nativity_recode$nativity_recode)
+```
+# Save processed dataset
+```{r}
+write_csv(data_combined, paste0(out_path, "/temp4.csv"))
+rm(list = ls())
+```

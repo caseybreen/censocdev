@@ -44,10 +44,8 @@ data_combined <- read_csv(path_to_temp_data,
 ```{r}
 colnames(data_combined)
 
-enlistment_records_final_v1 <- subset(data_combined, select = c("unique_id", "name" , "sex_r", "yob_precise", "date_of_enlistment_dd", "date_of_enlistment_mm","date_of_enlistment_yy", "nativity_clean" ,"serial_number" , "residence_county", "place_of_enlistment","weight",
-"card_number", "source_recode$source_recode","grade_recode$grade_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "branch_recode$branch_code_recode","component_recode$component_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode","education_recode$education_recode","marital_status_recode$marital_status_recode", "ht_recode", "civ_occupation_recode" ))
+enlistment_records_final_v1 <- subset(data_combined, select = c( "serial_number",  "yob_precise", "fname_clean" , "mname_clean" ,"lname_clean", "sex_r", "date_enlistment_recode", "nativity_recode$nativity_recode" , "residence_county", "residence_state", "place_of_enlistment","education_recode$education_recode","grade_recode$grade_code_recode",  "branch_recode$branch_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode", "civ_occupation_recode$civ_occupation_recode" ,"marital_status_recode$marital_status_recode", "ht_recode", "weight" ,"component_recode$component_recode","source_recode$source_recode"))
 
-#TO DO: pick which name, sex variable to include, rename cols
 ```
 #test df by looking at the first 200 rows
 ```{r}
@@ -55,10 +53,12 @@ head(enlistment_records_final_v1, 200)
 ```
 #rename columns
 ```{r}
-enlistment_records_final_v1 <- enlistment_records_final_v1 %>% 
-        rename("sex" ="sex_r" , 
-               "yob" = "yob_precise" ,
-               "place_of_birth" = "nativity_clean" ,
+enlistment_records_final <- enlistment_records_final_v1 %>% 
+        rename(  
+               "fname" = "fname_clean",
+               "mname" = "mname_clean",
+               "lname" = "lname_clean",
+               "place_of_birth" = "nativity_recode$nativity_recode" ,
                "weight_or_AGCT" = "weight" , 
                "source" = "source_recode$source_recode" ,
                "grade_code" = "grade_recode$grade_code_recode" , 
@@ -70,7 +70,7 @@ enlistment_records_final_v1 <- enlistment_records_final_v1 %>%
                "education" = "education_recode$education_recode" ,
                "marital_status" = "marital_status_recode$marital_status_recode" , 
                "height" = "ht_recode",
-               "civilian_occupation" = "civ_occupation_recode" )
+               "civilian_occupation" = "civ_occupation_recode$civ_occupation_recode" )
 ```
 
 

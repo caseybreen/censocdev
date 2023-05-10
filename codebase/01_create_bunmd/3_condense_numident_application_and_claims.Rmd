@@ -1,6 +1,6 @@
 ---
-title: "Condense Numident Entries"
-output: html_notebook
+title: "Condense numident entries"
+author: Casey Breen 
 ---
 
 In this notebook, we take cleaned application files and claims files and "condense" them to select the best record per person.

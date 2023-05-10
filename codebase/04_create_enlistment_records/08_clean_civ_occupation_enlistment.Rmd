@@ -13,7 +13,7 @@ library(stringr) # str_trim, str_split
 
 #NEED TO UPDATE PATH_TO_TEMP_DATA BEFORE FINAL RELEASE
 ```{r}
-path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp6.csv"
+path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp7.csv"
 out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
 civ_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_3323.csv"
 ```
@@ -653,6 +653,6 @@ data_combined <- cbind(data_combined, civ_occupation_recode$civ_occupation_recod
 
 #save dataset as temp7
 ```{r}
-write_csv(data_combined, paste0(out_path, "/temp7.csv"))
+write_csv(data_combined, paste0(out_path, "/temp8.csv"))
 rm(list = ls())
 ```

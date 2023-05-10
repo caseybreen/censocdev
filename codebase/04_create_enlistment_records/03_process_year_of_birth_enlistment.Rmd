@@ -5,8 +5,10 @@ output: html_document
 
 
 ```{r}
+library(tidyverse) ## ggplot, dplyr, readr, etc. 
 library(dplyr) # %>%, group_by, tally, print
 library(readr) # read_csv, write_csv
+library(lubridate) #as_date
 ```
 
 #Set path to temp data & outpath
@@ -37,8 +39,6 @@ data_combined <- read_csv(path_to_temp_data,
                           )
 
 ```
-
-
 
 # Process year_of_birth
 
@@ -102,8 +102,38 @@ data_combined$yob_precise <- apply(data_combined, 1, determine_yob) # SLOW
 sum(is.na(data_combined$yob_precise)) # 98742
 ```
 
-# Save processed dataset
 ```{r}
+## create new date variable 
+data_combined <- data_combined %>% 
+  mutate(date_of_enlistment_yy = as.numeric(date_of_enlistment_yy) + 1900) %>% 
+  mutate(date_enlistment_recode = make_date(date_of_enlistment_yy, date_of_enlistment_mm, date_of_enlistment_dd))
+
+## check dates look reasonable and are in yyyy-mm-dd format (match v1 release)
+data_combined %>%
+  count(date_enlistment_recode) %>% 
+  arrange(desc(n))
+
+## visualize distribution (loooks reasonable - identical pattern to v1 release)
+data_combined %>%
+  filter(date_of_enlistment_yy %in% c(1938:1947)) %>% ## restrict to years around WWII 
+  mutate(date_short = format(as.Date(date_enlistment_recode), "%Y-%m")) %>% 
+    group_by(date_short) %>% 
+    tally() %>% 
+    filter(!is.na(date_short)) %>%
+  ggplot(aes(x=date_short, y=n, group=1)) +
+  geom_line() +
+  geom_point() +
+  scale_x_discrete(breaks = paste0(seq(1938, 1947, 1), "-01")) +
+  theme_minimal(base_size = 15) +
+  ggtitle("Enlistment Date (Month and Year Only)") +
+  labs(x = "Date (yyyy-mm)", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) +
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+```{r}
+# Save processed dataset
 write_csv(data_combined, paste0(out_path, "/temp3.csv"))
 rm(list = ls())
 
