@@ -65,7 +65,7 @@ vars_to_keep_num <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age
 ## keep variables and rename to lower case 
 demo_file_numident <- numident2.1 %>%
   select(vars_to_keep_num) %>% 
-  rename_all(tolower) #%>% 
+  rename_all(tolower) %>% 
   censocdev::recode_education(educ_var = educd) 
 ```
 
@@ -94,7 +94,7 @@ vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age
 demo_file_dmf <- dmf2.1 %>%
   select(vars_to_keep_dmf) %>%
   rename(bpl = "BPLD") %>%
-  rename_all(tolower) #%>% 
+  rename_all(tolower) %>% 
   censocdev::recode_education(educ_var = educd) 
 ```
 
