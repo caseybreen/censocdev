@@ -39,6 +39,183 @@ data_combined <- read_csv(path_to_temp_data,
                           )
 ```
 
+```{r}
+data_combined %>% 
+  count(residence_state) 
+```
+```{r}
+recode_res_state_enlistment <- function(df){
+  
+  ## recode source variable
+  df <- df %>% 
+    mutate(state_recode = case_when(
+      residence_state == "41" ~ 41, #ALABAMA	
+      residence_state == "D1" ~ 41, #ALABAMA	
+      residence_state == "M1" ~ 41, #ALABAMA	
+      residence_state == "02" ~ 81,#Alaska
+      residence_state == "R0" ~ 81, #Alaska	
+      residence_state == "N9" ~ 81, #Alaska
+      residence_state == "98" ~ 61, #ARIZONA
+      residence_state == "I8" ~ 61, #ARIZONA
+      residence_state == "R8" ~ 61, #ARIZONA
+      residence_state == "87" ~ 42, #ARKANSAS
+      residence_state == "H7" ~ 42, #ARKANSAS
+      residence_state == "Q7" ~ 42, #ARKANSAS
+            residence_state == "91" ~ 71, #CALIFORNIA
+      residence_state == "I1" ~ 71, #CALIFORNIA
+      residence_state == "R1" ~ 71, #CALIFORNIA
+      residence_state == "70" ~ 62, #COLORADO
+      residence_state == "G0" ~ 62, #COLORADO
+      residence_state == "P0" ~ 62, #COLORADO
+            residence_state == "11" ~ 01, #CONNECTICUT
+      residence_state == "A1" ~ 01, #CONNECTICUT
+      residence_state == "J1" ~ 01, #CONNECTICUT
+      residence_state == "21" ~ 11, #DELAWARE
+      residence_state == "B1" ~ 11, #DELAWARE
+      residence_state == "K1" ~ 11, #DELAWARE
+            residence_state == "34" ~ 98, #DISTRICT OF COLUMBIA	
+      residence_state == "C4" ~ 98, #DISTRICT OF COLUMBIA	
+      residence_state == "L4" ~ 98, #DISTRICT OF COLUMBIA	
+      residence_state == "42" ~ 43, #FLORIDA
+      residence_state == "D2" ~ 43, #FLORIDA
+      residence_state == "M2" ~ 43, #FLORIDA
+            residence_state == "43" ~ 44, #GEORGIA
+      residence_state == "D3" ~ 44, #GEORGIA
+      residence_state == "R8" ~ 44, #GEORGIA
+      residence_state == "03" ~ 82, #HAWAII
+      residence_state == "92" ~ 63, #IDAHO
+      residence_state == "I2" ~ 63, #IDAHO
+            residence_state == "R2" ~ 63, #IDAHO
+      residence_state == "61" ~ 21, #ILLINOIS
+      residence_state == "F1" ~ 21, #ILLINOIS
+      residence_state == "O1" ~ 21, #ILLINOIS
+      residence_state == "51" ~ 22, #INDIANA	
+      residence_state == "E1" ~ 22, #INDIANA	
+            residence_state == "N1" ~ 22, #INDIANA	
+      residence_state == "72" ~ 31, #IOWA
+      residence_state == "G2" ~ 31, #IOWA
+      residence_state == "P2" ~ 31, #IOWA
+      residence_state == "73" ~ 32, #KANSAS
+      residence_state == "G3" ~ 32, #KANSAS
+            residence_state == "P3" ~ 32, #KANSAS
+      residence_state == "52" ~ 51, #KENTUCKY
+      residence_state == "E2" ~ 51, #KENTUCKY
+      residence_state == "N2" ~ 51, #KENTUCKY
+      residence_state == "88" ~ 45, #LOUISIANA
+      residence_state == "H8" ~ 45, #LOUISIANA
+            residence_state == "Q8" ~ 45, #LOUISIANA
+      residence_state == "12" ~ 02, #MAINE
+      residence_state == "A2" ~ 02, #MAINE
+      residence_state == "J2" ~ 02, #MAINE
+      residence_state == "31" ~ 52, #MARYLAND
+      residence_state == "C1" ~ 52, #MARYLAND
+            residence_state == "L1" ~ 52, #MARYLAND
+      residence_state == "13" ~ 03, #MASSACHUSETTS
+      residence_state == "A3" ~ 03, #MASSACHUSETTS
+      residence_state == "J3" ~ 03, #MASSACHUSETTS
+      residence_state == "62" ~ 23, #MICHIGAN
+      residence_state == "F2" ~ 23, #MICHIGAN
+            residence_state == "O2" ~ 23, #MICHIGAN
+      residence_state == "74" ~ 33, #MINNESOTA
+      residence_state == "G4" ~ 33, #MINNESOTA
+      residence_state == "P4" ~ 33, #MINNESOTA
+      residence_state == "45" ~ 46, #MISSISSIPPI
+            residence_state == "D5" ~ 46, #MISSISSIPPI
+      residence_state == "M5" ~ 46, #MISSISSIPPI
+      residence_state == "75" ~ 34, #MISSOURI
+      residence_state == "G5" ~ 34, #MISSOURI
+      residence_state == "P5" ~ 34, #MISSOURI
+      residence_state == "93" ~ 64, #MONTANA
+            residence_state == "I3" ~ 64, #MONTANA
+      residence_state == "38" ~ 64, #MONTANA
+      residence_state == "76" ~ 35, #NEBRASKA
+      residence_state == "G6" ~ 35, #NEBRASKA
+      residence_state == "P6" ~ 35, #NEBRASKA
+            residence_state == "94" ~ 65, #NEVADA
+      residence_state == "I4" ~ 65, #NEVADA
+      residence_state == "R4" ~ 65, #NEVADA
+      residence_state == "14" ~ 04, #NEW HAMPSHIRE	
+      residence_state == "A4" ~ 04, #NEW HAMPSHIRE	
+      residence_state == "J4" ~ 04, #NEW HAMPSHIRE	
+            residence_state == "22" ~ 12, #JERSEY
+      residence_state == "B2" ~ 12, #JERSEY
+      residence_state == "K2" ~ 12, #JERSEY
+      residence_state == "83" ~ 66, #NEW MEXICO	
+      residence_state == "H3" ~ 66, #NEW MEXICO	
+            residence_state == "Q3" ~ 66, #NEW MEXICO	
+      residence_state == "23" ~ 13,  #NEW YORK	
+      residence_state == "B3" ~ 13, #NEW YORK	
+      residence_state == "K3" ~ 13, #NEW YORK	
+      residence_state == "46" ~ 47, #NORTH CAROLINA	
+      residence_state == "D6" ~ 47, #NORTH CAROLINA	
+            residence_state == "M6" ~ 47, #NORTH CAROLINA	
+      residence_state == "77" ~ 36, #NORTH DAKOTA	
+      residence_state == "G7" ~ 36, #NORTH DAKOTA	
+      residence_state == "P7" ~ 36, #NORTH DAKOTA	
+      residence_state == "53" ~ 24, #OHIO
+            residence_state == "E3" ~ 24, #OHIO
+      residence_state == "N3" ~ 24, #OHIO
+      residence_state == "84" ~ 53, #OKLAHOMA
+      residence_state == "H4" ~ 53, #OKLAHOMA
+      residence_state == "Q4" ~ 53, #OKLAHOMA
+      residence_state == "95" ~ 72, #OREGON
+            residence_state == "I5" ~ 72, #OREGON
+      residence_state == "R5" ~ 72, #OREGON
+      residence_state == "32" ~ 14, #PENNSYLVANIA
+      residence_state == "C2" ~ 14, #PENNSYLVANIA
+      residence_state == "L2" ~ 14, #PENNSYLVANIA
+            residence_state == "08" ~ 83, #PUERTO RICO
+      residence_state == "15" ~ 05, #RHODE ISLAND	
+      residence_state == "A5" ~ 05, #RHODE ISLAND	
+      residence_state == "J5" ~ 05, #RHODE ISLAND	
+      residence_state == "47" ~ 48, #SOUTH CAROLINA	
+      residence_state == "D7" ~ 48, #SOUTH CAROLINA	
+            residence_state == "M7" ~ 48, #SOUTH CAROLINA	
+      residence_state == "78" ~ 37, #SOUTH DAKOTA	
+      residence_state == "G8" ~ 37, #SOUTH DAKOTA	
+      residence_state == "P8" ~ 37, #SOUTH DAKOTA	
+      residence_state == "48" ~ 54, #TENNESSEE	
+            residence_state == "D8" ~ 54, #TENNESSEE	
+      residence_state == "M8" ~ 54, #TENNESSEE	
+      residence_state == "85" ~ 49, #TEXAS
+      residence_state == "H5" ~ 49, #TEXAS
+      residence_state == "Q5" ~ 49, #TEXAS
+      residence_state == "96" ~ 67, #UTAH
+            residence_state == "I6" ~ 67, #UTAH
+      residence_state == "R6" ~ 67, #UTAH
+      residence_state == "16" ~ 06, #VERMONT
+      residence_state == "A6" ~ 06, #VERMONT
+      residence_state == "J6" ~ 06, #VERMONT
+            residence_state == "33" ~ 4, #VIRGINIA
+      residence_state == "C3" ~ 40, #VIRGINIA
+      residence_state == "L3" ~ 40, #VIRGINIA
+      residence_state == "97" ~ 40, #WASHINGTON
+      residence_state == "I7" ~ 73, #WASHINGTON
+      residence_state == "R7" ~ 73, #WASHINGTON
+            residence_state == "54" ~ 56, #WEST VIRGINIA	
+      residence_state == "E4" ~ 56, #WEST VIRGINIA	
+      residence_state == "N4" ~ 56, #WEST VIRGINIA	
+      residence_state == "63" ~ 25, #WISCONSIN
+      residence_state == "F3" ~ 25, #WISCONSIN
+            residence_state == "O3" ~ 25, #WISCONSIN
+      residence_state == "79" ~ 8, #WYOMING
+      residence_state == "G9" ~ 9,#WYOMING 
+      residence_state == "P9" ~ 3, #WYOMING
+      residence_state == "&" ~ 12, #WYOMING
+      TRUE ~ NA_real_     
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+
+```
+
+```{r}
+data_combined %>% 
+  count(residence_county) 
+```
+
 #Load csv with NARA AAD codes
 ```{r}
 civ_occupation_codes <- read_csv(civ_path)

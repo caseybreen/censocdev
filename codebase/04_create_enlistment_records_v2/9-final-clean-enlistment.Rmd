@@ -58,8 +58,11 @@ enlistment_records_final <- enlistment_records_final_v1 %>%
         rename(  
                "fname" = "fname_clean",
                "mname" = "mname_clean",
-               "lname" = "lname_clean",
-               "place_of_birth" = "nativity_recode$nativity_recode" ,
+                "lname" = "lname_clean",
+               "sex" = "sex_r",
+               "byear" = "yob_precise",
+               "bpl"="nativity_recode$nativity_recode"  ,
+               "date_of_enlistment" = "date_enlistment_recode",
                "weight_or_AGCT" = "weight" , 
                "source" = "source_recode$source_recode" ,
                "grade_code" = "grade_recode$grade_code_recode" , 
@@ -74,10 +77,13 @@ enlistment_records_final <- enlistment_records_final_v1 %>%
                "civilian_occupation" = "civ_occupation_recode$civ_occupation_recode" )
 ```
 
+```{r}
+head(enlistment_records_final, 200)
+```
 
 #save final dataset
 ```{r}
-write_csv(enlistment_records_final_v1, paste0(out_path, "/finalenlistment.csv"))
+write_csv(enlistment_records_final, paste0(out_path, "/finalenlistment.csv"))
 rm(list = ls())
 ```
 

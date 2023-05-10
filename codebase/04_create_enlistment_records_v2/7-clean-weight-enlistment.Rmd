@@ -98,41 +98,11 @@ height_recode <- recode_height_enlistment(df = data_combined) %>%
   select(height)
 ```
 
-
-#Filter column by people with enlistment dates prior to March 1943– all those will be weights
-
-#look at height and weight/AGCT vars
-```{r}
-data_combined %>% 
-  count(date_of_enlistment_mm) 
-
-data_combined %>% 
-  count(date_of_enlistment_yy) 
-```
-
-#filter data_combined to cases with enlistment dates prior to March 1943
-```{r}
-recode_weight_pre_43 <- function(df){
-df <- df %>% filter(date_of_enlistment_mm <= 03 & date_of_enlistment_yy <= 43 ) %>%
-  mutate(weight_pre_43 = case_when(
-    date_of_enlistment_mm <= 03 & date_of_enlistment_yy <= 43 ~ "weight",
-     TRUE ~ NA_character_     ## this recodes anything remaining to NA (this is better than blank)
-      ))
-  
-
-return(df)
-}
-```
-
-```{r}
-wt_recode <- recode_weight_pre_43(df = data_combined) %>% 
-  select(weight, weight_pre_43)
-```
 #Classify all people with a variable lower than 97 as an AGCT score and higher than 147 as weight 
 ```{r}
 recode_AGCT_wt <- function(df){
   df <- df%>% mutate(AGCT_wt = case_when(
-    weight <= 97 ~ "weight",
+    weight <= 97 ,
     weight >= 147 ~ "AGCT Score",
     TRUE ~ NA_character_
   ))
@@ -144,6 +114,40 @@ recode_AGCT_wt <- function(df){
 AGCT_wt_recode <- recode_AGCT_wt(df = data_combined) %>% 
   select(weight, AGCT_wt)
 ```
+
+
+
+
+#Filter column by people with enlistment dates prior to March 1943– all those will be weights
+
+#look at height and weight/AGCT vars
+```{r}
+data_combined %>% 
+  count(date_of_enlistment_mm) 
+
+data_combined %>% 
+  count(date_of_enlistment_yy) 
+colnames(data_combined)
+```
+
+
+```{r}
+recode_weight_pre_43 <- function(df){
+df <- df %>% 
+  mutate(wt_recode = if_else(date_of_enlistment_ddmmyy <= "010343", 
+                                weight, NA_character_))
+  
+
+return(df)
+}
+```
+
+
+```{r}
+wt_recode1 <- recode_weight_pre_43(df = data_combined) %>% 
+  select(weight, wt_recode)
+```
+
 
 #plot weight/AGCT with Date_of_enlistment_ddmmyy faceted by place_of_enlistment
 
@@ -172,9 +176,12 @@ height_recode1 <- ht_recode_enlistment(df = data_combined) %>%
 
 
 ```{r}
-data_combined <- cbind(data_combined, height_recode1)
+data_combined <- cbind(data_combined, height_recode1$ht_recode, wt_recode)
 ```
 
+```{r}
+data_combined %>% count(height_recode1)
+```
 
 ```{r}
 write_csv(data_combined, paste0(out_path, "/temp7.csv"))
