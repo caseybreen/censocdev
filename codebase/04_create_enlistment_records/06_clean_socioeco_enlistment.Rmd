@@ -140,16 +140,16 @@ recode_education_enlistment <- function(df){
   ## recode education variable
   df <- df %>% 
     mutate(education_recode = case_when(
-      education == 0 ~ 00,
-      education == 1 ~ 01,
-      education == 2 ~ 02,
-      education == 3 ~ 03,
-      education == 4 ~ 04,
-      education == 5 ~ 05,
-      education == 6 ~ 06,
-      education == 7 ~ 07,
-      education == 8 ~ 08,
-      education == 9 ~ 09,
+      education == 0 ~ 01,
+      education == 1 ~ 03,
+      education == 2 ~ 04,
+      education == 3 ~ 05,
+      education == 4 ~ 06,
+      education == 5 ~ 07,
+      education == 6 ~ 08,
+      education == 7 ~ 09,
+      education == 8 ~ 10,
+      education == 9 ~ 11,
       TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
     ))
   

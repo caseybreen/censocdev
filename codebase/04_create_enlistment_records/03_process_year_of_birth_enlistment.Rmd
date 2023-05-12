@@ -114,7 +114,7 @@ data_combined %>%
   arrange(desc(n))
 
 ## visualize distribution (loooks reasonable - identical pattern to v1 release)
-data_combined %>%
+enliste <- data_combined %>%
   filter(date_of_enlistment_yy %in% c(1938:1947)) %>% ## restrict to years around WWII 
   mutate(date_short = format(as.Date(date_enlistment_recode), "%Y-%m")) %>% 
     group_by(date_short) %>% 
@@ -130,6 +130,11 @@ data_combined %>%
        y = "Count") + 
   scale_y_continuous(labels = scales::comma) +
   theme(axis.text.x = element_text(angle = 45))
+```
+#save image for tech report
+```{r}
+library(here)
+ggsave(plot = enliste, filename = here("~/censoc_new/censocdev/codebase/04_create_enlistment_records/dateofenlist.png"), height = 5, width = 9)
 ```
 
 ```{r}

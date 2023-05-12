@@ -43,6 +43,7 @@ data_combined <- read_csv(path_to_temp_data,
 data_combined %>% 
   count(residence_state) 
 ```
+
 ```{r}
 recode_res_state_enlistment <- function(df){
   
@@ -212,8 +213,8 @@ recode_res_state_enlistment <- function(df){
 ```
 
 ```{r}
-data_combined %>% 
-  count(residence_county) 
+res_state_recode <- recode_res_state_enlistment(df = data_combined) %>% 
+  select(residence_state, state_recode)
 ```
 
 #Load csv with NARA AAD codes
@@ -824,7 +825,7 @@ civ_occupation_recode <- recode_civ_occupation_enlistment(df = data_combined) %>
 
 #add civ_occupation_recode to data_combined
 ```{r}
-data_combined <- cbind(data_combined, civ_occupation_recode$civ_occupation_recode)
+data_combined <- cbind(data_combined, civ_occupation_recode$civ_occupation_recode, res_state_recode$state_recode)
 
 ```
 

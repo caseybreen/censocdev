@@ -134,7 +134,7 @@ colnames(data_combined)
 ```{r}
 recode_weight_pre_43 <- function(df){
 df <- df %>% 
-  mutate(wt_recode = if_else(date_of_enlistment_ddmmyy <= "010343", 
+  mutate(wt_recode = if_else(date_of_enlistment_ddmmyy < "010343", 
                                 weight, NA_character_))
   
 
@@ -176,11 +176,11 @@ height_recode1 <- ht_recode_enlistment(df = data_combined) %>%
 
 
 ```{r}
-data_combined <- cbind(data_combined, height_recode1$ht_recode, wt_recode)
+data_combined <- cbind(data_combined, height_recode1$ht_recode, wt_recode1$wt_recode)
 ```
 
 ```{r}
-data_combined %>% count(height_recode1)
+data_combined %>% count(wt_recode1$wt_recode)
 ```
 
 ```{r}
