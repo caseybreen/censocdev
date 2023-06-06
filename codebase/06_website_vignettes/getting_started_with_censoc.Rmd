@@ -17,7 +17,8 @@ The CenSoc datasets link the complete-count 1940 U.S. Census to Social Security 
 2. Download 1940 Census data from IPUMS-USA [[Link](https://usa.ipums.org/usa/)]
 3. Merge CenSoc and 1940 Census files on `HISTID` variable
 
-The figure below gives an overview of how researchers merge together the CenSoc file and the 1940 Census file on the unique identifier variable  `HISTID` to create their final dataset for analysis.  
+The figure below gives an overview of how researchers merge together the CenSoc file and the 1940 Census file on the unique identifier variable  `HISTID` to create their final dataset for analysis.
+
 ```{r echo = F, fig.align = 'center', out.width = "100%", fig.cap = "**Figure 1:** Illustration of merging the CenSoc-DMF to an IPUMS 1940 Census data extract."}
 knitr::include_graphics("figures/censoc_overview_figure.png")
 ```
@@ -28,7 +29,7 @@ knitr::include_graphics("figures/censoc_overview_figure.png")
 
 ## Downloading CenSoc File
 
-Download the CenSoc-DMF or CenSoc-Numident file from: [https://censoc-download.demog.berkeley.edu](https://censoc-download.demog.berkeley.edu/)
+Download the CenSoc-DMF or CenSoc-Numident file from: [https://censoc.berkeley.edu/data/](https://censoc.berkeley.edu/data/)
 
 Whether the CenSoc-DMF or CenSoc-Numident file is a better choice for your analysis will depend on the research question. See the [data](https://censoc.org/data/) page for more information. 
 
