@@ -189,7 +189,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "41" ~ 21070, #PANAMA
       nativity == "06" ~ 21070, #PANAMA
       nativity == "J7" ~ 30060, #PARAGUAY   
-      nativity == "32" ~ 042, #PENNSYLVANIA
+      nativity == "32" ~ 04200, #PENNSYLVANIA
       nativity == "P3" ~ 52200, #PERSIA
       nativity == "J4" ~ 30050, #PERU
       nativity == "R3" ~ 51500, #PHILIPPINE ISLANDS
