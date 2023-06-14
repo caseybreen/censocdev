@@ -46,7 +46,7 @@ colnames(data_combined)
 ```
 
 ```{r}
-enlistment_records_final_v1 <- subset(data_combined, select = c( "serial_number",  "yob_precise", "fname_clean" , "mname_clean" ,"lname_clean", "sex_r", "date_enlistment_recode", "nativity_recode$nativity_recode" , "residence_county", "res_state_recode$state_recode", "place_of_enlistment","education_recode$education_recode","grade_recode$grade_code_recode",  "branch_recode$branch_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode", "civ_occupation_recode$civ_occupation_recode" ,"marital_status_recode$marital_status_recode", "height_recode1$ht_recode...54", "weight","wt_recode1$wt_recode...57", "component_recode$component_recode","source_recode$source_recode"))
+enlistment_records_final_v1 <- subset(data_combined, select = c( "serial_number",  "yob_precise", "fname_clean_std" , "mname_clean" ,"lname_clean", "sex_r", "date_enlistment_recode", "nativity_recode$nativity_recode" , "residence_county", "res_state_recode$state_recode", "place_of_enlistment","education_recode$education_recode","grade_recode$grade_code_recode",  "branch_recode$branch_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode", "civ_occupation_recode$civ_occupation_recode" ,"marital_status_recode$marital_status_recode", "height_recode1$ht_recode...54", "weight","wt_recode1$wt_recode...57", "component_recode$component_recode","source_recode$source_recode"))
 
 ```
 #test df by looking at the first 200 rows
@@ -57,7 +57,7 @@ head(enlistment_records_final_v1, 200)
 ```{r}
 enlistment_records_final <- enlistment_records_final_v1 %>% 
         rename(  
-               "fname" = "fname_clean",
+               "fname" = "fname_clean_std",
                "mname" = "mname_clean",
                 "lname" = "lname_clean",
                "sex" = "sex_r",
