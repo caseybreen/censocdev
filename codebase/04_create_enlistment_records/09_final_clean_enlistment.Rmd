@@ -84,6 +84,17 @@ enlistment_records_final <- enlistment_records_final_v1 %>%
 head(enlistment_records_final, 200)
 ```
 
+
+# remove rows that contain no actual data 
+About 160,000 rows contain the string "ONE OR MORE CARDS WERE UNREADABLE AT THIS LOCATION",
+indicating a gap in the data rather than an actual data record.
+```{r}
+enlistment_records_final <- enlistment_records_final %>%
+  filter(serial_number != "ONE OR M")
+```
+
+
+
 #save final dataset
 ```{r}
 write_csv(enlistment_records_final, paste0(out_path, "/finalenlistment.csv"))
