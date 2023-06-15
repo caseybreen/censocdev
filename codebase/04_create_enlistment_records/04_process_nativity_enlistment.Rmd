@@ -199,12 +199,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "R4" ~ 11000, #PUERTO RICO 	
       nativity == "15" ~ 04400, #RHODE ISLAND	
       nativity == "N5" ~ 45600, #ROUMANIA
-      nativity == "O9" ~ 46530, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS 
-      nativity == "O9" ~ 46200, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
-      nativity == "O9" ~ 46100, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
-      nativity == "O9" ~ 46000, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
-      nativity == "O9" ~ 45900, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS	
-      nativity == "O9" ~ 46500, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS	   
+      nativity == "O9" ~ 46500, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS 
       nativity == "X4" ~ 21030, #SALVADOR
       nativity == "!4" ~ 21030, #SALVADOR
       nativity == "P7" ~ 51700, #SIAM aka THAILAND
