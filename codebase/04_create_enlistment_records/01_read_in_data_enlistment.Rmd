@@ -12,9 +12,9 @@ library(readr) # read_fwf, write_csv
 
 #Set paths to raw data and outpath
 ```{r}
-raw_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/raw/ASNEF.FIN.DAT"
+raw_data <- "/data/censoc/input_data/enlistment_records_public/data/raw/ASNEF.FIN.DAT"
 
-outpath <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code"
+outpath <- "/data/censoc/workspace/enlistment_records"
 
 ```
 

@@ -16,8 +16,8 @@ library(stringr) # str_trim, str_split
 
 
 ```{r }
-path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp5.csv"
-out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+path_to_temp_data   <-  "//data/censoc/workspace/enlistment_records/temp5.csv"
+out_path <- "/data/censoc/workspace/enlistment_records"
 race_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2059.csv"
 ```
 
@@ -47,7 +47,7 @@ data_combined <- read_csv(path_to_temp_data,
 #View race fields
 ```{r}
 data_combined %>% 
-  count(race) 
+  dplyr::count(race) 
 ```
 
 ```{r}
@@ -129,7 +129,7 @@ citizenship_recode <- recode_citizenship_enlistment(df = data_combined) %>%
 ## Recode education
 ```{r}
 data_combined %>% 
-  count(education) 
+  dplyr::count(education) 
 ```
 
 ## write a function to recode education codes to better match ipums codes 
@@ -166,7 +166,7 @@ education_recode <- recode_education_enlistment(df = data_combined) %>%
 #Recode marital_status from NARA AAD TO IPUMS CODES
 ```{r}
 data_combined %>% 
-  count(marital_status) 
+  dplyr::count(marital_status) 
 ```
 #Create a function to recode marital status to IPUMs codes
 ## no delineation of 1. married, spouse present & 2.married, spouse absent so all

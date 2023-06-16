@@ -13,7 +13,7 @@ library(stringr)   # str_trim, str_split
 library(tidyverse) # add_row
 library(data.table)
 packageurl <- "https://cran.r-project.org/src/contrib/Archive/gender/gender_0.5.4.tar.gz"
-install.packages(packageurl, repos=NULL, type="source") #gender package not available on this 
+# install.packages(packageurl, repos=NULL, type="source") #gender package not available on this 
 #r software so must use different method to install gender & gender data packages
 library(gender)
 library(genderdata)
@@ -22,9 +22,9 @@ library(genderdata)
 #Set paths to temp data, outpath, and tan path to titles
 
 ```{r}
-path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp1.csv"
-outpath <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/"
-tan_path   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/titles-and-nicknames"
+path_to_temp_data <- "/data/censoc/workspace/enlistment_records/temp1.csv"
+outpath <- "/data/censoc/workspace/enlistment_records/"
+tan_path   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/titles-and-nicknames" # should update at some point
 ```
 
 

@@ -14,9 +14,9 @@ library(data.table)
 
 #Set paths to data & csvs of NARA AAD codes
 ```{r}
-path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp4.csv"
-out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
-grade_codes_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2072.csv"
+path_to_temp_data   <-  "//data/censoc/workspace/enlistment_records/temp4.csv"
+out_path <- "/data/censoc/workspace/enlistment_records"
+grade_codes_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2072.csv" # to update
 branch_codes_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2075.csv"
 source_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2077.csv"
 branch_alpha_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2074 (1).csv"
@@ -52,7 +52,7 @@ data_combined <- read_csv(path_to_temp_data,
 #Count of grade codes
 ```{r}
 data_combined %>% 
-  count(grade_code) 
+  dplyr::count(grade_code) 
 
 ```
 
@@ -96,7 +96,7 @@ grade_recode <- recode_grade_code_enlistment(df = data_combined) %>%
 #Count of branch codes
 ```{r}
 data_combined %>% 
-  count(branch_code) 
+  dplyr::count(branch_code) 
 ```
 
 #Create function to recode branch codes
@@ -163,7 +163,7 @@ branch_recode <- recode_branch_code_enlistment(df = data_combined) %>%
 
 ```{r}
 data_combined %>% 
-  count(source) 
+  dplyr::count(source) 
 ```
 
 #Create function to recode source codes
@@ -205,7 +205,7 @@ source_recode <- recode_source_enlistment(df = data_combined) %>%
 #Count of term_or_enlistment
 ```{r}
 data_combined %>% 
-  count(term_or_enlistment) 
+  dplyr::count(term_or_enlistment) 
 ```
 
 #Create function to recode term_or_enlistment 
@@ -244,7 +244,7 @@ term_or_enlistment_recode <- recode_term_or_enlistment_enlistment(df = data_comb
 
 ```{r}
 data_combined %>% 
-  count(component) 
+  dplyr::count(component) 
 ```
 #Create function to recode component 
 ```{r}

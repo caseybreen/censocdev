@@ -14,8 +14,8 @@ library(scales)
 
 
 ```{r}
-path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp6.csv"
-out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+path_to_temp_data   <-   "//data/censoc/workspace/enlistment_records/temp6.csv"
+out_path <-  "//data/censoc/workspace/enlistment_records"
 ```
 
 ```{r}
@@ -32,7 +32,9 @@ data_combined <- read_csv(path_to_temp_data,
                             mname_clean = col_character(),
                             sex = col_integer(),
                             sex_r = col_integer(),
-                            fname_std = col_character()
+                            fname_std = col_character(),
+                            height = col_integer(),
+                            weight = col_integer()
                             )
                           )
 ```
@@ -83,14 +85,17 @@ plot( weight_hist, col=rgb(0,0,1,1/4), xlim=c(0,10))  # first histogram
 plot( height_hist, col=rgb(1,0,0,1/4), xlim=c(0,10), add=TRUE)  # second
 
 ```
+
 #clean height
 ```{r}
-data_combined %>% count(height)
+data_combined %>% dplyr::count(height)
 ```
+
 ```{r}
-recode_height_enlistment <- data_combined %>% function(df){
-df <- df %>% filter(height => 60 & height <= 100 )
-return(df)}
+recode_height_enlistment <- function(df) {
+  df <- df %>% filter(height >= 60 & height <= 100)
+  return(df)
+}
 ```
 
 ```{r}

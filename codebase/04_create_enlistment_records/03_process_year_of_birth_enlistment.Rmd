@@ -13,8 +13,8 @@ library(lubridate) #as_date
 
 #Set path to temp data & outpath
 ```{r}
-path_to_temp_data <- "//data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp2.csv"
-out_path          <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+path_to_temp_data <- "//data/censoc/workspace/enlistment_records/temp2.csv"
+out_path          <- "/data/censoc/workspace/enlistment_records"
 
 ```
 
@@ -110,7 +110,7 @@ data_combined <- data_combined %>%
 
 ## check dates look reasonable and are in yyyy-mm-dd format (match v1 release)
 data_combined %>%
-  count(date_enlistment_recode) %>% 
+  dplyr::count(date_enlistment_recode) %>% 
   arrange(desc(n))
 
 ## visualize distribution (loooks reasonable - identical pattern to v1 release)
