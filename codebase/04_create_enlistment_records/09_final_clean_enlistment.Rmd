@@ -17,8 +17,8 @@ library(stringr) # str_trim, str_split
 
 #update path
 ```{r}
-path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp8.csv"
-out_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+path_to_temp_data   <-  "/data/censoc/workspace/enlistment_records/temp8.csv"
+out_path <- "/data/censoc/workspace/enlistment_records/"
 ```
 
 ```{r}
@@ -46,7 +46,7 @@ colnames(data_combined)
 ```
 
 ```{r}
-enlistment_records_final_v1 <- subset(data_combined, select = c( "serial_number",  "yob_precise", "fname_clean_std" , "mname_clean" ,"lname_clean", "sex_r", "date_enlistment_recode", "nativity_recode$nativity_recode" , "residence_county", "res_state_recode$state_recode", "place_of_enlistment","education_recode$education_recode","grade_recode$grade_code_recode",  "branch_recode$branch_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode", "civ_occupation_recode$civ_occupation_recode" ,"marital_status_recode$marital_status_recode", "height_recode1$ht_recode...54", "weight","wt_recode1$wt_recode...57", "component_recode$component_recode","source_recode$source_recode"))
+enlistment_records_final_v1 <- subset(data_combined, select = c( "serial_number",  "yob_precise", "fname_clean_std" , "mname_clean" ,"lname_clean", "sex_r", "date_enlistment_recode", "nativity_recode$nativity_recode" , "residence_county", "res_state_recode$state_recode", "place_of_enlistment","education_recode$education_recode","grade_recode$grade_code_recode",  "branch_recode$branch_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode", "civ_occupation_recode$civ_occupation_recode" ,"marital_status_recode$marital_status_recode", "height_recode", "weight_before_1943","weight_or_AGCT", "component_recode$component_recode","source_recode$source_recode"))
 
 ```
 #test df by looking at the first 200 rows
@@ -65,7 +65,6 @@ enlistment_records_final <- enlistment_records_final_v1 %>%
                "byear" = "yob_precise",
                "bpl"="nativity_recode$nativity_recode"  ,
                "date_of_enlistment" = "date_enlistment_recode",
-               "weight_or_AGCT" = "weight" , 
                "source" = "source_recode$source_recode" ,
                "grade_code" = "grade_recode$grade_code_recode" , 
               "term_of_enlistment" = "term_or_enlistment_recode$term_or_enlistment_recode" , 
@@ -75,8 +74,7 @@ enlistment_records_final <- enlistment_records_final_v1 %>%
                "citizenship" = "citizenship_recode$citizenship_recode", 
                "education" = "education_recode$education_recode" ,
                "marital_status" = "marital_status_recode$marital_status_recode" , 
-               "height" = "height_recode1$ht_recode...54",
-              "weight" = "wt_recode1$wt_recode...57",
+               "height" = "height_recode",
                "civilian_occupation" = "civ_occupation_recode$civ_occupation_recode" )
 ```
 
@@ -88,6 +86,7 @@ head(enlistment_records_final, 200)
 # remove rows that contain no actual data 
 About 160,000 rows contain the string "ONE OR MORE CARDS WERE UNREADABLE AT THIS LOCATION",
 indicating a gap in the data rather than an actual data record.
+9,200,232 rows --> 9,039,840 rows
 ```{r}
 enlistment_records_final <- enlistment_records_final %>%
   filter(serial_number != "ONE OR M")
