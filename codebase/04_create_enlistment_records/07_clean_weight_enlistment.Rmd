@@ -10,6 +10,7 @@ library(readr)   # read_csv, write_csv
 library(stringr) # str_trim, str_split
 library(ggplot2)
 library(scales)
+library(data.table)
 ```
 
 
@@ -17,6 +18,7 @@ library(scales)
 path_to_temp_data   <-   "//data/censoc/workspace/enlistment_records/temp6.csv"
 out_path <-  "//data/censoc/workspace/enlistment_records"
 ```
+
 
 ```{r}
 data_combined <- read_csv(path_to_temp_data, 
@@ -32,9 +34,7 @@ data_combined <- read_csv(path_to_temp_data,
                             mname_clean = col_character(),
                             sex = col_integer(),
                             sex_r = col_integer(),
-                            fname_std = col_character(),
-                            height = col_integer(),
-                            weight = col_integer()
+                            fname_std = col_character()
                             )
                           )
 ```
@@ -55,140 +55,255 @@ in the Access to Archival Databases (AAD) implementation of the Electronic Army 
 Merged File. The raw data electronic records that NARA preserves retains whatever values were
 punched in these positions
 
-#visualize data variables 
-#create weight histogram and overlay with height and remove 0s
-
+# convert height and weight to integers
 ```{r}
+data_combined$height <- as.integer(data_combined$height)
+data_combined$weight <- as.integer(data_combined$weight)
+data_combined <- as.data.table(data_combined)
+```
 
-weight_hist <- data_combined %>% filter(weight < 250) %>% ggplot(mapping = aes(x = weight)) +                           # Modify title & axis labels
+# height distribution
+```{r}
+summary(data_combined$height) # 0 - 99
+# all
+hist(data_combined$height, breaks = seq(0,100,1))
+#before 1943
+hist(data_combined[date_enlistment_recode < "1943-01-01"]$height, breaks = seq(0,100,1))
+#Jan - Feb 1943
+hist(data_combined[date_enlistment_recode >= "1943-01-01" & date_enlistment_recode <= "1943-03-01"]$height,
+     breaks = seq(0,100,1))
+# March 1943 +
+hist(data_combined[date_enlistment_recode >= "1943-03-01"]$height,
+     breaks = seq(0,100,1)) # WAY different distribution
+# missing date
+hist(data_combined[is.na(date_enlistment_recode)]$height, breaks = seq(0,100,1)) # hard to tell
+# dist by height for each month in 1943
+data_combined %>% filter(lubridate::year(date_enlistment_recode) == 1943) %>% 
+  group_by(lubridate::month(date_enlistment_recode)) %>% 
+  ggplot(aes(x = height)) +
   geom_histogram(stat="count") +
-  labs(title = "Weight/IQ",
-       x = "Weight/IQ",
-       y = "Count of Values") + stat_count() +  scale_y_continuous(labels = scales::comma)
-print(weight_hist)
+  facet_wrap(~ lubridate::month(date_enlistment_recode))
 ```
 
-#PLOT HEIGHT/IQ W XLIM
-
+# weight/AGCT stats:
 ```{r}
-height_hist <- data_combined %>% ggplot(mapping =  aes(x = height)) +                           # Modify title & axis labels geom_histogram(stat="count") +
-  labs(title = "Height",
-       x = "Height",
-       y = "Count of Values") + stat_count() +  scale_y_continuous(labels = scales::comma)
-
-print(height_hist)
-```
-#OVERLAY HEIGHT AND WEIGHT/IQ GRAPHS
-```{r}
-set.seed(42)
-plot( weight_hist, col=rgb(0,0,1,1/4), xlim=c(0,10))  # first histogram
-plot( height_hist, col=rgb(1,0,0,1/4), xlim=c(0,10), add=TRUE)  # second
-
-```
-
-#clean height
-```{r}
-data_combined %>% dplyr::count(height)
-```
-
-```{r}
-recode_height_enlistment <- function(df) {
-  df <- df %>% filter(height >= 60 & height <= 100)
-  return(df)
-}
+summary(data_combined$weight) # 0 - 999
+# all (cut out 0's to make easier to see)
+hist(data_combined[weight > 0]$weight, breaks = seq(0,1000,1)) #huge spike at 100, prob AGCT scores
+#before 1943
+hist(data_combined[weight > 0 & date_enlistment_recode < "1943-01-01"]$weight, breaks = seq(0,1000,1))
+#Jan - Feb 1943
+hist(data_combined[weight > 0 & date_enlistment_recode >= "1943-01-01" & date_enlistment_recode <= "1943-03-01"]$weight,
+     breaks = seq(0,1000,1))
+# March 1943 +
+hist(data_combined[weight > 0 & date_enlistment_recode >= "1943-03-01"]$weight,
+     breaks = seq(0,1000,1)) # def more characteristic of AGCT scores, but hard to separate the two.
+# dist by weight for each month in 1943
+data_combined %>% filter(weight > 0) %>% 
+  filter(lubridate::year(date_enlistment_recode) == 1943) %>% 
+  group_by(lubridate::month(date_enlistment_recode)) %>% 
+  ggplot(aes(x = weight)) +
+  geom_histogram(stat="count") +
+  facet_wrap(~ lubridate::month(date_enlistment_recode))
 ```
 
-```{r}
-height_recode <- recode_height_enlistment(df = data_combined) %>% 
-  select(height)
-```
+HEIGHT AND WEIGHT OF SELECTIVE SERVICE REGISTRANTS PROCESSED FOR MILITARY
+SERVICE DURING WORLD WAR II by Karpinos:
+Height between 60 and 78 inches
+Minimum weight for a 60 inch person is 105 pounds. (no clear maximum)
 
-#Classify all people with a variable lower than 97 as an AGCT score and higher than 147 as weight 
-```{r}
-recode_AGCT_wt <- function(df){
-  df <- df%>% mutate(AGCT_wt = case_when(
-    weight <= 97 ,
-    weight >= 147 ~ "AGCT Score",
-    TRUE ~ NA_character_
-  ))
-  return(df)
-}
-```
 
+# Recode height:
+Only retain for February 1943 and earlier
+Remove values < 60 and > 78
 ```{r}
-AGCT_wt_recode <- recode_AGCT_wt(df = data_combined) %>% 
-  select(weight, AGCT_wt)
+data_combined <- data_combined %>% 
+  mutate(height_recode = case_when(date_enlistment_recode < "1943-03-01" ~ height,
+                                   TRUE ~ NA_integer_))
+data_combined <- data_combined %>% 
+  mutate(height_recode = case_when(height_recode < 60 ~ NA_integer_,
+                                   height_recode > 78 ~ NA_integer_,
+                                   TRUE ~ height_recode))
+
+summary(data_combined$height_recode)
+summary(data_combined[date_enlistment_recode < "1943-03-01"]$height_recode)
+summary(data_combined[date_enlistment_recode >= "1943-03-01"]$height_recode) # all NA's 
 ```
 
 
+# Recode Weight:
+Before 1943 = weight
+set minimum to 105, maximum to 500
 
-
-#Filter column by people with enlistment dates prior to March 1943– all those will be weights
-
-#look at height and weight/AGCT vars
+Period of early 1943: some sites did AGCT scores, hard to tell which ones
+remove zeros and set max to 500 again
 ```{r}
-data_combined %>% 
-  count(date_of_enlistment_mm) 
+data_combined <- data_combined %>% 
+  mutate(weight_before_1943 = case_when(date_enlistment_recode < "1943-01-01" ~ weight,
+                                        TRUE ~ NA_integer_))
+data_combined <- data_combined %>% 
+  mutate(weight_before_1943 = case_when(weight_before_1943 < 105 ~ NA_integer_,
+                                   weight_before_1943 > 500 ~ NA_integer_,
+                                   TRUE ~ weight_before_1943))
 
-data_combined %>% 
-  count(date_of_enlistment_yy) 
-colnames(data_combined)
-```
-
-
-```{r}
-recode_weight_pre_43 <- function(df){
-df <- df %>% 
-  mutate(wt_recode = if_else(date_of_enlistment_ddmmyy < "010343", 
-                                weight, NA_character_))
-  
-
-return(df)
-}
-```
-
-
-```{r}
-wt_recode1 <- recode_weight_pre_43(df = data_combined) %>% 
-  select(weight, wt_recode)
-```
-
-
-#plot weight/AGCT with Date_of_enlistment_ddmmyy faceted by place_of_enlistment
-
-
-```{r}
-data_combined %>%
-  count(place_of_enlistment, sort = TRUE) %>% 
-  mutate(freq = round(n / sum(n), 2))
-```
-
-#filter out reasonable heights
-```{r}
-ht_recode_enlistment <-function(df){
-  df <- df %>% mutate(height = as.numeric(height)) %>% mutate(ht_recode = case_when(
-  height > 60 & height < 109 ~ height,
-        TRUE ~ NA_real_ 
-))
-return(df)}
+summary(data_combined$weight_before_1943)
+hist(data_combined$weight_before_1943, breaks = seq(90,510,5))
 ```
 
 ```{r}
-height_recode1 <- ht_recode_enlistment(df = data_combined) %>% 
-  select(height, ht_recode)
+data_combined <- data_combined %>% 
+  mutate(weight_or_AGCT = case_when(date_enlistment_recode >= "1943-01-01" ~ weight,
+                                        TRUE ~ NA_integer_))
 
+data_combined <- data_combined %>% 
+  mutate(weight_or_AGCT = case_when(weight_or_AGCT == 0 ~ NA_integer_,
+                                   weight_or_AGCT > 500 ~ NA_integer_,
+                                   TRUE ~ weight_or_AGCT))
+
+summary(data_combined$weight_or_AGCT)
+hist(data_combined$weight_or_AGCT, breaks = seq(0,500,1))
 ```
 
 
-```{r}
-data_combined <- cbind(data_combined, height_recode1$ht_recode, wt_recode1$wt_recode)
-```
 
-```{r}
-data_combined %>% count(wt_recode1$wt_recode)
-```
 
 ```{r}
 write_csv(data_combined, paste0(out_path, "/temp7.csv"))
 rm(list = ls())
 ```
+
+
+
+
+#visualize data variables 
+#create weight histogram and overlay with height and remove 0s
+
+```{r}
+# 
+# weight_hist <- data_combined %>% filter(weight < 250) %>% ggplot(mapping = aes(x = weight)) +                           # Modify title & axis labels
+#   geom_histogram(stat="count") +
+#   labs(title = "Weight/IQ",
+#        x = "Weight/IQ",
+#        y = "Count of Values") + stat_count() +  scale_y_continuous(labels = scales::comma)
+# print(weight_hist)
+# ```
+# 
+# #PLOT HEIGHT/IQ W XLIM
+# 
+# ```{r}
+# height_hist <- data_combined %>% ggplot(mapping =  aes(x = height)) +                           # Modify title & axis labels geom_histogram(stat="count") +
+#   labs(title = "Height",
+#        x = "Height",
+#        y = "Count of Values") + stat_count() +  scale_y_continuous(labels = scales::comma)
+# 
+# print(height_hist)
+# ```
+# #OVERLAY HEIGHT AND WEIGHT/IQ GRAPHS
+# ```{r}
+# set.seed(42)
+# plot( weight_hist, col=rgb(0,0,1,1/4), xlim=c(0,10))  # first histogram
+# plot( height_hist, col=rgb(1,0,0,1/4), xlim=c(0,10), add=TRUE)  # second
+# 
+# ```
+# #clean height
+# ```{r}
+# data_combined %>% count(height)
+# ```
+# ```{r}
+# recode_height_enlistment <- data_combined %>% function(df){
+# df <- df %>% filter(height => 60 & height <= 100 )
+# return(df)}
+# ```
+# 
+# ```{r}
+# height_recode <- recode_height_enlistment(df = data_combined) %>% 
+#   select(height)
+# ```
+# 
+# #Classify all people with a variable lower than 97 as an AGCT score and higher than 147 as weight 
+# ```{r}
+# recode_AGCT_wt <- function(df){
+#   df <- df%>% mutate(AGCT_wt = case_when(
+#     weight <= 97 ,
+#     weight >= 147 ~ "AGCT Score",
+#     TRUE ~ NA_character_
+#   ))
+#   return(df)
+# }
+# ```
+# 
+# ```{r}
+# AGCT_wt_recode <- recode_AGCT_wt(df = data_combined) %>% 
+#   select(weight, AGCT_wt)
+# ```
+# 
+# 
+# 
+# 
+# #Filter column by people with enlistment dates prior to March 1943– all those will be weights
+# 
+# #look at height and weight/AGCT vars
+# ```{r}
+# data_combined %>% 
+#   count(date_of_enlistment_mm) 
+# 
+# data_combined %>% 
+#   count(date_of_enlistment_yy) 
+# colnames(data_combined)
+# ```
+# 
+# 
+# ```{r}
+# recode_weight_pre_43 <- function(df){
+# df <- df %>% 
+#   mutate(wt_recode = if_else(date_of_enlistment_ddmmyy < "010343", 
+#                                 weight, NA_character_))
+#   
+# 
+# return(df)
+# }
+# ```
+# 
+# 
+# ```{r}
+# wt_recode1 <- recode_weight_pre_43(df = data_combined) %>% 
+#   select(weight, wt_recode)
+# ```
+# 
+# 
+# #plot weight/AGCT with Date_of_enlistment_ddmmyy faceted by place_of_enlistment
+# 
+# 
+# ```{r}
+# data_combined %>%
+#   count(place_of_enlistment, sort = TRUE) %>% 
+#   mutate(freq = round(n / sum(n), 2))
+# ```
+# 
+# #filter out reasonable heights
+# ```{r}
+# ht_recode_enlistment <-function(df){
+#   df <- df %>% mutate(height = as.numeric(height)) %>% mutate(ht_recode = case_when(
+#   height > 60 & height < 109 ~ height,
+#         TRUE ~ NA_real_ 
+# ))
+# return(df)}
+# ```
+# 
+# ```{r}
+# height_recode1 <- ht_recode_enlistment(df = data_combined) %>% 
+#   select(height, ht_recode)
+# 
+# ```
+# 
+# 
+# ```{r}
+# data_combined <- cbind(data_combined, height_recode1$ht_recode, wt_recode1$wt_recode)
+# ```
+# 
+# ```{r}
+# data_combined %>% count(wt_recode1$wt_recode)
+```
+
+
+
