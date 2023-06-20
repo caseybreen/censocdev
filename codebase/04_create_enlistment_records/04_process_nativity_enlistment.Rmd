@@ -100,6 +100,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "P8" ~ 50000, #CHINA or MONGOLIA or SINKIAN or TIBET	
       nativity == "Q1" ~ 50200, #CHOSEN or FORMOSA or JAPANESE ASIATIC POSSESSIONS or JAPANESE PACIFIC ISLANDS or KWANGTUNG or KOREA	 coded to Korea
       nativity == "J1" ~ 30025, #COLOMBIA
+      nativity == "70" ~ 00800, #Colorado
       nativity == "11" ~ 00900, #CONNECTICUT	
       nativity == "!6" ~ 21020, #COSTA RICA	
       nativity == "X6" ~ 21020, #COSTARICA
@@ -160,6 +161,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "O6" ~ 50020, #MACAO or PORTUGESE ASIATIC POSSESSIONS or PORTUGESE INDIA or PORTUGESE TIMOR	coded to Macau
       nativity == "12" ~ 02300, #MAINE
       nativity == "P9" ~ 50100, #MANCHOUKUO coded to JAPAN
+      nativity == "31" ~ 02400, #Maryland
       nativity == "13" ~ 02500, #MASSACHUSETTS   
       nativity == "X1" ~ 20000, #MEXICO
       nativity == "!1" ~ 20000, #MEXICO
@@ -177,7 +179,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "23" ~ 03600, #NEW YORK	
       nativity == "X5" ~ 21060, #NICARAGUA
       nativity == "!5" ~ 21060, #NICARAGUA
-      nativity == "46" ~ 52000, #North Carolina	
+      nativity == "46" ~ 03700, #North Carolina	
       nativity == "77" ~ 03800, #NORTH DAKOTA	
       nativity == "M4" ~ 40400, #NORWAY or SPITZBERGEN	coded to norway
       nativity == "53" ~ 03900, #OHIO   
@@ -204,7 +206,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "!4" ~ 21030, #SALVADOR
       nativity == "P7" ~ 51700, #SIAM aka THAILAND
       nativity == "47" ~ 04500, #SOUTH CAROLINA	
-      nativity == "78" ~ 00100, #SOUTH DAKOTA	   
+      nativity == "78" ~ 04600, #SOUTH DAKOTA	   
       nativity == "O3" ~ 43800, #SPAIN
       nativity == "M5" ~ 40500, #SWEDEN
       nativity == "48" ~ 04700, #TENNESSEE
