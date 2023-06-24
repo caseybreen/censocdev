@@ -163,7 +163,9 @@ byear_plot
 
 **Label**: Sex
 
-**Description**: sex is a numeric variable that reports a person's sex, as inferred by army branch or name using the R package **gender** ([Mullen, 2021](https://cran.r-project.org/web/packages/gender/index.html)).
+**Description**: sex is a numeric variable that reports a person's sex, as inferred by army branch in World War II ensistment records.
+
+**Note**: Sex was not listed on enlistee punchcards. If an individual's numeric branch code or alphabetic branch code in the raw enlistment corresponds to the Women's Army Corps, we declare that person to be female. All other persons are assigned male. There potential for error in this designation due to missing branch information or disagreements between army branch numeric codes, branch alphabetic codes (which we do not publish), and army component information. Thus, sex may not always correspond exactly to army branch and component information in the published data set.
 
 ```{r, include = F}
 sex_tabulated <- knitr::kable(enlistment_records_final %>%
@@ -320,7 +322,7 @@ For a complete list of codes, please see: https://aad.archives.gov/aad/popup-cod
 **Description**: education  is a numeric variable that reports an individual's educational attainment at time of enlistment, as reported in the World War II Army Enlistment Records.
 Codes also available at: https://usa.ipums.org/usa-action/variables/EDUC#codes_section
 
-**Note**: Exact number of years of schooling is unknown for enlistees who did not complete at least one year of high school. Such enlistees were given a code meaning "grammar school", though it is unknown if this corresponds to the modern equivalent of a 5th, 6th, or 8th grade education, or whether this code indicates completion or attendance of grammar school. As basic literary was required to enlist in the Army, all enlistees likely had at least some years of elementary education.
+**Note**: Exact number of years of schooling is unknown for enlistees who did not complete at least one year of high school. Such enlistees were given originally given a code meaning "grammar school", though it is unknown if this corresponds to the modern equivalent of a 5th, 6th, or 8th grade education. Many enlistees with this code likely had little to no actual education. Before the attack on Pearl Harbor, literacy was required of army inductees, but this requirement relaxed as the war effort increased ([\textcolor{blue}{Brandt, 2004}](https://doi.org/10.2307/4140731)). By 1942, the Army accepted illiterate men if they were deemed trainable, though academic standards for admission increased again in 1944 and 1945.
 
 
 ```{r, include = F}
@@ -356,8 +358,8 @@ grade_tabulated <- knitr::kable(enlistment_records_final %>%
   group_by(grade_code) %>% 
   tally() %>%
   left_join(grades, by = c('grade_code' = 'Code')) %>%
-  mutate(freq = signif(n * 100 / sum(n), 3), `freq %` = paste0(freq, "%")) %>%
-  select(grade_code, label = Meaning, n, `freq %`))
+  mutate(freq = signif(n * 100 / sum(n), 3)) %>%
+  select(grade_code, label = Meaning, n, `freq %`=freq))
 
 ```
 
@@ -420,7 +422,8 @@ toe_tabulated <- knitr::kable(enlistment_records_final %>%
      tally() %>%
      mutate(freq = signif(n*100 / sum(n), 3)) %>%
      mutate(label = c("One year enlistment	", "Enlistment for Alaska	" , "Enlistment for Hawaiian Department	", " Enlistment for assignment to another corps area", "Enlistment for the duration of the War or other emergency, plus six months, subject to the discretion of the President or otherwise according to law	", "Enlistment for the Panama Canal Department	", "Enlistment for the Philippine Department	", "Enlistment for the Puerto Rican Department	 ", "Three year enlistment	", "NA")) %>%
-     select(term_of_enlistment, label, n, `freq %` = freq))
+     select(term_of_enlistment, label, n, `freq %` = freq)) %>% 
+  column_spec(column=2, width = '6cm')
 ```
 
 \vspace{30 pt}
@@ -540,7 +543,7 @@ marital_tabulated
 
 **Label**: Height
 
-**Description**: height is a numeric variable that reports a person's height in inches at time of enlistment, as reported in the World War II Army Enlistment Records. Height was filtered based on a reasonable range of numbers compliant with what is permissible for enlistment in the military, 60 - 78 inches ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). 
+**Description**: height is a numeric variable that reports a person's height in inches at time of enlistment, as reported in the World War II Army Enlistment Records. Height was filtered based on the range of permissible heights for enlistment in the military, 60 - 78 inches ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). 
 
 **Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field may encode military occupation or other information depending on time and site of enlistment. We have removed height data for men who enlisted in March of 1943 or later, as the distribution of this variable changes significantly at that point. However, it is possible that other data remains in this field. See the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information.
 
@@ -566,7 +569,6 @@ height_plot
 \normalsize
 \vspace{12pt}
 
-**Label** Weight (pounds) at enlistment 
 
 **Description**: weight_before_1943 is a numeric variable that reports a person's weight in pounds at time of enlistment as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted before the year 1943. Weight is filtered to a minimum of 105 pounds, the minimum permissible weight for a 60-inch-tall enlistee ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). While there was no clear maximum body weight for army enlistees, we have removed values of over 500.
 
