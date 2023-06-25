@@ -75,6 +75,7 @@ enlistment_records_final <- enlistment_records_final_v1 %>%
                "education" = "education_recode$education_recode" ,
                "marital_status" = "marital_status_recode$marital_status_recode" , 
                "height" = "height_recode",
+               "weight_before_march_1943" = "weight_before_1943",
                "civilian_occupation" = "civ_occupation_recode$civ_occupation_recode" )
 ```
 

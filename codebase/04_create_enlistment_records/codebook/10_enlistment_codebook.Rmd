@@ -30,7 +30,7 @@ header-includes: \usepackage{hyperref}
 |  \hyperlink{page.20}{20} |\hyperlink{page.20}{civilian\_occupation}            |Civilian Occupation |
 |  \hyperlink{page.21}{21} |\hyperlink{page.21}{marital\_status}            |Marital Status at Enlistment |
 |  \hyperlink{page.22}{22} |\hyperlink{page.22}{height}                |Height at Enlistment (inches) |
-|  \hyperlink{page.23}{23} |\hyperlink{page.23}{weight\_before\_1943}                |Weight (pounds)|
+|  \hyperlink{page.23}{23} |\hyperlink{page.23}{weight\_before\_march\_1943}                |Weight (pounds)|
 |  \hyperlink{page.24}{24} |\hyperlink{page.24}{weight\_or\_AGCT}                |Weight (pounds) or AGCT score|
 |  \hyperlink{page.25}{25} |\hyperlink{page.25}{component\_enlistment}             |Army component |
 |  \hyperlink{page.26}{26} |\hyperlink{page.26}{source}                          |Source of Army Personnel |
@@ -565,19 +565,19 @@ height_plot
 ```
 
 \newpage
-**\huge weight_before_1943**
+**\huge weight_before_march_1943**
 \normalsize
 \vspace{12pt}
 
 
-**Description**: weight_before_1943 is a numeric variable that reports a person's weight in pounds at time of enlistment as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted before the year 1943. Weight is filtered to a minimum of 105 pounds, the minimum permissible weight for a 60-inch-tall enlistee ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). While there was no clear maximum body weight for army enlistees, we have removed values of over 500.
+**Description**: weight_before_march_1943 is a numeric variable that reports a person's weight in pounds at time of enlistment as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted before the March of 1943. Weight is filtered to a minimum of 105 pounds, the minimum permissible weight for a 60-inch-tall enlistee ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). While there was no clear maximum body weight for army enlistees, we have removed values of over 500.
 
-**Note**: On enlistment punchcards, the field used to record weight was also used for Army General Classification Test (AGCT) scores, and may also encode military occupation or other information. Weight may have been recorded through about 1943 at some enlistment sites, but the recording of AGCT score instead of weight at some enlistment sites likely began in early 1943. Because of this ambiguity, we only make this variable available for enlistees who enlisted before 1943. 
-Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information. For enlistees who enlisted starting in January 1943, we have created an additional variable called **weight_or_AGCT**.
+**Note**: On enlistment punchcards, the field used to record weight was also used for Army General Classification Test (AGCT) scores, and may also encode military occupation or other information. Weight may have been recorded through 1943 at some enlistment sites, but the recording of AGCT score instead of weight at many enlistment sites likely began in March 1943. Because of this ambiguity, we only make this variable available for enlistees who enlisted before 1943. 
+Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information. For enlistees who enlisted starting in March 1943, we have created an additional variable called **weight_or_AGCT**.
 
 ```{r, include = F}
 weight_plot <- enlistment_records_final %>%
-  ggplot(aes(x = weight_before_1943)) +
+  ggplot(aes(x = weight_before_march_1943)) +
   geom_histogram(breaks = seq(100,500,5)) +
   theme_minimal(base_size = 15) +
   ggtitle("Weight") +
@@ -605,8 +605,8 @@ weight_plot
 
 **Description**: weight_or_AGCT is a numeric variable that reports a person's weight in pounds at time of enlistment or their Army General Classification Test (AGCT) score, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted in January 1943 or later.  We have removed zeros and values above 500, which presumably exceed the maximum realistic body weights and AGCT scores, but otherwise leave the data in this field unfiltered and unsorted.
 
-**Note**: On enlistment punchcards, this field used to record weight was also used for Army General Classification Test (AGCT) scores, and may also encode military occupation or other information. Weight may have been recorded through about 1943 at some enlistment sites, but the recording of AGCT score instead of weight at some enlistment sites likely began in early 1943. Because of this ambiguity, we created this variable which may record weight or AGCT score for enlistees starting in January 1943. 
-Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/OpaAPI/media/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1ND_NC.pdf?download=false) for further information. For enlistees prior to January 1943, we used the information recorded in this field to create the **weight_before_1943** variable.
+**Note**: On enlistment punchcards, the field used to record weight was also used for Army General Classification Test (AGCT) scores, and may also encode military occupation or other information. Weight may have been recorded through 1943 at some enlistment sites, but the recording of AGCT score instead of weight at many enlistment sites likely began in March 1943. Because of this ambiguity, we created this variable for persons enlisted in March 1943 or later, which may contain weight or AGCT or other information.  
+Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/OpaAPI/media/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1ND_NC.pdf?download=false) for further information. For enlistees prior to January 1943, we used the information recorded in this field to create the **weight_before_march_1943** variable.
 
 ```{r, include = F}
 weight_agct_plot <- enlistment_records_final %>%

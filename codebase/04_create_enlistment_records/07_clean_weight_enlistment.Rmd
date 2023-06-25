@@ -98,11 +98,16 @@ hist(data_combined[weight > 0 & date_enlistment_recode >= "1943-01-01" & date_en
 # March 1943 +
 hist(data_combined[weight > 0 & date_enlistment_recode >= "1943-03-01"]$weight,
      breaks = seq(0,1000,1)) # def more characteristic of AGCT scores, but hard to separate the two.
-# dist by weight for each month in 1943
+
+# Distribution of raw weights for individual months in 1943
 data_combined %>% filter(weight > 0) %>% 
+  filter(weight < 400) %>% 
   filter(lubridate::year(date_enlistment_recode) == 1943) %>% 
+  filter(lubridate::month(date_enlistment_recode) %in% 1:6) %>% 
   group_by(lubridate::month(date_enlistment_recode)) %>% 
   ggplot(aes(x = weight)) +
+  geom_vline(xintercept = 147, color = "red", linetype = "dashed") + # 147 = mean weight (ferrie)
+  geom_vline(xintercept = 100, color = "blue", linetype = "dashed") + # 100 = mean AGCT score
   geom_histogram(stat="count") +
   facet_wrap(~ lubridate::month(date_enlistment_recode))
 ```
@@ -139,7 +144,7 @@ Period of early 1943: some sites did AGCT scores, hard to tell which ones
 remove zeros and set max to 500 again
 ```{r}
 data_combined <- data_combined %>% 
-  mutate(weight_before_1943 = case_when(date_enlistment_recode < "1943-01-01" ~ weight,
+  mutate(weight_before_1943 = case_when(date_enlistment_recode < "1943-03-01" ~ weight,
                                         TRUE ~ NA_integer_))
 data_combined <- data_combined %>% 
   mutate(weight_before_1943 = case_when(weight_before_1943 < 105 ~ NA_integer_,
@@ -152,7 +157,7 @@ hist(data_combined$weight_before_1943, breaks = seq(90,510,5))
 
 ```{r}
 data_combined <- data_combined %>% 
-  mutate(weight_or_AGCT = case_when(date_enlistment_recode >= "1943-01-01" ~ weight,
+  mutate(weight_or_AGCT = case_when(date_enlistment_recode >= "1943-03-01" ~ weight,
                                         TRUE ~ NA_integer_))
 
 data_combined <- data_combined %>% 
