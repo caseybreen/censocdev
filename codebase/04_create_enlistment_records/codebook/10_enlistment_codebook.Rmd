@@ -1,5 +1,5 @@
 ---
-title: "CenSoc World War II Enlistment File Codebook[^updated]"
+title: "Berkeley Unified WWII Military Enlistment Database Codebook[^updated]"
 output:
   pdf_document: default
 header-includes: \usepackage{hyperref}
@@ -30,12 +30,12 @@ header-includes: \usepackage{hyperref}
 |  \hyperlink{page.20}{20} |\hyperlink{page.20}{civilian\_occupation}            |Civilian Occupation |
 |  \hyperlink{page.21}{21} |\hyperlink{page.21}{marital\_status}            |Marital Status at Enlistment |
 |  \hyperlink{page.22}{22} |\hyperlink{page.22}{height}                |Height at Enlistment (inches) |
-|  \hyperlink{page.23}{23} |\hyperlink{page.23}{weight\_or\_AGCT}                |Weight (pounds) or AGCT score|
-|  \hyperlink{page.24}{24} |\hyperlink{page.24}{weight}                |Weight|
+|  \hyperlink{page.23}{23} |\hyperlink{page.23}{weight\_before\_march\_1943}                |Weight (pounds)|
+|  \hyperlink{page.24}{24} |\hyperlink{page.24}{weight\_or\_AGCT}                |Weight (pounds) or AGCT score|
 |  \hyperlink{page.25}{25} |\hyperlink{page.25}{component\_enlistment}             |Army component |
 |  \hyperlink{page.26}{26} |\hyperlink{page.26}{source}                          |Source of Army Personnel |
 
-**Summary:** The CenSoc World War II Enlistment  File captures 9,200,232 of the 15 million enlistees of World War II. The dataset contains 22 variables on demographic information of the men and women enlisted in the United States Army and the Women’s Army Auxiliary Corps. 
+**Summary:** The Berkeley Unified WWII Military Enlistment Database captures 9,039,840 of the 15 million enlistees of World War II. The dataset contains 22 variables on demographic information of the men and women enlisted in the United States Army and the Women’s Army Auxiliary Corps. 
 
 
 
@@ -51,46 +51,19 @@ library(data.table)
 library(stringi)
 library(lubridate)
 library(kableExtra)
+library(here)
 
-data_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/finalenlistment.csv'
+data_path <- '/data/censoc/workspace/enlistment_records/finalenlistment.csv'
 resource_file_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode'
 path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp3.csv"
-out_path          <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
-codebook_path <- "/censoc_new/censocdev/codebase/04_create_enlistment_records_v2/10-enlistment-codebook_files"
-## read in data file
-#setwd(data_path)
-#enlistment_dmf <- fread('finalenlistment.csv')
-
+#out_path          <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+codebook_path <- here("04_create_enlistment_records/codebook")
 
 setwd(resource_file_path)
-test_file_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode'
-enlistment_records_final <- fread('finalenlistment.csv')
-
-
+#test_file_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode'
+enlistment_records_final <- fread(data_path)
 
 ```
-```{r}
-#read in temp2
-data_combined <- read_csv(path_to_temp_data, 
-                          col_types = cols(
-                            empty_field = col_character(),
-                            term_or_enlistment = col_character(),
-                            longevity = col_character(),
-                            education = col_character(),
-                            marital_status = col_character(),
-                            component = col_character(),
-                            educ_spec = col_character(),
-                            defer_date_mmyy = col_character(),
-                            mname_clean = col_character(),
-                            sex = col_integer(),
-                            sex_r = col_integer(),
-                            fname_std = col_character()
-                            )
-                          )
-
-```
-
-
 
 \newpage
 
@@ -190,14 +163,16 @@ byear_plot
 
 **Label**: Sex
 
-**Description**: sex is a numeric variable that reports a person's sex, as recorded in the World War II Army Enlistment Records.    
+**Description**: sex is a numeric variable that reports a person's sex, as inferred by army branch in World War II ensistment records.
+
+**Note**: Sex was not listed on enlistee punchcards. If an individual's numeric branch code or alphabetic branch code in the raw enlistment corresponds to the Women's Army Corps, we declare that person to be female. All other persons are assigned male. There potential for error in this designation due to missing branch information or disagreements between army branch numeric codes, branch alphabetic codes (which we do not publish), and army component information. Thus, sex may not always correspond exactly to army branch and component information in the published data set.
 
 ```{r, include = F}
 sex_tabulated <- knitr::kable(enlistment_records_final %>%
     group_by(sex) %>%
      tally() %>%
      mutate(freq = signif(n*100 / sum(n), 3)) %>%
-     mutate(label = c("Men", "Women", "NA")) %>%
+     mutate(label = c("Men", "Women")) %>%
      select(sex, label, n, `freq %` = freq))
 ```
 
@@ -258,9 +233,9 @@ sex_tabulated
 
 
 ## visualize distribution (loooks reasonable - identical pattern to v1 release)
-data_combined %>%
-  filter(date_of_enlistment_yy %in% c(1938:1947)) %>% ## restrict to years around WWII 
-  mutate(date_short = format(as.Date(date_enlistment_recode), "%Y-%m")) %>% 
+enlistment_records_final %>%
+  filter(lubridate::year(date_of_enlistment) %in% c(1938:1947)) %>% ## restrict to years around WWII 
+  mutate(date_short = format(as.Date(date_of_enlistment), "%Y-%m")) %>% 
     group_by(date_short) %>% 
     tally() %>% 
     filter(!is.na(date_short)) %>%
@@ -304,7 +279,7 @@ For a complete list of codes, please see: https://usa.ipums.org/usa-action/varia
 
 **Description**: residence_state is a character variable that reports a person's state of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the US.
 
-For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2057&dt=893&c_id=24998
+For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2046&dt=893&c_id=24996
 
 
 \newpage 
@@ -347,6 +322,8 @@ For a complete list of codes, please see: https://aad.archives.gov/aad/popup-cod
 **Description**: education  is a numeric variable that reports an individual's educational attainment at time of enlistment, as reported in the World War II Army Enlistment Records.
 Codes also available at: https://usa.ipums.org/usa-action/variables/EDUC#codes_section
 
+**Note**: Exact number of years of schooling is unknown for enlistees who did not complete at least one year of high school. Such enlistees were given originally given a code meaning "grammar school", though it is unknown if this corresponds to the modern equivalent of a 5th, 6th, or 8th grade education. Many enlistees with this code likely had little to no actual education. Before the attack on Pearl Harbor, literacy was required of army inductees, but this requirement relaxed as the war effort increased ([\textcolor{blue}{Brandt, 2004}](https://doi.org/10.2307/4140731)). By 1942, the Army accepted illiterate men if they were deemed trainable, though academic standards for admission increased again in 1944 and 1945.
+
 
 ```{r, include = F}
 education_tabulated <- knitr::kable(enlistment_records_final %>%
@@ -375,12 +352,14 @@ Code list also is available at: https://aad.archives.gov/aad/popup-codelist.jsp?
 
 ```{r, include = F}
 grades <- fread('cl_2072.csv')
+grades <- grades %>% mutate(Code = ifelse(Code %in% c("M", "N", "O"), NA_integer_, as.integer(Code))) %>% 
+  drop_na(Code)
 grade_tabulated <- knitr::kable(enlistment_records_final %>%
-  group_by(grade_code) %>% na.omit(grades) %>%
+  group_by(grade_code) %>% 
   tally() %>%
-  left_join(grades %>% mutate(Code = as.integer(Code)), by = c('grade_code' = 'Code')) %>%
-  mutate(freq = signif(n * 100 / sum(n), 3), `freq %` = paste0(freq, "%")) %>%
-  select(grade_code, label = Meaning, n, `freq %`))
+  left_join(grades, by = c('grade_code' = 'Code')) %>%
+  mutate(freq = signif(n * 100 / sum(n), 3)) %>%
+  select(grade_code, label = Meaning, n, `freq %`=freq))
 
 ```
 
@@ -443,7 +422,8 @@ toe_tabulated <- knitr::kable(enlistment_records_final %>%
      tally() %>%
      mutate(freq = signif(n*100 / sum(n), 3)) %>%
      mutate(label = c("One year enlistment	", "Enlistment for Alaska	" , "Enlistment for Hawaiian Department	", " Enlistment for assignment to another corps area", "Enlistment for the duration of the War or other emergency, plus six months, subject to the discretion of the President or otherwise according to law	", "Enlistment for the Panama Canal Department	", "Enlistment for the Philippine Department	", "Enlistment for the Puerto Rican Department	 ", "Three year enlistment	", "NA")) %>%
-     select(term_of_enlistment, label, n, `freq %` = freq))
+     select(term_of_enlistment, label, n, `freq %` = freq)) %>% 
+  column_spec(column=2, width = '6cm')
 ```
 
 \vspace{30 pt}
@@ -563,14 +543,15 @@ marital_tabulated
 
 **Label**: Height
 
-**Description**: height is a numeric variable that reports a person's height in inches at time of enlistment, as reported in the World War II Army Enlistment Records. Height was filtered based on a reasonable range of numbers compliant with what is permissible for enlistment in the military, 60 - 109 inches. 
+**Description**: height is a numeric variable that reports a person's height in inches at time of enlistment, as reported in the World War II Army Enlistment Records. Height was filtered based on the range of permissible heights for enlistment in the military, 60 - 78 inches ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). 
 
-**Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field may encode military occupation or other information. Height may have been recorded through about 1943, but height data recorded after February 1943 are likely unreliable. See the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/OpaAPI/media/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1ND_NC.pdf?download=false) for further information.
+**Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field may encode military occupation or other information depending on time and site of enlistment. We have removed height data for men who enlisted in March of 1943 or later, as the distribution of this variable changes significantly at that point. However, it is possible that other data remains in this field. See the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information.
 
 ```{r, include = F}
 height_plot <- enlistment_records_final %>%
   ggplot(aes(x = height)) +
-  geom_histogram(breaks = seq(0,100,1)) +
+  geom_bar(stat = "count") +
+  #geom_histogram(breaks = seq(60,78,1)) +
   theme_minimal(base_size = 15) +
   ggtitle("Height in inches") +
   scale_y_continuous(labels = scales::comma)
@@ -583,26 +564,23 @@ height_plot <- enlistment_records_final %>%
 height_plot
 ```
 
-
-
 \newpage
-
-**\huge weight\_or\_AGCT\_enlistment**
+**\huge weight_before_march_1943**
 \normalsize
 \vspace{12pt}
 
-**Label**: Weight (pounds) at enlistment or AGCT score
 
-**Description**: weight_or_AGCT_enlistment is a numeric variable that reports a person's weight in pounds at time of enlistment or their Army General Classification Test (AGCT) score, as reported in the World War II Army Enlistment Records. 
+**Description**: weight_before_march_1943 is a numeric variable that reports a person's weight in pounds at time of enlistment as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted before the March of 1943. Weight is filtered to a minimum of 105 pounds, the minimum permissible weight for a 60-inch-tall enlistee ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). While there was no clear maximum body weight for army enlistees, we have removed values of over 500.
 
-**Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field was explicitly used for both weight and AGCT scores, but may also encode military occupation or other information. Weight may have been recorded through about 1943 at some enlistment sites, but the recording of AGCT score instead of weight at some enlistment sites likely began in March 1943. Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/OpaAPI/media/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1ND_NC.pdf?download=false) for further information.
+**Note**: On enlistment punchcards, the field used to record weight was also used for Army General Classification Test (AGCT) scores, and may also encode military occupation or other information. Weight may have been recorded through 1943 at some enlistment sites, but the recording of AGCT score instead of weight at many enlistment sites likely began in March 1943. Because of this ambiguity, we only make this variable available for enlistees who enlisted before 1943. 
+Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information. For enlistees who enlisted starting in March 1943, we have created an additional variable called **weight_or_AGCT**.
 
 ```{r, include = F}
 weight_plot <- enlistment_records_final %>%
-  ggplot(aes(x = weight_or_AGCT)) +
-  geom_histogram(breaks = seq(0,1000,10)) +
+  ggplot(aes(x = weight_before_march_1943)) +
+  geom_histogram(breaks = seq(100,500,5)) +
   theme_minimal(base_size = 15) +
-  ggtitle("Weight or AGCT Score") +
+  ggtitle("Weight") +
   scale_y_continuous(labels = scales::comma)
   
 ```
@@ -613,14 +591,38 @@ weight_plot <- enlistment_records_final %>%
 weight_plot
 ```
 
+
+
+
+
 \newpage
-**\huge weight**
+
+**\huge weight\_or\_AGCT**
 \normalsize
 \vspace{12pt}
 
-**Label**: Weight
+**Label**: Weight (pounds) at enlistment or AGCT score
 
-**Description**: weight is a numeric variable that reports a person's weight in inches at time of enlistment, prior to March 1943, as reported in the World War II Army Enlistment Records. 
+**Description**: weight_or_AGCT is a numeric variable that reports a person's weight in pounds at time of enlistment or their Army General Classification Test (AGCT) score, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted in January 1943 or later.  We have removed zeros and values above 500, which presumably exceed the maximum realistic body weights and AGCT scores, but otherwise leave the data in this field unfiltered and unsorted.
+
+**Note**: On enlistment punchcards, the field used to record weight was also used for Army General Classification Test (AGCT) scores, and may also encode military occupation or other information. Weight may have been recorded through 1943 at some enlistment sites, but the recording of AGCT score instead of weight at many enlistment sites likely began in March 1943. Because of this ambiguity, we created this variable for persons enlisted in March 1943 or later, which may contain weight or AGCT or other information.  
+Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/OpaAPI/media/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1ND_NC.pdf?download=false) for further information. For enlistees prior to January 1943, we used the information recorded in this field to create the **weight_before_march_1943** variable.
+
+```{r, include = F}
+weight_agct_plot <- enlistment_records_final %>%
+  ggplot(aes(x = weight_or_AGCT)) +
+  geom_histogram(breaks = seq(0,500,5)) +
+  theme_minimal(base_size = 15) +
+  ggtitle("Weight or AGCT Score") +
+  scale_y_continuous(labels = scales::comma)
+  
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+weight_agct_plot
+```
 
 
 \newpage

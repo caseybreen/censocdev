@@ -13,10 +13,10 @@ library(stringr) # str_trim, str_split
 ```
 
 ```{r}
-path_to_temp_data   <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp3.csv"
-out_path <- "//data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
+path_to_temp_data   <-  "//data/censoc/workspace/enlistment_records/temp3.csv"
+out_path <- "//data/censoc/workspace/enlistment_records/"
 # This file can be downloaded from #https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2079&dt=893&c_id=24982
-nativity_codes_path <-"/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/cl_2079.csv"
+nativity_codes_path <-"/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/cl_2079.csv" # should move, update
 path_to_ipums_ddi   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/fullcount.ddi.xml"
 ```
 
@@ -44,7 +44,7 @@ data_combined <- read_csv(path_to_temp_data,
 ```
 
 ```{r}
-data_combined %>% count(nativity)
+data_combined %>% dplyr::count(nativity)
 ```
 
 
@@ -100,6 +100,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "P8" ~ 50000, #CHINA or MONGOLIA or SINKIAN or TIBET	
       nativity == "Q1" ~ 50200, #CHOSEN or FORMOSA or JAPANESE ASIATIC POSSESSIONS or JAPANESE PACIFIC ISLANDS or KWANGTUNG or KOREA	 coded to Korea
       nativity == "J1" ~ 30025, #COLOMBIA
+      nativity == "70" ~ 00800, #Colorado
       nativity == "11" ~ 00900, #CONNECTICUT	
       nativity == "!6" ~ 21020, #COSTA RICA	
       nativity == "X6" ~ 21020, #COSTARICA
@@ -160,6 +161,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "O6" ~ 50020, #MACAO or PORTUGESE ASIATIC POSSESSIONS or PORTUGESE INDIA or PORTUGESE TIMOR	coded to Macau
       nativity == "12" ~ 02300, #MAINE
       nativity == "P9" ~ 50100, #MANCHOUKUO coded to JAPAN
+      nativity == "31" ~ 02400, #Maryland
       nativity == "13" ~ 02500, #MASSACHUSETTS   
       nativity == "X1" ~ 20000, #MEXICO
       nativity == "!1" ~ 20000, #MEXICO
@@ -177,7 +179,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "23" ~ 03600, #NEW YORK	
       nativity == "X5" ~ 21060, #NICARAGUA
       nativity == "!5" ~ 21060, #NICARAGUA
-      nativity == "46" ~ 52000, #North Carolina	
+      nativity == "46" ~ 03700, #North Carolina	
       nativity == "77" ~ 03800, #NORTH DAKOTA	
       nativity == "M4" ~ 40400, #NORWAY or SPITZBERGEN	coded to norway
       nativity == "53" ~ 03900, #OHIO   
@@ -189,7 +191,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "41" ~ 21070, #PANAMA
       nativity == "06" ~ 21070, #PANAMA
       nativity == "J7" ~ 30060, #PARAGUAY   
-      nativity == "32" ~ 042, #PENNSYLVANIA
+      nativity == "32" ~ 04200, #PENNSYLVANIA
       nativity == "P3" ~ 52200, #PERSIA
       nativity == "J4" ~ 30050, #PERU
       nativity == "R3" ~ 51500, #PHILIPPINE ISLANDS
@@ -199,17 +201,12 @@ nativity_enlistment_recode <- function(df){
       nativity == "R4" ~ 11000, #PUERTO RICO 	
       nativity == "15" ~ 04400, #RHODE ISLAND	
       nativity == "N5" ~ 45600, #ROUMANIA
-      nativity == "O9" ~ 46530, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS 
-      nativity == "O9" ~ 46200, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
-      nativity == "O9" ~ 46100, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
-      nativity == "O9" ~ 46000, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS
-      nativity == "O9" ~ 45900, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS	
-      nativity == "O9" ~ 46500, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS	   
+      nativity == "O9" ~ 46500, #RUSSIA or UNION OF SOCIALIST SOVIET REPUBLICS 
       nativity == "X4" ~ 21030, #SALVADOR
       nativity == "!4" ~ 21030, #SALVADOR
       nativity == "P7" ~ 51700, #SIAM aka THAILAND
       nativity == "47" ~ 04500, #SOUTH CAROLINA	
-      nativity == "78" ~ 00100, #SOUTH DAKOTA	   
+      nativity == "78" ~ 04600, #SOUTH DAKOTA	   
       nativity == "O3" ~ 43800, #SPAIN
       nativity == "M5" ~ 40500, #SWEDEN
       nativity == "48" ~ 04700, #TENNESSEE
