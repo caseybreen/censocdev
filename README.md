@@ -24,6 +24,6 @@ In the `codebase/` directory, each subfolder contains code to:
 - `05_create_censoc_codebooks` — create the codebooks for all CenSoc datasets 
 - `06_website_vignettes`— all CenSoc website vignettes (.Rmd files and 
 - `07_replication_assess_match_quality` — replication code for the assess match quality 
-- `08_track_censoc_users` — code to keep track of the number of new and total CenSoc users 
+- `08_track_censoc_users` — code to keep track of the number of new and total CenSoc users
 
 
