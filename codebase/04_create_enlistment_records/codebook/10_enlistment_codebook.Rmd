@@ -9,7 +9,7 @@ header-includes: \usepackage{hyperref}
 
 
 | Page| Variable     | Label                                        |
-|----:|:-------------|:---------------------------------------------|
+|----:|:-------------------|:---------------------------------------------|
 |   \hyperlink{page.2}{2}  | \hyperlink{page.2}{serial\_number}         |Army Serial Number  |
 |   \hyperlink{page.3}{3}  | \hyperlink{page.3}{byear}           |Year of Birth    |
 |   \hyperlink{page.4}{4}  | \hyperlink{page.4}{fname}           |First Name                      |
@@ -35,7 +35,7 @@ header-includes: \usepackage{hyperref}
 |  \hyperlink{page.25}{25} |\hyperlink{page.25}{component\_enlistment}             |Army component |
 |  \hyperlink{page.26}{26} |\hyperlink{page.26}{source}                          |Source of Army Personnel |
 
-**Summary:** The Berkeley Unified WWII Military Enlistment Database captures 9,039,840 of the 15 million enlistees of World War II. The dataset contains 22 variables on demographic information of the men and women enlisted in the United States Army and the Women’s Army Auxiliary Corps. 
+**Summary:** The Berkeley Unified WWII Military Enlistment Database captures 9,039,840 American men and women enlisted in the United States Army and the Women’s Army Auxiliary Corps circa 1938-1947. This dataset is a cleaned and harmonized version of the National Archives and Records Administration's [Electronic Army Serial Number Merged File, ca. 1938 - 1946 (2002)](https://catalog.archives.gov/id/1263923). It contains information on enlistee demographics, military position, and body measurements.
 
 
 
@@ -73,7 +73,7 @@ enlistment_records_final <- fread(data_path)
 
 **Label**: Army Serial Number
 
-**Description**: serial_number is a character variable reporting a person’s serial number, as recorded in the World War II Army Enlistment Records. This variable uniquely identifies each enlistee.
+**Description**: serial_number is a character variable reporting a person’s army serial number, as recorded in the World War II Army Enlistment Records. These numbers are intended to uniquely identify each enlistee, however, due to scanning or transciption errors some serial numbers in this dataset are non-unique.
 
 
 \newpage 
@@ -119,7 +119,7 @@ byear_plot
 
 **Label:** First Name
 
-**Description:** fname is a character variable reporting a person’s first name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw first names by removing titles (e.g., Dr.) and replacing nicknames with standard names (e.g., Billy to William. Non-alphabetical characters were also removed.
+**Description:** fname is a character variable reporting a person’s first name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw first names by removing titles (e.g., Dr.), non-alphabetical characters, and replacing nicknames with standard names (e.g., Billy to William.)
 
 
 
@@ -133,12 +133,7 @@ byear_plot
 
 **Label**: Middle Name
 
-**Description**: mname is a character variable reporting a person’s middle name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw middle names by removing titles (e.g., Dr.) and replacing nicknames with standard names (e.g., Billy to William. Non-alphabetical characters were also removed.
-
-
-
-
-
+**Description**: mname is a character variable reporting a person’s middle name or middle initial, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw names by removing non-alphabetic characters.
 
 \newpage 
 
@@ -148,7 +143,7 @@ byear_plot
 
 **Label**: Last Name
 
-**Description**: lname is a character variable reporting a person’s last name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw last names by removing titles (e.g., Dr.) and replacing nicknames with standard names (e.g., Billy to William. Non-alphabetical characters were also removed.
+**Description**: lname is a character variable reporting a person’s last name, as recorded in the World War II Army Enlistment Records. This variable was cleaned and standardized by removing non-alphabetic characters and whitespace (e.g., O'Connor to oconnor and Villa-Lobos to villalobos).
 
 
 \vspace{30pt}
