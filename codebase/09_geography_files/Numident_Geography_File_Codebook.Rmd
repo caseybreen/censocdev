@@ -37,7 +37,7 @@ header-includes:
 \vspace{10pt}
 
 
-The Numident Supplementary Geography File (N = 42,878,885) provides a set of supplementary geography variables reporting place of birth and death for individuals in the Numident. This file can be linked onto the Numident at the individual-level using Social Security number. 
+The Numident Supplementary Geography File (N = 7,044,519) provides a set of supplementary geography variables reporting place of birth and death for individuals in the Numident. This file can be linked onto the Numident at the individual-level using HISTID. 
 
 **Place of death variables:** To construct the place of death variables, we use the ZIP code of last residence available in the Numident Death record. It is likely that this reflects the ZIP code where an individual last lived. We map these ZIP codes onto city, county, state, census region, country, and rural urban continuum codes using a database from the United States Postal Service (USPS) [Link](https://postalpro.usps.com/ZIP_Locale_Detail). For ZIP codes that have been decommissioned, we use a secondary database from UnitedStatesZipCodes.org.
 
@@ -47,7 +47,7 @@ The Numident Supplementary Geography File (N = 42,878,885) provides a set of sup
 |     Migration on Mortality of African Americans: Evidence from  the Deep South.”*American Economic Review.*
 |    105(2):477–503. doi: 10.1257/aer.20120642.
 
-To construct other place of birth variable, we mapped the GNIS codes onto city, county, state, and census regions using a database from the U.S. Board on Geographic Names [Link](https://www.usgs.gov/u.s.-board-on-geographic-names/download-gnis-data). Please cite Black et al. (2015) if you are using any of the birthplace geography variables in the file.
+To construct other place of birth variable, we mapped the GNIS codes onto city, county, state, and census regions using a database from the U.S. Board on Geographic Names [Link](https://www.usgs.gov/u.s.-board-on-geographic-names/download-gnis-data). **Note that the District of Columbia and birth locations outside the United States are not mapped to GNIS codes.** Please cite Black et al. (2015) if you are using any of the birthplace geography variables in the file.
 
 \newpage 
 
@@ -61,16 +61,19 @@ library(forcats)
 library(cowplot)
 library(readxl)
 
-Numident_Geography_File <- fread("/hdir/0/chrissoria/Birth_Places/Numident_Geography_File.csv",
+Numident_Geography_File <- fread("/data/censoc/workspace/geography_variables/numident_geography_file_v2.1_conservative.csv",
                               colClasses = c("death_fips" = "character", "death_zip" = "character"))
 
 
 numident <- fread("/data/censoc/censoc_data_releases/censoc_numident/censoc_numident_v2.1/censoc_numident_v2.1.csv")
+numident <- numident[link_abe_exact_conservative == 1]
 
 numident_merged <- merge(numident, Numident_Geography_File, by = "HISTID", all.x = TRUE)
 rm(numident)
 
 numident_merged$death_place_match <-ifelse(!is.na(numident_merged$death_country),1,0)
+
+nrow(numident_merged)
 ```
 
 \newpage 
@@ -81,8 +84,7 @@ numident_merged$death_place_match <-ifelse(!is.na(numident_merged$death_country)
 
 **Label**: Historical Unique Identifier
 
-**Description**: histid is a unique individual-level identifier. It can be used to match the CenSoc-Numident to
-the IPUMS 1940 full-count census.
+**Description**: HISTID is a unique individual-level identifier. This variable uniquely identifies all records in the dataset and can be used to merge onto the CenSoc-Numident mortality dataset.
 
 \newpage 
 
@@ -247,7 +249,7 @@ Although FIPS codes rarely change, one major change occurred after Dade County, 
 
 ```{r echo = T, message=FALSE, warning=FALSE, fig.pos="H", results='asis'}
 #Hypothetical education data
-education <- read_excel("Education.xlsx") 
+education <- read_excel("/data/censoc/workspace/geography_variables/Education.xlsx") 
 
 #we rename FIPS to death_fips so that it can match
 colnames(education)[1] <- "death_fips" 
