@@ -6,7 +6,7 @@ output:
   html_document: default
 ---
 
-To create this file, we will need to read in a truncated version of the BUNMD and ZIP code of death variables files along withplace of birth variables that were created using Seth Sanders' Crosswalk.
+To create this file, we will need to read in a truncated version of the BUNMD and ZIP code of death variables files along with place of birth variables that were created using Seth Sanders' Crosswalk.
 
 To construct the “place of birth” variables, we used a crosswalk originally developed for this paper: 
 
@@ -18,18 +18,45 @@ library(data.table)
 library(dplyr)
 ```
 
+file paths
+```{r}
+# zip features data (ZIP to state, county, region, etc)
+zip_features_path <- "/data/censoc/workspace/geography_variables/Zip_Features.csv"   
+
+# string to GNIS feature by ssn, using Black et al.
+bunmd_birthplace_crosswalk_path <- "/data/censoc/workspace/geography_variables/bunmd_Birthplace.csv"  
+
+# raw unclean birthplace strings
+unclean_birthplace_stings_path <- "/data/censoc/workspace/geography_variables/bunmd_city_string.csv" 
+
+# full BUNMD V2.0
+bunmd_path <- "/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv"                         
+
+# bunmd to numident ID variable crosswalk
+ssn_crosswalk_path <- "/data/censoc/crosswalks/numident_ssn_histid_v2_1_crosswalk.csv"
+
+# path to write files
+geo_files_out_path <- "/data/censoc/workspace/geography_variables/"
+```
+
+
+
 Here, I read in the data and select only for the variables of interest.
 ```{r}
-Zip_Features <- read.csv("Zip_Features.csv", colClasses = c(zip = "character",FIPS = "character")) 
+Zip_Features <- read.csv(zip_features_path,
+                         colClasses = c(zip = "character",FIPS = "character")) 
 
 Zip_Features <- subset(Zip_Features, select=-c(RUC1974, area_name, conterminous, acceptable_cities,district_name,RUC1983,timezone,area_codes,OASDI_benefits_2005,OASDI_total_2005,type,elevation,state_full,delv_address,OASDI_average_2005,OASDI_disabled_2005,OASDI_benefits_2005,OASDI_retired_2005,geocode))
 
-birthplaces_df <- fread("bunmd_Birthplace.csv", select=c("ssn","bpl_city","feature_id","county_name","Region","bpl_string"))
+birthplaces_df <- fread(bunmd_birthplace_crosswalk_path,
+                        select=c("ssn","bpl_city","feature_id","county_name","Region","bpl_string"))
 
-bunmd_trunc <- fread("bunmd_v2.csv", select=c("ssn", "zip_residence","bpl_string"))
+bunmd_trunc <- fread(bunmd_path,
+                     select=c("ssn", "zip_residence","bpl_string"))
 ```
 
-Next, I rename the ZIP code death place varirables so that it'll be clear that these refer to places of death in the final file.
+
+Next, I rename the ZIP code death place variables so that it'll be clear that these refer to places of death in the final file.
 ```{r}
 Zip_Features <- Zip_Features %>% 
   rename(
@@ -44,6 +71,8 @@ Zip_Features <- Zip_Features %>%
   )
 head(Zip_Features)
 ```
+
+
 I truncate the BUNMD zip_residence variable so that it only has 5 digits. This is an important step since the places of death file only contains 5 digit ZIP codes, and gives us a variable that we can match on. 
 ```{r}
 bunmd_trunc <- bunmd_trunc %>% 
@@ -55,6 +84,8 @@ bunmd_trunc <- bunmd_trunc %>%
 
 head(bunmd_trunc)
 ```
+
+
 ```{r}
 west_states <- c("Arizona", "Colorado", "Idaho", "Montana", "Nevada", "New Mexico", "Utah", "Wyoming", "Alaska", "California", "Hawaii", "Oregon", "Washington")
 midwest_states <- c("Illinois", "Indiana", "Michigan", "Ohio", "Wisconsin", "Iowa", "Kansas", "Minnesota", "Missouri", "Nebraska", "North Dakota", "South Dakota")
@@ -74,6 +105,7 @@ bunmd_trunc <- merge(bunmd_trunc, Zip_Features, by = "death_zip", all.x = TRUE,s
 rm(Zip_Features)
 head(bunmd_trunc)
 ```
+
 ```{r}
 bunmd_trunc$death_state <- ifelse(bunmd_trunc$death_county == "DISTRICT OF COLUMBIA", "DC", bunmd_trunc$death_state)
 ```
@@ -90,24 +122,29 @@ birthplaces_df <- birthplaces_df %>%
 
 head(birthplaces_df)
 ```
+
 Next, we merge birth place variables to the BUNMD file. These variables include the city, county, and state where the person was born. Now, we have a new file that contains information on people's death and birthplaces, in addition to their SSN.
 ```{r}
 birthplaces_df <- merge(bunmd_trunc, birthplaces_df, by = "ssn", all.x = TRUE,sort = FALSE)
 rm(bunmd_trunc)
 head(birthplaces_df)
 ```
+
 Let's see how well of a job the crosswalk did and count how many birth states in the BUNMD match with the birth states in the birthplaces file.
 ```{r}
 birthplaces_df$birth_place_matched <- ifelse(birthplaces_df$bpl_string.x == birthplaces_df$bpl_string.y & !is.na(birthplaces_df$bpl_string.x),0,
                                              ifelse(birthplaces_df$bpl_string.x != birthplaces_df$bpl_string.y & !is.na(birthplaces_df$bpl_string.x),1,NA))
 
-print(paste("There are",sum(birthplaces_df$birth_place_matched),"mismatched birth states in the birth places data frame"))
+print(paste("There are",sum(birthplaces_df$birth_place_matched,na.rm=T),"mismatched birth states in the birth places data frame"))
 ```
+
+
 ```{r}
 birthplaces_df <- birthplaces_df %>%
   select(-birth_region.y, -bpl_string.y, -bpl_string.x, -birth_place_matched) %>% 
   rename(birth_region = names(.)[3])
 ```
+
 In the chunks of code below, we standardize the data set and make everything lowercase. We also make sure that any differences in wording are standardized. 
 ```{r}
 birthplaces_df$birth_city <- tolower(birthplaces_df$birth_city)
@@ -142,6 +179,8 @@ birthplaces_df <- birthplaces_df %>%
   )
 head(birthplaces_df$death_county, 10) #we remove the word "county" 
 ```
+
+
 ```{r}
 birthplaces_df$death_state <- gsub("\\b\\s+", "", birthplaces_df$death_state)
 
@@ -171,12 +210,15 @@ We then make sure that the FIPS and ZIP code variables are coded as string varia
 birthplaces_df$death_zip <- as.character(birthplaces_df$death_zip)
 birthplaces_df$death_fips <- as.character(birthplaces_df$death_fips)
 ```
+
 We also include the "uncleaned" birthplace string for researchers who might want to work with them
 ```{r}
-birth_city_uncleaned <- fread("bunmd_city_string.csv")
+birth_city_uncleaned <- fread(unclean_birthplace_stings_path)
 
 head(birth_city_uncleaned)
 ```
+
+
 ```{r}
 birthplaces_df <- merge(birthplaces_df, birth_city_uncleaned, by = "ssn", all.x = TRUE,sort = FALSE)
 
@@ -204,15 +246,20 @@ birthplaces_df <- birthplaces_df %>%
   select(-deletes)
 head(birthplaces_df)
 ```
+
 Next, we save the file as a csv. This file is usable with the BUNMD
 ```{r}
-write.csv(birthplaces_df,"/hdir/0/chrissoria/Birth_Places/BUNMD_Geography_File.csv",row.names = FALSE)
+write.csv(birthplaces_df,
+          paste0(geo_files_out_path, "BUNMD_Geography_File.csv"),
+          row.names = FALSE)
 ```
+
 Next, let's read in our HISTID crosswalk and merge it onto the Geography File so we can use it to merge onto the Numident.
 ```{r}
-HISTID <- fread("/data/censoc/crosswalks/numident_ssn_histid_v2_1_crosswalk.csv")
-birthplaces_df <- fread("/hdir/0/chrissoria/Birth_Places/BUNMD_Geography_File.csv")
+HISTID <- fread(ssn_crosswalk_path)
+birthplaces_df <- fread(paste0(geo_files_out_path, "BUNMD_Geography_File.csv"))
 ```
+
 
 ```{r}
 numident_birthplaces_df <- left_join(HISTID, birthplaces_df, by = "ssn")
@@ -220,7 +267,9 @@ numident_birthplaces_df <- left_join(HISTID, birthplaces_df, by = "ssn")
 numident_birthplaces_df <- numident_birthplaces_df %>%
   select(-ssn)
 
-write.csv(numident_birthplaces_df,"/hdir/0/chrissoria/Birth_Places/Numident_Geography_File.csv",row.names = FALSE)
+write.csv(numident_birthplaces_df,
+          paste0(geo_files_out_path, "Numident_Geography_File.csv"),
+          row.names = FALSE)
 ```
 
 
