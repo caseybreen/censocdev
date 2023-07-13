@@ -30,7 +30,10 @@ bunmd_birthplace_crosswalk_path <- "/data/censoc/workspace/geography_variables/b
 unclean_birthplace_stings_path <- "/data/censoc/workspace/geography_variables/bunmd_city_string.csv" 
 
 # full BUNMD V2.0
-bunmd_path <- "/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv"                         
+bunmd_path <- "/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv" 
+
+# path to published Numident 2.1
+numident_path <- "/data/censoc/censoc_data_releases/censoc_numident/censoc_numident_v2.1/censoc_numident_v2.1.csv"
 
 # bunmd to numident ID variable crosswalk
 ssn_crosswalk_path <- "/data/censoc/crosswalks/numident_ssn_histid_v2_1_crosswalk.csv"
@@ -269,6 +272,26 @@ numident_birthplaces_df <- numident_birthplaces_df %>%
 
 write.csv(numident_birthplaces_df,
           paste0(geo_files_out_path, "Numident_Geography_File.csv"),
+          row.names = FALSE)
+```
+
+
+# create conservative numident version for publicatin
+```{r}
+censoc_numident <- fread(numident_path, select = c("HISTID", "link_abe_exact_conservative"))
+
+# limit to conservative links
+censoc_numident <- censoc_numident[link_abe_exact_conservative == 1]
+
+numident_birthplaces_df_conservative <- numident_birthplaces_df[histid %in% censoc_numident$HISTID]
+
+# capitalize histid variable
+numident_birthplaces_df_conservative <- numident_birthplaces_df_conservative %>% 
+  rename(HISTID = histid)
+
+# write
+write.csv(numident_birthplaces_df_conservative,
+          paste0(geo_files_out_path, "numident_geography_file_v2.1_conservative.csv"),
           row.names = FALSE)
 ```
 
