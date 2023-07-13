@@ -37,17 +37,17 @@ header-includes:
 \vspace{10pt}
 
 
-The BUNMD Supplementary Geography File (N = 42,878,885) provides a set of supplementary geography variables reporting place of birth and death for individuals in the BUNMD. This file can be linked onto the BUNMD at the individual-level using Social Security number. 
+The BUNMD Supplementary Geography File (N = 43,541,997) provides a set of supplementary geography variables reporting place of birth and death for individuals in the BUNMD. This file can be linked onto the BUNMD at the individual-level using Social Security number. 
 
 **Place of death variables:** To construct the place of death variables, we use the ZIP code of last residence available in the Numident Death record. It is likely that this reflects the ZIP code where an individual last lived. We map these ZIP codes onto city, county, state, census region, country, and rural urban continuum codes using a database from the United States Postal Service (USPS) [Link](https://postalpro.usps.com/ZIP_Locale_Detail). For ZIP codes that have been decommissioned, we use a secondary database from UnitedStatesZipCodes.org.
 
-**Place of birth variables:** To construct the place of birth variables, we use the uncleaned 12-character city/county of birth string from the Numident Application records. These strings are uncleaned and contain misspellings and other inconsistencies. We mapped these uncleaned strings onto Geographic Names Information System (GNIS) codes using the crosswalk developed for this paper:
+**Place of birth variables:** To construct the place of birth variables, we use 12-character city/county of birth string from the Numident Application records. These strings are uncleaned and contain misspellings and other inconsistencies. We mapped these uncleaned strings onto Geographic Names Information System (GNIS) codes using the crosswalk developed for this paper:
 
 |     Black, Dan A., Seth G. Sanders, Evan J. Taylor, and Lowell J. Taylor. 2015. “The Impact of the Great 
 |     Migration on Mortality of African Americans: Evidence from  the Deep South.”*American Economic Review.*
 |    105(2):477–503. doi: 10.1257/aer.20120642.
 
-To construct other place of birth variable, we mapped the GNIS codes onto city, county, state, and census regions using a database from the U.S. Board on Geographic Names [Link](https://www.usgs.gov/u.s.-board-on-geographic-names/download-gnis-data). Please cite Black et al. (2015) if you are using any of the birthplace geography variables in the file.
+To construct other place of birth variable, we mapped the GNIS codes onto city, county, state, and census regions using a database from the U.S. Board on Geographic Names [Link](https://www.usgs.gov/u.s.-board-on-geographic-names/download-gnis-data). **Note that the District of Columbia and birth locations outside the United States are not mapped to GNIS codes.** Please cite Black et al. (2015) if you are using any of the birthplace geography variables in the file.
 
 \newpage 
 
@@ -61,11 +61,12 @@ library(forcats)
 library(cowplot)
 library(readxl)
 
-BUNMD_Geography_File <- fread("/hdir/0/chrissoria/Birth_Places/BUNMD_Geography_File.csv",
+BUNMD_Geography_File <- fread("/data/censoc/workspace/geography_variables/BUNMD_Geography_File.csv",
                               colClasses = c("death_fips" = "character", "death_zip" = "character"))
 
 
-bunmd <- fread("bunmd_v2.csv", select=c("ssn","byear","dyear","death_age","race_first","sex","bpl_string","zip_residence")) 
+bunmd <- fread("/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv",
+               select=c("ssn","byear","dyear","death_age","race_first","sex","bpl_string","zip_residence")) 
 
 bunmd_merged <- merge(bunmd, BUNMD_Geography_File, by = "ssn", all.x = TRUE)
 rm(bunmd)
@@ -249,7 +250,7 @@ Although FIPS codes rarely change, one major change occurred after Dade County, 
 
 ```{r echo = T, message=FALSE, warning=FALSE, fig.pos="H", results='asis'}
 #Hypothetical education data
-education <- read_excel("Education.xlsx") 
+education <- read_excel("/data/censoc/workspace/geography_variables/Education.xlsx") 
 
 #we rename FIPS to death_fips so that it can match
 colnames(education)[1] <- "death_fips" 
