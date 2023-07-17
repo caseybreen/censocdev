@@ -9,7 +9,7 @@ library(stringi)
 library(stringr)
 
 # Cleaned enlistment data
-path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment.csv"
+path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
 
 # Enlistment-Numident matches
 path_enlistment_numident_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched-enlistment-numident-males/matched_numident_enlistment_male.csv"

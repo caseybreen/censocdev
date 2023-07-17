@@ -8,7 +8,7 @@ library(readr)
 library(stringi)
 
 # Cleaned enlistment data
-path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment.csv"
+path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
 
 # Enlistment-DMF matches
 path_enlistment_dmf_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_dmf/matched_enlistment_dmf.csv"
@@ -68,7 +68,7 @@ dmf_with_links_public <- dmf_matches_with_enlist_vars_and_histid %>%
          race, citizenship, civilian_occupation, marital_status, height, weight_before_march_1943,
          weight_or_AGCT, component, source, HISTID)
 
-# make a unique identifier for each row 
+# make a unique identifier for each row
 set.seed(4486)
 linked_dmfs_id <- stri_paste(
   stri_rand_strings(n=nrow(dmf_with_links_public), 4, '[A-Za-z0-9]'),

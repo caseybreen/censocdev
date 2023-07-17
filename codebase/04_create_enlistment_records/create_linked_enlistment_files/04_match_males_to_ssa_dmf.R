@@ -1,4 +1,4 @@
-# Match enlistment males to social security DMF 
+# Match enlistment males to social security DMF
 # Author: Maria Osborne, after Wok-tak Joo and Uger Yildirim
 # Updated: July 2, 2023
 
@@ -16,7 +16,7 @@ source("~/censocdev/R/match-records.R")
 # File B: DMF (whole DMF, not the matched censoc-DMF, N = 54.6 million, sex=1 only)
 in_path_dmf <- "/home/ipums/wontak.joo-ipums/project/abe/data/cleaned-dmf/dmf_cleaned.csv"
 # file_B: Enlistment (N = 9 million)
-in_path_clean_enlistment <-"/data/censoc/workspace/enlistment_records/finalenlistment.csv"
+in_path_clean_enlistment <-"/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
 # Out path:
 out_path <- "/home/ipums/mariaosborne-ipums/enlistment_records_linking/matched_enlistment_dmf/"
 
@@ -37,7 +37,7 @@ lname_var_A    <- "lname"
 lname_var_B    <- "lname"
 time_var_A     <- "byear"
 time_var_B     <- "byear"
-id_var_A       <- "ssn" 
+id_var_A       <- "ssn"
 id_var_B       <- "unique_ID"
 vars_to_keep_A <- c("fname_raw", "lname_raw", "middle", "middle_raw", "sex",
                     "bmonth", "dyear", "dmonth", "death_age", "weight")

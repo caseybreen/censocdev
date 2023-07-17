@@ -6,9 +6,9 @@ library(dplyr)
 library(readr)
 
 # Cleaned enlistment data
-path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment.csv"
+path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
 
-# Enlistment-Census matches 
+# Enlistment-Census matches
 path_enlistment_census_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched-enlistment-census/matched_census_enlistment_male.csv"
 
 # Out path Final matched datasets

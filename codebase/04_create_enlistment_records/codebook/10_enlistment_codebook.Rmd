@@ -119,7 +119,7 @@ byear_plot
 
 **Label:** First Name
 
-**Description:** fname is a character variable reporting a person’s first name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw first names by removing titles (e.g., Dr.), non-alphabetical characters, and replacing nicknames with standard names (e.g., Billy to William.)
+**Description:** fname is a character variable reporting a person’s first name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw first names by removing non-alphabetical characters and titles (e.g., Dr.).
 
 
 
@@ -133,7 +133,7 @@ byear_plot
 
 **Label**: Middle Name
 
-**Description**: mname is a character variable reporting a person’s middle name or middle initial, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw names by removing non-alphabetic characters.
+**Description**: mname is a character variable reporting a person’s middle initial or name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw names by removing non-alphabetic characters. Most middle names consist of a single character.
 
 \newpage 
 
@@ -143,7 +143,7 @@ byear_plot
 
 **Label**: Last Name
 
-**Description**: lname is a character variable reporting a person’s last name, as recorded in the World War II Army Enlistment Records. This variable was cleaned and standardized by removing non-alphabetic characters and whitespace (e.g., O'Connor to oconnor and Villa-Lobos to villalobos).
+**Description**: lname is a character variable reporting a person’s last name, as recorded in the World War II Army Enlistment Records. This variable was cleaned and standardized to exclude non-alphabetic characters and whitespace (e.g., "O'Connor" is coded as "oconnor", and "Villa-Lobos" is coded as "villalobos").
 
 
 \vspace{30pt}
