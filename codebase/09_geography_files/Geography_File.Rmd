@@ -38,6 +38,9 @@ numident_path <- "/data/censoc/censoc_data_releases/censoc_numident/censoc_numid
 # bunmd to numident ID variable crosswalk
 ssn_crosswalk_path <- "/data/censoc/crosswalks/numident_ssn_histid_v2_1_crosswalk.csv"
 
+# state FIPS codes
+state_fips_path <- "/data/censoc/workspace/geography_variables/state_fips_codes.csv"
+
 # path to write files
 geo_files_out_path <- "/data/censoc/workspace/geography_variables/"
 ```
@@ -52,7 +55,7 @@ Zip_Features <- read.csv(zip_features_path,
 Zip_Features <- subset(Zip_Features, select=-c(RUC1974, area_name, conterminous, acceptable_cities,district_name,RUC1983,timezone,area_codes,OASDI_benefits_2005,OASDI_total_2005,type,elevation,state_full,delv_address,OASDI_average_2005,OASDI_disabled_2005,OASDI_benefits_2005,OASDI_retired_2005,geocode))
 
 birthplaces_df <- fread(bunmd_birthplace_crosswalk_path,
-                        select=c("ssn","bpl_city","feature_id","county_name","Region","bpl_string"))
+                        select=c("ssn","bpl_city","feature_id","county_name", "Region", "county_numeric", "bpl_string"))
 
 bunmd_trunc <- fread(bunmd_path,
                      select=c("ssn", "zip_residence","bpl_string"))
@@ -121,10 +124,31 @@ birthplaces_df <- birthplaces_df %>%
     birth_city = names(birthplaces_df)[2],
     birth_gnis_code = names(birthplaces_df)[3],
     birth_county = names(birthplaces_df)[4],
-    birth_region = names(birthplaces_df)[5])
+    birth_region = names(birthplaces_df)[5],
+    birth_fips = names(birthplaces_df)[6])
 
 head(birthplaces_df)
 ```
+
+merge county and state numeric codes to get birth fips
+```{r}
+state_fips <- fread(state_fips_path, select = c("stname", "st"))
+names(state_fips) <- c("bpl_string", "state_fips_code")
+state_fips <- state_fips %>%
+  mutate(state_fips_code = str_pad(as.character(state_fips_code), width = 2, side = "left", pad = "0"))
+
+birthplaces_df <- birthplaces_df %>%
+  mutate(birth_fips = str_pad(as.character(birth_fips), width = 3, side = "left", pad = "0"))
+
+birthplaces_df <- birthplaces_df %>% left_join(state_fips, by = "bpl_string")
+
+birthplaces_df <- birthplaces_df %>% mutate(birth_fips = paste0(state_fips_code, birth_fips))
+
+# drop if not a proper 5 digit FIPS code
+birthplaces_df <- birthplaces_df %>% mutate(birth_fips = ifelse(nchar(birth_fips) < 5, "", birth_fips))
+birthplaces_df$state_fips_code <-  NULL
+```
+
 
 Next, we merge birth place variables to the BUNMD file. These variables include the city, county, and state where the person was born. Now, we have a new file that contains information on people's death and birthplaces, in addition to their SSN.
 ```{r}
@@ -212,6 +236,11 @@ We then make sure that the FIPS and ZIP code variables are coded as string varia
 ```{r}
 birthplaces_df$death_zip <- as.character(birthplaces_df$death_zip)
 birthplaces_df$death_fips <- as.character(birthplaces_df$death_fips)
+
+# change NA's to blank strings for these variables (death_zip already okay)
+# will prevent them from being read as integers
+birthplaces_df[is.na(death_fips), death_fips := ""]
+birthplaces_df[is.na(birth_fips), birth_fips := ""]
 ```
 
 We also include the "uncleaned" birthplace string for researchers who might want to work with them
@@ -228,12 +257,12 @@ birthplaces_df <- merge(birthplaces_df, birth_city_uncleaned, by = "ssn", all.x 
 birthplaces_df <- select(birthplaces_df, -c(V1,bpl_city_oflo))
 
 birthplaces_df <- birthplaces_df %>% 
-  rename(birth_city_uncleaned = names(birthplaces_df)[14])
+  rename(birth_city_uncleaned = names(birthplaces_df)[15])
     
 birthplaces_df$birth_city_uncleaned <- tolower(birthplaces_df$birth_city_uncleaned)
 
 birthplaces_df <- birthplaces_df %>%
-  relocate(names(birthplaces_df)[14], .before = names(birthplaces_df)[11])
+  relocate(names(birthplaces_df)[15], .before = names(birthplaces_df)[11])
 
 head(birthplaces_df)
 rm(birth_city_uncleaned)
@@ -249,6 +278,14 @@ birthplaces_df <- birthplaces_df %>%
   select(-deletes)
 head(birthplaces_df)
 ```
+rearrange a bit
+```{r}
+birthplaces_df <- birthplaces_df %>%
+  relocate(birth_region, .before = birth_city_uncleaned) %>% 
+  relocate(death_fips, .after = death_county)
+```
+
+
 
 Next, we save the file as a csv. This file is usable with the BUNMD
 ```{r}
@@ -276,7 +313,7 @@ write.csv(numident_birthplaces_df,
 ```
 
 
-# create conservative numident version for publicatin
+# create conservative numident version for publication
 ```{r}
 censoc_numident <- fread(numident_path, select = c("HISTID", "link_abe_exact_conservative"))
 
