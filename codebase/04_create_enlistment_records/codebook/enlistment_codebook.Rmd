@@ -1,5 +1,5 @@
 ---
-title: "Berkeley Unified WWII Military Enlistment Database Codebook[^updated]"
+title: "Berkeley WWII Military Enlistment Dataset Codebook[^updated]"
 output:
   pdf_document: default
 header-includes: \usepackage{hyperref}
@@ -35,7 +35,7 @@ header-includes: \usepackage{hyperref}
 |  \hyperlink{page.25}{25} |\hyperlink{page.25}{component\_enlistment}             |Army component |
 |  \hyperlink{page.26}{26} |\hyperlink{page.26}{source}                          |Source of Army Personnel |
 
-**Summary:** The Berkeley Unified WWII Military Enlistment Database captures 9,039,840 American men and women enlisted in the United States Army and the Women’s Army Auxiliary Corps circa 1938-1947. This dataset is a cleaned and harmonized version of the National Archives and Records Administration's [Electronic Army Serial Number Merged File, ca. 1938 - 1946 (2002)](https://catalog.archives.gov/id/1263923). It contains information on enlistee demographics, military position, and body measurements.
+**Summary:** The Berkeley WWII Military Enlistment Dataset captures 9,039,840 American men and women enlisted in the United States Army and the Women’s Army Auxiliary Corps circa 1938-1946. This dataset is a cleaned and harmonized version of the National Archives and Records Administration's [Electronic Army Serial Number Merged File, ca. 1938 - 1946 (2002)](https://catalog.archives.gov/id/1263923). It contains information on enlistee sociodemographics, military service, and anthropometry.
 
 
 
