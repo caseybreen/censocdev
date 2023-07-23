@@ -1,5 +1,5 @@
 ---
-title: "Berkeley WWII Military Enlistment Dataset Codebook[^updated]"
+title: "CenSoc WWII Army Enlistment Dataset Codebook[^updated]"
 output:
   pdf_document: default
 header-includes: \usepackage{hyperref}
@@ -35,8 +35,7 @@ header-includes: \usepackage{hyperref}
 |  \hyperlink{page.25}{25} |\hyperlink{page.25}{component\_enlistment}             |Army component |
 |  \hyperlink{page.26}{26} |\hyperlink{page.26}{source}                          |Source of Army Personnel |
 
-**Summary:** The Berkeley WWII Military Enlistment Dataset captures 9,039,840 American men and women enlisted in the United States Army and the Women’s Army Auxiliary Corps circa 1938-1946. This dataset is a cleaned and harmonized version of the National Archives and Records Administration's [Electronic Army Serial Number Merged File, ca. 1938 - 1946 (2002)](https://catalog.archives.gov/id/1263923). It contains information on enlistee sociodemographics, military service, and anthropometry.
-
+**Summary:** The CenSoc WWII Army Enlistment Dataset captures 9,039,840 American men and women enlisted in the United States Army and the Women’s Army Auxiliary Corps circa 1938-1946. This dataset is a cleaned and harmonized version of the National Archives and Records Administration's [Electronic Army Serial Number Merged File, ca. 1938 - 1946 (2002)](https://catalog.archives.gov/id/1263923). It contains information on enlistee sociodemographics, military service, and anthropometry.
 
 
 ```{r global_options, include=FALSE}
@@ -119,9 +118,7 @@ byear_plot
 
 **Label:** First Name
 
-**Description:** fname is a character variable reporting a person’s first name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw first names by removing non-alphabetical characters and titles (e.g., Dr.).
-
-
+**Description:** fname is a character variable reporting a person’s first name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw first names by removing non-alphabetical characters, whitespace, and titles (e.g., Dr.).
 
 
 
@@ -158,9 +155,9 @@ byear_plot
 
 **Label**: Sex
 
-**Description**: sex is a numeric variable that reports a person's sex, as inferred by army branch in World War II ensistment records.
+**Description**: sex is a numeric variable that reports a person's sex, as inferred by army branch in World War II Army Enlistment Records.
 
-**Note**: Sex was not listed on enlistee punchcards. If an individual's numeric branch code or alphabetic branch code in the raw enlistment corresponds to the Women's Army Corps, we declare that person to be female. All other persons are assigned male. There potential for error in this designation due to missing branch information or disagreements between army branch numeric codes, branch alphabetic codes (which we do not publish), and army component information. Thus, sex may not always correspond exactly to army branch and component information in the published data set.
+**Note**: Sex was not listed on enlistee punchcards. If an individual's numeric branch code or alphabetic branch code in the raw enlistment corresponds to the Women's Army Corps, we declare that person to be female. All other persons are assigned male. There is potential for error in this designation due to missing branch information or disagreements between army branch numeric codes, branch alphabetic codes (which we do not publish), and army component information. Thus, sex may not always correspond exactly to army branch and component information in the published data set.
 
 ```{r, include = F}
 sex_tabulated <- knitr::kable(enlistment_records_final %>%
@@ -190,43 +187,6 @@ sex_tabulated
 \vspace{30pt}
 
 ```{r}
-#min(data_combined$year_of_birth, na.rm=T) # "00"
-#max(data_combined$year_of_birth, na.rm=T) # "99"
-
-#data_combined %>%
-  #group_by(year_of_birth) %>%
- # tally() %>%
-#  print(n=101)
-
-#split_date_of_enlistment_ddmmyy <- function(row) {
- # dd <- substr(row, 1, 2)
-#  mm <- substr(row, 3, 4)
-#  yy <- substr(row, 5, 6)
-#  return(list(dd=dd, mm=mm, yy=yy))}
-#res <- lapply(data_combined$date_of_enlistment_ddmmyy, split_date_of_enlistment_ddmmyy) # SLOW
-#data_combined$date_of_enlistment_dd <- unlist(res)[attr(unlist(res), "names") == "dd"]
-#data_combined$date_of_enlistment_mm <- unlist(res)[attr(unlist(res), "names") == "mm"]
-#data_combined$date_of_enlistment_yy <- unlist(res)[attr(unlist(res), "names") == "yy"]
-#rm(res)
-
-#min(data_combined$date_of_enlistment_yy, na.rm=T) # "00"
-#max(data_combined$date_of_enlistment_yy, na.rm=T) # "99"
-
-#data_combined %>%
-  #group_by(date_of_enlistment_yy) %>%
-  #tally() %>%
- # print(n=100)
-
-#nrow(subset(data_combined, date_of_enlistment_yy < "38" | date_of_enlistment_yy > "46")) # 41896
-
-## create new date variable 
-#data_combined <- data_combined %>% 
- # mutate(date_of_enlistment_yy = as.numeric(date_of_enlistment_yy) + 1900) %>% 
-  #mutate(date_enlistment_recode = make_date(date_of_enlistment_yy, date_of_enlistment_mm, date_of_enlistment_dd))
-
-## check dates look reasonable and are in yyyy-mm-dd format (match v1 release)
-
-
 ## visualize distribution (loooks reasonable - identical pattern to v1 release)
 enlistment_records_final %>%
   filter(lubridate::year(date_of_enlistment) %in% c(1938:1947)) %>% ## restrict to years around WWII 
@@ -299,7 +259,7 @@ For a complete list of codes, please see: https://aad.archives.gov/aad/popup-cod
 
 **Label**: Place of enlistment
 
-**Description**: place_of_enlistment_enlistment is a character variable that reports where a person was enlisted, as reported in the World War II Army Enlistment Records. 
+**Description**: place_of_enlistment is a character variable that reports the place a person was enlisted, as reported in the World War II Army Enlistment Records. 
 
 For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=4123&dt=893&c_id=24997
 
@@ -366,8 +326,6 @@ grade_tabulated
 ```
 
 
-
-
 \newpage 
 
 **\huge branch\_code**
@@ -408,17 +366,18 @@ branch_tabulated
 **Label**: Term of enlistment
 
 **Description**: term_of_enlistment is a numeric variable that reports the length of a person's enlistment or their department of enlistment, as reported in the World War II Army Enlistment Records. 
-Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2076&dt=893&c_id=24979
+The codes and full descriptions are available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2076&dt=893&c_id=24979
 
 
 ```{r, include = F}
 toe_tabulated <- knitr::kable(enlistment_records_final %>%
-    group_by(term_of_enlistment) %>%
-     tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
-     mutate(label = c("One year enlistment	", "Enlistment for Alaska	" , "Enlistment for Hawaiian Department	", " Enlistment for assignment to another corps area", "Enlistment for the duration of the War or other emergency, plus six months, subject to the discretion of the President or otherwise according to law	", "Enlistment for the Panama Canal Department	", "Enlistment for the Philippine Department	", "Enlistment for the Puerto Rican Department	 ", "Three year enlistment	", "NA")) %>%
-     select(term_of_enlistment, label, n, `freq %` = freq)) %>% 
-  column_spec(column=2, width = '6cm')
+                                group_by(term_of_enlistment) %>%
+                                tally() %>%
+                                mutate(freq = round(n*100 / sum(n), 2)) %>%
+                                mutate(label = c("One year enlistment", "Enlistment for Alaska" , "Enlistment for Hawaiian Department", " Enlistment for assignment to another corps area", "Enlistment for the duration of the War or other emergency	", "Enlistment for the Panama Canal Department	", "Enlistment for the Philippine Department", "Enlistment for the Puerto Rican Department", "Three year enlistment", "NA")) %>%
+                                select(term_of_enlistment, `label (abbreviated)` = label, n, `freq %` = freq)) 
+
+# %>%   column_spec(column=2, width = '6cm')
 ```
 
 \vspace{30 pt}
@@ -426,12 +385,6 @@ toe_tabulated <- knitr::kable(enlistment_records_final %>%
 ```{r, echo = F}
 toe_tabulated
 ```
-
-
-
-
-
-
 
 
 \newpage 
@@ -497,9 +450,6 @@ cit_tabulated
 
 For complete codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=3323&dt=893&c_id=24986
 
-
-
-
 \newpage 
 
 **\huge marital\_status**
@@ -528,9 +478,6 @@ marital_tabulated
 ```
 
 
-
-
-
 \newpage
 **\huge height**
 \normalsize
@@ -540,7 +487,7 @@ marital_tabulated
 
 **Description**: height is a numeric variable that reports a person's height in inches at time of enlistment, as reported in the World War II Army Enlistment Records. Height was filtered based on the range of permissible heights for enlistment in the military, 60 - 78 inches ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). 
 
-**Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field may encode military occupation or other information depending on time and site of enlistment. We have removed height data for men who enlisted in March of 1943 or later, as the distribution of this variable changes significantly at that point. However, it is possible that other data remains in this field. See the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information.
+**Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field may encode army occupation or other information depending on time and site of enlistment. We have removed height data for men who enlisted in March of 1943 or later, as the distribution of this variable changes significantly at that point. However, it is possible that other erroneous data remains in this field. See the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information.
 
 ```{r, include = F}
 height_plot <- enlistment_records_final %>%
@@ -585,9 +532,6 @@ weight_plot <- enlistment_records_final %>%
 ```{r, echo = F}
 weight_plot
 ```
-
-
-
 
 
 \newpage
