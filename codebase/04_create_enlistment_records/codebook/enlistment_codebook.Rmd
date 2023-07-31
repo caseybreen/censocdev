@@ -72,7 +72,7 @@ enlistment_records_final <- fread(data_path)
 
 **Label**: Army Serial Number
 
-**Description**: serial_number is a character variable reporting a person’s army serial number, as recorded in the World War II Army Enlistment Records. These numbers are intended to uniquely identify each enlistee, however, due to scanning or transciption errors some serial numbers in this dataset are non-unique.
+**Description**: serial_number is a character variable reporting a person’s army serial number, as recorded in the World War II Army Enlistment Records. These numbers are intended to uniquely identify each enlistee, however, due to scanning or transcription errors some serial numbers in this dataset are non-unique.
 
 
 \newpage 
@@ -118,7 +118,7 @@ byear_plot
 
 **Label:** First Name
 
-**Description:** fname is a character variable reporting a person’s first name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw first names by removing non-alphabetical characters, whitespace, and titles (e.g., Dr.).
+**Description:** fname is a character variable reporting a person’s first name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw first names by removing non-alphabetical characters and titles (e.g., Dr.).
 
 
 
@@ -130,7 +130,7 @@ byear_plot
 
 **Label**: Middle Name
 
-**Description**: mname is a character variable reporting a person’s middle initial or name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw names by removing non-alphabetic characters. Most middle names consist of a single character.
+**Description**: mname is a character variable reporting a person’s middle initial or name, as recorded in the World War II Army Enlistment Records. This variable was cleaned from raw names by removing non-alphabetic characters. Most middle names consist of a single character/initial.
 
 \newpage 
 
@@ -163,7 +163,7 @@ byear_plot
 sex_tabulated <- knitr::kable(enlistment_records_final %>%
     group_by(sex) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c("Men", "Women")) %>%
      select(sex, label, n, `freq %` = freq))
 ```
@@ -259,11 +259,9 @@ For a complete list of codes, please see: https://aad.archives.gov/aad/popup-cod
 
 **Label**: Place of enlistment
 
-**Description**: place_of_enlistment is a character variable that reports the place a person was enlisted, as reported in the World War II Army Enlistment Records. 
+**Description**: place_of_enlistment is a character variable that reports the place a person was enlisted, as reported in the World War II Army Enlistment Records. Place of enlistment may record a state, town, military post, or other ad-hoc station of enlistment. For example, places of enlistment in the state of Florida include Florida, Tallahassee, Orlando Air Base, and Municipal Fair Grounds Tampa.
 
 For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=4123&dt=893&c_id=24997
-
-
 
 
 \newpage 
@@ -284,7 +282,7 @@ Codes also available at: https://usa.ipums.org/usa-action/variables/EDUC#codes_s
 education_tabulated <- knitr::kable(enlistment_records_final %>%
     group_by(education) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c( "Nursery school to grade 4" , "Grade 9", "Grade 10", "Grade 11", "Grade 12", "1 year of college	", "2 years of college", "3 years of college" ,"	4 years of college", "5+ years of college", "NA")) %>%
      select(education, label, n, `freq %` = freq))
 ```
@@ -313,7 +311,7 @@ grade_tabulated <- knitr::kable(enlistment_records_final %>%
   group_by(grade_code) %>% 
   tally() %>%
   left_join(grades, by = c('grade_code' = 'Code')) %>%
-  mutate(freq = signif(n * 100 / sum(n), 3)) %>%
+  mutate(freq = round(n * 100 / sum(n), 2)) %>%
   select(grade_code, label = Meaning, n, `freq %`=freq))
 
 ```
@@ -338,15 +336,22 @@ grade_tabulated
 
 ```{r, include = F}
 branches <- fread('cl_2075.csv')
+branches_abb <- branches
+branches_abb[Meaning == "Veterinary Corps or Service - For Officers of the Veterinary Corps and for Enlisted Men of the Veterinary Service",
+             Meaning := "Veterinary Corps or Service"]
+branches_abb[Meaning == "Medical Department  - For Enlisted Men of the Medical Department (includes Enlisted Men of the Medical Department on Duty with the Dental Corps) or Army Nurse Corps",
+             Meaning := "Medical Department or Army Nurse Corps"]
+branches_abb[Meaning == "Veterinary Corps or Service - For Officers of the Veterinary Corps and for Enlisted Men of the Veterinary Service",
+             Meaning := "Veterinary Corps or Service"]
 branch_tabulated <- knitr::kable(enlistment_records_final %>%
                           group_by(branch_code) %>% 
                           tally() %>% 
-                          left_join(branches, by=c('branch_code' = 'Code')) %>%
-                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
+                          left_join(branches_abb, by=c('branch_code' = 'Code')) %>%
+                          mutate(freq = round(n*100 / sum(n), 3)) %>% 
                           select('branch_code'= branch_code, 'label' = Meaning, n, `freq %` = freq),
                           format='latex', booktabs=T) %>% 
-  kable_styling(position = "center") %>% 
-  column_spec(column=2, width = '9cm')
+  kable_styling(position = "center") #%>% 
+  #column_spec(column=2, width = '9cm')
 ```
 
 \vspace{75 pt}
@@ -402,7 +407,7 @@ Codes also available at: https://usa.ipums.org/usa-action/variables/RACE#codes_s
 race_tabulated <- knitr::kable(enlistment_records_final %>%
     group_by(race) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c("White", "Puerto Rican" , "Black", "Native American", "Chinese", "Japanese", "Filipino", "Native Hawaiian", "Other", "NA")) %>%
      select(race, label, n, `freq %` = freq))
 ```
@@ -428,7 +433,7 @@ race_tabulated
 cit_tabulated <- knitr::kable(enlistment_records_final %>%
     group_by(citizenship) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c("Non-Citizen", "Citizen", "NA")) %>%
      select(citizenship, label, n, `freq %` = freq))
 ```
@@ -467,7 +472,7 @@ Codes also available at: https://usa.ipums.org/usa-action/variables/MARST#codes_
 marital_tabulated <- knitr::kable(enlistment_records_final %>%
     group_by(marital_status) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c("Married", "Separated", "Divorced", "Widowed", "Single","NA")) %>%
      select(marital_status, label, n, `freq %` = freq))
 ```
@@ -581,7 +586,7 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 component_tabulated <- knitr::kable(enlistment_records_final %>%
     group_by(component) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c("Regular Army", "Regular Army Reserve","Reserves", "National Guard ", "Philippine Scouts", "Army of the United States", "Selectees", "Women’s Army Corps","NA")) %>%
      select(component, label, n, `freq %` = freq))
 
@@ -608,7 +613,7 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 source_tabulated <- knitr::kable(enlistment_records_final %>%
     group_by(source) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 3)) %>%
      mutate(label = c("Civil Life", "Enlisted Man, Regular Army, within 3 months of Discharge or former WAAC Auxiliary","National Guard in Federal Service, within 3 months of Discharge", "Enlisted Man, Regular Army, after 3 months of Discharge", "National Guard in Federal Service, after 3 months of Discharge ", "Enlisted Reserve or Medical Administrative Corps (MAC) Officer", "Enlisted Man, Philippine Scout or recall to AD of an enlisted man who had been transferred to the ERC", "National Guard	", "Returned to Military Control, Surrendered", "Returned to Military Control Apprehended", "Selective Service within 3 months of Discharge", "Selective Service after 3 months of Discharge","NA")) %>%
      select(source, label, n, `freq %` = freq))
 

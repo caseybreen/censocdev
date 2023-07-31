@@ -376,7 +376,8 @@ data_records %>%
 
 **Label**: Place of Birth 
 
-**Description**: bpl is a numeric variable that reports a person's place of birth, as reported in the World War II Army Enlistment Records.
+**Description**: bpl is a numeric variable that reports a person's place of birth, as reported in the World War II Army Enlistment Records. Place of enlistment may record a state, town, military post, or other ad-hoc station of enlistment. For example, places of enlistment in the state of Florida include Florida, Tallahassee, Orlando Air Base, and Municipal Fair Grounds Tampa.
+
 
 For a complete list of codes, please see: https://usa.ipums.org/usa-action/variables/BPL#codes_section
 

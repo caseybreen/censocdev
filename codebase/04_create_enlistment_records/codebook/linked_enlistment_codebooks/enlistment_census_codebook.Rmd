@@ -255,7 +255,8 @@ For a complete list of codes, please see: https://aad.archives.gov/aad/popup-cod
 
 **Label**: Place of enlistment
 
-**Description**: place_of_enlistment_enlistment is a character variable that reports where a person was enlisted, as reported in the World War II Army Enlistment Records. 
+**Description**: place_of_enlistment_enlistment is a character variable that reports where a person was enlisted, as reported in the World War II Army Enlistment Records. Place of enlistment may record a state, town, military post, or other ad-hoc station of enlistment. For example, places of enlistment in the state of Florida include Florida, Tallahassee, Orlando Air Base, and Municipal Fair Grounds Tampa.
+
 
 For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=4123&dt=893&c_id=24997
 

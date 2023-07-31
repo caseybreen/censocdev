@@ -47,7 +47,7 @@ header-includes: \usepackage{hyperref}
 |  \hyperlink{page.36}{36} |\hyperlink{page.36}{source\_enlistment}      |Source of Army Personnel |
 | \hyperlink{page.37}{37}  | \hyperlink{page.37}{HISTID}         |HISTID (1940 Census)  |
 
-**Summary:** The CenSoc Enlistment-Numident file links 1,692,279 men from World War II era (circa 1938-1947) army enlistment records to mortality records in the Berkeley Unified Numident Mortality Database (BUNMD). The suffix on each variable inidicates if the variable comes from Numident (BUNMD) records or army enlistment records. For enlistment records that have been independently linked to the 1940 census, we include the HISTID identifier variable that researchers may use to merge this data set with IPUMS 1940 census data. Matches between datasets were established using the conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/return-migrants.pdf)).
+**Summary:** The CenSoc Enlistment-Numident file links 1,692,279 men from World War II era (circa 1938-1947) army enlistment records to mortality records in the Berkeley Unified Numident Mortality Database (BUNMD). The suffix on each variable indicates if the variable comes from Numident (BUNMD) records or army enlistment records. For enlistment records that have been independently and additionally linked to the 1940 Census, we include the HISTID identifier variable that researchers may use to merge this data set with IPUMS 1940 Census data. Matches between datasets were established using the conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj5391/f/return-migrants.pdf)).
 
 
 
@@ -80,20 +80,20 @@ setwd(resource_file_path)
 
 **Label**: CenSoc Numident-Enlistment Unique Identifier
 
-**Description**: id is an 11-digit string that uniquely identifies each records in the dataset.
+**Description**: id is an 11-digit string generated to uniquely identify each records in the dataset.
 
 
 
 \newpage
 **Label:** Sex
 
-**Description**: sex reports a person's sex
+**Description**: sex reports a person's sex.
 
 ```{r, include = F}
 sex_tabulated <- data_records %>%
     group_by(sex) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 3)) %>%
      mutate(label = c("Men")) %>%
      select(sex, label, n, `freq %` = freq) %>% 
   knitr::kable(format = "pipe")
@@ -114,7 +114,7 @@ sex_tabulated
 
 **Label**: Place of Birth 
 
-**Description**: bpl is a numeric variable that reports a person's place of birth, as reported in the World War II Army Enlistment Records and Numident death records
+**Description**: bpl is a numeric variable that reports a person's place of birth, as reported in the World War II Army Enlistment Records and Numident death records.
 
 For a complete list of codes, please see: https://usa.ipums.org/usa-action/variables/BPL#codes_section
 
@@ -129,9 +129,9 @@ For a complete list of codes, please see: https://usa.ipums.org/usa-action/varia
 
 **Label**: Year of Birth (Numident)
 
-**Description**: byear is a numeric variable reporting a person’s year of birth, as recorded in Numident records
+**Description**: byear is a numeric variable reporting a person’s year of birth, as recorded in the Numident death records.
 
-**note**: The matching algorithm used allows for up to two years of flexibility on birth year, so birth year in the Numident may disagree with birth year in enlistment records. Birth years are discordant by one year in 7.2\% of records, and discordant by two years in 4.1\% of records. Both birth year variables are published in thus data set.
+**Note**: The matching algorithm used allows for up to two years of flexibility on birth year, so birth year in the Numident may disagree with birth year in enlistment records. Birth years are discordant by one year in 7.2\% of records, and discordant by two years in 4.1\% of records. Both birth year variables are published in thus data set.
 
 ```{r, include = F}
 byear_numident_plot <- data_records %>%
@@ -165,14 +165,14 @@ byear_numident_plot
 
 **Label:** Birth Month
 
-**Description:** bmonth_ reports a person's month of birth, as recorded in the Numident. 
+**Description:** bmonth reports a person's month of birth, as recorded in the Numident death records. 
 
 ```{r, include = F}
 ## run in the console and copy and paste into documentation
 bmonth_tabulated <- data_records %>% 
     group_by(bmonth_numident) %>%
     tally() %>%
-    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
     mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
     select(bmonth_numident, label, n, `freq %` = freq) %>% 
   knitr::kable(format = "pipe")
@@ -192,7 +192,7 @@ bmonth_tabulated
 
 **Label**: Death Year
 
-**Description**: dyear reports a person's year of death, as recorded in the Numident.    
+**Description**: dyear reports a person's year of death, as recorded in the Numident death records.   
 
 ```{r, include = F, message = F}
 dyear_plot <- data_records %>%
@@ -228,13 +228,13 @@ dyear_plot
 
 **Label**: Death Month
 
-**Description**: dmonth_numident reports a person's month of death, as recorded in the Numident death records.  
+**Description**: dmonth_numident reports a person's month of death, as recorded in the Numident death records.
 
 ```{r, include = F}
 dmonth_tabulated <- knitr::kable(data_records %>%
     group_by(dmonth_numident) %>%
     tally() %>%
-    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
     mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
     select(dmonth_numident, label, n, `freq %` = freq))
 ```
@@ -298,7 +298,7 @@ death_age_plot
 race_first_tabulated <- knitr::kable(data_records %>%
     group_by(race_first_numident) %>%
     tally() %>%
-    mutate(freq = signif(n*100 / sum(n), 3)) %>%
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
     mutate(label = c("White", "Black", "Other", "Asian", "Hispanic", "North American Native", "Missing")) %>%
     select(race_first_numident, label, n, `freq %` = freq))
 ```
@@ -356,7 +356,7 @@ race_first_tabulated
 race_last_tabulated <- knitr::kable(data_records %>%
     group_by(race_last_numident) %>%
     tally() %>%
-    mutate(freq = signif(n*100 / sum(n), 3)) %>%
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
     mutate(label = c("White", "Black", "Other", "Asian", "Hispanic", "North American Native", "Missing")) %>%
     select(race_last_numident, label, n, `freq %` = freq))
 ```
@@ -422,7 +422,7 @@ race_last_tabulated
 
 **Label**: State where Social Security Number Issued
 
-**Description**: The state in which a person's social security card was issued. Determined by first three (3) digits of Social Security number, as recorded in Numident death records. The coding schema matches the detailed IPUMS-USA Birthplace coding schema. 
+**Description**: socstate_numident is a numeric variable reporting the state in which a person's social security card was issued. It is determined by the first three (3) digits of the Social Security number, as recorded in Numident death records. The coding schema matches the detailed IPUMS-USA Birthplace coding schema. 
 
 
 
@@ -473,7 +473,7 @@ age_first_app_plot
 
 **Description**: byear is a numeric variable reporting a person’s year of birth, as recorded in the World War II Army Enlistment Records.
 
-**note**: The matching algorithm used allows for up to two years of flexibility on birth year, so birth year in the BUNMD may disagree with birth year in enlistment records. Birth years are discordant by one year in 7.2\% of records, and discordant by two years in 4.1\% of records. Both birth year variables are published in this data set.
+**Note**: The matching algorithm used allows for up to two years of flexibility on birth year, so birth year in the BUNMD may disagree with birth year in enlistment records. Birth years are discordant by one year in 7.2\% of records, and discordant by two years in 4.1\% of records. Both birth year variables are published in this data set.
 
 ```{r, include = F}
 byear_plot_en <- data_records %>%
@@ -611,7 +611,8 @@ For a complete list of codes, please see: https://aad.archives.gov/aad/popup-cod
 
 **Label**: Place of enlistment
 
-**Description**: place_of_enlistment_enlistment is a character variable that reports where a person was enlisted, as reported in the World War II Army Enlistment Records. 
+**Description**: place_of_enlistment_enlistment is a character variable that reports where a person was enlisted, as reported in the World War II Army Enlistment Records. Place of enlistment may record a state, town, military post, or other ad hoc station of enlistment. For example, places of enlistment in the state of Florida include Florida, Tallahassee, Orlando Air Base, and Municipal Fair Grounds Tampa.
+
 
 For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=4123&dt=893&c_id=24997
 
@@ -636,7 +637,7 @@ Codes also available at: https://usa.ipums.org/usa-action/variables/EDUC#codes_s
 education_tabulated <- knitr::kable(data_records %>%
     group_by(education_enlistment) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c( "Nursery school to grade 4" , "Grade 9", "Grade 10", "Grade 11", "Grade 12", "1 year of college	", "2 years of college", "3 years of college" ,"	4 years of college", "5+ years of college")) %>%
      select(education_enlistment, label, n, `freq %` = freq))
 ```
@@ -665,7 +666,7 @@ grade_tabulated <- knitr::kable(data_records %>%
   group_by(grade_code_enlistment) %>% 
   tally() %>%
   left_join(grades, by = c('grade_code_enlistment' = 'Code')) %>%
-  mutate(freq = signif(n * 100 / sum(n), 3)) %>%
+  mutate(freq = round(n * 100 / sum(n), 2)) %>%
   select(grade_code_enlistment, label = Meaning, n, `freq %`=freq))
 
 ```
@@ -692,11 +693,18 @@ grade_tabulated
 
 ```{r, include = F}
 branches <- fread(paste0(resource_file_path,'/cl_2075.csv'))
+branches_abb <- branches
+branches_abb[Meaning == "Veterinary Corps or Service - For Officers of the Veterinary Corps and for Enlisted Men of the Veterinary Service",
+             Meaning := "Veterinary Corps or Service"]
+branches_abb[Meaning == "Medical Department  - For Enlisted Men of the Medical Department (includes Enlisted Men of the Medical Department on Duty with the Dental Corps) or Army Nurse Corps",
+             Meaning := "Medical Department or Army Nurse Corps"]
+branches_abb[Meaning == "Veterinary Corps or Service - For Officers of the Veterinary Corps and for Enlisted Men of the Veterinary Service",
+             Meaning := "Veterinary Corps or Service"]
 branch_tabulated <- knitr::kable(data_records %>%
                           group_by(branch_code_enlistment) %>% 
                           tally() %>% 
                           left_join(branches, by=c('branch_code_enlistment' = 'Code')) %>%
-                          mutate(freq = signif(n*100 / sum(n), 3)) %>% 
+                          mutate(freq = round(n*100 / sum(n), 3)) %>% 
                           select(branch_code_enlistment, 'label' = Meaning, n, `freq %` = freq),
                           format='latex', booktabs=T) %>% 
   kable_styling(position = "center") %>% 
@@ -727,9 +735,9 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 toe_tabulated <- knitr::kable(data_records %>%
     group_by(term_of_enlistment_enlistment) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
-     mutate(label = c("One year enlistment	", "Enlistment for Alaska	" , "Enlistment for Hawaiian Department	", " Enlistment for assignment to another corps area", "Enlistment for the duration of the War or other emergency, plus six months, subject to the discretion of the President or otherwise according to law	", "Enlistment for the Panama Canal Department	", "Enlistment for the Philippine Department	", "Enlistment for the Puerto Rican Department	 ", "Three year enlistment	", "NA")) %>%
-     select(term_of_enlistment_enlistment, label, n, `freq %` = freq))
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
+     mutate(label = c("One year enlistment", "Enlistment for Alaska" , "Enlistment for Hawaiian Department", "Enlistment for assignment to another corps area", "Enlistment for the duration of the War or other emergency", "Enlistment for the Panama Canal Department	", "Enlistment for the Philippine Department	", "Enlistment for the Puerto Rican Department", "Three year enlistment	", "NA")) %>%
+     select(term_of_enlistment_enlistment, `label (abbreviated)` = label, n, `freq %` = freq))
 ```
 
 \vspace{30 pt}
@@ -760,7 +768,7 @@ Codes also available at: https://usa.ipums.org/usa-action/variables/RACE#codes_s
 race_tabulated <- knitr::kable(data_records %>%
     group_by(race_enlistment) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 3)) %>%
      mutate(label = c("White", "Puerto Rican" , "Black", "Native American", "Chinese", "Japanese", "Filipino", "Native Hawaiian", "Other", "NA")) %>%
      select(race_enlistment, label, n, `freq %` = freq))
 ```
@@ -786,7 +794,7 @@ race_tabulated
 cit_tabulated <- knitr::kable(data_records %>%
     group_by(citizenship_enlistment) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c("Non-Citizen", "Citizen", "NA")) %>%
      select(citizenship_enlistment, label, n, `freq %` = freq))
 ```
@@ -828,7 +836,7 @@ Codes also available at: https://usa.ipums.org/usa-action/variables/MARST#codes_
 marital_tabulated <- knitr::kable(data_records %>%
     group_by(marital_status_enlistment) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c("Married", "Separated", "Divorced", "Widowed", "Single","NA")) %>%
      select(marital_status_enlistment, label, n, `freq %` = freq))
 ```
@@ -949,7 +957,7 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 component_tabulated <- knitr::kable(data_records %>%
     group_by(component_enlistment) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c("Regular Army", "Regular Army Reserve","Reserves", "National Guard ", "Philippine Scouts", "Army of the United States", "Selectees", "Women’s Army Corps","NA")) %>%
      select(component_enlistment, label, n, `freq %` = freq))
 
@@ -976,7 +984,7 @@ Codes also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2
 source_tabulated <- knitr::kable(data_records %>%
     group_by(source_enlistment) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 3)) %>%
      mutate(label = c("Civil Life", "Enlisted Man, Regular Army, within 3 months of Discharge or former WAAC Auxiliary","National Guard in Federal Service, within 3 months of Discharge", "Enlisted Man, Regular Army, after 3 months of Discharge", "National Guard in Federal Service, after 3 months of Discharge ", "Enlisted Reserve or Medical Administrative Corps (MAC) Officer", "Enlisted Man, Philippine Scout or recall to AD of an enlisted man who had been transferred to the ERC", "National Guard	", "Returned to Military Control, Surrendered", "Returned to Military Control Apprehended", "Selective Service within 3 months of Discharge", "Selective Service after 3 months of Discharge","NA")) %>%
      select(source_enlistment, label, n, `freq %` = freq))
 
@@ -995,13 +1003,13 @@ source_tabulated
 
 **Label**: Historical Unique Identifier (1940 Census)
 
-**Description**: HISTID is a unique individual-level identifier assigned to indivuals in IPUMS-USA 1940 census data. This variable is availible for individuals where a link between army enlistment records and the 1940 census has been established.
+**Description**: HISTID is a unique individual-level identifier assigned to individuals in IPUMS-USA 1940 Census data. This variable is available for individuals where a link between army enlistment records and the 1940 Census has been established.
 
 ```{r, include = F}
 hist_tab <- data_records %>%
     group_by(is.na(HISTID)) %>%
      tally() %>%
-     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(freq = round(n*100 / sum(n), 3)) %>%
      mutate(HISTID = c("non-missing", "NA")) %>%
      select(HISTID, n, `freq %` = freq) %>% 
   knitr::kable(format = "pipe")
