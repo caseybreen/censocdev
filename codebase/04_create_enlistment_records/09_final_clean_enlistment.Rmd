@@ -49,6 +49,7 @@ colnames(data_combined)
 enlistment_records_final_v1 <- subset(data_combined, select = c( "serial_number",  "yob_precise", "fname_clean", "fname_clean_std" , "mname_clean" ,"lname_clean", "sex_r", "date_enlistment_recode", "nativity_recode$nativity_recode" , "residence_county", "res_state_recode$state_recode", "place_of_enlistment","education_recode$education_recode","grade_recode$grade_code_recode",  "branch_recode$branch_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode", "civ_occupation_recode$civ_occupation_recode" ,"marital_status_recode$marital_status_recode", "height_recode", "weight_before_1943","weight_or_AGCT", "component_recode$component_recode","source_recode$source_recode"))
 
 ```
+
 #test df by looking at the first 200 rows
 ```{r}
 head(enlistment_records_final_v1, 200)
@@ -59,7 +60,7 @@ enlistment_records_final <- enlistment_records_final_v1 %>%
         rename(  
                "fname" = "fname_clean",
                "mname" = "mname_clean",
-                "lname" = "lname_clean",
+               "lname" = "lname_clean",
                "sex" = "sex_r",
                "residence_state"="res_state_recode$state_recode",
                "byear" = "yob_precise",
@@ -84,6 +85,7 @@ head(enlistment_records_final, 200)
 ```
 
 
+
 # remove rows that contain no actual data 
 About 160,000 rows contain the string "ONE OR MORE CARDS WERE UNREADABLE AT THIS LOCATION",
 indicating a gap in the data rather than an actual data record.
@@ -95,6 +97,39 @@ enlistment_records_final <- enlistment_records_final %>%
 
 
 
+# Filter Dates (enlistment & birth)
+Birth dates: no one could legally enlist under age 17. We filter to those born in 1930 or earlier, who would have turned 17 in the year 1947. No clear maximum age, but we will filter out birth years before 1860 (cohort that turned 78 in 1938). Records before this date mostly have invalid/missing names and dates of enlistment, so are likely not reliable.
+
+There may cases where (year of enlistment) - (year of birth) < 17, we have not filtered these out.
+```{r}
+mean(enlistment_records_final$byear %in% 1860:1930) # 98.9% of people are born 1860 - 1930
+enlistment_records_final <- enlistment_records_final %>% 
+  mutate(byear = ifelse(byear %in% 1860:1930, byear, NA_integer_))
+table(enlistment_records_final$byear, useNA = "always")
+```
+
+Date of enlistment:
+remove anything outside 1938-1947 range
+```{r}
+table(lubridate::year(enlistment_records_final$date_of_enlistment), useNA = "always")
+enlistment_records_final <- enlistment_records_final %>% 
+  mutate(date_of_enlistment = if_else(date_of_enlistment >= "1938-01-01" & date_of_enlistment <= "1947-12-31",
+                                      date_of_enlistment, as.Date(NA)))
+table(lubridate::year(enlistment_records_final$date_of_enlistment), useNA = "always")
+```
+
+rearrange cols slightly so residence state is before county
+```{r}
+enlistment_records_final <- enlistment_records_final %>%
+  relocate(residence_state, .before = residence_county)
+```
+
+
+```{r}
+head(enlistment_records_final)
+```
+
+
 #save final dataset
 ```{r}
 # with cleaned names for publication
@@ -104,7 +139,10 @@ write_csv(enlistment_records_final %>% select(-c("fname_clean_std")),
 # with standardized names for matching
 write_csv(enlistment_records_final %>% select(-c("fname")),
           paste0(out_path, "/finalenlistment_for_linking.csv"))
+```
 
+clean up
+```{r}
 rm(list = ls())
 ```
 

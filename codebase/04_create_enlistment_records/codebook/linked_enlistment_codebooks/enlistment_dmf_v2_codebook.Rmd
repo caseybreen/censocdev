@@ -391,9 +391,7 @@ For a complete list of codes, please see: https://usa.ipums.org/usa-action/varia
 
 **Label**: State of residence
 
-**Description**: residence_state_enlistment is a character variable that reports a person's state of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the US.
-
-For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2046&dt=893&c_id=24996
+**Description**: residence_state_enlistment is a numeric variable that reports a person's state of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the United States, Hawaii, Alaska, and Puerto Rico. The coding schema matches the **detailed** IPUMS-USA Birthplace coding schema. For a complete list of IPUMS codes, please see: https://usa.ipums.org/usa-action/variables/BPL. 
 
 
 \newpage 
@@ -404,9 +402,11 @@ For a complete list of codes, please see: https://aad.archives.gov/aad/popup-cod
 
 **Label**: County of residence
 
-**Description**: residence_county_enlistment is a character variable that reports a person's county of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the US.
+**Description**: residence_county is a character variable that reports a person's county of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the US. County is not available for residents of Hawaii and Alaska, which were not yet states.
 
 For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2057&dt=893&c_id=24998
+
+**Note:** County codes are only unique within states. For example, code 111 refers to Ventura County for residents of California, but refers to Jefferson County for residents of Kentucky. County codes are numbers assigned to counties within states by alphabetical order, and are generally equivalent to FIPS county codes. However, they may not align exactly with modern FIPS codes due to county splits, merges, name changes, etc. since 1947.
 
 
 
