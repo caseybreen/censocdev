@@ -256,9 +256,11 @@ recode_res_state_enlistment_to_ipums <- function(df){
       residence_state == "D3" ~ 1300, #GEORGIA
       residence_state == "R8" ~ 1300, #GEORGIA
       residence_state == "03" ~ 1500, #HAWAII 1500
+      residence_state == "R2" ~ 1500, #HAWAII
+         # R2 = Idaho or Hawaiian Islands. Most people w/ code R2 are born in HI,
+         # so we choose HI as place of residence
       residence_state == "92" ~ 1600, #IDAHO 1600
       residence_state == "I2" ~ 1600, #IDAHO
-      residence_state == "R2" ~ 1600, #IDAHO
       residence_state == "61" ~ 1700, #ILLINOIS 1700
       residence_state == "F1" ~ 1700, #ILLINOIS
       residence_state == "O1" ~ 1700, #ILLINOIS

@@ -197,7 +197,7 @@ nativity_enlistment_recode <- function(df){
       nativity == "R3" ~ 51500, #PHILIPPINE ISLANDS
       nativity == "07" ~ 51500, #PHILIPPINE ISLANDS	
       nativity == "N0" ~ 45500, #POLAND   
-      nativity == "08" ~ 25000, #PUERTO RICO (INCLUDING VIRGIN ISLANDS AND CUBA)	
+      nativity == "08" ~ 11000, #PUERTO RICO (INCLUDING VIRGIN ISLANDS AND CUBA)	
       nativity == "R4" ~ 11000, #PUERTO RICO 	
       nativity == "15" ~ 04400, #RHODE ISLAND	
       nativity == "N5" ~ 45600, #ROUMANIA
