@@ -25,7 +25,7 @@ path_final <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment
 enlistment <- fread(path_full_enlistment)
 numident_matches <- fread(path_enlistment_numident_matched)
 census_to_enlistment_matches <- fread(path_census_enlistment_matched,
-                                      select = c("id_A", "id_B", "fname.y", "lname.y")) #all conservative matches
+                                      select = c("id_A", "id_B", "fname_clean_std", "lname.y")) #all conservative matches
 setnames(census_to_enlistment_matches, c("HISTID", "id_B", "fname_census_clean", "lname_census_clean"))
 
 # Add unique row number identifier to enlistment records
@@ -35,7 +35,7 @@ enlistment <- enlistment %>% mutate(unique_ID = row_number())
 numident_matches$link_abe_exact_conservative_enlist_numident <- ifelse(
   numident_matches$uniquestub_match2 == 1 & numident_matches$uniquestub_file2 == 1, 1, 0)
 
-# pare down to consdrevative matches
+# pare down to conservative matches
 numident_matches <- numident_matches %>%
   filter(link_abe_exact_conservative_enlist_numident == 1) # 2.74 million --> 2.1 million
 

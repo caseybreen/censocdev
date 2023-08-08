@@ -32,7 +32,7 @@ header-includes: \usepackage{hyperref}
 |  \hyperlink{page.22}{22} |\hyperlink{page.22}{height}                |Height at Enlistment (Inches) |
 |  \hyperlink{page.23}{23} |\hyperlink{page.23}{weight\_before\_march\_1943}                |Weight (Pounds)|
 |  \hyperlink{page.24}{24} |\hyperlink{page.24}{weight\_or\_AGCT}                |Weight (Pounds) or AGCT Score|
-|  \hyperlink{page.25}{25} |\hyperlink{page.25}{component\_enlistment}             |Army Component |
+|  \hyperlink{page.25}{25} |\hyperlink{page.25}{component}             |Army Component |
 |  \hyperlink{page.26}{26} |\hyperlink{page.26}{source}                          |Source of Army Personnel |
 
 **Summary:** The CenSoc WWII Army Enlistment Dataset captures 9,039,840 American men and women enlisted in the United States Army and the Women’s Army Auxiliary Corps circa 1938-1946. This dataset is a cleaned and harmonized version of the National Archives and Records Administration's [Electronic Army Serial Number Merged File, ca. 1938 - 1946 (2002)](https://catalog.archives.gov/id/1263923). It contains information on enlistee sociodemographics, military service, and anthropometry.
@@ -52,7 +52,7 @@ library(lubridate)
 library(kableExtra)
 library(here)
 
-data_path <- '/data/censoc/workspace/enlistment_records/finalenlistment.csv'
+data_path <- '/data/censoc/censoc_data_releases/army_enlistment_standalone/enlistment_v1/censoc_wwii_army_enlistment_v1.csv'
 resource_file_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode'
 path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp3.csv"
 #out_path          <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
@@ -72,7 +72,7 @@ enlistment_records_final <- fread(data_path)
 
 **Label**: Army Serial Number
 
-**Description**: serial_number is a character variable reporting a person’s army serial number, as recorded in the World War II Army Enlistment Records. These numbers are intended to uniquely identify each enlistee, however, due to scanning or transcription errors some serial numbers in this dataset are non-unique.
+**Description**: serial_number is a character variable reporting a person’s army serial number, as recorded in the World War II Army Enlistment Records. These numbers were intended to uniquely identify each enlistee, however, due to scanning or transcription errors some serial numbers in this dataset are non-unique.
 
 
 \newpage 
@@ -218,7 +218,7 @@ enlistment_records_final %>%
 
 **Label**: Place of Birth 
 
-**Description**: bpl is a numeric variable that reports a person's place of birth, as reported in the World War II Army Enlistment Records.The coding schema matches the **detailed** IPUMS-USA Birthplace coding schema. For a complete list of IPUMS codes, please see: https://usa.ipums.org/usa-action/variables/BPL.
+**Description**: bpl is a numeric variable that reports a person's place of birth, as reported in the World War II Army Enlistment Records. The coding schema matches the **detailed** IPUMS-USA Birthplace coding schema. For a complete list of IPUMS codes, please see: https://usa.ipums.org/usa-action/variables/BPL#codes_section.
 
 
 
@@ -228,9 +228,9 @@ enlistment_records_final %>%
 \normalsize
 \vspace{12pt}
 
-**Label**: State of residence
+**Label**: State of Residence
 
-**Description**: residence_state is a numeric variable that reports a person's state of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the United States, Hawaii, Alaska, and Puerto Rico. The coding schema matches the **detailed** IPUMS-USA birthplace coding schema. For a complete list of IPUMS codes, please see: https://usa.ipums.org/usa-action/variables/BPL. 
+**Description**: residence_state is a numeric variable that reports a person's state of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the United States, Hawaii, Alaska, and Puerto Rico. The coding schema matches the **detailed** IPUMS-USA birthplace coding schema. For a complete list of IPUMS codes, please see: https://usa.ipums.org/usa-action/variables/BPL#codes_section. 
 
 
 \newpage 
@@ -239,11 +239,11 @@ enlistment_records_final %>%
 \normalsize
 \vspace{12pt}
 
-**Label**: County of residence
+**Label**: County of Residence
 
-**Description**: residence_county is a character variable that reports a person's county of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the US. County is not available for residents of Hawaii and Alaska, which were not yet states. For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2057&dt=893&c_id=24998. Or, for county codes organized by state, see page 1-65 of [\textcolor{blue}{Nara Compiled Technical Documention.}](https://s3.amazonaws.com/NARAprodstorage/opastorage/live/23/2639/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1CL_SD.pdf)
+**Description**: residence_county is a character variable that reports a person's county of residence at time of enlistment, as reported in the World War II Army Enlistment Records. These codes are generally equivalent to FIPS county codes. This variable is only available for enlistees residing in the United States. County is not available for residents of Hawaii and Alaska, which were not yet states. For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2057&dt=893&c_id=24998. Or, for county codes organized by state, see page 1-65 of [\textcolor{blue}{Nara Compiled Technical Documention.}](https://s3.amazonaws.com/NARAprodstorage/opastorage/live/23/2639/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1CL_SD.pdf) (Note that state codes in NARA Compiled Technical Documentation are *not* equivalent to either state FIPS codes or IPUMS state codes published in this dataset.)
 
-**Note:** County codes are only unique within states. For example, code 111 refers to Ventura County for residents of California, but refers to Jefferson County for residents of Kentucky. County codes are numbers assigned to counties within states by alphabetical order, and are generally equivalent to FIPS county codes. However, they may not align exactly with modern FIPS codes due to county splits, merges, name changes, etc. since 1947. Invalid codes may be present in the data.
+**Note:** County codes are only unique within states. For example, code 111 refers to Ventura County for residents of California, but refers to Jefferson County for residents of Kentucky. These codes may not align exactly with modern FIPS codes due to county splits, merges, name changes, etc. since the 1940s. County codes within individual states have not been cleaned, and invalid codes may be present.
 
 
 
@@ -253,7 +253,7 @@ enlistment_records_final %>%
 \normalsize
 \vspace{12pt}
 
-**Label**: Place of enlistment
+**Label**: Place of Enlistment
 
 **Description**: place_of_enlistment is a character variable that reports the place a person was enlisted, as reported in the World War II Army Enlistment Records. Place of enlistment may record a state, town, military post, or other ad hoc station of enlistment. For example, places of enlistment in the state of Florida include Florida, Tallahassee, Orlando Air Base, and Municipal Fair Grounds Tampa.
 
@@ -271,7 +271,7 @@ For a complete list of codes, please see: https://aad.archives.gov/aad/popup-cod
 **Description**: education  is a numeric variable that reports an individual's educational attainment at time of enlistment, as reported in the World War II Army Enlistment Records.
 Codes are also available at: https://usa.ipums.org/usa-action/variables/EDUC#codes_section
 
-**Note**: Exact number of years of schooling is unknown for enlistees who did not complete at least one year of high school. Such enlistees were given originally given a code meaning "grammar school", though it is unknown if this corresponds to the modern equivalent of a 5th, 6th, or 8th grade education. Many enlistees with this code likely had little to no actual education. Before the attack on Pearl Harbor, literacy was required of army inductees, but this requirement relaxed as the war effort increased ([\textcolor{blue}{Brandt, 2004}](https://doi.org/10.2307/4140731)). By 1942, the Army accepted illiterate men if they were deemed trainable, though academic standards for admission increased again in 1944 and 1945.
+**Note**: Exact number of years of schooling is unknown for enlistees who did not complete at least one year of high school. Such enlistees were given originally given a code meaning "grammar school", though it is unknown if this corresponds to the modern equivalent of a 5th, 6th, or 8th grade education. Some enlistees with this code may have had little to no actual education. Before the attack on Pearl Harbor, literacy was required of army inductees, but this requirement relaxed as the war effort increased ([\textcolor{blue}{Brandt, 2004}](https://doi.org/10.2307/4140731)). By 1942, the Army accepted illiterate men if they were deemed trainable, though academic standards for admission increased again in 1944 and 1945.
 
 
 ```{r, include = F}
@@ -293,9 +293,9 @@ education_tabulated
 \normalsize
 \vspace{12pt}
 
-**Label**: Army grade 
+**Label**: Army Grade 
 
-**Description**: grade_code is a numeric variable that records a person's army grade (rank), as reported in the World War II Army Enlistment Records. The code list also is available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2072&dt=893&c_id=24999
+**Description**: grade_code is a numeric variable that records a person's army grade (rank), as reported in the World War II Army Enlistment Records. 
 
 
 ```{r, include = F}
@@ -325,7 +325,7 @@ grade_tabulated
 \normalsize
 \vspace{12pt}
 
-**Label**: Army branch 
+**Label**: Army Branch 
 
 **Description**: branch_code is a numeric variable that records the army branch in which the enlistee served, as reported in the World War II Army Enlistment Records. 
 
@@ -363,7 +363,7 @@ branch_tabulated
 \normalsize
 \vspace{12pt}
 
-**Label**: Term of enlistment
+**Label**: Term of Enlistment
 
 **Description**: term_of_enlistment is a numeric variable that reports the length of a person's enlistment or their department of enlistment, as reported in the World War II Army Enlistment Records. 
 The codes and full descriptions are available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2076&dt=893&c_id=24979
@@ -444,7 +444,7 @@ cit_tabulated
 \normalsize
 \vspace{12pt}
 
-**Label**: civilian occupation
+**Label**: Civilian Occupation
 
 **Description**: civilian_occupation is a numeric variable that reports a person's occupation at time of enlistment, as reported in the World War II Army Enlistment Records. 
 
@@ -456,7 +456,7 @@ For complete codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?
 \normalsize
 \vspace{12pt}
 
-**Label**: marital status
+**Label**: Marital Status
 
 **Description**: marital_status is a numeric variable that reports a person's marital status at time of enlistment, as reported in the World War II Army Enlistment Records. 
 
@@ -487,7 +487,7 @@ marital_tabulated
 
 **Description**: height is a numeric variable that reports a person's height in inches at time of enlistment, as reported in the World War II Army Enlistment Records. Height was filtered based on the range of permissible heights for enlistment in the military, 60 - 78 inches ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). 
 
-**Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field may encode army occupation or other information depending on time and site of enlistment. We have removed height data for men who enlisted in March of 1943 or later, as the distribution of this variable changes significantly at that point. However, it is possible that other erroneous data remains in this field. See the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information.
+**Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field may encode army occupation or other information depending on time and site of enlistment. We have removed height data for persons who enlisted in March of 1943 or later, as the distribution of this variable changes significantly at that point. However, it is possible that other erroneous data remains in this field. See the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information.
 
 ```{r, include = F}
 height_plot <- enlistment_records_final %>%
@@ -512,7 +512,7 @@ height_plot
 \vspace{12pt}
 
 
-**Description**: weight_before_march_1943 is a numeric variable that reports a person's weight in pounds at time of enlistment as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted before the March of 1943. Weight is filtered to a minimum of 105 pounds, the minimum permissible weight for a 60-inch-tall enlistee ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). While there was no clear maximum body weight for army enlistees, we have removed values of over 500.
+**Description**: weight_before_march_1943 is a numeric variable that reports a person's weight in pounds at time of enlistment as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted before March of 1943. Weight is filtered to a minimum of 105 pounds, the minimum permissible weight for a 60-inch-tall enlistee ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). While there was no clear maximum allowable body weight for army enlistees, we have removed values of over 500.
 
 **Note**: On enlistment punch cards, the field used to record weight was also used for Army General Classification Test (AGCT) scores, and may also encode military occupation or other information. Weight may have been recorded through 1943 at some enlistment sites, but the recording of AGCT score instead of weight at many enlistment sites likely began in March 1943. Because of this ambiguity, we only make this variable available for enlistees who enlisted before March 1943. 
 Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information. For enlistees who enlisted March 1943 or later, we have created an additional variable called **weight_or_AGCT**.
@@ -540,7 +540,7 @@ weight_plot
 \normalsize
 \vspace{12pt}
 
-**Label**: Weight (pounds) at enlistment or AGCT score
+**Label**: Weight (Pounds) at Enlistment or AGCT Score
 
 **Description**: weight_or_AGCT is a numeric variable that reports a person's weight in pounds at time of enlistment or their Army General Classification Test (AGCT) score, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted in March 1943 or later.  We have removed zeros and values above 500, which likely exceed the maximum realistic body weights and AGCT scores, but otherwise leave the data in this field unfiltered and unsorted.
 
@@ -574,7 +574,7 @@ weight_agct_plot
 
 **Description**:  component is a numeric variable that records the component of the army in which an individual served, as recorded in the World War II Army Enlistment Records. 
 
-Codes are also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2078&dt=929&c_id=25014
+For more detailed variable labels, see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2078&dt=929&c_id=25014
 \vspace{75 pt}
 
 ```{r}
@@ -583,7 +583,7 @@ component_tabulated <- knitr::kable(enlistment_records_final %>%
      tally() %>%
      mutate(freq = round(n*100 / sum(n), 2)) %>%
      mutate(label = c("Regular Army", "Regular Army Reserve","Reserves", "National Guard ", "Philippine Scouts", "Army of the United States", "Selectees", "Women’s Army Corps","NA")) %>%
-     select(component, label, n, `freq %` = freq))
+     select(component, `label (abbreviated)` = label, n, `freq %` = freq))
 
 ```
 
@@ -598,10 +598,10 @@ component_tabulated
 \normalsize
 \vspace{12pt}
 
-**Label**: Source of army personnel
+**Label**: Source of Army Personnel
 
 **Description**: source is a numeric variable that reports the source of the enlisted person, as reported in the World War II Army Enlistment Records. This denotes if an enlistee was a civilian prior to enlistment, or if they were already enlisted in the National Guard or another faction of the military.
-Codes are also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2077&dt=893&c_id=24981
+
 
 \vspace{75 pt}
 ```{r}

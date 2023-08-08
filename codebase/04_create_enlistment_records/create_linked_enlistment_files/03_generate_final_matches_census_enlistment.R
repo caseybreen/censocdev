@@ -4,6 +4,7 @@
 
 library(dplyr)
 library(readr)
+library(data.table)
 
 # Cleaned enlistment data
 path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
@@ -48,6 +49,7 @@ census_with_links_public <- census_with_links_public %>% rename("HISTID" = id_A)
 # remove identifying information from this version
 census_with_links_public$id_B <- NULL
 census_with_links_public$fname <- NULL
+census_with_links_public$fname_clean_std <- NULL
 census_with_links_public$mname <- NULL
 census_with_links_public$lname <- NULL
 census_with_links_public$serial_number <- NULL

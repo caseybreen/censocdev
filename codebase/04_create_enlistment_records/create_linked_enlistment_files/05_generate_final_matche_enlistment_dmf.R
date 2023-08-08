@@ -24,7 +24,7 @@ path_final <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment
 enlistment <- fread(path_full_enlistment)
 dmf_matches <- fread(path_enlistment_dmf_matched)
 census_to_enlistment_matches <- fread(path_census_enlistment_matched,
-                                      select = c("id_A", "id_B", "fname.y", "lname.y")) #all conservative matches
+                                      select = c("id_A", "id_B", "fname_clean_std", "lname.y")) #all conservative matches
 setnames(census_to_enlistment_matches, c("HISTID", "id_B", "fname_census_clean", "lname_census_clean"))
 
 # Add unique row number identifier to enlistment records
@@ -34,7 +34,7 @@ enlistment <- enlistment %>% mutate(unique_ID = row_number())
 dmf_matches$link_abe_exact_conservative_enlist_dmf <- ifelse(
   dmf_matches$uniquestub_match2 == 1 & dmf_matches$uniquestub_file2 == 1, 1, 0)
 
-# pare down to consdrevative matches
+# pare down to conservative matches
 dmf_matches <- dmf_matches %>% filter(link_abe_exact_conservative_enlist_dmf == 1) # 2.9 million -> 1.85 million records
 
 
@@ -85,7 +85,7 @@ colnames(dmf_with_links_public) = str_replace(colnames(dmf_with_links_public), "
 colnames(dmf_with_links_public)[7:25] <- paste0(colnames(dmf_with_links_public)[7:25], "_enlistment")
 # 3) special cases
 dmf_with_links_public <- dmf_with_links_public %>% rename(sex = "sex_DMF")
-dmf_with_links_public <- dmf_with_links_public %>% rename(HISTID = "HISTID_census_1940")
+#dmf_with_links_public <- dmf_with_links_public %>% rename(HISTID = "HISTID_census_1940")
 
 # rearrange columns
 dmf_with_links_public <- dmf_with_links_public %>% relocate(sex)
