@@ -66,7 +66,7 @@ library(kableExtra)
 library(here)
 
 data_path <- '/data/censoc/censoc_data_releases/army_enlistment_numident/enlistment_numident_v2/army_enlistment_numident_v2.csv'
-resource_file_path <- "~mariaosborne-ipums/censocdev/codebase/04_create_enlistment_records/codebook"
+resource_file_path <- here("codebase/04_create_enlistment_records/codebook")
 
 data_records <- fread(data_path)
 setwd(resource_file_path)
