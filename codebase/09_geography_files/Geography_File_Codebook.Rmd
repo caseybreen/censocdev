@@ -1,5 +1,5 @@
 ---
-title: "BUNMD Supplementary Geography File Codebook"
+title: "BUNMD Supplementary Geography File Codebook[^updated]"
 output:
   pdf_document:
 header-includes:
@@ -7,6 +7,8 @@ header-includes:
 - \usepackage{float}
 - \restylefloat{table}
 - \usepackage{caption}
+- \usepackage{booktabs}
+geometry: "left=1.5cm,right=1.5cm,top=2.5cm,bottom=2.5cm"
 ---
 [^updated]: Last updated: `r format(Sys.time(), '%d %B, %Y')`
 
@@ -14,20 +16,20 @@ header-includes:
 
 | Page                        | Variable                                     | Label                                        |
 |-----------------------------|:---------------------------------------------|:---------------------------------------------|
-| \hyperlink{page.2}{2}       | \hyperlink{page.2}{ssn}                      |Social Security Number                        |
-| \hyperlink{page.3}{3}       | \hyperlink{page.3}{birth\_string\_uncleaned} |Place of birth, uncleaned string              |
+| \hyperlink{page.3}{3}       | \hyperlink{page.3}{ssn}                      |Social Security Number                        |
 | \hyperlink{page.4}{4}       | \hyperlink{page.4}{birth\_gnis\_code}        |Place of birth, GNIS code                     |
-| \hyperlink{page.5}{5}       | \hyperlink{page.5}{birth\_city}              |Place of birth, city                          | 
+| \hyperlink{page.5}{5}       | \hyperlink{page.5}{birth\_city}              |Place of birth, city uncleaned string         | 
 | \hyperlink{page.6}{6}       | \hyperlink{page.6}{birth\_county}            |Place of birth, county                        |
-| \hyperlink{page.7}{7}       | \hyperlink{page.7}{birth\_region}            |Place of birth, census region                 |
-| \hyperlink{page.8}{8}       | \hyperlink{page.8}{death\_zip}               |Place of death, 5-digit ZIP code              |
-| \hyperlink{page.9}{9}       | \hyperlink{page.9}{death\_city}              |Place of death, city                          |
-| \hyperlink{page.10}{10}     | \hyperlink{page.10}{death\_county\_fips}     |Place of death, FIPS county codes             |
+| \hyperlink{page.7}{7}       | \hyperlink{page.7}{birth\_fips}              |Place of birth, FIPS county code              |
+| \hyperlink{page.8}{8}       | \hyperlink{page.8}{birth\_region}            |Place of birth, census region                 |
+| \hyperlink{page.9}{9}       | \hyperlink{page.9}{death\_zip}               |Place of death, 5-digit ZIP code              |
+| \hyperlink{page.10}{10}     | \hyperlink{page.10}{death\_city}              |Place of death, city                          |
 | \hyperlink{page.11}{11}     | \hyperlink{page.11}{death\_county}           |Place of death, county                        |
-| \hyperlink{page.12}{12}     | \hyperlink{page.12}{death\_state}            |Place of death, state                         |
-| \hyperlink{page.13}{13}     | \hyperlink{page.13}{death\_region}           |Place of death, census region                 |
-| \hyperlink{page.14}{14}     | \hyperlink{page.14}{death\_country}          |Place of death, country                       |
-| \hyperlink{page.15}{15}     | \hyperlink{page.15}{death\_ruc1993}          |place of death, county rural-urban continuum  |
+| \hyperlink{page.12}{12}     | \hyperlink{page.12}{death\_fips}             |Place of death, FIPS county codes             |
+| \hyperlink{page.13}{13}     | \hyperlink{page.13}{death\_state}            |Place of death, state                         |
+| \hyperlink{page.14}{14}     | \hyperlink{page.14}{death\_region}           |Place of death, census region                 |
+| \hyperlink{page.15}{15}     | \hyperlink{page.15}{death\_country}          |Place of death, country                       |
+| \hyperlink{page.16}{16}     | \hyperlink{page.15}{death\_ruc1993}          |place of death, county rural-urban continuum  |
 
 \vspace{10pt}
 
@@ -37,17 +39,20 @@ header-includes:
 \vspace{10pt}
 
 
-The BUNMD Supplementary Geography File (N = 43,541,997) provides a set of supplementary geography variables reporting place of birth and death for individuals in the BUNMD. This file can be linked onto the BUNMD at the individual-level using Social Security number. 
+The BUNMD Supplementary Geography File (N = 42,922,321) provides a set of supplementary geography variables reporting place of birth and death for individuals in the BUNMD. This file can be linked onto the BUNMD at the individual-level using Social Security number. Individuals records may contain only place of birth variables, only place of death variables, or both place of birth and place of death variables.
 
-**Place of death variables:** To construct the place of death variables, we use the ZIP code of last residence available in the Numident Death record. It is likely that this reflects the ZIP code where an individual last lived. We map these ZIP codes onto city, county, state, census region, country, and rural urban continuum codes using a database from the United States Postal Service (USPS) [Link](https://postalpro.usps.com/ZIP_Locale_Detail). For ZIP codes that have been decommissioned, we use a secondary database from UnitedStatesZipCodes.org.
+**Place of death variables:** To construct the place of death variables, we use the ZIP code of last residence available in Social Security Numident records. It is likely that this reflects the ZIP code where an individual last lived. We map these ZIP codes onto city, county, state, census region, country, and rural-urban continuum codes using a database from the United States Postal Service (USPS) [\textcolor{blue}{(link)}](https://postalpro.usps.com/ZIP_Locale_Detail). For ZIP codes that have been decommissioned, we use a secondary database from UnitedStatesZipCodes.org. Approximately 35 million records have a ZIP code mapped to state, county, and city information, though some fields may be missing for certain records. Place of death variables are primarily available for individuals who died in the 50 U.S. states and the District of Columbia, but some are also present for deaths in Puerto Rico and a small number of ZIP codes indicating military bases abroad.
 
-**Place of birth variables:** To construct the place of birth variables, we use 12-character city/county of birth string from the Numident Application records. These strings are uncleaned and contain misspellings and other inconsistencies. We mapped these uncleaned strings onto Geographic Names Information System (GNIS) codes using the crosswalk developed for this paper:
+
+**Place of birth variables:** To construct the place of birth variables, we use 12-character city/county of birth string from the Socal Security Numident records. These strings are uncleaned and contain misspellings and other inconsistencies. We mapped these uncleaned strings onto Geographic Names Information System (GNIS) codes using the crosswalk developed for the paper:
 
 |     Black, Dan A., Seth G. Sanders, Evan J. Taylor, and Lowell J. Taylor. 2015. “The Impact of the Great 
 |     Migration on Mortality of African Americans: Evidence from  the Deep South.”*American Economic Review.*
 |    105(2):477–503. doi: 10.1257/aer.20120642.
 
-To construct other place of birth variable, we mapped the GNIS codes onto city, county, state, and census regions using a database from the U.S. Board on Geographic Names [Link](https://www.usgs.gov/u.s.-board-on-geographic-names/download-gnis-data). **Note that the District of Columbia and birth locations outside the United States are not mapped to GNIS codes.** Please cite Black et al. (2015) if you are using any of the birthplace geography variables in the file.
+To construct other place of birth variable, we mapped the GNIS codes onto city, county, state, and census regions using a database from the U.S. Board on Geographic Names [\textcolor{blue}{(link)}](https://www.usgs.gov/u.s.-board-on-geographic-names/download-gnis-data). Please cite Black et al. (2015) if you are using any of the birthplace geography variables in the file. Birthplace variables are available for nearly 30 million records in this dataset. Place of birth variables are only available for locations within the 50 United States and the District of Columbia. Note that state/country of birth is already included in the BUNMD (see the variables **bpl** and **bpl_string**) and thus not present in this dataset.
+
+
 
 \newpage 
 
@@ -60,18 +65,24 @@ library(knitr)
 library(forcats)
 library(cowplot)
 library(readxl)
+library(kableExtra)
 
 BUNMD_Geography_File <- fread("/data/censoc/workspace/geography_variables/BUNMD_Geography_File.csv",
-                              colClasses = c("death_fips" = "character", "death_zip" = "character"))
+                              colClasses = c("death_fips" = "character", "death_zip" = "character",
+                                             "birth_fips" = "character"))
 
 
 bunmd <- fread("/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv",
                select=c("ssn","byear","dyear","death_age","race_first","sex","bpl_string","zip_residence")) 
 
 bunmd_merged <- merge(bunmd, BUNMD_Geography_File, by = "ssn", all.x = TRUE)
-rm(bunmd)
 
-bunmd_merged$death_place_match <-ifelse(!is.na(bunmd_merged$death_country),1,0)
+#replace empty strings with NA to make match rates easier to compute
+bunmd_merged[bunmd_merged == ""] <- NA # SLOW
+
+bunmd_merged$death_place_match <-ifelse(!is.na(bunmd_merged$death_county),1,0)
+
+rm(bunmd)
 ```
 
 \newpage 
@@ -84,18 +95,6 @@ bunmd_merged$death_place_match <-ifelse(!is.na(bunmd_merged$death_country),1,0)
 
 **Description**: ssn is a numeric variable reporting a person’s Social Security number. This variable uniquely identifies all records in the dataset and can be used to merge onto the BUNMD dataset. 
 
-\newpage 
-
-**\huge birth_string_uncleaned **
-\normalsize
-\vspace{12pt}
-
-**Label**: Place of birth, uncleaned city/county string 
-
-**Description**: birth_string_uncleaned reports the 12-character city/county of birth string from the Numident Application records. This variable is uncleaned and unprocessed, and any many contain spelling errors or inconsistencies. 
-
-NA values are due to birth cities not being inputted in social security records.
-
 
 
 \newpage 
@@ -107,33 +106,30 @@ NA values are due to birth cities not being inputted in social security records.
 
 **Label:** Place of birth, GNIS code
 
-**Description**: birth_gnis_code is a numeric variable that reports a person's Geographic Names Information System (GNIS) code for their place of birth. Each GNIS code maps onto physical locations located in the U.S., including longitude and latitude coordinates, physical feature names, counties, and states. 
+**Description**: birth_gnis_code is a numeric variable that reports a person's Geographic Names Information System (GNIS) code for their place of birth. Each GNIS code maps onto physical locations located in the U.S., including longitude and latitude coordinates, physical feature names, counties, and states. For more information on GNIS codes, please see [\textcolor{blue}{https://www.usgs.gov/faqs/what-geographic-names-information-system-gnis}](https://www.usgs.gov/faqs/what-geographic-names-information-system-gnis).
 
-NA values are due to an inability to match uncleaned birth city values with the GNIS crosswalk or a lack of birth city on social security records.
+Missing values occur if birth city is absent from Numident records, or if the original birth city string was not matched to a GNIS code.
 
-For more information on GNIS codes, please see <https://www.usgs.gov/faqs/what-geographic-names-information-system-gnis>.
 
-\newpage 
 
-**\huge birth_city **
-\normalsize
-\vspace{12pt}
-
-**Label**: Place of birth, city
-
-**Description**: birth_city is a character variable reporting a person's city of birth. NA values are due to an inability to match uncleaned birth city values with the GNIS crosswalk or a lack of birth city on social security records.
+\vspace{75 pt}
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center"}
-valid_birth_percent <- 100 - (mean(is.na(bunmd_merged$birth_city)) * 100)
-birth_percent <- 100 - (mean(is.na(bunmd_merged$birth_city_uncleaned)) * 100)
-death_percent <- (mean(bunmd_merged$zip_residence != "") * 100)
+unclean_birthplace_stings_path <- "/data/censoc/workspace/geography_variables/bunmd_city_string.csv" 
+birth_city_raw_strings <- fread(unclean_birthplace_stings_path, select = c("ssn", "bpl_city"))
+bunmd_merged <- merge(bunmd_merged, birth_city_raw_strings, by = "ssn", all.x = TRUE,sort = FALSE)
+
+valid_birth_percent <- 100 - (mean(is.na(bunmd_merged$birth_gnis_code)) * 100)
+birth_percent <- 100 - (mean(is.na(bunmd_merged$bpl_city)) * 100)
+death_percent <- (mean(!is.na(bunmd_merged$zip_residence)) * 100)
 valid_death_percent <- 100 - (mean(is.na(bunmd_merged$death_county)) * 100)
 
 birth_props <- c(birth_percent,valid_birth_percent)
 death_props <- c(death_percent,valid_death_percent)
 
-birth_props_plot <- barplot(birth_props, names.arg = c("have a birth city", "matched birth city"),
-        xlab = "Match Percentage", ylab = "Percentage",
+birth_props_plot <- barplot(birth_props,
+                            names.arg = c("Have birth city information", "Birth city matched to GNIS code"),
+        xlab = "Birth City Information Availibility", ylab = "Percentage of BUNMD records",
         main = "Birth City Match Percentage",
         col = c("lightblue", "grey"),
         ylim = c(0, 100)) # Set the y-axis range to 0-100
@@ -141,11 +137,30 @@ birth_props_plot <- barplot(birth_props, names.arg = c("have a birth city", "mat
 # Calculate the bar centers
 bar_centers <- birth_props_plot
 
-value_labels <- c("69%", "60%")
+#value_labels <- c("69%", "60%")
+value_labels <- paste0(round(birth_props,1), "%")
 
 text(x = bar_centers, y = birth_props + 2, # Increase the offset to position labels better above the bars
      labels = value_labels, col = "black", cex = 1, pos = 3)
 ```
+
+
+
+
+\newpage 
+
+**\huge birth_city **
+\normalsize
+\vspace{12pt}
+
+**Label**: Place of birth, uncleaned city/county string 
+
+**Description**: birth_city reports the 12-character city/county of birth string from the Numident Application records. This variable is generally uncleaned and unprocessed, and contains spelling errors and naming inconsistencies. 
+
+Missing values occur when birth city is not available in Numident records.
+
+
+
 
 \newpage 
 
@@ -155,9 +170,32 @@ text(x = bar_centers, y = birth_props + 2, # Increase the offset to position lab
 
 **Label**: Place of birth, county
 
-**Description**: birth_county is a character variable reporting a person's county of birth. 
+**Description**: birth_county is a character variable reporting a person's county of birth, as determined by GNIS place of birth. 
 
-NA values are due to an inability to match uncleaned birth city values with the GNIS crosswalk or a lack of birth city on social security records.
+Missing values occur if birth city is absent from Numident records, or if the original birth city string was not matched to a GNIS code.
+
+**Note**: In 2022, the state of Connecticut began replacing its eight counties with nine county-equivalent planning regions. This dataset contains the eight "legacy" county regions of Connecticut.
+
+
+
+\newpage
+**\huge birth_fips **
+\normalsize
+\vspace{12pt}
+
+**Label**: Place of birth, county FIPS code
+
+**Description**: birth_fips is a character variable reporting a person's county FIPS code of birth. FIPS codes are 5 digits, of which the first two are the FIPS code of the state to which the county belongs. For a list of modern FIPS codes, see: [\textcolor{blue}{https://en.wikipedia.org/wiki/List\_of\_United\_States\_FIPS\_codes\_by\_county}](https://en.wikipedia.org/wiki/List\_of\_United\_States\_FIPS\_codes\_by\_county). 
+
+Missing values occur if birth city is absent from Numident records, or if the original birth city string was not matched to a GNIS code or FIPS code.
+
+**Notes**: FIPS codes appear numeric but can contain leading zeros. County-level FIPS codes are always 5 digits. In 2022, the state of Connecticut began replacing its eight counties with nine county-equivalent planning regions. This dataset contain FIPS codes for the the eight "legacy" county regions of Connecticut. FIPS codes occasionally change due to county boundary changes, name changes, etc., and thus codes contained in this dataset may not be completely consistent with external county-level data.
+
+
+
+
+
+
 
 \newpage 
 
@@ -168,22 +206,30 @@ NA values are due to an inability to match uncleaned birth city values with the 
 
 **Label**: Place of birth, census region
 
-**Description**:  birth_region is a character variable reporting a person's census region of birth. For more information on Census Regions, please see <https://www.census.gov/programs-surveys/economic-census/guidance-geographies/levels.html>. 
+**Description**:  birth_region is a character variable reporting a person's census region of birth. For more information on census regions, please see [\textcolor{blue}{https://www.census.gov/programs-surveys/economic-census/guidance-geographies/levels.html}](https://www.census.gov/programs-surveys/economic-census/guidance-geographies/levels.html). 
 
 NA values are due to an inability to match uncleaned birth city values with the GNIS crosswalk, birth city being outside of a census region (in a different country for example), or a birth city not being entered in social security records.
 
+\vspace{40 pt}
+
 ```{r echo = F, message=FALSE, warning=FALSE, fig.pos="H", results='asis'}
 
-birthregion_table <- table(BUNMD_Geography_File$birth_region, useNA = "always")
+birthregion_table <- table(BUNMD_Geography_File$birth_region, useNA = "ifany" )
 
 birthregion_table <- as.data.frame(birthregion_table)
 
 birthregion_table$Freq_perc <- round((birthregion_table$Freq/sum(birthregion_table$Freq))*100, digits = 1)
+birthregion_table$label <- c("NA", "Midwest", "Northeast", "South", "West")
 
-kable(birthregion_table, 
+br_tab <- knitr::kable(birthregion_table %>% select(Var1, label, Freq, Freq_perc), 
       caption = "Births by Census Region",
-      col.names = c("Region", "n","freq %"),
-      align = c("l", "r","l"))
+      col.names = c("birth_region", "label", "n","freq %"),
+      align = c("l", "r","l"),
+      booktabs = TRUE,
+      format = "latex") %>% 
+  kableExtra::kable_styling(latex_options = "HOLD_position")
+
+br_tab
 ```
 
 \newpage 
@@ -194,16 +240,22 @@ kable(birthregion_table,
 
 **Label**: Place of death, ZIP code
 
-**Description**: death_zip is a numeric variable that represents the 5-digit ZIP code of the last residence. It is obtained from the Numident Death record, which is a record maintained by the Social Security Administration. However, it's important to note that the ZIP codes in this variable include non-identifiable codes such as "XX768" and "00000".
+**Description**: death_zip is a character variable that represents the 5-digit ZIP code of the last residence, as obtained from Numident Death records
 
-We note that ZIP codes are primarily used for USPS mail delivery purposes, not as geographic units. For a more detailed description of ZIP codes, please see: <https://faq.usps.com/s/article/ZIP-Code-The-Basics>. 
+Missing values may occur if ZIP code was entered incorrectly in Numident records, if ZIP code is absent from Numident records, or if place of death occured outside USPS identifiable ZIP codes (e.g., most locations abroad). However, Non-identifiable codes such as "XX768" and "00000" may remain in this field.
 
-NA values are due to ZIP code not being entered correctly in social security records or a person dying in a place where there is no USPS identifiable ZIP code. 
+
+**Notes**:  ZIP codes appear numeric, but can contain leading zeros. They should always be 5 digits.
+
+We note that ZIP codes are primarily used for USPS mail delivery purposes, not as geographic units. For a more detailed description of ZIP codes, please see: [\textcolor{blue}{https://faq.usps.com/s/article/ZIP-Code-The-Basics}](https://faq.usps.com/s/article/ZIP-Code-The-Basics). 
+
+
+\vspace{75 pt}
 
 ```{r echo = F, message=FALSE, warning=FALSE, fig.pos="H", results='asis'}
 # Your existing barplot code
-death_props_plot <- barplot(death_props, names.arg = c("have a death ZIP", "matched ZIP"),
-        xlab = "Match Percentage", ylab = "Percentage",
+death_props_plot <- barplot(death_props, names.arg = c("Have a death ZIP code", "ZIP Code matched to county"),
+        xlab = "Match Percentage", ylab = "Percentage of BUNMD records",
         main = "Death ZIP Match Percentage",
         col = c("lightblue", "grey"),
         ylim = c(0, 100)) # Set the y-axis range to 0-100
@@ -212,11 +264,12 @@ death_props_plot <- barplot(death_props, names.arg = c("have a death ZIP", "matc
 bar_centers <- death_props_plot
 
 # Define the value labels
-value_labels <- c("73%", "71%")
+#value_labels <- c("73%", "71%")
+values_labels <- paste0(round(death_props,1), '%')
 
 # Add the value labels at the top center of the bars
 text(x = bar_centers, y = death_props + 2, # Increase the offset to position labels better above the bars
-     labels = value_labels, col = "black", cex = 1, pos = 3)
+     labels = values_labels, col = "black", cex = 1, pos = 3)
 ```
 
 
@@ -229,40 +282,15 @@ text(x = bar_centers, y = death_props + 2, # Increase the offset to position lab
 
 **Label**: Place of death, city
 
-**Description**: death_city is a character variable reporting a person's city of death, as sourced from the ZIP code of their residence at time of death. For ZIP codes that cross city lines, we report the city where the primary post office for that ZIP code is located. 
+**Description**: death_city is a character variable reporting a person's city of death, as determined from the ZIP code of their residence at time of death. For ZIP codes that cross city lines, we report the city where the primary post office for that ZIP code is located. 
 
-NA values are due to ZIP code not being entered correctly in social security records, a person dying in a place with no ZIP codes, or a ZIP code that could not be matched against USPS records.
-
-\newpage 
-
-**\huge death_county_fips **
-\normalsize
-\vspace{12pt}
-
-**Label**: Place of death, county FIPS code
-
-**Description**: death_fips is a numeric variable reporting a person's county FIPS code of death. NA values are due to ZIP code not being entered correctly in social security records, a ZIP code that could not be matched against USPS records, a person dying in a place with no ZIP code, or a county not being matched  with a FIPS code.
-
-For a more detailed description of county FIPS codes, please see: <https://transition.fcc.gov/oet/info/maps/census/fips/fips.txt#:~:text=FIPS%20codes%20are%20numbers%20which,to%20which%20the%20county%20belongs>.
-
-Although FIPS codes rarely change, one major change occurred after Dade County, FL became Miami-Dade and a new FIPS code was assigned. If you're using FIPS code data that was produced after 1997, you'll want to manually change Dade County's FIPS code in order for it to match. Below is an example of how you could use these FIPS codes if you wanted to incorporate county-level education attainment (<https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls>). 
+Missing values may occur if ZIP code was entered incorrectly in Numident records, if ZIP code is absent from Numident records, or if place of death could not be matched to an USPS identifiable ZIP code.
 
 
-```{r echo = T, message=FALSE, warning=FALSE, fig.pos="H", results='asis'}
-#Hypothetical education data
-education <- read_excel("/data/censoc/workspace/geography_variables/Education.xlsx") 
 
-#we rename FIPS to death_fips so that it can match
-colnames(education)[1] <- "death_fips" 
 
-#recode Miami-Dade's FIPS to Dade County's FIPS
-education <- education %>%
-  mutate(death_fips = ifelse(death_fips == "12086", "12025", death_fips)) %>% 
-  mutate(death_fips = as.character(death_fips))
 
-#merge onto BUNMD 
-bunmd_merged <- merge(bunmd_merged, education, by = "death_fips", all.x = TRUE) 
-```
+
 
 \newpage 
 
@@ -273,9 +301,14 @@ bunmd_merged <- merge(bunmd_merged, education, by = "death_fips", all.x = TRUE)
 
 **Label**: Place of death, county
 
-**Description**: death_county is a character variable reporting a person's county of death, as sourced from the ZIP code of their residence at time of death. 
+**Description**: death_county is a character variable reporting a person's county of death, as determined by the ZIP code of their residence at time of death. 
 
 NA values are due to ZIP code not being entered correctly in social security records or a ZIP code that could not be matched against USPS records.
+
+**Note**: In 2022, the state of Connecticut began replacing its eight counties with nine county-equivalent planning regions. This dataset contains the eight "legacy" county regions for Connecticut.
+
+
+\vspace{75 pt}
 
 ```{r echo = F, results='hide', message=FALSE, warning=FALSE, results='asis'}
 bunmd_men <- filter(bunmd_merged, sex == 1)
@@ -312,13 +345,53 @@ combined_plot <- birth_year_match_combined_gender %>%
   filter(match == 1) %>% 
   ggplot(aes(x = byear_numeric, y = proportion, color = gender_category)) +
   geom_point(size = 1, alpha = 0.5) + # Keep only the points
-  labs(title = "Matched Death ZIP Proportions by Gender and Cohort", x = "Birth Year", y = "Proportion") +
+  labs(title = "Matched Death ZIP to County by Gender and Cohort", x = "Birth Year", y = "Proportion of BUNMD Records") +
   theme_cowplot() +
   scale_color_manual(values = c("blue", "red"), name = "Gender")
 
 # Print the combined plot
 print(combined_plot)
 ```
+
+\newpage
+
+**\huge death_fips **
+\normalsize
+\vspace{12pt}
+
+**Label**: Place of death, county FIPS code
+
+**Description**: death_fips is a character variable reporting a person's county FIPS code of birth. FIPS codes are 5 digits, of which the first two are the FIPS code of the state to which the county belongs. For a list of modern FIPS codes, see: [\textcolor{blue}{https://en.wikipedia.org/wiki/List\_of\_United\_States\_FIPS\_codes\_by\_county}](https://en.wikipedia.org/wiki/List\_of\_United\_States\_FIPS\_codes\_by\_county). 
+
+Missing values may occur if ZIP code was entered incorrectly in Numident records, if ZIP code is absent from Numident records, if place of death could not be matched to an identifiable USPS identifiable ZIP code, or if county could not be matched to a FIPS code. County FIPS codes are not available for deaths occurring in Puerto Rico.
+
+
+**Notes**: FIPS codes appear numeric but can contain leading zeros. County-level FIPS codes are are always 5 digits. In 2022, the state of Connecticut began replacing its eight counties with nine county-equivalent planning regions. This dataset contain FIPS codes for the the eight "legacy" county regions of Connecticut. FIPS codes occasionally change due to county boundary changes, name changes, etc., and thus codes contained in this dataset may not be completely consistent with external county-level data.
+
+
+```{r echo = T, message=FALSE, warning=FALSE, fig.pos="H", results='asis', include = FALSE}
+#Although it is rare, FIPS codes can change when county boundaries are redefined or names changed. One major change occurred after Dade County, FL became Miami-Dade and a new FIPS code (12086) was assigned. If using FIPS code data produced after 1997, users may wish to manually change Dade County's FIPS code in order for it to match. Below is an example of how to harmionize FIPS codes if you wanted to incorporate county-level education attainment (data from <https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls>).
+
+#Hypothetical education data
+education <- read_excel("/data/censoc/workspace/geography_variables/Education.xlsx") 
+
+#we rename FIPS to death_fips so that it can match
+colnames(education)[1] <- "death_fips" 
+
+#recode Miami-Dade's FIPS to Dade County's FIPS
+education <- education %>%
+  mutate(death_fips = ifelse(death_fips == "12086", "12025", death_fips)) %>% 
+  mutate(death_fips = as.character(death_fips))
+
+#merge onto BUNMD 
+bunmd_merged <- merge(bunmd_merged, education, by = "death_fips", all.x = TRUE) 
+```
+
+
+
+
+
+
 
 \newpage 
 
@@ -329,9 +402,42 @@ print(combined_plot)
 
 **Label**: Place of death, state
 
-**Description**: death_state is a character variable reporting a person's state of death, as sourced from the ZIP code of their residence at time of death. 
+**Description**: death_state is a character variable reporting a person's state of death, as determined by the ZIP code of their residence at time of death. Includes the 50 U.S states, the District of Columbia, and Puerto Rico.
 
-NA values are due to ZIP code not being entered correctly in social security records, the person died outside of the US, or a ZIP code that could not be matched against USPS records.
+Missing values may occur if ZIP code was entered incorrectly in Numident records, if ZIP code is absent from Numident records, or if place of death could not be matched to an identifiable USPS identifiable ZIP code in the United States.
+
+\vspace{30 pt}
+
+```{r, echo = F}
+state_key <- data.frame(death_state = tolower(state.abb), label = state.name) %>% 
+  rbind(c("pr", "Puerto Rico")) %>% 
+  rbind(c("dc", "Washington DC"))
+  
+# death_state_tab <- knitr::kable(bunmd_merged %>% group_by(death_state) %>%
+#   tally() %>% 
+#   left_join(state_key, by = "death_state") %>% 
+#   relocate(label, .before = n) %>% 
+#   mutate(`freq %` = round(n*100 / sum(n), 2)))
+  
+#death_state_tab 
+tab <-  BUNMD_Geography_File %>% group_by(death_state) %>%
+  tally() %>% 
+  left_join(state_key, by = "death_state") %>% 
+  mutate(`freq %` = round(n*100 / sum(n), 1)) %>% 
+  select(death_state, label, n, `freq %`)
+rows <- seq_len(nrow(tab) %/% 2)
+death_state_tab  <- knitr::kable(list(tab[rows, 1:4],
+                                      matrix(numeric(), nrow=0, ncol=1),
+                                      tab[-rows, 1:4]),
+                                 caption = "Deaths by State",
+                                 format = "latex",
+                                 booktabs = TRUE)  %>%
+  kableExtra::kable_styling(latex_options = "HOLD_position")
+
+death_state_tab
+
+```
+
 
 \newpage 
 
@@ -341,21 +447,29 @@ NA values are due to ZIP code not being entered correctly in social security rec
 
 **Label**: Place of death, census region
 
-**Description**: death_region is a character variable reporting a person's census region of death, as sourced from the ZIP code of their residence at time of death. 
+**Description**: death_region is a character variable reporting a person's census region of death, as sourced from the ZIP code of their residence at time of death. This variable is available for persons dying withing the 50 United States and the District of Columbia.
 
-NA values are due to ZIP code not being entered correctly in social security records, the person died outside of one of the four census regions (for example in a different country), or a ZIP code that could not be matched against USPS records.
+Missing values may occur if ZIP code was entered incorrectly in Numident records, if ZIP code is absent from Numident records,if place of death could not be matched to an identifiable USPS identifiable ZIP code in the United States.
+
+\vspace{70 pt}
 
 ```{r echo = F, results='asis'}
-deathregion_table <- table(BUNMD_Geography_File$death_region, useNA = "always")
+deathregion_table <- table(BUNMD_Geography_File$death_region, useNA = "ifany")
 
 deathregion_table <- as.data.frame(deathregion_table)
 
 deathregion_table$Freq_perc <- round((deathregion_table$Freq/sum(deathregion_table$Freq))*100, digits = 1)
+deathregion_table$label <- c("NA", "Midwest", "Northeast", "South", "West")
 
-kable(deathregion_table, 
+region_tab <- knitr::kable(deathregion_table %>% select(Var1, label, Freq, Freq_perc), 
       caption = "Deaths by Census Region",
-      col.names = c("region", "n","freq %"),
-      align = c("l", "r","l"))
+      col.names = c("birth_region", "label", "n","freq %"),
+      align = c("l", "r","l"),
+      format = "latex",
+      booktabs = TRUE) %>% 
+  kable_styling(latex_options = "hold_position")
+
+region_tab
 ```
 
 \newpage 
@@ -366,9 +480,11 @@ kable(deathregion_table,
 
 **Label**: Place of death, country
 
-**Description**: death_country is a character variable reporting a person's country of death, as sourced from the ZIP code of their residence at time of death. While the majority of ZIP codes are within the U.S., countries that host U.S. military bases on their territories may also have ZIP codes associated with them. 
+**Description**: death_country is a character variable reporting a person's country of death, as determined by the ZIP code of their residence at time of death. While the vast majority of ZIP codes are within the U.S., countries that host U.S. military bases on their territories may also have ZIP codes associated with them. Codes follow [\textcolor{blue}{ISO 3166-1 alpha-2 country codes}](https://www.iso.org/obp/ui/#search/code/).
 
-NA values are due to ZIP code not being entered correctly in social security records or a ZIP code that could not be matched against USPS records. People who died in a country where there are no ZIP codes identifiable by the USPS are assigned an NA. 
+Missing values may occur if ZIP code being entered incorrectly in Numident records, if ZIP code is absent from Numident records,if place of death could not be matched to an identifiable USPS identifiable ZIP code.
+
+
 
 \newpage 
 
@@ -378,11 +494,13 @@ NA values are due to ZIP code not being entered correctly in social security rec
 
 **Label**: County of death, rural-urban continuum code
 
-**Description**: death_ruc1993 report the Rural-Urban continuum code for a person's county of death, as sourced from the United States Department of Agriculture (USDA). The Urban-Rural Continuum Codes are a classification system developed to categorize U.S. counties based on their degree of urbanization and adjacency to metropolitan areas. The system consists of ten codes, ranging from 0 to 9, where lower codes represent more urbanized counties and higher codes represent more rural areas. 
+**Description**: death_ruc1993 report the 1993 Rural-Urban continuum code for a person's county (or county equivalent) of death, as sourced from the United States Department of Agriculture (USDA). The Urban-Rural Continuum Codes are a classification system developed to categorize U.S. counties based on their degree of urbanization and adjacency to metropolitan areas. The system consists of ten codes, ranging from 0 to 9, where lower codes represent more urbanized counties and higher codes represent more rural areas. 
 
-NA values are due to ZIP code not being entered correctly in social security records, a ZIP code that could not be matched against USPS records, or a county not being matched  with a FIPS code.
+Missing values may occur if ZIP code being entered incorrectly in Numident records, if ZIP code is absent from Numident records, or if ZIP code could not be matched to a county.
 
-For more information: <https://www.ers.usda.gov/data-products/rural-urban-continuum-codes.aspx>
+For more information, see: \textcolor{blue}{<https://www.ers.usda.gov/data-products/rural-urban-continuum-codes.aspx>}
+
+\vspace{70 pt}
 
 ```{r echo = F, results='hide', message=FALSE, warning=FALSE, results='asis'}
 ruc1993_table <- table(BUNMD_Geography_File$death_ruc1993, useNA = "always")
@@ -399,9 +517,14 @@ ruc1993_table <- ruc1993_table[, c(1, 3, 2, 4)]
 ```
 
 ```{r echo = F, results='asis'} 
-kable(ruc1993_table, 
-      caption = "Rural-Urban Deaths",
-      col.names = c("code", "description", "n","freq %"),
-      align = c("l", "r", "l","l"))
+ructab <- knitr::kable(ruc1993_table, 
+      caption = "Rural-Urban County of Death",
+      col.names = c("death_ruc1993", "label", "n","freq %"),
+      align = c("l", "r", "l","l"),
+      format = "latex",
+      booktabs = TRUE) %>% 
+  kable_styling(latex_options = "hold_position")
+
+ructab
 ```
 

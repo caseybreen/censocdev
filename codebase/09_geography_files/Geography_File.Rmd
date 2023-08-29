@@ -85,13 +85,14 @@ bunmd_trunc <- bunmd_trunc %>%
   mutate(
     zip = str_trunc(as.character(zip_residence), width = 5, side = "right", ellipsis = "")
   ) %>% 
-  select(-2) %>% 
-  rename(death_zip = names(.)[3])
+  dplyr::select(-c(zip_residence)) %>% 
+  rename(death_zip = zip)
 
 head(bunmd_trunc)
 ```
 
-
+add birth region using bpl_string from BUNMD
+(IPUMS-defined regions)
 ```{r}
 west_states <- c("Arizona", "Colorado", "Idaho", "Montana", "Nevada", "New Mexico", "Utah", "Wyoming", "Alaska", "California", "Hawaii", "Oregon", "Washington")
 midwest_states <- c("Illinois", "Indiana", "Michigan", "Ohio", "Wisconsin", "Iowa", "Kansas", "Minnesota", "Missouri", "Nebraska", "North Dakota", "South Dakota")
@@ -132,19 +133,23 @@ head(birthplaces_df)
 
 merge county and state numeric codes to get birth fips
 ```{r}
+# read state FIPS codes
 state_fips <- fread(state_fips_path, select = c("stname", "st"))
 names(state_fips) <- c("bpl_string", "state_fips_code")
 state_fips <- state_fips %>%
   mutate(state_fips_code = str_pad(as.character(state_fips_code), width = 2, side = "left", pad = "0"))
 
+# pad county FIPS codes
 birthplaces_df <- birthplaces_df %>%
   mutate(birth_fips = str_pad(as.character(birth_fips), width = 3, side = "left", pad = "0"))
 
+# add state codes to birthplaces_df
 birthplaces_df <- birthplaces_df %>% left_join(state_fips, by = "bpl_string")
 
+# combine to get full FIPS codes
 birthplaces_df <- birthplaces_df %>% mutate(birth_fips = paste0(state_fips_code, birth_fips))
 
-# drop if not a proper 5 digit FIPS code
+# drop if not a proper 5 digit FIPS code (small number of records are missing county code)
 birthplaces_df <- birthplaces_df %>% mutate(birth_fips = ifelse(nchar(birth_fips) < 5, "", birth_fips))
 birthplaces_df$state_fips_code <-  NULL
 ```
@@ -163,6 +168,18 @@ birthplaces_df$birth_place_matched <- ifelse(birthplaces_df$bpl_string.x == birt
                                              ifelse(birthplaces_df$bpl_string.x != birthplaces_df$bpl_string.y & !is.na(birthplaces_df$bpl_string.x),1,NA))
 
 print(paste("There are",sum(birthplaces_df$birth_place_matched,na.rm=T),"mismatched birth states in the birth places data frame"))
+```
+
+
+manually add info for people born in Washington D.C
+(it's all the same GNIS ID, county, etc, but don't want them to look like NAs)
+```{r}
+birthplaces_df[bpl_string.x == "District of Columbia", birth_gnis_code := 1702382]
+birthplaces_df[bpl_string.x == "District of Columbia", birth_region.x := "south"]
+birthplaces_df[bpl_string.x == "District of Columbia", birth_county := "District of Columbia"]
+birthplaces_df[bpl_string.x == "District of Columbia", birth_fips := "11001"]
+birthplaces_df[bpl_string.x == "District of Columbia", birth_city := "District of Columbia"]
+birthplaces_df[bpl_string.x == "District of Columbia"] 
 ```
 
 
@@ -198,13 +215,56 @@ birthplaces_df <- birthplaces_df %>%
 table(birthplaces_df$death_region)
 ```
 
+standardize county birth and death names
+(not perfect, but captures some major differences)
 ```{r}
 birthplaces_df <- birthplaces_df %>% 
   mutate(
-    death_county = str_remove_all(death_county, "county"),
-    death_county = str_trim(death_county)
+    death_county = str_remove_all(death_county, "county"), #remove the word "county" 
+    death_county = str_remove_all(death_county, "parish"), # remove "parish"
+    death_county = str_trim(death_county),
+    birth_county = str_replace_all(birth_county, "\\(ca\\)", "census area"), # ca --> census area
+    birth_county = str_remove_all(birth_county, "\\("), # remove parens
+    birth_county = str_remove_all(birth_county, "\\)"),
+    birth_county = str_trim(birth_county)
   )
-head(birthplaces_df$death_county, 10) #we remove the word "county" 
+birthplaces_df <- birthplaces_df %>% 
+  mutate(
+    death_county = str_remove_all(death_county, "city and borough of"), 
+    death_county = str_remove_all(death_county, "city and borough"), 
+    death_county = str_trim(death_county))
+birthplaces_df <- birthplaces_df %>% 
+  mutate(death_county = str_remove_all(death_county, " borough"), #remove the full word "borough"
+         death_county = str_trim(death_county))
+birthplaces_df <- birthplaces_df %>% 
+  mutate(birth_county = str_remove_all(birth_county, "\\."), # remove periods
+         birth_county = str_trim(birth_county))
+birthplaces_df <- birthplaces_df %>% 
+  mutate(death_county = str_remove_all(death_county, "\\."), # remove periods
+         death_county = str_trim(death_county))
+birthplaces_df <- birthplaces_df %>% 
+  mutate(death_county = str_remove_all(death_county, "municipality of"),
+         death_county = str_remove_all(death_county, "municipality"), #
+         death_county = str_trim(death_county))
+
+# some special cases
+birthplaces_df[death_fips == "17099", death_county := "lasalle"] # LaSalle, IL
+birthplaces_df[birth_fips == "17099", birth_county := "lasalle"]
+birthplaces_df[death_fips == "48283", death_county := "la salle"] # La Salle, TX
+birthplaces_df[birth_fips == "48283", birth_county := "la salle"]
+birthplaces_df[death_fips == "22059", death_county := "lasalle"] # LaSalle (parish), LA
+birthplaces_df[birth_fips == "22059", birth_county := "lasalle"]
+birthplaces_df[birth_county == "doña ana", birth_county := "dona ana"]
+birthplaces_df[birth_county == "carson city city", birth_county := "carson city"]
+
+birthplaces_df[birth_fips == death_fips & birth_county != death_county] %>%
+  group_by(birth_county, death_county) %>%
+  tally() %>% arrange(desc(n))
+
+setdiff(unique(birthplaces_df$death_county), unique(birthplaces_df$birth_county))
+setdiff(unique(birthplaces_df$birth_county), unique(birthplaces_df$death_county))
+
+head(birthplaces_df$death_county, 10) 
 ```
 
 
@@ -230,28 +290,41 @@ birthplaces_df <- birthplaces_df %>%
     )
   )
 unique(birthplaces_df$death_state)
+
+# standardize washington dc death city string to match death county, birth city, birth county
+birthplaces_df[death_state == "dc", death_city := "district of columbia"]
 ```
 
-We then make sure that the FIPS and ZIP code variables are coded as string variables so that the leading zeroes do not get truncated.  
+Harmonize a few FIPS codes in the death county field that are out of date to align
+with birth FIPS codes
+(again not comprehensive but takes care of most discrepancies, mostly Miami-Dade)
 ```{r}
-birthplaces_df$death_zip <- as.character(birthplaces_df$death_zip)
-birthplaces_df$death_fips <- as.character(birthplaces_df$death_fips)
+# Dade (FL) ---> Miami-Dade
+birthplaces_df[death_fips == "12025", death_fips := "12086"]
+birthplaces_df[death_fips == "12086", death_county := "miami-dade"]
+# Shannon (SD) ---> Oglala Dakota
+birthplaces_df[death_fips == "46113", death_fips := "46102"]
+birthplaces_df[death_fips == "46102", death_county := "oglala lakota"]
+# wade hampton census area (AK) ---> Kusilvak Census Area 
+birthplaces_df[death_fips == "02270", death_fips := "02158"]
+birthplaces_df[death_fips == "02158", death_county := "kusilvak census area"]
 
-# change NA's to blank strings for these variables (death_zip already okay)
-# will prevent them from being read as integers
-birthplaces_df[is.na(death_fips), death_fips := ""]
-birthplaces_df[is.na(birth_fips), birth_fips := ""]
+setdiff(unique(birthplaces_df$death_county), unique(birthplaces_df$birth_county)) # mostly PR
+setdiff(unique(birthplaces_df$birth_county), unique(birthplaces_df$death_county))
 ```
+
 
 We also include the "uncleaned" birthplace string for researchers who might want to work with them
 ```{r}
 birth_city_uncleaned <- fread(unclean_birthplace_stings_path)
 
 head(birth_city_uncleaned)
+nrow(birth_city_uncleaned)
 ```
 
 
 ```{r}
+# merge raw strings onto dataset
 birthplaces_df <- merge(birthplaces_df, birth_city_uncleaned, by = "ssn", all.x = TRUE,sort = FALSE)
 
 birthplaces_df <- select(birthplaces_df, -c(V1,bpl_city_oflo))
@@ -266,18 +339,27 @@ birthplaces_df <- birthplaces_df %>%
 
 head(birthplaces_df)
 rm(birth_city_uncleaned)
+
+# quick look at unmatched birth strings (foreign birthplaces, incomprehensible strings)
+birthplaces_df[!is.na(birth_city_uncleaned) & is.na(birth_city)]
 ```
+
+
 
 Then, we remove all people who have neither a birth or a death city. 
 ```{r}
+# filtering on birth_region removes people who don't have ANY birth *state* info
+# or are born abroad. filtering on birth_city removes people whose city of birth
+# was not matched to a valid location.
 birthplaces_df <- birthplaces_df %>% 
   mutate(
-    deletes = paste(birth_region, death_city)
+    deletes = paste(birth_city, death_city)
   ) %>% 
   filter(!deletes %in% "NA NA") %>% 
   select(-deletes)
 head(birthplaces_df)
 ```
+
 rearrange a bit
 ```{r}
 birthplaces_df <- birthplaces_df %>%
@@ -286,10 +368,47 @@ birthplaces_df <- birthplaces_df %>%
 ```
 
 
+make NA values consistent across variable types
+character variables should have blank strings "" as missing values
+```{r}
+names(birthplaces_df)
+str(birthplaces_df)
+
+birthplaces_df[is.na(death_state), death_state := ""]
+birthplaces_df[is.na(death_fips), death_fips := ""]
+birthplaces_df[is.na(birth_fips), birth_fips := ""]
+birthplaces_df[is.na(death_city), death_city := ""]
+birthplaces_df[is.na(death_county), death_county := ""]
+birthplaces_df[is.na(death_country), death_country := ""]
+birthplaces_df[is.na(death_region), death_region := ""]
+birthplaces_df[is.na(birth_city), birth_city := ""]
+birthplaces_df[is.na(birth_county), birth_county := ""]
+birthplaces_df[is.na(birth_region), birth_region := ""]
+birthplaces_df[is.na(birth_city_uncleaned), birth_city_uncleaned := ""]
+
+str(birthplaces_df)
+```
+
+
+Make final BUNMD dataset with columns in selected order and name
+```{r}
+bunmd_geo_dataset <- birthplaces_df %>% select(ssn, birth_gnis_code, birth_city, 
+                                               birth_county, birth_fips, birth_region, 
+                                               death_zip, death_city,
+                                               death_county, death_fips,
+                                               death_state, death_region, death_country,
+                                               death_ruc1993)
+  
+
+# make sure this looks ok
+head(bunmd_geo_dataset)
+str(bunmd_geo_dataset)
+```
+
 
 Next, we save the file as a csv. This file is usable with the BUNMD
 ```{r}
-write.csv(birthplaces_df,
+write.csv(bunmd_geo_dataset,
           paste0(geo_files_out_path, "BUNMD_Geography_File.csv"),
           row.names = FALSE)
 ```
@@ -306,6 +425,8 @@ numident_birthplaces_df <- left_join(HISTID, birthplaces_df, by = "ssn")
 
 numident_birthplaces_df <- numident_birthplaces_df %>%
   select(-ssn)
+
+numident_birthplaces_df <- numident_birthplaces_df[!is.na(birth_city) & !is.na(death_city)]
 
 write.csv(numident_birthplaces_df,
           paste0(geo_files_out_path, "Numident_Geography_File.csv"),
@@ -325,6 +446,13 @@ numident_birthplaces_df_conservative <- numident_birthplaces_df[histid %in% cens
 # capitalize histid variable
 numident_birthplaces_df_conservative <- numident_birthplaces_df_conservative %>% 
   rename(HISTID = histid)
+
+numident_birthplaces_df_conservative[, birth_fips := str_pad(as.character(birth_fips),
+                                                             width = 5, side = "left", pad = "0")]
+numident_birthplaces_df_conservative[, death_fips := str_pad(as.character(death_fips), width = 5,
+                                                             side = "left", pad = "0")]
+numident_birthplaces_df_conservative[is.na(death_fips), death_fips := ""]
+numident_birthplaces_df_conservative[is.na(birth_fips), birth_fips := ""]
 
 # write
 write.csv(numident_birthplaces_df_conservative,
