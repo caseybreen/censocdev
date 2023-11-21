@@ -187,14 +187,14 @@ other_cols <- c("ssn","zip_residence","byear","dyear","socstate","bmonth","dmont
                 "mother_lname","age_first_application","death_age","weight","ccweight",
                 "bpl_string","socstate_string")
 middle <- "mname"
-file_name <- "bunmd_sampled.csv"
+file_name <- "bunmd.csv"
 clean_names(in_path, file_name, lname_col, fname_col,
             sex_col, other_cols, out_path, middle)
 
 ```
 #Check cleaned dataset 
 ```{r}
-bunmd_cleaned <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_sampled_cleaned.csv")
+bunmd_cleaned <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned.csv")
 ```
 
 
@@ -323,7 +323,7 @@ clean_names_father <- function(in_path, file_name, lname_col, fname_col, sex_col
 #add sex column for father 
 bunmd_cleaned$father_sex <- 1
 #write out new dataset
-fwrite(bunmd_cleaned, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_sampled_f.csv")
+fwrite(bunmd_cleaned, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_f.csv")
 
 
 in_path_f <-"/censoc/data/numident/4_berkeley_unified_mortality_database"
@@ -338,14 +338,14 @@ other_cols_f <- c("fname","mname","lname","sex","fname_raw","mname_raw","lname_r
                 "mother_lname","age_first_application","death_age","weight","ccweight",
                 "bpl_string","socstate_string")
 middle_f <- "father_mname"
-file_name_f <- "bunmd_sampled_f.csv"
+file_name_f <- "bunmd_f.csv"
 clean_names_father(in_path_f, file_name_f, lname_col_f, fname_col_f,
             sex_col_f, other_cols_f, out_path_f, middle_f)
 ```
 
 #Check cleaned dataset 
 ```{r}
-bunmd_cleaned_f <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_sampled_f_cleaned.csv")
+bunmd_cleaned_f <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_f_cleaned.csv")
 ```
 
 #repeat for mothers- create clean_names_mother function
