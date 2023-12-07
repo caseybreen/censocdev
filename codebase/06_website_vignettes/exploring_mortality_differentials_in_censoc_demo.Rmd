@@ -15,7 +15,7 @@ The CenSoc-DMF Demo dataset was constructed by (i) linking the CenSoc-DMF datase
 
 Before getting started with the vignette, make sure to: 
 
-- [Download](https://censoc-download.demog.berkeley.edu/) the CenSoc DMF Demo File 
+- [Download](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/QVDPM9) the CenSoc DMF Demo File 
 - Install packages if necessary (use the `install.packages()` function)
     - `tidyverse`
     - `statebins`
@@ -33,6 +33,11 @@ library(knitr)
 
 ## make sure to update the path to your CenSoc file
 censoc_demo <- read_csv("/data/censoc/censoc_data_releases/censoc_dmf_demo/censoc_dmf_demo_v2.1/censoc_dmf_demo_v2.1.csv")
+
+## state strings
+state_strings <- read_csv("/data/censoc/miscellaneous/ipums_bpld_usa.csv")
+names(state_strings) <- c("bpl", "bpl_string")
+censoc_demo <- censoc_demo %>% left_join(state_strings, by = "bpl")
 
 ## set seed for reproducibility 
 set.seed(16)
@@ -73,9 +78,10 @@ censoc_state_model <-
   censoc_demo %>%
   filter(byear %in% c(1900:1920)) %>% 
   filter(dyear >= 65) %>% 
+  filter(bpl_string != "Hawaii" & bpl_string != "Alaska" & bpl_string != "Puerto Rico") %>% 
   mutate(byear = as.factor(byear)) %>% 
   mutate(byear = relevel(byear, ref = "1910")) %>%
-  mutate(statefip = as.factor(statefip_string)) %>% 
+  mutate(statefip = as.factor(bpl_string)) %>% 
   mutate(statefip = relevel(statefip, ref = "Maine")) 
 
 ## Linear model predicting age at death from State and byear 

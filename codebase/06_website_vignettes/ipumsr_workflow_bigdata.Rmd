@@ -18,7 +18,7 @@ Before getting started with the vignette, you'll need to:
     - `tidyverse`
     - `ipumsr`
 
-2. [Download](https://censoc-download.demog.berkeley.edu/) the CenSoc-Numident or CenSoc-DMF file 
+2. [Download](https://dataverse.harvard.edu/dataverse/censoc/) the CenSoc-Numident or CenSoc-DMF file 
 
 3. [Download](https://usa.ipums.org/usa/) the 1940 full count census and accompanying DDI from IPUMS (instructions below)
 

@@ -13,7 +13,7 @@ vignette: >
 
 Before getting started with the vignette, make sure to: 
 
-- [Download](https://censoc-download.demog.berkeley.edu/) the CenSoc-Numident File 
+- [Download](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/I0TLPI) the CenSoc-Numident File 
 - [Download](https://usa.ipums.org/usa/) the IPUMS 1940 full count census and DDI
 - Follow the instructions in the `ipumsr` vignette [TODO link] to merge the CenSoc-Numident and Census files
   
