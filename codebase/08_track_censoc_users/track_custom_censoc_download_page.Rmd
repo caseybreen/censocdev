@@ -91,9 +91,10 @@ censocLogs <- read.multiple.apache.access.log("/admin/lab_writeable/Censoc1313/W
 prefix="censoc-access.log")
 
 ## Restrict to data 
+## Note: Only getting activity from 2023. Needs to figure out how to get all downloads
 download_logs <- censocLogs %>% 
   filter(httpcode == 200) %>% 
-  filter(str_detect(url, pattern = "GET /Data/"))
+  filter(str_detect(url, pattern = "GET /Data/")) 
 
 ## scrape url to figure out which dataset was downloaded 
 download_logs <- download_logs %>% 
@@ -120,7 +121,7 @@ download_logs <- download_logs %>%
 ```{r}
 ## all downloads 
 signup_log <- signup_log %>% 
-  mutate(link = tolower(link))
+  mutate(link = tolower(link))  
 
 ## combine all signups with all download logs
 censoc_downloaders <- download_logs %>% 
@@ -134,6 +135,8 @@ censoc_downloaders_long <- censoc_downloaders %>%
   ungroup() %>% 
   filter(!is.na(dataset_downloaded)) 
 
+summary(as_date(censoc_downloaders_long$dateh)) # Only 2023
+
 ## visualize downloads 
 downloads_by_dataset <- censoc_downloaders_long %>% 
   filter(dateh >= as_date("2022-01-01")) %>% 
@@ -146,7 +149,7 @@ downloads_by_dataset <- censoc_downloaders_long %>%
   coord_flip() + 
   labs(x = "",                                                     
        y = "Downloads",
-       title = "Downloads by Dataset (2022)") + 
+       title = "Downloads by Dataset (January - October 2023)") + 
   theme_cowplot()
 
 ## save file 
@@ -171,25 +174,12 @@ users <- users %>%
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Save signup log
+TODO: Get all downloads prior to 2023
+```{r}
+write_csv(signup_log %>% mutate(date_obj = as.Date(substring(dateh, 1, 10))),
+          "/data/censoc/miscellaneous/user_logs/old_download_page_signups.csv")
+```
 
 
 

@@ -4,21 +4,28 @@
 #' where name, email, institution, and position are collected.
 #' The guestbook can only be downloaded by admins of the dataverse.
 #'
-#' NOTE: for about 7/2023 through 9/2023, the guestbook was disabled for the CenSoc-DMF
-#' and CenSoc-Numident. This was while our article in Scientific Data
-#' (https://www.nature.com/articles/s41597-023-02713-y) was under review so that
-#' reviewers who downloaded the data mentioned in that article remained anonymous.
-#' This affects downloads of the CenSoc-Numident/CenSoc-DMF version 2.1 and codebooks.
+#' NOTE: From mid July to Mid October 2023, users were not required to provide information
+#' when downloading the  CenSoc-DMF and CenSoc-Numident. This was so that reviewers of our
+#' article in Scientific Data  (https://www.nature.com/articles/s41597-023-02713-y) could
+#' remain anonymous while the paper was under review.
+#' Downloads of the CenSoc-Numident and CenSoc-DMF during this time do appear to be tracked
+#' in the guestbook, but no identifying information of the downloaders was recorded.
 
 library(tidyverse)
 library(data.table)
+library(ggsci)
+library(ggthemes)
 
 # Read guestbook (note: read permissions limited)
-gb <- fread("~/censoc/UC_Berkeley_CenSoc__GuestbookReponses.csv")
+gb <- fread("~/censoc/UC_Berkeley_CenSoc__GuestbookReponses01_04_24.csv")
+head(gb)
 
 # Format date
 gb[, c("mo", "day", "yr") := tstrsplit(Date, "/", fixed = TRUE)]
 gb <- gb %>% mutate_at(c("mo", "day", "yr"), as.integer)
+
+# Remove downloads prior to 2023 (these were internal tests)
+gb <- gb %>% filter(yr >= 2023)
 
 
 # Categorize downloads: first into groups....
@@ -36,9 +43,10 @@ gb <- gb %>%
 table(gb$`File Name`)
 gb <- gb %>%
   mutate(dataset_downloaded = case_when(
-    str_detect(`File Name`, pattern = "bunmd") ~ "BUNMD",
+    str_detect(`File Name`, pattern = "bunmd") & !(str_detect(`File Name`, pattern = "supplement")) ~ "BUNMD",
     str_detect(`File Name`, pattern = "numident") & !(str_detect(`File Name`, pattern = "demo")) &
-                                                        !(str_detect(`File Name`, pattern = "enlistment")) ~ "CenSoc-Numident",
+                                                      !(str_detect(`File Name`, pattern = "enlistment")) &
+                                                      !(str_detect(`File Name`, pattern = "supplement")) ~ "CenSoc-Numident",
     str_detect(`File Name`, pattern = "numident_demo") ~ "CenSoc-Numident Demo",
     str_detect(`File Name`, pattern = "dmf") & !(str_detect(`File Name`, pattern = "demo")) &
                                                       !(str_detect(`File Name`, pattern = "enlistment")) ~ "CenSoc-DMF",
@@ -49,15 +57,12 @@ gb <- gb %>%
     str_detect(`File Name`, pattern = "enlistment_dmf") ~ "CenSoc-DMF WWII Enlistment",
     str_detect(`File Name`, pattern = "numident_enlistment") ~ "CenSoc-Numident WWII Enlistment",
     str_detect(`File Name`, pattern = "dmf_enlistment") ~ "CenSoc-DMF WWII Enlistment",
+    str_detect(`File Name`, pattern = "supplement") ~ "Supplementary Files",
     TRUE ~ NA_character_))
-# note: might need to deal with the fact that I had one of the
-# enlistment codebooks misnamed for like a month.
+gb %>% group_by(dataset_downloaded) %>% tally() %>% arrange(desc(n))
 
 # make sure this looks okay
 gb %>% group_by(Dataset, dataset_group, dataset_downloaded) %>% tally()
-
-# Remove downloads prior to 2023 when data became available
-gb <- gb %>% filter(yr >= 2023)
 
 # Flag codebook vs data downloads in case we care about that
 gb <- gb %>% mutate(data_or_codebook =
@@ -65,15 +70,62 @@ gb <- gb %>% mutate(data_or_codebook =
                          TRUE ~ "dataset"))
 
 
-# what are the most downloaded datasets?
+# which datasets & codebooks are most downloaded?
 gb %>% group_by(dataset_downloaded) %>% tally() %>% arrange(desc(n))
 # Demo files, BUNMD, Enlistment files
 
-# Get email addresses
-#hvd_users <- gb %>% filter(Email != "") %>%
-#  group_by(`User Name`, Email) %>%
-#  tally() %>%
-#  select(-n)
+# "Type" can be download, explore, read doc, or a few other options
+table(gb$Type)
+
+# For download metrics, we will only care about actual downloads of datasets themselves
+gb_metrics <- gb %>% filter(Type == "Download" & data_or_codebook == "dataset")
+
+# Let's look at monthly download numbers
+# formatting these as Date objects will allow us sort them chronologically
+gb_metrics <- gb_metrics %>% mutate(date_obj = paste(str_pad(day ,2, pad ="0", side ="left"),
+                                                     str_pad(mo,2, pad ="0", side ="left"),
+                                                     yr, sep = "-")) %>%
+  mutate(date_obj = format(as.Date(date_obj, "%d-%m-%Y"))) %>%
+  mutate(year_mo = format(as.Date(date_obj), "%Y-%m"))
+
+# Bar plot of downloads by month since June 2023
+gb_metrics %>%
+  filter(year_mo >= "2023-06") %>%
+  group_by(year_mo) %>%
+  tally() %>%
+  ggplot(aes(year_mo, n)) +
+  geom_col() +
+  theme_classic() +
+  labs(x = "Month",
+       y = "Downloads") +
+  scale_y_continuous(labels = scales::comma)
+
+# monthly downloads categorizes by dataset group
+gb_metrics %>% filter(year_mo >= "2023-06") %>%
+  ggplot(aes(fill=dataset_group, x=year_mo)) +
+  geom_bar(position="stack", stat="count") +
+  theme_classic() +
+  ggsci::scale_fill_locuszoom() +
+  ggtitle("Dataset Downloads June 1 2023 - January 4 2024") # change end date if needed
+
+# Note: demo downloads in 10/2023 are likely from a teaching demonstration
+# Note: No user info for Numident & DMF downloads from about July - October 2023
+
+# Let's plot downloads by dataset
+gb_metrics %>%
+  group_by(dataset_downloaded) %>%
+  tally() %>%
+  arrange(desc(n)) %>%
+  ungroup %>%
+  mutate(dataset_downloaded= reorder(dataset_downloaded, n)) %>%
+  ggplot(aes(dataset_downloaded, n)) +
+  geom_col() +
+  coord_flip() +
+  theme_classic()
+
+
+
+
 
 
 
