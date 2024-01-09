@@ -2,7 +2,7 @@
 
 **Summary:** The scripts in this directory create statistical weights for the CenSoc-Numident and CenSoc-DMF 3.0 datasets. We weight to cells cross-classified by age at death, year of death, sex, race, and birthplace. The full procedure is detailed in our [technical documentation](https://censoc.berkeley.edu/wp-content/uploads/2023/10/CenSoc_V3_Weights_Technical_Report.pdf)
 
-**Important Note:** NCHS data with birthplace for the year 2005 is restricted and only accessible to researchers who have NCHS approval. These data are stored on UC Berkeley's Secure Research Data and Compute (SRDC) platform. 
+**Important Note:** NCHS data with birthplace for the year 2005 is restricted and only accessible to researchers who have NCHS approval. These data are stored on UC Berkeley's Secure Research Data and Compute (SRDC) platform. All CenSoc data imported into the SRDC are completely de-identified and formatted as tables of cell counts so that no re-identification of restricted NCHS data is possible.
 
 The general process of creating weights is as follows:
 
@@ -28,7 +28,11 @@ The tabulated DMF and Numident data can then be transferred to the SRDC. The fol
 
 `06_tabulate_restricted_NCHS_data.R`: Creates cell counts by age at death, year of death, sex, race, and birthplace for restricted NCHS mortality data 2005-2020, ages 65+.
 
-`07_create_weights.R`: Creates weights for all ages and years. Calls the function master_weighting_function.R, which in turn sources a number of functions from weighting_functions.R. Output is a data table with weights for each cell in each dataset. No identifiers or identifying information are contained in these data tables, so they can be exported from the SRDC.
+`07_create_weights.R`: Creates weights for all ages and years. Calls the function master_weighting_function.R, which in turn sources a number of functions from weighting_functions.R. Output is a data table with weights for each cell in each dataset.
+
+No identifiers or identifying information are contained in these data tables, so they can be exported from the SRDC to run the final script:
+
+`08_create_final_weighted_datasets.R`: Reattach weights for each cell back to full CenSoc-DMF and CenSoc-Numident datasets and do some final modifications to create publishable datasets.
 
 
 
