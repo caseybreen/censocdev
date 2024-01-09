@@ -1,19 +1,19 @@
 ####################################################
-# Last revised by Maria Osborne (August __ 2023)   #
+# Last revised by Maria Osborne (August 2023)   #
 ####################################################
-#' 
+#'
 #' Calls weighting functions:
 #' create_NCHS_weights_numident()
 #' create_NCHS_weights_dmf()
-#' 
+#'
 #' Input: processed and tabulated CenSoc Numident and/or DMF data set,
 #' tabulated NCHS mortality data
-#' Output: weights by strata 
-#' 
+#' Output: weights by strata
+#'
 #' Assumes years 1975-2005 for DMF and 1988-2005 for Numident.
 #' If running on public server where 2005+ NCHS data are not available,
 #' user will have to change the end_year argument to functions
-#' 
+#'
 #'
 
 # libraries
@@ -24,7 +24,7 @@ library(caret)
 library(MASS)
 
 # Source master functions
-source("~/CenSoc Weights/code/master_weighting_function.R")
+source("~/CenSoc Weights/code/nchs_master_weighting_function.R")
 
 # Paths
 numident_tabulated_path <- "~/CenSoc Weights/data/numident/numident_data_prepared_tabulated.csv"

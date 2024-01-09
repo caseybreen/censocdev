@@ -28,7 +28,7 @@ The tabulated DMF and Numident data can then be transferred to the SRDC. The fol
 
 `06_tabulate_restricted_NCHS_data.R`: Creates cell counts by age at death, year of death, sex, race, and birthplace for restricted NCHS mortality data 2005-2020, ages 65+.
 
-`07_create_weights.R`: Creates weights for all ages and years. Calls the function master_weighting_function.R, which in turn sources a number of functions from weighting_functions.R. Output is a data table with weights for each cell in each dataset.
+`07_create_weights.R`: Creates weights for all ages and years. Calls the function nchs_master_weighting_function.R, which in turn sources a number of functions from nchs_weighting_functions.R. Output is a data table with weights for each cell in each dataset.
 
 No identifiers or identifying information are contained in these data tables, so they can be exported from the SRDC to run the final script:
 

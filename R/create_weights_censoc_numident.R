@@ -12,7 +12,8 @@
 #' @export
 #'
 
-create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:1939), death_ages = c(65:100), hmd_path = "/data/josh/CenSoc/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") {
+create_weights_censoc_numident <- function(censoc.numident, cohorts = c(1895:1939), death_ages = c(65:100),
+                                           hmd_path = "/data/censoc/input_data/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") {
 
   ## Read in death by lexis triangle from HMD
   hmd_deaths <-  fread(hmd_path) %>%
