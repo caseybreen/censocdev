@@ -15,12 +15,12 @@ header-includes:
 | Page| Variable            | Label                                        |
 |----:|:--------------------|:---------------------------------------------|
 |  \hyperlink{page.2}{2}    | \hyperlink{page.2}{ssn}                |Social Security Number                        |
-|  \hyperlink{page.3}{3}    | \hyperlink{page.3}{fname}              |First Name                                    |
-|  \hyperlink{page.4}{4}    | \hyperlink{page.4}{mname}              |Middle Name                                   | 
-|  \hyperlink{page.5}{5}    | \hyperlink{page.5}{lname}              |Last Name                                     |
-|  \hyperlink{page.6}{6}    | \hyperlink{page.6}{fname\_raw}          |First Name Raw                               |
-|  \hyperlink{page.7}{7}    | \hyperlink{page.7}{mname\_raw}          |Middle Name Raw                              | 
-|  \hyperlink{page.8}{8}    | \hyperlink{page.8}{lname\_raw}         |Last Name Raw                                 |
+|  \hyperlink{page.3}{3}    | \hyperlink{page.3}{fname}              |First Name   (Cleaned)                        |
+|  \hyperlink{page.4}{4}    | \hyperlink{page.4}{mname}              |Middle Name  (Cleaned)                        | 
+|  \hyperlink{page.5}{5}    | \hyperlink{page.5}{lname}              |Last Name    (Cleaned)                        |
+|  \hyperlink{page.6}{6}    | \hyperlink{page.6}{fname\_raw}          |First Name (Raw)                               |
+|  \hyperlink{page.7}{7}    | \hyperlink{page.7}{mname\_raw}          |Middle Name (Raw)                              |
+|  \hyperlink{page.8}{8}    | \hyperlink{page.8}{lname\_raw}         |Last Name (Raw)                                 |
 |  \hyperlink{page.9}{9}    | \hyperlink{page.9}{sex}                |Sex                                           |
 |  \hyperlink{page.10}{10}    | \hyperlink{page.10}{race\_first}         |Race on First Application                   |
 |  \hyperlink{page.11}{11}    | \hyperlink{page.11}{race\_first\_cyear}   |First Race: Application Year               |
@@ -39,18 +39,18 @@ header-includes:
 |  \hyperlink{page.24}{24}  | \hyperlink{page.24}{death\_age}         |Age at Death (Years)                         |
 |  \hyperlink{page.25}{25}  | \hyperlink{page.25}{zip\_residence}     |ZIP Code of Residence at Time of Death       |
 |  \hyperlink{page.26}{26}  | \hyperlink{page.26}{socstate}          |State where Social Security Number Issued     |
-|  \hyperlink{page.27}{27}  | \hyperlink{page.27}{father\_fname}      |Father's First Name                          |
-|  \hyperlink{page.28}{28}  | \hyperlink{page.28}{father\_mname}      |Father's Middle Name                         |
-|  \hyperlink{page.29}{29}  | \hyperlink{page.29}{father\_lname}      |Father's Last Name                           |
-|  \hyperlink{page.30}{30}  | \hyperlink{page.30}{father\_fname\_raw} |Father's First Name Raw                      |
-|  \hyperlink{page.31}{31}  | \hyperlink{page.31}{father\_mname\_raw} |Father's Middle Name Raw                     |
-|  \hyperlink{page.32}{32}  | \hyperlink{page.32}{father\_lname\_raw} |Father's Last Name Raw                       |
-|  \hyperlink{page.33}{33}  | \hyperlink{page.33}{mother\_fname}      |Mother's First Name                          |
-|  \hyperlink{page.34}{34}  | \hyperlink{page.34}{mother\_mname}      |Mother's Middle Name                         |
-|  \hyperlink{page.35}{35}  | \hyperlink{page.35}{mother\_lname}      |Mother's Last Name                           |
-|  \hyperlink{page.36}{36}  | \hyperlink{page.36}{mother\_fname\_raw} |Mother's First Name Raw                      |
-|  \hyperlink{page.37}{37}  | \hyperlink{page.37}{mother\_mname\_raw} |Mother's Middle Name Raw                     |
-|  \hyperlink{page.38}{38}  | \hyperlink{page.38}{mother\_lname\_raw} |Mother's Last Name Raw                       |
+|  \hyperlink{page.27}{27}  | \hyperlink{page.27}{father\_fname}      |Father's First Name (Cleaned)                |
+|  \hyperlink{page.28}{28}  | \hyperlink{page.28}{father\_mname}      |Father's Middle Name (Cleaned)               |
+|  \hyperlink{page.29}{29}  | \hyperlink{page.29}{father\_lname}      |Father's Last Name   (Cleaned)               |
+|  \hyperlink{page.30}{30}  | \hyperlink{page.30}{father\_fname\_raw} |Father's First Name (Raw)                    |
+|  \hyperlink{page.31}{31}  | \hyperlink{page.31}{father\_mname\_raw} |Father's Middle Name (Raw)                   |
+|  \hyperlink{page.32}{32}  | \hyperlink{page.32}{father\_lname\_raw} |Father's Last Name (Raw)                     |
+|  \hyperlink{page.33}{33}  | \hyperlink{page.33}{mother\_fname}      |Mother's First Name (Cleaned)                |
+|  \hyperlink{page.34}{34}  | \hyperlink{page.34}{mother\_mname}      |Mother's Middle Name (Cleaned)               |
+|  \hyperlink{page.35}{35}  | \hyperlink{page.35}{mother\_lname}      |Mother's Last Name (Cleaned)                 |
+|  \hyperlink{page.36}{36}  | \hyperlink{page.36}{mother\_fname\_raw} |Mother's First Name (Raw)                    |
+|  \hyperlink{page.37}{37}  | \hyperlink{page.37}{mother\_mname\_raw} |Mother's Middle Name (Raw)                   |
+|  \hyperlink{page.38}{38}  | \hyperlink{page.38}{mother\_lname\_raw} |Mother's Last Name (Raw)                     |
 |  \hyperlink{page.39}{39}  | \hyperlink{page.39}{age\_first\_application} |Age at First Social Security Application|
 |  \hyperlink{page.40}{40}  | \hyperlink{page.40}{number\_apps}       |Number of Applications                       |
 |  \hyperlink{page.41}{41}  | \hyperlink{page.41}{number\_claims}     |Number of Claims                             |
@@ -90,9 +90,11 @@ knitr::opts_knit$set(root.dir = here("~/censocdev/codebase/05_create_censoc_code
 \normalsize
 \vspace{12pt}
 
-**Label**: First Name
+**Label**: First Name (Cleaned)
 
-**Description**: fname reports the first 16 letters of the person's cleaned first name, as recorded in the Numident death records.
+**Description**: fname reports the first 16 letters of the person's cleaned first name, as recorded in the Numident death records. This variable was cleaned from raw first names by removing titles (e.g., Dr.)
+and replacing nicknames with standard names (e.g., Billy to William). Non-alphabetical characters were also
+removed.
 
 \newpage 
 
@@ -100,9 +102,9 @@ knitr::opts_knit$set(root.dir = here("~/censocdev/codebase/05_create_censoc_code
 \normalsize
 \vspace{12pt}
 
-**Label:** Middle Name
+**Label:** Middle Name (Cleaned)
 
-**Description**: mname reports the first 16 letters of the person's cleaned middle name, as recorded in the Numident death records.
+**Description**: mname reports the first 16 letters of the person's cleaned middle name, as recorded in the Numident death records. This variable was cleaned from raw middle names by replacing nicknames with standard names (e.g., Billy to William) and removing non-alphabetical characters.
 
 \newpage 
 
@@ -111,18 +113,19 @@ knitr::opts_knit$set(root.dir = here("~/censocdev/codebase/05_create_censoc_code
 \normalsize
 \vspace{12pt}
 
-**Label:** Last Name 
+**Label:** Last Name (Cleaned)
 
-**Description**: lname reports the first 21 letters of the person's cleaned last name, as recorded in the Numident death records.
+**Description**: lname reports the first 21 letters of the person's cleaned last name, as recorded in the Numident death records. This variable was cleaned from the raw middle name variable by removing non-alphabetical characters. Last names with two words were combined into one (e.g. Mc Donald to McDonald).
+
 
 \newpage 
 **\huge fname\_raw **
 \normalsize
 \vspace{12pt}
 
-**Label**: First Name Raw
+**Label**: First Name (Raw)
 
-**Description**: fname_raw reports the first 16 letters of the person's raw first name, as recorded in the Numident death records.
+**Description**: fname_raw reports the first 16 letters of the person's raw first name, as recorded in the Numident death records. These strings are taken directly from the Social Security application (SSA) records, have not been cleaned, and users should refer to fname if they want cleaned names.
 
 \newpage 
 
@@ -130,9 +133,9 @@ knitr::opts_knit$set(root.dir = here("~/censocdev/codebase/05_create_censoc_code
 \normalsize
 \vspace{12pt}
 
-**Label:** Middle Name Raw
+**Label:** Middle Name (Raw)
 
-**Description**: mname_raw reports the first 16 letters of the person's raw middle name, as recorded in the Numident death records.
+**Description**: mname_raw reports the first 16 letters of the person's raw middle name, as recorded in the Numident death records. These strings are taken directly from the Social Security application (SSA) records, have not been cleaned, and users should refer to mname if they want cleaned names.
 
 \newpage 
 
@@ -141,9 +144,9 @@ knitr::opts_knit$set(root.dir = here("~/censocdev/codebase/05_create_censoc_code
 \normalsize
 \vspace{12pt}
 
-**Label:** Last Name Raw
+**Label:** Last Name (Raw)
 
-**Description**: lname_raw reports the first 21 letters of the person's raw last name, as recorded in the Numident death records.
+**Description**: lname_raw reports the first 21 letters of the person's raw last name, as recorded in the Numident death records. These strings are taken directly from the Social Security application (SSA) records, have not been cleaned, and users should refer to lname if they want cleaned names.
 
 \newpage 
 **\huge sex **
@@ -179,7 +182,7 @@ knitr::kable(bunmd %>%
 
 **Label**: race first
 
-**Description**: race_first reports a person's race, as recorded on their most recent application entry. 
+**Description**: race_first reports a person's race, as recorded on their first application entry. 
 
 
 **Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. They also removed the Other category.
@@ -879,9 +882,10 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Father's First Name
+**Label**: Father's First Name (Cleaned)
 
-**Description**: father_fname is a character variable reporting the first 16 letters of the person's father's cleaned first name, as recorded in the Numident application records.
+**Description**: father_fname is a character variable reporting the first 16 letters of the person's father's cleaned first name, as recorded in the Numident application records.  This variable was cleaned from the father's raw first names by removing titles (e.g., Dr.) and replacing nicknames with standard names (e.g., Billy to William). Non-alphabetical characters were also
+removed.
 
 \newpage 
 
@@ -889,9 +893,9 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Father's Middle Name
+**Label**: Father's Middle Name (Cleaned)
 
-**Description**: father_mname is a character variable reporting the first 16 letters of the person's father's cleaned middle name, as recorded in the Numident application records.
+**Description**: father_mname is a character variable reporting the first 16 letters of the person's father's cleaned middle name, as recorded in the Numident application records.  This variable was cleaned from the father's raw middle names by replacing nicknames with standard names (e.g., Billy to William) and removing non-alphabetical characters.
 
 \newpage 
 
@@ -900,9 +904,10 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Father's Last Name 
+**Label**: Father's Last Name (Cleaned)
 
-**Description**: father_lname is a character variable reporting the first 21 letters of the person's father's cleaned last name, as recorded in the Numident application records.
+**Description**: father_lname is a character variable reporting the first 21 letters of the person's father's cleaned last name, as recorded in the Numident application records.  This variable was cleaned from the father's raw last names by removing non-alphabetical characters. Last names with two words were combined into one (e.g. Mc Donald to McDonald).
+
 \newpage 
 
 
@@ -910,9 +915,9 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Father's First Name Raw
+**Label**: Father's First Name (Raw)
 
-**Description**: father_fname_raw is a character variable reporting the first 16 letters of the person's father's raw first name, as recorded in the Numident application records.
+**Description**: father_fname_raw is a character variable reporting the first 16 letters of the person's father's raw first name, as recorded in the Numident application records. These strings are taken directly from SSA records, have not been cleaned, and users should refer to father_fname if they want cleaned names.
 
 \newpage 
 
@@ -920,9 +925,9 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Father's Middle Name Raw
+**Label**: Father's Middle Name (Raw)
 
-**Description**: father_mname_raw is a character variable reporting the first 16 letters of the person's raw father's middle name, as recorded in the Numident application records.
+**Description**: father_mname_raw is a character variable reporting the first 16 letters of the person's raw father's middle name, as recorded in the Numident application records. These strings are taken directly from SSA records, have not been cleaned, and users should refer to father_mname if they want cleaned names.
 
 \newpage 
 
@@ -931,9 +936,9 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Father's Last Name Raw
+**Label**: Father's Last Name (Raw)
 
-**Description**: father_lname_raw is a character variable reporting the first 21 letters of the person's father's raw last name, as recorded in the Numident application records.
+**Description**: father_lname_raw is a character variable reporting the first 21 letters of the person's father's raw last name, as recorded in the Numident application records.These strings are taken directly from SSA records, have not been cleaned, and users should refer to father_lname if they want cleaned names.
 
 \newpage 
 
@@ -942,9 +947,9 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Mother's First Name
+**Label**: Mother's First Name (Cleaned)
 
-**Description**: mother_fname is a character variable reporting the first 16 letters of the person's mother's cleaned first name, as recorded in the Numident application records.
+**Description**: mother_fname is a character variable reporting the first 16 letters of the person's mother's cleaned first name, as recorded in the Numident application records.  This variable was cleaned from the mother's raw first names by removing titles (e.g., Dr.) and replacing nicknames with standard names (e.g., Billy to William). Non-alphabetical characters were also removed.
 
 \newpage 
 
@@ -952,9 +957,11 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Mother's Middle Name
+**Label**: Mother's Middle Name (Cleaned)
 
-**Description**: mother_mname is a character variable reporting the first 16 letters of the person's mother's cleaned middle name, as recorded in the Numident application records.
+**Description**: mother_mname is a character variable reporting the first 16 letters of the person's mother's cleaned middle name, as recorded in the Numident application records. This variable was cleaned from the mother's raw middle names by replacing nicknames with standard names (e.g., Billy to William) and removing non-alphabetical characters.
+
+removed.
 
 \newpage 
 
@@ -963,9 +970,10 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Mother's Last Name 
+**Label**: Mother's Last Name (Cleaned)
 
-**Description**: mother_lname is a character variable reporting the first 21 letters of the person's mother's cleaned last name, as recorded in the Numident application records.
+**Description**: mother_lname is a character variable reporting the first 21 letters of the person's mother's cleaned last name, as recorded in the Numident application records. This variable was cleaned from the mother's raw last names by removing non-alphabetical characters. Last names with two words were combined into one (e.g. Mc Donald to McDonald).
+
 \newpage 
 
 
@@ -973,9 +981,9 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Mother's First Name Raw
+**Label**: Mother's First Name (Raw)
 
-**Description**: mother_fname is a character variable reporting the first 16 letters of the person's mother's rawfirst name, as recorded in the Numident application records.
+**Description**: mother_fname is a character variable reporting the first 16 letters of the person's mother's rawfirst name, as recorded in the Numident application records. These strings are taken directly from SSA records, have not been cleaned, and users should refer to mother_fname if they want cleaned names.
 
 \newpage 
 
@@ -983,9 +991,9 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Mother's Middle Name Raw
+**Label**: Mother's Middle Name (Raw)
 
-**Description**: mother_mname is a character variable reporting the first 16 letters of the person's mother's raw middle name, as recorded in the Numident application records.
+**Description**: mother_mname is a character variable reporting the first 16 letters of the person's mother's raw middle name, as recorded in the Numident application records. These strings are taken directly from SSA records, have not been cleaned, and users should refer to mother_mname if they want cleaned names.
 
 \newpage 
 
@@ -994,9 +1002,9 @@ NA &  & 471923 & 0.96\\
 \normalsize
 \vspace{12pt}
 
-**Label**: Mother's Last Name Raw
+**Label**: Mother's Last Name (Raw)
 
-**Description**: mother_lname is a character variable reporting the first 21 letters of the person's mother's raw last name, as recorded in the Numident application records.
+**Description**: mother_lname is a character variable reporting the first 21 letters of the person's mother's raw last name, as recorded in the Numident application records. These strings are taken directly from SSA records, have not been cleaned, and users should refer to mother_lname if they want cleaned names.
 
 \newpage 
 
