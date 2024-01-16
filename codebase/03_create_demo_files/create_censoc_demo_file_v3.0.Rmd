@@ -1,8 +1,10 @@
 ---
-title: "Make CenSoc Demo File"
+title: "Make CenSoc Demo Files v3.0"
 author: "Benjamin Shapiro (shapiro_ben1729@berkeley.edu)"
-date: "01-12-2023"
+date: "01/2024"
 ---
+
+Updated.
 
 Summary: In this Notebook, I make the CenSoc-DMF and CenSoc-Numident Demo files. 
 
@@ -23,10 +25,10 @@ library(datasets)
 library(readxl)
 library(censocdev)
 ```
+
 ##Function to recode education
 ```{r}
 recode_education <- function(df, educ_var) {
-
   df <- df  %>%
     mutate(educ_variable = !!sym(educ_var)) %>%
     mutate(educ_yrs = case_when(
@@ -53,13 +55,12 @@ recode_education <- function(df, educ_var) {
       educ_variable == 112 ~ 17,
       educ_variable == 113 ~ 17
     )) %>%
-    select(-educ_variable)
-
+    dplyr::select(-educ_variable)
   return(df)
-
 }
 
 ```
+
 ## Read in the 1 percent file and the crosswalk from IPUMS
 ```{r}
 # Read in 1% IPUMS 1940 Census Extract
@@ -99,11 +100,11 @@ numidentdemo <- recode_education(numidentdemo,"educd")
 #  ) # 85865 remaining observations
 
 ## Select numident variables for v3.0
-vars_to_keep_num <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "race_first", "race_first_cyear", "race_last", "bpl_string", "zip_residence", "socstate", "socstate_string", "age_first_application", "weight",  "perwt", "age", "sex", "bpl", "mbpl", "fbpl", "educd", "empstatd", "hispan", "incnonwg", "incwage", "marst", "nativity", "occ", "occscore",  "pernum", "race",  "serial")
+vars_to_keep_num <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "race_first", "race_first_cyear", "race_last", "bpl_string", "zip_residence", "socstate", "socstate_string", "age_first_application", "weight",  "perwt", "age", "sex", "bpl", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incnonwg", "incwage", "marst", "nativity", "occ", "occscore",  "pernum", "race", "serial")
 
 ## keep variables and rename to lower case 
 demo_file_numident <- numidentdemo %>%
-  select(vars_to_keep_num)
+  dplyr::select(all_of(vars_to_keep_num))
 ```
 
 ## Construct CenSoc-DMF Demo
@@ -113,7 +114,7 @@ dmfdata <- fread("/data/censoc/censoc_data_releases/censoc_dmf/censoc_dmf_v3/cen
 
 # Join dmf to demo by histid
 dmfdata_demo <- ipums1pct %>%
-  inner_join(dmfdata, by = c("histid" = "HISTID")) # 76,496
+  inner_join(dmfdata, by = c("histid" = "HISTID")) # 45,907
 
 # Match sex, age, and race from demo to dmf data -- removed this code for V3 as there is no utility
 #dmf3.0 <- dmfdata_demo %>%
@@ -124,19 +125,17 @@ dmfdata_demo <- ipums1pct %>%
 #  ) # 70,211 remaining obs
 dmfdata_demo <- recode_education(dmfdata_demo, "educd")
 ## Select DMF variables for v2.1
-vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "weight", "perwt", "age", "sex", "bpld", "mbpl", "fbpl", "educd", "empstatd", "hispan", "incnonwg", "incwage", "marst", "nativity", "occ", "occscore",  "pernum", "race",  "serial")
+vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "weight", "perwt", "age", "sex", "bpld", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incnonwg", "incwage", "marst", "nativity", "occ", "occscore",  "pernum", "race",  "serial")
 
 ## Write out demo file 
 demo_file_dmf <- dmfdata_demo %>%
-  select(vars_to_keep_dmf) 
+  dplyr::select(all_of(vars_to_keep_dmf))
 ```
 
 statefip_string and bpl_string function
 ```{r}
 # bpl_string_code<-read_csv("/data/josh/CenSoc/censoc_data/bpl_string_code.csv") %>%
 #   mutate(Code= as.factor(Code))
-
-
 
 demo_file_numident %>% 
   mutate(statefip = as.numeric(statefip)) %>% 
