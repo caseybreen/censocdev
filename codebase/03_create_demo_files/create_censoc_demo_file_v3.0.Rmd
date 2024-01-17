@@ -1,7 +1,7 @@
 ---
 title: "Make CenSoc Demo Files v3.0"
 author: "Benjamin Shapiro (shapiro_ben1729@berkeley.edu)"
-date: "01/2024"
+date: "January 2024"
 ---
 
 Updated.
@@ -64,7 +64,7 @@ recode_education <- function(df, educ_var) {
 ## Read in the 1 percent file and the crosswalk from IPUMS
 ```{r}
 # Read in 1% IPUMS 1940 Census Extract
-ipums1pct <- fread("/data/censoc/workspace/demo_input/sampleIPUMS.csv") %>% rename_all(tolower)
+ipums1pct <- fread("/data/censoc/workspace/demo_input/ipums1940_1p_sample_2024.csv.gz") %>% rename_all(tolower)
 
 # Read crosswalk (Histid)
 xwalk <- fread("/data/censoc/crosswalks/1940_histid_cc_1p_xwalk.txt")
@@ -87,7 +87,7 @@ numidentdemo <- ipums1pct %>%
     sex.demo = "sex",
     bpl.demo = "bpl"
   ) %>%
-  inner_join(numidentdata, by = c("histid" = "HISTID")) # 93917 remaining observations
+  inner_join(numidentdata, by = c("histid" = "HISTID")) # 70k remaining observations
 
 numidentdemo <- recode_education(numidentdemo,"educd")
 
@@ -100,7 +100,7 @@ numidentdemo <- recode_education(numidentdemo,"educd")
 #  ) # 85865 remaining observations
 
 ## Select numident variables for v3.0
-vars_to_keep_num <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "race_first", "race_first_cyear", "race_last", "bpl_string", "zip_residence", "socstate", "socstate_string", "age_first_application", "weight",  "perwt", "age", "sex", "bpl", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incnonwg", "incwage", "marst", "nativity", "occ", "occscore",  "pernum", "race", "serial")
+vars_to_keep_num <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "sex", "race_first", "race_first_cyear", "race_first_cmonth", "race_last", "race_last_cyear", "race_last_cmonth", "bpl", "bpl_string", "zip_residence", "socstate", "socstate_string", "age_first_application", "weight", "pernum", "perwt", "age", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incnonwg", "marst", "nativity", "occ", "occscore", "race", "rent", "serial", "statefip", "urban")
 
 ## keep variables and rename to lower case 
 demo_file_numident <- numidentdemo %>%
@@ -123,56 +123,25 @@ dmfdata_demo <- ipums1pct %>%
  #   SEX == sex,
   #  RACE == race
 #  ) # 70,211 remaining obs
-dmfdata_demo <- recode_education(dmfdata_demo, "educd")
-## Select DMF variables for v2.1
-vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "weight", "perwt", "age", "sex", "bpld", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incnonwg", "incwage", "marst", "nativity", "occ", "occscore",  "pernum", "race",  "serial")
 
-## Write out demo file 
+# recode education
+dmfdata_demo <- recode_education(dmfdata_demo, "educd")
+
+## Select DMF variables for v2.1
+vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "weight", "pernum", "perwt", "age", "sex", "bpld", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incnonwg", "marst", "nativity", "occ", "occscore", "ownershp", "race", "serial", "statefip", "urban")
+
+##
 demo_file_dmf <- dmfdata_demo %>%
   dplyr::select(all_of(vars_to_keep_dmf))
 ```
 
-statefip_string and bpl_string function
+Write Files
 ```{r}
-# bpl_string_code<-read_csv("/data/josh/CenSoc/censoc_data/bpl_string_code.csv") %>%
-#   mutate(Code= as.factor(Code))
-
-demo_file_numident %>% 
-  mutate(statefip = as.numeric(statefip)) %>% 
-  count(statefip) %>% 
-  add_row(statefip = c(2,15), n = c(0,0))
-
-
-statefip_string_fun<-function(numident_dmf){
-#Create separate data.frame for statefip values and add Alaska and Hawaii 
-statenum<- numident_dmf %>% 
-    mutate(statefip = as.numeric(statefip)) %>% 
-    count(statefip) %>% 
-    add_row(statefip= c(2,15), n = c(0,0)) %>% arrange(statefip)
-  
-#Create another data.frame with `state.name` character values and add Washington D.C.
-state_new<-tibble(state.name) %>% 
-  rbind("District of Columbia") %>% 
-  arrange(state.name) %>% 
-  mutate(statefip = statenum$statefip)
-
-# Integrate state.name
-return(numident_dmf %>% 
-         inner_join(state_new, by = "statefip") %>% 
-         # inner_join(bpl_string_code, by = c("bpl" = "Code")) %>% 
-         rename(statefip_string = "state.name") %>% 
-         mutate(statefip = as.factor(statefip),
-                bpl = as.factor(bpl))) 
-}
-
-
-#Update numident and demo
-demo_file_numident<-statefip_string_fun(demo_file_numident)
-demo_file_dmf<-statefip_string_fun(demo_file_dmf)
-
 ## Write out csv file 
-write_csv(demo_file_dmf, "/data/censoc/censoc_data_releases/censoc_dmf_demo/")
-write_csv(demo_file_numident, "/data/censoc/censoc_data_releases/censoc_numdent_demo/")
+write_csv(demo_file_dmf,
+          "/data/censoc/censoc_data_releases/censoc_dmf_demo/censoc_dmf_demo_v3/censoc_dmf_demo_v3.csv")
+write_csv(demo_file_numident,
+          "/data/censoc/censoc_data_releases/censoc_numident_demo/censoc_numident_demo_v3/censoc_numident_demo_v3.csv")
 ```
 
 
