@@ -1,0 +1,532 @@
+---
+title: "CenSoc-Numident 3.0 Codebook[^updated]"
+output:
+  pdf_document: default
+header-includes:
+- \usepackage{hyperref}
+- \usepackage{caption}
+---
+[^updated]: Last updated: `r format(Sys.time(), '%d %B, %Y')`
+
+\captionsetup[table]{labelformat=empty}
+
+
+| Page| Variable     | Label                                        |
+|----:|:-------------|:---------------------------------------------|
+|   \hyperlink{page.2}{2}  | \hyperlink{page.2}{HISTID}        |Historical unique identifier                  |
+|   \hyperlink{page.3}{3}  | \hyperlink{page.3}{byear}         |Year of birth                                 |
+|   \hyperlink{page.4}{4}  | \hyperlink{page.4}{bmonth}        |Month of birth                                |
+|   \hyperlink{page.5}{5}  | \hyperlink{page.5}{dyear}         |Year of death                                 |
+|   \hyperlink{page.6}{6}  | \hyperlink{page.6}{dmonth}        |Month of death                                |
+|   \hyperlink{page.7}{7}  | \hyperlink{page.7}{death\_age}    |Age at death (years)                          |
+|  \hyperlink{page.8}{8}   |\hyperlink{page.8}{sex}              |Sex                                        |
+|  \hyperlink{page.9}{9}   |\hyperlink{page.9}{race\_first}       |Race on First Application                  |
+|  \hyperlink{page.10}{10} |\hyperlink{page.10}{race\_first\_cyear} |First Race: Application Year               |
+|  \hyperlink{page.11}{11} |\hyperlink{page.11}{race\_first\_cmonth}|First Race: Application Month              |
+|  \hyperlink{page.12}{12} |\hyperlink{page.12}{race\_last}        |Race on Last Application                   |
+|  \hyperlink{page.13}{13} |\hyperlink{page.13}{race\_last\_cyear}  |Last Race: Application Year                |
+|  \hyperlink{page.14}{14} |\hyperlink{page.14}{race\_last\_cmonth} |Last Race: Application Month               |
+|  \hyperlink{page.15}{15} |\hyperlink{page.15}{bpl}              |Place of Birth                             |
+|  \hyperlink{page.16}{16} |\hyperlink{page.16}{zip\_residence}    |ZIP Code of Residence at Time of Death     |
+|  \hyperlink{page.17}{17} |\hyperlink{page.17}{socstate}         |State where Social Security Number Issued  |
+|  \hyperlink{page.18}{18} |\hyperlink{page.18}{age\_first\_application}    |Age at First Social Security Application   |
+|   \hyperlink{page.19}{19}  | \hyperlink{page.19}{weight}        |CenSoc weight                                 |
+
+\vspace{200pt}
+
+**Summary:** The CenSoc-Numident 3.0 dataset (N = 7,044,519) links the full-count 1940 Census to the National Archives’ public release of the Social Security Numident file.Records were linked using the conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([\textcolor{blue}{2012}](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [\textcolor{blue}{2014}](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [\textcolor{blue}{2017}](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)). To merge 1940 Census variables with this dataset, researchers can obtain a copy of the 1940 Census from IPUMS-USA and link on the individual-level, unique identifier HISTID variable.
+
+\newpage 
+
+**\huge HISTID**
+\normalsize
+\vspace{12pt}
+
+**Label**: Historical Unique Identifier
+
+**Description**: HISTID is a unique individual-level identifier. It can be used to merge the CenSoc-Numident file with the 1940 Full-Count Census from IPUMS. 
+
+\newpage 
+
+**\huge byear **
+\normalsize
+\vspace{12pt}
+
+**Label**: Birth Year
+
+**Description**: byear reports a person's year of birth, as recorded in the Numident death records.  
+
+```{r echo = F, results='hide', message=FALSE, warning=FALSE}
+## Library Packages
+library(tidyverse)
+library(data.table)
+library(kableExtra)
+
+## input path (to update)
+input_path <- "/data/censoc/censoc_data_releases/censoc_numident/censoc_numident_v3/censoc_numident_v3.csv"
+
+## read in censoc_numident_v3 data file
+censoc_numident_v3 <- fread(input_path)
+```
+
+```{r, include = F}
+byear_plot <- censoc_numident_v3 %>%
+    group_by(byear) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = byear, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) +
+  ggtitle("Year of Birth") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Year", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma, limits = c(0, 350000)) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+byear_plot
+```
+
+
+\newpage 
+**\huge bmonth **
+\normalsize
+\vspace{12pt}
+
+**Label:** Birth Month
+
+**Description:** bmonth reports a person's month of birth, as recorded in the Numident death records.  
+
+```{r, include = F}
+## run in the console and copy and paste into documentation
+bmonth_tabulated <- censoc_numident_v3 %>% 
+    group_by(bmonth) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
+    select(bmonth, label, n, `freq %` = freq) %>% 
+  knitr::kable(format = "pipe")
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+bmonth_tabulated
+```
+
+\newpage 
+
+**\huge dyear **
+\normalsize
+\vspace{12pt}
+
+**Label**: Death Year
+
+**Description**: dyear reports a person's year of death, as recorded in the Numident death records.     
+
+```{r, include = F, message = F}
+dyear_plot <- censoc_numident_v3 %>%
+    group_by(dyear) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = dyear, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) +  
+  ggtitle("Year of Death") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Year", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_y_continuous(labels = scales::comma, limits = c(0, 600000)) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+dyear_plot
+```
+
+\newpage 
+
+**\huge dmonth **
+\normalsize
+\vspace{12pt}
+
+**Label**: Death Month
+
+**Description**: dmonth reports a person's month of death, as recorded in the Numident death records.  
+
+```{r, include = F}
+dmonth_tabulated <- censoc_numident_v3 %>%
+    group_by(dmonth) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 2)) %>%
+    mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
+    select(dmonth, label, n, `freq %` = freq) %>% 
+  knitr::kable(format = "pipe")
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+dmonth_tabulated
+```
+
+\newpage 
+
+**\huge death\_age **
+\normalsize
+\vspace{12pt}
+
+**Label**: Age at Death (Years)
+
+**Description**: death_age reports a person's age at death in years, calculated using the birth and death information recorded in the Numident death records.    
+
+```{r, include = F}
+death_age_plot <- censoc_numident_v3 %>%
+    group_by(death_age) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = death_age, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) + 
+  ggtitle("Age at Death") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Age at Death", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+death_age_plot
+```
+
+\newpage
+
+
+**\huge sex **
+\normalsize
+\vspace{12pt}
+
+**Label:** Sex
+
+**Description**: sex reports a person's sex, as recorded in the Numident death, application, or claim records. 
+
+```{r, include = F}
+sex_tabulated <- censoc_numident_v3 %>%
+    group_by(sex) %>%
+     tally() %>%
+     mutate(freq = signif(n*100 / sum(n), 3)) %>%
+     mutate(label = c("Men", "Women")) %>%
+     select(sex, label, n, `freq %` = freq) %>% 
+  knitr::kable(format = "pipe")
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+sex_tabulated
+```
+
+
+\newpage
+
+\newpage 
+
+**\huge race\_first **
+\normalsize
+\vspace{12pt}
+
+**Label**: race first
+
+**Description**: race_first reports a person's race, as recorded on their first application entry.
+
+**Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. The Other category was also removed. 
+
+```{r, include = F}
+race_first_tabulated <- censoc_numident_v3 %>%
+    group_by(race_first) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 3)) %>%
+    mutate(label = c("White", "Black", "Other", "Asian", "Hispanic", "North American Native", "Missing")) %>%
+    select(race_first, label, n, `freq %` = freq) %>% 
+  knitr::kable(format = "pipe")
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+race_first_tabulated
+```
+
+\newpage
+
+**\huge race_first_cyear **
+\normalsize
+\vspace{12pt}
+
+**Label:** First Race: Application Year
+
+**Description**: race_first_cyear is a numeric variable reporting the year of the application on which a person reported their first race.
+
+\vspace{12pt}
+
+\newpage 
+
+**\huge race_first_cmonth **
+\normalsize
+\vspace{12pt}
+
+**Label:** First Race: Application Month
+
+**Description**: race_first_cmonth is a numeric variable reporting the month of the application on which a person reported their first race. 
+
+\newpage 
+
+
+**\huge race\_last **
+\normalsize
+\vspace{12pt}
+
+**Label**: race last
+
+**Description**: race_last reports a person's race, as recorded on their most recent application entry.
+
+**Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. They also removed the Other category.
+
+```{r, include = F}
+race_last_tabulated <- censoc_numident_v3 %>%
+    group_by(race_last) %>%
+    tally() %>%
+    mutate(freq = signif(n*100 / sum(n), 3)) %>%
+    mutate(label = c("White", "Black", "Other", "Asian", "Hispanic", "North American Native", "Missing")) %>%
+    select(race_last, label, n, `freq %` = freq) %>% 
+  knitr::kable(format = "pipe")
+```
+
+
+\vspace{30pt}
+
+```{r, echo = F}
+race_last_tabulated
+```
+
+\newpage
+
+**\huge race_last_cyear **
+\normalsize
+\vspace{12pt}
+
+**Label:** First Race: Application Year
+
+**Description**: race_last_cyear reports the year of the application on which a person reported their last race. 
+
+\newpage 
+
+**\huge race_last_cmonth **
+\normalsize
+\vspace{12pt}
+
+**Label:** Last Race: Application Month
+
+**Description**: race_last_cmonth is a numeric variable reporting the month of the application on which a person reported their last race.
+
+\newpage
+
+**\huge bpl **
+\normalsize
+\vspace{12pt}
+
+**Label**: Birthplace
+
+**Description**: bpl is a numeric variable reporting a person's place of birth, as recorded in the Numident application or claims records. The accompanying bpl_string variable reports the person's place of birth as a character string. The coding schema matches the **detailed** IPUMS-USA Birthplace coding schema. 
+
+For a complete list of IPUMS Birthplace codes, please see: https://usa.ipums.org/usa-action/variables/BPL
+
+```{r echo = F, message=FALSE, warning=FALSE, fig.pos="H"}
+bpl_tabulation <- censoc_numident_v3 %>%
+    filter(bpl < 10000 | is.na(bpl)) %>%
+    group_by(bpl, bpl_string) %>%
+    tally() %>%
+    ungroup() %>%
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
+    select(bpl, bpl_string, n, `freq %` = freq)
+
+rows <- seq_len(nrow(bpl_tabulation) %/% 2)
+
+knitr::kable(list(bpl_tabulation[rows,1:4],
+           matrix(numeric(), nrow=0, ncol=1),
+           bpl_tabulation[-rows, 1:4]),
+      caption = "BPL Tabulation (Native born only)",
+      label = "tables", format = "latex", booktabs = TRUE)  %>%
+  kableExtra::kable_styling(latex_options = "HOLD_position")
+```
+
+
+\newpage 
+
+
+**\huge zip\_residence **
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: ZIP Code of Residence at Time of Death
+
+**Description**: zip_residence is a string variable (9-characters) reporting a person's ZIP Code of residence at time of death, as recorded in the Numident death records.
+
+\newpage 
+**\huge socstate**
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: State where Social Security Number Issued
+
+**Description**: The state in which a person's social security card was issued. Determined by first three (3) digits of Social Security number, as recorded in Numident death records. The accompanying socstate_string variable reports the state in which a person's social security card was issued as a character string. The coding schema matches the detailed IPUMS-USA Birthplace coding schema.
+
+\vspace{30pt}
+
+```{r echo = F, message=FALSE, warning=FALSE, fig.pos="H"}
+socstate_tabulation <- censoc_numident_v3 %>%
+    filter(socstate < 10000 | is.na(socstate)) %>%
+    group_by(socstate, socstate_string) %>%
+    tally() %>%
+    ungroup() %>%
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
+    select(socstate, socstate_string, n, `freq %` = freq)
+
+rows <- seq_len(nrow(socstate_tabulation) %/% 2)
+
+knitr::kable(list(socstate_tabulation[rows,1:4],
+           matrix(numeric(), nrow=0, ncol=1),
+           socstate_tabulation[-rows, 1:4]),
+      caption = "Tabulation of socstate (Native born only)",
+      label = "tables", format = "latex", booktabs = TRUE)  %>%
+  kableExtra::kable_styling(latex_options = "HOLD_position")
+```
+
+\newpage 
+
+**\huge age\_first\_app **
+
+\normalsize
+
+\vspace{12pt}
+
+**Label**: Age at First Social Security Application 
+
+**Description**: age_first_application reports the age at which a person submitted their first Social Security Application. 
+
+```{r, include = F}
+age_first_app_plot <- censoc_numident_v3 %>%
+  group_by(age_first_application) %>%
+  filter(age_first_application %in% c(0:110)) %>% 
+  summarise(n = n()) %>%
+  ggplot(aes(x = age_first_application, y = n)) + 
+  geom_point() +
+  geom_line() + 
+  theme_minimal(15) + 
+  theme(legend.position="bottom") +
+  labs(title = "Age of First Application",
+       x = "Age of First Application", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+age_first_app_plot
+```
+
+
+
+\newpage
+
+**\huge weight**
+\normalsize
+
+**Label**: Sample Weight
+
+\vspace{12pt}
+
+**Description**: A post-stratification person-weight to National Center for Health Statistics (NCHS) totals for persons (1) dying between 1988-2005 (2) dying between ages 65-100. Weights are based on age at death, year of death, sex, and race, and place of birth. Please see the [\textcolor{blue}{technical documentation on weights}](https://censoc.berkeley.edu/wp-content/uploads/2023/10/CenSoc_V3_Weights_Technical_Report.pdf) for more information.
+
+```{r echo = F, results='hide', message=FALSE, warning=FALSE}
+weights_tabulated <- censoc_numident_v3 %>%
+  filter(!is.na(weight)) %>% 
+  summarize('Min Weight' = round(min(weight),2), 'Max Weight' = round(max(weight), 2)) %>%
+  mutate(id = 1:n()) %>% 
+  pivot_longer(-id, names_to = "Label", values_to = "Value") %>% 
+  select(Value, Label) %>% 
+  add_row(Label = "No Weight Assigned", Value = NA) %>% 
+  knitr::kable(format = "markdown")
+
+weights <- censoc_numident_v3 %>% 
+  filter(!is.na(weight)) %>% 
+  group_by(death_age, dyear) %>% 
+  summarize(weight = mean(weight))
+
+## plot mortality on Lexis surface
+weights_lexis <- weights %>% 
+  ggplot() +
+  geom_raster(aes(x = dyear, y = death_age,
+                  fill = weight)) +
+  ## Lexis grid
+  geom_hline(yintercept = seq(65, 100, 10),
+             alpha = 0.2, lty = "dotted") +
+  geom_vline(xintercept = seq(1985, 2005, 10),
+             alpha = 0.2, lty = "dotted") +
+  geom_abline(intercept = seq(-100, 100, 10)-1910,
+              alpha = 0.2, lty = "dotted") +
+  scale_fill_viridis_c(option = "magma") +
+  scale_x_continuous("Year", expand = c(0.02, 0),
+                     breaks = seq(1988, 2005, 5)) +
+  scale_y_continuous("Age", expand = c(0, 0),
+                     breaks = seq(65, 100, 10)) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  # coord
+  coord_equal() +
+  # theme
+  theme_void() +
+  theme(
+    axis.text = element_text(colour = "black"),
+    axis.text.y = element_text(size = 10),
+    axis.text.x = element_text(size = 10, angle = 45, hjust = .5), 
+    plot.title = element_text(size = 10, vjust = 2),
+    legend.text = element_text(size = 10), 
+    axis.title=element_text(size = 10,face="bold")
+  ) + 
+  labs(X = "Year",
+       Y = "Age",
+       title = "Average weight by age at death and year of death") 
+```
+
+\vspace{50pt}
+```{r echo = F, message=FALSE, warning=FALSE}
+weights_tabulated
+```
+
+\vspace{50pt}
+```{r echo = F, message=FALSE, warning=FALSE, fig.align="center"}
+weights_lexis
+```
+
+
+
+
