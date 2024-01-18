@@ -9,21 +9,21 @@ header-includes: \usepackage{hyperref}
 
 | Page| Variable     | Label                                        |
 |----:|:------------------------|:---------------------------------------------|
-|   \hyperlink{page.2}{2}  | \hyperlink{page.2}{HISTID}        |Historical unique identifier                  |
-|   \hyperlink{page.3}{3}  | \hyperlink{page.3}{byear}         |Year of birth                                 |
-|   \hyperlink{page.4}{4}  | \hyperlink{page.4}{bmonth}        |Month of birth                                |
-|   \hyperlink{page.5}{5}  | \hyperlink{page.5}{dyear}         |Year of death                                 |
-|   \hyperlink{page.6}{6}  | \hyperlink{page.6}{dmonth}        |Month of death                                |
-|   \hyperlink{page.7}{7}  | \hyperlink{page.7}{death\_age}    |Age at death (years)                          |
-|   \hyperlink{page.8}{8}  | \hyperlink{page.8}{weight}        |CenSoc sample weight                          |
-|   \hyperlink{page.9}{9}  | \hyperlink{page.9}{Additional IPUMS variables}| Additional 1940 Census variables, including: pernum, perwt, age, bpld, mbpl, fbpl, educd, educ_yrs, empstatd, hispan, incnonwg, marst, nativity, occ, occscore, ownershp, race, rent, serial, statefip, urban|  
+|   \hyperlink{page.2}{2}  | \hyperlink{page.2}{HISTID}        |Historical Unique Identifier                  |
+|   \hyperlink{page.3}{3}  | \hyperlink{page.3}{byear}         |Year of Birth                                 |
+|   \hyperlink{page.4}{4}  | \hyperlink{page.4}{bmonth}        |Month of Birth                                |
+|   \hyperlink{page.5}{5}  | \hyperlink{page.5}{dyear}         |Year of Death                                 |
+|   \hyperlink{page.6}{6}  | \hyperlink{page.6}{dmonth}        |Month of Death                                |
+|   \hyperlink{page.7}{7}  | \hyperlink{page.7}{death\_age}    |Age at Death (Years)                          |
+|   \hyperlink{page.8}{8}  | \hyperlink{page.8}{weight}        |CenSoc Sample Weight                          |
+|   \hyperlink{page.9}{9}  | \hyperlink{page.9}{Additional IPUMS variables}| Additional 1940 Census variables, including: pernum, perwt, age, bpld, mbpl, fbpl, educd, educ_yrs, empstatd, hispan, incwage, incnonwg, marst, nativity, occ, occscore, ownershp, race, rent, serial, statefip, and urban|  
 
 
 \vspace{210pt}
 
 **Summary**: The CenSoc-DMF Version 3.0 Demo dataset (N = 45,907) links the IPUMS 1940 1% census sample to the Death Master File (DMF) dataset, a collection of death records reported to the Social Security Administration. Records were linked using a conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
 
-Note that this demo dataset is not conducive to high-resolution mortality research, as it only contains about 1% of records in the full CenSoc-DMF. We recommend using this file for exploratory and demonstrative purposes. To best conduct research with CenSoc data, researchers may download the full CenSoc-DMF from the CenSoc website, obtain an extract of the 1940 Census from IPUMS-USA, and merge data using on the individual-level, unique identifier HISTID variable. Please adhere to IPUMS citation guidelines when using IPUMS census data.
+Note that this demo dataset is not conducive to high-resolution mortality research. We recommend using this file for exploratory and demonstrative purposes. To best conduct research with CenSoc data, researchers may download the full CenSoc-DMF from the CenSoc website, obtain an extract of the 1940 Census from IPUMS-USA, and merge data using on the individual-level, unique identifier HISTID variable. Please adhere to IPUMS citation guidelines when using IPUMS census data.
 
 \newpage 
 
@@ -211,7 +211,7 @@ death_age_plot
 
 **Label**: CenSoc Sample Weight[^1]  
 
-**Description**: A post-stratification person-weight to National Center for Health Statistics (NCHS) totals for persons (1) dying between 1988-2005 (2) dying between ages 65-100. Weights are based on age at death, year of death, sex, and race, and place of birth. Please see the [\textcolor{blue}{technical documentation on weights}](https://censoc.berkeley.edu/wp-content/uploads/2023/10/CenSoc_V3_Weights_Technical_Report.pdf) for more information.
+**Description**: A post-stratification person-weight to National Center for Health Statistics (NCHS) totals for persons (1) dying between 1975-2005 (2) dying between ages 65-100. Weights are based on age at death, year of death, sex, and race, and place of birth. Please see the [\textcolor{blue}{technical documentation on weights}](https://censoc.berkeley.edu/wp-content/uploads/2023/10/CenSoc_V3_Weights_Technical_Report.pdf) for more information.
 
 [^1]: The IPUMS-USA 1940 1% sample also includes a weight (`perweight`) to account for the 1940 sampling procedure (thus no weights for the 100% complete count 1940 census). For analysis, we recommend using both sets of weights. A final weight can be constructed by multiplying the two weights together.  
 ```{r, include = F}
@@ -273,15 +273,15 @@ weights_lexis_dmf <- weights_dmf %>%
        title = "Average weight by age at death and year of death") 
 ```
 
-\vspace{50pt}
+\vspace{30pt}
 ```{r echo = F, message=FALSE, warning=FALSE}
 weights_tabulated
 ```
 
 
-\vspace{50pt}
+\vspace{30pt}
 
-```{r, echo = F, fig.align = 'center'}
+```{r, echo = F, fig.align = 'center', fig.width = 4}
 weights_lexis_dmf
 ```
 
@@ -298,7 +298,7 @@ weights_lexis_dmf
 
 \vspace{12pt}
 
-The variables below are from the IPUMS-USA 1940 1% census sample. We recommend looking at the terrific documentation on the IPUMS-USA website: \hyperlink{https://usa.ipums.org/usa/index.shtml}{https://usa.ipums.org/usa/index.shtml.} 
+The variables below are from the IPUMS-USA 1940 1% census sample. We recommend looking at the terrific documentation on the IPUMS-USA website: [\textcolor{blue}{https://usa.ipums.org/usa/index.shtml}](https://usa.ipums.org/usa/index.shtml)
 
 | Variable     | Label                                        |
 |:-------------|:---------------------------------------------|
@@ -310,9 +310,10 @@ The variables below are from the IPUMS-USA 1940 1% census sample. We recommend l
 |   mbpl |Mother's place of birth[^3]|
 |   fbpl |Father's place of birth[^4]|
 |   educd |Educational attainment (detailed IPUMS codes)|
-|   educ_yrs |Educational attainment in years (constructed)|
+|   educ_yrs |Educational attainment in years (constructed)[^5]|
 |   empstatd |Employment status (detailed)|
-|   hispan |Hispanic/Spanish/Latino origin (imputed)[^5]|
+|   hispan |Hispanic/Spanish/Latino origin (imputed)[^6]|
+|   incwage | Wage and salary income in 1939 |
 |   incnonwg |Had non-wage/salary income over $50 in 1939|
 |   marst |Marital status|
 |   nativity |Foreign birthplace or parentage|
@@ -325,10 +326,11 @@ The variables below are from the IPUMS-USA 1940 1% census sample. We recommend l
 |   statefip |State of residence 1940 (FIPS code)|
 |   urban |Urban/rural status|  
 
-[^2]: The `perweight` accounts for the 1940 sampling procedure to construct the 1% sample, and thus is only available in the 1940 1% sample. For analysis, we recommend using both the IPUMS `perweight` and the CenSoc `weight.` A final weight can be constructed by multiplying the two weights together
-[^3]: This variable is only available for sample-line persons (a one-in-twenty sample asked additional questions in the 1940 Census) or those living with their father.
-[^4]: This variable is only available for sample-line persons (a one-in-twenty sample asked additional questions in the 1940 Census) or those living with their mother.
-[^5]: This information was not collected in the 1940 Census and is determined by other information, such as one's birthplace or a parent's birthplace.
+[^2]: The IPUMS `perweight` accounts for the 1940 sampling procedure to construct the 1% sample, and thus is only available in the 1940 1% sample. For analysis, we recommend using both the IPUMS `perweight` and the CenSoc `weight.` A final weight can be constructed by multiplying the two weights together
+[^3]: This variable is only available for sample-line persons (a one-in-twenty sample asked additional questions in the 1940 Census) or those living with their mother.
+[^4]: This variable is only available for sample-line persons (a one-in-twenty sample asked additional questions in the 1940 Census) or those living with their father.
+[^5]: `educ_yrs` is constructed from the IPUMS `educd` variable but not directly available from IPUMS.  
+[^6]: The 1940 Census did not directly inquire about Hispanic ethnicity or origin. This variable is determined by IPUMS using information such as one's birthplace or a parent's birthplace.
 
 
 

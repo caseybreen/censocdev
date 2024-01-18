@@ -23,10 +23,9 @@ library(ipumsr)
 library(styler)
 library(datasets)
 library(readxl)
-library(censocdev)
 ```
 
-##Function to recode education
+## Function to recode education
 ```{r}
 recode_education <- function(df, educ_var) {
   df <- df  %>%
@@ -61,6 +60,7 @@ recode_education <- function(df, educ_var) {
 
 ```
 
+
 ## Read in the 1 percent file and the crosswalk from IPUMS
 ```{r}
 # Read in 1% IPUMS 1940 Census Extract
@@ -91,21 +91,15 @@ numidentdemo <- ipums1pct %>%
 
 numidentdemo <- recode_education(numidentdemo,"educd")
 
-# match sex, age and race from demo to numident data -- removed this code for V3 as there is no utility
-#numident3.0 <- numidentdemo %>%
- # filter(
-#    AGE == age, 
-#    RACE == race,
-#    SEX == sex.demo
-#  ) # 85865 remaining observations
-
-## Select numident variables for v3.0
-vars_to_keep_num <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "sex", "race_first", "race_first_cyear", "race_first_cmonth", "race_last", "race_last_cyear", "race_last_cmonth", "bpl", "bpl_string", "zip_residence", "socstate", "socstate_string", "age_first_application", "weight", "pernum", "perwt", "age", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incnonwg", "marst", "nativity", "occ", "occscore", "race", "rent", "serial", "statefip", "urban")
+## Select numident variables 
+vars_to_keep_num <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "sex", "race_first", "race_first_cyear", "race_first_cmonth", "race_last", "race_last_cyear", "race_last_cmonth", "bpl", "bpl_string", "zip_residence", "socstate", "socstate_string", "age_first_application", "weight", "pernum", "perwt", "age", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incwage", "incnonwg", "marst", "nativity", "occ", "occscore", "ownershp", "race", "rent", "serial", "statefip", "urban")
 
 ## keep variables and rename to lower case 
 demo_file_numident <- numidentdemo %>%
   dplyr::select(all_of(vars_to_keep_num))
 ```
+
+
 
 ## Construct CenSoc-DMF Demo
 ```{r}
@@ -116,19 +110,11 @@ dmfdata <- fread("/data/censoc/censoc_data_releases/censoc_dmf/censoc_dmf_v3/cen
 dmfdata_demo <- ipums1pct %>%
   inner_join(dmfdata, by = c("histid" = "HISTID")) # 45,907
 
-# Match sex, age, and race from demo to dmf data -- removed this code for V3 as there is no utility
-#dmf3.0 <- dmfdata_demo %>%
- # filter(
-#    AGE == age,
- #   SEX == sex,
-  #  RACE == race
-#  ) # 70,211 remaining obs
-
 # recode education
 dmfdata_demo <- recode_education(dmfdata_demo, "educd")
 
-## Select DMF variables for v2.1
-vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "weight", "pernum", "perwt", "age", "sex", "bpld", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incnonwg", "marst", "nativity", "occ", "occscore", "ownershp", "race", "serial", "statefip", "urban")
+## Select DMF variables
+vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "weight", "pernum", "perwt", "age", "sex", "bpld", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incwage", "incnonwg", "marst", "nativity", "occ", "occscore", "ownershp", "race", "serial", "statefip", "urban")
 
 ##
 demo_file_dmf <- dmfdata_demo %>%
@@ -137,6 +123,9 @@ demo_file_dmf <- dmfdata_demo %>%
 
 Write Files
 ```{r}
+demo_file_dmf <- demo_file_dmf %>% rename(HISTID = histid)
+demo_file_numident <- demo_file_numident %>% rename(HISTID = histid)
+
 ## Write out csv file 
 write_csv(demo_file_dmf,
           "/data/censoc/censoc_data_releases/censoc_dmf_demo/censoc_dmf_demo_v3/censoc_dmf_demo_v3.csv")
@@ -145,3 +134,4 @@ write_csv(demo_file_numident,
 ```
 
 
+# should do a little testing to make sure that nothing went terribly wrong in the linking process.

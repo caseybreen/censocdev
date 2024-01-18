@@ -12,12 +12,12 @@ header-includes:
 
 | Page| Variable     | Label                                        |
 |----:|:-----------------------|:---------------------------------------------|
-|   \hyperlink{page.2}{2}  | \hyperlink{page.2}{HISTID}        |Historical unique identifier                  |
-|   \hyperlink{page.3}{3}  | \hyperlink{page.3}{byear}         |Year of birth                                 |
-|   \hyperlink{page.4}{4}  | \hyperlink{page.4}{bmonth}        |Month of birth                                |
-|   \hyperlink{page.5}{5}  | \hyperlink{page.5}{dyear}         |Year of death                                 |
-|   \hyperlink{page.6}{6}  | \hyperlink{page.6}{dmonth}        |Month of death                                |
-|   \hyperlink{page.7}{7}  | \hyperlink{page.7}{death\_age}    |Age at death (years)                          |
+|   \hyperlink{page.2}{2}  | \hyperlink{page.2}{HISTID}        |Historical Unique Identifier                  |
+|   \hyperlink{page.3}{3}  | \hyperlink{page.3}{byear}         |Year of Birth                                 |
+|   \hyperlink{page.4}{4}  | \hyperlink{page.4}{bmonth}        |Month of Birth                                |
+|   \hyperlink{page.5}{5}  | \hyperlink{page.5}{dyear}         |Year of Death                                 |
+|   \hyperlink{page.6}{6}  | \hyperlink{page.6}{dmonth}        |Month of Death                                |
+|   \hyperlink{page.7}{7}  | \hyperlink{page.7}{death\_age}    |Age at Death (Years)                          |
 |  \hyperlink{page.8}{8}   |\hyperlink{page.8}{sex}              |Sex                                        |
 |  \hyperlink{page.9}{9}   |\hyperlink{page.9}{race\_first}       |Race on First Application                  |
 |  \hyperlink{page.10}{10} |\hyperlink{page.10}{race\_first\_cyear} |First Race: Application Year               |
@@ -30,14 +30,14 @@ header-includes:
 |  \hyperlink{page.17}{17} |\hyperlink{page.17}{socstate}         |State where Social Security Number Issued  |
 |  \hyperlink{page.18}{18} |\hyperlink{page.18}{age\_first\_application}    |Age at First Social Security Application   |
 |   \hyperlink{page.19}{19}  | \hyperlink{page.19}{weight}        |CenSoc Sample Weight                                 |
-|   \hyperlink{page.20}{20}  | \hyperlink{page.20}{Additional IPUMS variables}| Additional 1940 Census variables, including: pernum, perwt, age, mbpl, fbpl, educd, educ_yrs, empstatd, hispan, incnonwg, marst, nativity, occ, occscore, ownershp, race, rent, serial, statefip, urban|  
+|   \hyperlink{page.20}{20}  | \hyperlink{page.20}{Additional IPUMS variables}| Additional 1940 Census variables, including: pernum, perwt, age, mbpl, fbpl, educd, educ_yrs, empstatd, hispan, incwage, incnonwg, marst, nativity, occ, occscore, ownershp, race, rent, serial, statefip, and urban|  
 
 
 \vspace{100pt}
 
-**Summary:** The CenSoc-Numident Version 2.1 Demo dataset (N = --- ) links the IPUMS 1940 1% census sample to the National Archives' public release of the Social Security Numident file. Records were linked using a conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
+**Summary:** The CenSoc-Numident Version 3 Demo dataset (N = 70,320) links the IPUMS 1940 Census 1% sample to the National Archives' public release of the Social Security Numident file. Records were linked using a conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
 
-Note that this demo dataset is not conducive to high-resolution mortality research, as it only contains about 1% of records in the full CenSoc-Numident file. We recommend using this file for exploratory and demonstrative purposes. To best conduct research with CenSoc data, researchers may download the full CenSoc-Numident from the CenSoc website, obtain an extract of the 1940 Census from IPUMS-USA, and merge data using on the individual-level, unique identifier HISTID variable. Please adhere to IPUMS citation guidelines when using IPUMS census data.
+Note that this demo dataset is not conducive to high-resolution mortality research. We recommend using this file for exploratory and demonstrative purposes. To best conduct research with CenSoc data, researchers may download the full CenSoc-Numident from the CenSoc website, obtain an extract of the 1940 Census from IPUMS-USA, and merge data using on the individual-level, unique identifier HISTID variable. Please adhere to IPUMS citation guidelines when using IPUMS census data.
 
 
 \newpage 
@@ -250,7 +250,7 @@ sex_tabulated
 \normalsize
 \vspace{12pt}
 
-**Label**: race first
+**Label**: Race First
 
 **Description**: race_first reports a person's race, as recorded on their first application entry.
 
@@ -301,7 +301,7 @@ race_first_tabulated
 \normalsize
 \vspace{12pt}
 
-**Label**: race last
+**Label**: Race Last
 
 **Description**: race_last reports a person's race, as recorded on their most recent application entry.
 
@@ -329,7 +329,7 @@ race_last_tabulated
 \normalsize
 \vspace{12pt}
 
-**Label:** First Race: Application Year
+**Label:** Last Race: Application Year
 
 **Description**: race_last_cyear reports the year of the application on which a person reported their last race. 
 
@@ -351,7 +351,7 @@ race_last_tabulated
 
 **Label**: Birthplace
 
-**Description**: bpl is a numeric variable reporting a person's place of birth, as recorded in the Numident application or claims records. The accompanying bpl_string variable reports the person's place of birth as a character string. The coding schema matches the **detailed** IPUMS-USA Birthplace coding schema. 
+**Description**: bpl is a numeric variable reporting a person's place of birth, as recorded in the Numident application or claims records. The accompanying `bpl_string` variable reports the person's place of birth as a character string. The coding schema matches the **detailed** IPUMS-USA Birthplace coding schema. 
 
 For a complete list of IPUMS Birthplace codes, please see: https://usa.ipums.org/usa-action/variables/BPL
 
@@ -399,13 +399,13 @@ knitr::kable(list(bpl_tabulation[rows,1:4],
 
 **Label**: State where Social Security Number Issued
 
-**Description**: The state in which a person's social security card was issued. Determined by first three (3) digits of Social Security number, as recorded in Numident death records. The accompanying socstate_string variable reports the state in which a person's social security card was issued as a character string. The coding schema matches the detailed IPUMS-USA Birthplace coding schema.
+**Description**: The state in which a person's social security card was issued. Determined by first three (3) digits of Social Security number, as recorded in Numident death records. The accompanying `socstate_string` variable reports the state in which a person's social security card was issued as a character string. The coding schema matches the detailed IPUMS-USA Birthplace coding schema.
 
 \vspace{30pt}
 
 ```{r echo = F, message=FALSE, warning=FALSE, fig.pos="H"}
 socstate_tabulation <- censoc_numident_v3 %>%
-    filter(socstate < 10000 | is.na(socstate)) %>%
+    #filter(socstate < 10000 | is.na(socstate)) %>%
     group_by(socstate, socstate_string) %>%
     tally() %>%
     ungroup() %>%
@@ -417,7 +417,7 @@ rows <- seq_len(nrow(socstate_tabulation) %/% 2)
 knitr::kable(list(socstate_tabulation[rows,1:4],
            matrix(numeric(), nrow=0, ncol=1),
            socstate_tabulation[-rows, 1:4]),
-      caption = "Tabulation of socstate (Native born only)",
+      caption = "Tabulation of socstate",
       label = "tables", format = "latex", booktabs = TRUE)  %>%
   kableExtra::kable_styling(latex_options = "HOLD_position")
 ```
@@ -521,12 +521,12 @@ weights_lexis <- weights %>%
        title = "Average weight by age at death and year of death") 
 ```
 
-\vspace{50pt}
+\vspace{30pt}
 ```{r echo = F, message=FALSE, warning=FALSE}
 weights_tabulated
 ```
 
-\vspace{50pt}
+\vspace{30pt}
 ```{r echo = F, message=FALSE, warning=FALSE, fig.align="center"}
 weights_lexis
 ```
@@ -542,7 +542,7 @@ weights_lexis
 
 \vspace{12pt}
 
-The variables below are from the IPUMS-USA 1940 1% census sample. We recommend looking at the terrific documentation on the IPUMS-USA website: [https://usa.ipums.org/usa/index.shtml.](https://usa.ipums.org/usa/index.shtml) 
+The variables below are from the IPUMS-USA 1940 Census 1% sample. We recommend looking at the terrific documentation on the IPUMS-USA website: [\textcolor{blue}{https://usa.ipums.org/usa/index.shtml}](https://usa.ipums.org/usa/index.shtml)
 
 | Variable     | Label                                        |
 |:-------------|:---------------------------------------------|
@@ -552,26 +552,29 @@ The variables below are from the IPUMS-USA 1940 1% census sample. We recommend l
 |   mbpl |Mother's place of birth[^3]|
 |   fbpl |Father's place of birth[^4]|
 |   educd |Educational attainment (detailed IPUMS codes)|
-|   educ_yrs |Educational attainment in years (constructed)|
+|   educ_yrs |Educational attainment in years (constructed)[^5]|
 |   empstatd |Employment status (detailed)|
-|   hispan |Hispanic/Spanish/Latino origin (imputed)[^5]|
-|   incnonwg |Had non-wage/salary income over $50|
+|   hispan |Hispanic/Spanish/Latino origin (imputed)[^6]|
+|   incwage | Wage and salary income in 1939 |
+|   incnonwg |Had non-wage/salary income over $50 in 1939|
 |   marst |Marital status|
 |   nativity |Foreign birthplace or parentage|
 |   occ |Occupation|
 |   occscore |Occupational income score|
 |   ownershp |Ownership of dwelling (tenure)|
-|   race |Race (as recorded in Census)|
+|   race |Race[^7]|
 |   rent |Monthly contract rent|
 |   serial |Household serial number|
 |   statefip |State of residence 1940 (FIPS codes)|
 |   urban |Urban/rural status|
 
 
-[^2]: The `perweight` accounts for the 1940 sampling procedure to construct the 1% sample, and thus is only available in the 1940 1% sample. For analysis, we recommend using both the IPUMS `perweight` and the CenSoc `weight.` A final weight can be constructed by multiplying the two weights together
-[^3]: This variable is only available for sample-line persons (a one-in-twenty sample asked additional questions in the 1940 Census) or those living with their father.
-[^4]: This variable is only available for sample-line persons (a one-in-twenty sample asked additional questions in the 1940 Census) or those living with their mother.
-[^5]: This information was not collected in the 1940 Census and is determined by other information, such as one's birthplace or a parent's birthplace.
+[^2]: The IPUMS `perweight` accounts for the 1940 sampling procedure to construct the 1% sample, and thus is only available in the 1940 1% sample. For analysis, we recommend using both the IPUMS `perweight` and the CenSoc `weight.` A final weight can be constructed by multiplying the two weights together
+[^3]: This variable is only available for sample-line persons (a one-in-twenty sample asked additional questions in the 1940 Census) or those living with their mother.
+[^4]: This variable is only available for sample-line persons (a one-in-twenty sample asked additional questions in the 1940 Census) or those living with their father.
+[^5]: `educ_yrs` is constructed from the IPUMS `educd` variable but not directly available from IPUMS. 
+[^6]: The 1940 Census did not directly inquire about Hispanic ethnicity or origin. This variable is determined by IPUMS using information such as one's birthplace or a parent's birthplace.
+[^7]: The IPUMS `race` variable reports race as recorded in the 1940 Census. In contrast, the `race_first` and `race_last` variables in this dataset contain race as self-reported on Social Security applications.
 
 
 
