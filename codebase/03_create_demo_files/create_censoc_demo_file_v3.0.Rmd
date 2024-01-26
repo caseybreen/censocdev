@@ -4,8 +4,6 @@ author: "Benjamin Shapiro (shapiro_ben1729@berkeley.edu)"
 date: "January 2024"
 ---
 
-Updated.
-
 Summary: In this Notebook, I make the CenSoc-DMF and CenSoc-Numident Demo files. 
 
 Steps to make CenSoc Demo File:
@@ -79,7 +77,8 @@ ipums1pct <- ipums1pct %>%
 ## Construct Censoc-Numident Demo
 ```{r}
 ## Read in linked Numident 
-numidentdata <- fread("/data/censoc/censoc_data_releases/censoc_numident/censoc_numident_v3/censoc_numident_v3.csv")
+#numidentdata <- fread("/data/censoc/censoc_data_releases/censoc_numident/censoc_numident_v3/censoc_numident_v3.csv")
+numidentdata <- fread("/data/censoc/censoc_data_releases/censoc_linked_to_census/v3/censoc_numident_v3_linked.csv")
 
 # Join numident to demo by histid
 numidentdemo <- ipums1pct %>%
@@ -89,6 +88,16 @@ numidentdemo <- ipums1pct %>%
   ) %>%
   inner_join(numidentdata, by = c("histid" = "HISTID")) # 70k remaining observations
 
+# match sex, age and race from ipums 1% to numident data
+# (there are seemingly some slight differences between sample (unkown year -- maybe 2021) and 
+# full count data (2022) used to construct the CenSoc-Numident.) 
+numidentdemo %<>%
+  filter(
+    AGE == age, 
+    SEX == sex.demo 
+  ) #64,686
+
+# recode education
 numidentdemo <- recode_education(numidentdemo,"educd")
 
 ## Select numident variables 
@@ -104,7 +113,8 @@ demo_file_numident <- numidentdemo %>%
 ## Construct CenSoc-DMF Demo
 ```{r}
 ## Read in linked demo file 
-dmfdata <- fread("/data/censoc/censoc_data_releases/censoc_dmf/censoc_dmf_v3/censoc_dmf_v3.csv")
+#dmfdata <- fread("/data/censoc/censoc_data_releases/censoc_dmf/censoc_dmf_v3/censoc_dmf_v3.csv")
+dmfdata <- fread("/data/censoc/censoc_data_releases/censoc_linked_to_census/v3/censoc_dmf_v3_linked.csv")
 
 # Join dmf to demo by histid
 dmfdata_demo <- ipums1pct %>%
@@ -113,8 +123,14 @@ dmfdata_demo <- ipums1pct %>%
 # recode education
 dmfdata_demo <- recode_education(dmfdata_demo, "educd")
 
+dmfdata_demo %<>%
+  filter(
+    AGE == age,
+    SEX == sex,
+  ) # 42,421
+
 ## Select DMF variables
-vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "weight", "pernum", "perwt", "age", "sex", "bpld", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incwage", "incnonwg", "marst", "nativity", "occ", "occscore", "ownershp", "race", "serial", "statefip", "urban")
+vars_to_keep_dmf <- c("histid", "byear", "bmonth", "dyear", "dmonth", "death_age", "weight", "pernum", "perwt", "age", "sex", "bpld", "mbpl", "fbpl", "educd", "educ_yrs", "empstatd", "hispan", "incwage", "incnonwg", "marst", "nativity", "occ", "occscore", "ownershp", "race", "rent", "serial", "statefip", "urban")
 
 ##
 demo_file_dmf <- dmfdata_demo %>%
@@ -123,8 +139,8 @@ demo_file_dmf <- dmfdata_demo %>%
 
 Write Files
 ```{r}
-demo_file_dmf <- demo_file_dmf %>% rename(HISTID = histid)
-demo_file_numident <- demo_file_numident %>% rename(HISTID = histid)
+demo_file_dmf %<>% rename(HISTID = histid)
+demo_file_numident %<>% rename(HISTID = histid)
 
 ## Write out csv file 
 write_csv(demo_file_dmf,
@@ -133,5 +149,3 @@ write_csv(demo_file_numident,
           "/data/censoc/censoc_data_releases/censoc_numident_demo/censoc_numident_demo_v3/censoc_numident_demo_v3.csv")
 ```
 
-
-# should do a little testing to make sure that nothing went terribly wrong in the linking process.

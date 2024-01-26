@@ -16,14 +16,14 @@ header-includes: \usepackage{hyperref}
 |   \hyperlink{page.6}{6}  | \hyperlink{page.6}{dmonth}        |Month of Death                                |
 |   \hyperlink{page.7}{7}  | \hyperlink{page.7}{death\_age}    |Age at Death (Years)                          |
 |   \hyperlink{page.8}{8}  | \hyperlink{page.8}{weight}        |CenSoc Sample Weight                          |
-|   \hyperlink{page.9}{9}  | \hyperlink{page.9}{Additional IPUMS variables}| Additional 1940 Census variables, including: pernum, perwt, age, bpld, mbpl, fbpl, educd, educ_yrs, empstatd, hispan, incwage, incnonwg, marst, nativity, occ, occscore, ownershp, race, rent, serial, statefip, and urban|  
+|   \hyperlink{page.9}{9}  | \hyperlink{page.9}{Additional IPUMS variables}| Additional 1940 Census variables, including: pernum, perwt, age, sex, bpld, mbpl, fbpl, educd, educ_yrs, empstatd, hispan, incwage, incnonwg, marst, nativity, occ, occscore, ownershp, race, rent, serial, statefip, and urban.|  
 
 
 \vspace{210pt}
 
-**Summary**: The CenSoc-DMF Version 3.0 Demo dataset (N = 45,907) links the IPUMS 1940 1% census sample to the Death Master File (DMF) dataset, a collection of death records reported to the Social Security Administration. Records were linked using a conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
+**Summary**: The CenSoc-DMF Version 3.0 Demo dataset (N = 42,421) links the IPUMS 1940 1% census sample to the Death Master File (DMF) dataset, a collection of death records reported to the Social Security Administration. Records were linked using a conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([\textcolor{blue}{2012}](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [\textcolor{blue}{2014}](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [\textcolor{blue}{2017}](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
 
-Note that this demo dataset is not conducive to high-resolution mortality research. We recommend using this file for exploratory and demonstrative purposes. To best conduct research with CenSoc data, researchers may download the full CenSoc-DMF from the CenSoc website, obtain an extract of the 1940 Census from IPUMS-USA, and merge data using on the individual-level, unique identifier HISTID variable. Please adhere to IPUMS citation guidelines when using IPUMS census data.
+We note that this demo dataset is not conducive to high-resolution mortality research. We recommend using this file for exploratory and demonstrative purposes. To best conduct research with CenSoc data, researchers may download the full CenSoc-DMF from the CenSoc website, obtain an extract of the full-count 1940 Census from IPUMS-USA, and merge data using on the individual-level, unique identifier HISTID variable. Please adhere to CenSoc and IPUMS citation guidelines when using this file.
 
 \newpage 
 
@@ -211,7 +211,7 @@ death_age_plot
 
 **Label**: CenSoc Sample Weight[^1]  
 
-**Description**: A post-stratification person-weight to National Center for Health Statistics (NCHS) totals for persons (1) dying between 1975-2005 (2) dying between ages 65-100. Weights are based on age at death, year of death, sex, and race, and place of birth. Please see the [\textcolor{blue}{technical documentation on weights}](https://censoc.berkeley.edu/wp-content/uploads/2023/10/CenSoc_V3_Weights_Technical_Report.pdf) for more information.
+**Description**: weight is a post-stratification person-weight to National Center for Health Statistics (NCHS) totals for persons (1) dying between 1975-2005 (2) dying between ages 65-100. Weights are based on age at death, year of death, sex, and race, and place of birth. Please see the [\textcolor{blue}{technical documentation on weights}](https://censoc.berkeley.edu/wp-content/uploads/2023/10/CenSoc_V3_Weights_Technical_Report.pdf) for more information.
 
 [^1]: The IPUMS-USA 1940 1% sample also includes a weight (`perweight`) to account for the 1940 sampling procedure (thus no weights for the 100% complete count 1940 census). For analysis, we recommend using both sets of weights. A final weight can be constructed by multiplying the two weights together.  
 ```{r, include = F}
@@ -245,11 +245,11 @@ weights_lexis_dmf <- weights_dmf %>%
                   fill = weight)) +
   ## Lexis grid
   geom_hline(yintercept = seq(65, 100, 10),
-             alpha = 0.2, lty = "dotted") +
+             alpha = 0.6, lty = "dotted") +
   geom_vline(xintercept = seq(1985, 2005, 10),
-             alpha = 0.2, lty = "dotted") +
+             alpha = 0.6, lty = "dotted") +
   geom_abline(intercept = seq(-100, 100, 10)-1910,
-              alpha = 0.2, lty = "dotted") +
+              alpha = 0.6, lty = "dotted") +
   scale_fill_viridis_c(option = "magma") +
   scale_x_continuous("Year", expand = c(0.02, 0),
                      breaks = seq(1975, 2005, 5)) +
@@ -263,7 +263,7 @@ weights_lexis_dmf <- weights_dmf %>%
   theme(
     axis.text = element_text(colour = "black"),
     axis.text.y = element_text(size = 10),
-    axis.text.x = element_text(size = 10, angle = 45, hjust = .5), 
+    axis.text.x = element_text(size = 10, angle = 45, hjust = 0.5), 
     plot.title = element_text(size = 10, vjust = 2),
     legend.text = element_text(size = 10), 
     axis.title=element_text(size = 10,face="bold")

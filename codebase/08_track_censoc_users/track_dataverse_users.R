@@ -17,7 +17,7 @@ library(ggsci)
 library(ggthemes)
 
 # Read guestbook (note: read permissions limited)
-gb <- fread("~/censoc/UC_Berkeley_CenSoc__GuestbookReponses01_04_24.csv")
+gb <- fread("~/censoc/UC_Berkeley_CenSoc__GuestbookReponses012524.csv")
 head(gb)
 
 # Format date
@@ -106,7 +106,7 @@ gb_metrics %>% filter(year_mo >= "2023-06") %>%
   geom_bar(position="stack", stat="count") +
   theme_classic() +
   ggsci::scale_fill_locuszoom() +
-  ggtitle("Dataset Downloads June 1 2023 - January 4 2024") # change end date if needed
+  ggtitle("Dataset Downloads June 1 2023 - January 2024") # change end date if needed
 
 # Note: demo downloads in 10/2023 are likely from a teaching demonstration
 # Note: No user info for Numident & DMF downloads from about July - October 2023

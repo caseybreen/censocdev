@@ -30,14 +30,15 @@ header-includes:
 |  \hyperlink{page.17}{17} |\hyperlink{page.17}{socstate}         |State where Social Security Number Issued  |
 |  \hyperlink{page.18}{18} |\hyperlink{page.18}{age\_first\_application}    |Age at First Social Security Application   |
 |   \hyperlink{page.19}{19}  | \hyperlink{page.19}{weight}        |CenSoc Sample Weight                                 |
-|   \hyperlink{page.20}{20}  | \hyperlink{page.20}{Additional IPUMS variables}| Additional 1940 Census variables, including: pernum, perwt, age, mbpl, fbpl, educd, educ_yrs, empstatd, hispan, incwage, incnonwg, marst, nativity, occ, occscore, ownershp, race, rent, serial, statefip, and urban|  
+|   \hyperlink{page.20}{20}  | \hyperlink{page.20}{Additional IPUMS variables}| Additional 1940 Census variables, including: pernum, perwt, age, mbpl, fbpl, educd, educ_yrs, empstatd, hispan, incwage, incnonwg, marst, nativity, occ, occscore, ownershp, race, rent, serial, statefip, and urban.|  
 
 
 \vspace{100pt}
 
-**Summary:** The CenSoc-Numident Version 3 Demo dataset (N = 70,320) links the IPUMS 1940 Census 1% sample to the National Archives' public release of the Social Security Numident file. Records were linked using a conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
+**Summary:** The CenSoc-Numident Version 3 Demo dataset (N = 64,686) links the IPUMS 1940 Census 1% sample to the National Archives' public release of the Social Security Numident file. Records were linked using a conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([\textcolor{blue}{2012}](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [\textcolor{blue}{2014}](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [\textcolor{blue}{2017}](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
 
-Note that this demo dataset is not conducive to high-resolution mortality research. We recommend using this file for exploratory and demonstrative purposes. To best conduct research with CenSoc data, researchers may download the full CenSoc-Numident from the CenSoc website, obtain an extract of the 1940 Census from IPUMS-USA, and merge data using on the individual-level, unique identifier HISTID variable. Please adhere to IPUMS citation guidelines when using IPUMS census data.
+
+We note that this demo dataset is not conducive to high-resolution mortality research. We recommend using this file for exploratory and demonstrative purposes. To best conduct research with CenSoc data, researchers may download the full CenSoc-Numident from the CenSoc website, obtain an extract of the full-count 1940 Census from IPUMS-USA, and merge data using on the individual-level, unique identifier HISTID variable. Please adhere to CenSoc and IPUMS citation guidelines when using this file.
 
 
 \newpage 
@@ -74,7 +75,7 @@ censoc_numident_v3<-read_csv("/data/censoc/censoc_data_releases/censoc_numident_
 byear_plot <- censoc_numident_v3 %>%
     group_by(byear) %>%
     summarise(n = n()) %>%
-    ggplot(aes(x = byear, y = n)) + 
+  ggplot(aes(x = byear, y = n)) + 
     geom_line() + 
     geom_point() +
     theme_minimal(base_size = 15) +
@@ -252,7 +253,7 @@ sex_tabulated
 
 **Label**: Race First
 
-**Description**: race_first reports a person's race, as recorded on their first application entry.
+**Description**: race_first reports a person's race, as recorded on their first Social Security application entry.
 
 **Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. The Other category was also removed. 
 
@@ -303,7 +304,7 @@ race_first_tabulated
 
 **Label**: Race Last
 
-**Description**: race_last reports a person's race, as recorded on their most recent application entry.
+**Description**: race_last reports a person's race, as recorded on their most recent Social Security application entry.
 
 **Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. They also removed the Other category.
 
@@ -351,9 +352,10 @@ race_last_tabulated
 
 **Label**: Birthplace
 
-**Description**: bpl is a numeric variable reporting a person's place of birth, as recorded in the Numident application or claims records. The accompanying `bpl_string` variable reports the person's place of birth as a character string. The coding schema matches the **detailed** IPUMS-USA Birthplace coding schema. 
+**Description**: bpl is a numeric variable reporting a person's place of birth, as recorded in the Numident application or claims records. The accompanying `bpl_string` variable reports the person's place of birth as a character string. The coding schema matches the **detailed** IPUMS-USA birthplace coding schema. 
 
-For a complete list of IPUMS Birthplace codes, please see: https://usa.ipums.org/usa-action/variables/BPL
+For a complete list of IPUMS Birthplace codes, please see: [\textcolor{blue}{https://usa.ipums.org/usa-action/variables/BPL}](https://usa.ipums.org/usa-action/variables/BPL)
+
 
 ```{r echo = F, message=FALSE, warning=FALSE, fig.pos="H"}
 bpl_tabulation <- censoc_numident_v3 %>%
@@ -388,7 +390,7 @@ knitr::kable(list(bpl_tabulation[rows,1:4],
 
 **Label**: ZIP Code of Residence at Time of Death
 
-**Description**: zip_residence is a string variable (9-characters) reporting a person's ZIP Code of residence at time of death, as recorded in the Numident death records.
+**Description**: zip_residence is a string variable (9-characters) reporting a person's ZIP code of residence at time of death, as recorded in the Numident death records.
 
 \newpage 
 **\huge socstate**
@@ -399,7 +401,9 @@ knitr::kable(list(bpl_tabulation[rows,1:4],
 
 **Label**: State where Social Security Number Issued
 
-**Description**: The state in which a person's social security card was issued. Determined by first three (3) digits of Social Security number, as recorded in Numident death records. The accompanying `socstate_string` variable reports the state in which a person's social security card was issued as a character string. The coding schema matches the detailed IPUMS-USA Birthplace coding schema.
+**Description**: socstate is a numeric variable reporting the state in which a person's Social Security card was issued. It is determined by the first three (3) digits of a person's Social Security number, as recorded in Numident death records. The accompanying `socstate_string` variable reports the state in which a person's Social Security card was issued as a character string. The coding schema matches the **detailed** IPUMS-USA birthplace coding schema.
+
+The list of codes is also available at: [\textcolor{blue}{https://usa.ipums.org/usa-action/variables/BPL}](https://usa.ipums.org/usa-action/variables/BPL)
 
 \vspace{30pt}
 
@@ -432,7 +436,7 @@ knitr::kable(list(socstate_tabulation[rows,1:4],
 
 **Label**: Age at First Social Security Application 
 
-**Description**: age_first_application reports the age at which a person submitted their first Social Security Application. 
+**Description**: age_first_application reports the age at which a person submitted their first Social Security application. 
 
 ```{r, include = F}
 age_first_app_plot <- censoc_numident_v3 %>%
@@ -468,7 +472,7 @@ age_first_app_plot
 [^1]: The IPUMS-USA 1940 1% sample also includes a weight (`perweight`) to account for the 1940 sampling procedure (thus no weights for the 100% complete count 1940 census). For analysis, we recommend using both sets of weights. A final weight can be constructed by multiplying the two weights together.  
 
 
-**Description**:  A post-stratification person-weight to National Center for Health Statistics (NCHS) totals for persons (1) dying between 1988-2005 (2) dying between ages 65-100. Weights are based on age at death, year of death, sex, and race, and place of birth. Please see the [\textcolor{blue}{technical documentation on weights}](https://censoc.berkeley.edu/wp-content/uploads/2023/10/CenSoc_V3_Weights_Technical_Report.pdf) for more information.
+**Description**:  weight is a post-stratification person-weight to National Center for Health Statistics (NCHS) totals for persons (1) dying between 1988-2005 (2) dying between ages 65-100. Weights are based on age at death, year of death, sex, and race, and place of birth. Please see the [\textcolor{blue}{technical documentation on weights}](https://censoc.berkeley.edu/wp-content/uploads/2023/10/CenSoc_V3_Weights_Technical_Report.pdf) for more information.
 
 
 ```{r echo = F, results='hide', message=FALSE, warning=FALSE}
