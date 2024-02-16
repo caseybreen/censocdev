@@ -1,0 +1,170 @@
+---
+title: "Berkeley Unified Numident Mortality Database Cleaned Names[^updated]"
+output:
+  pdf_document:
+header-includes:
+- \usepackage{hyperref}
+- \usepackage{float}
+- \restylefloat{table}
+- \usepackage{caption}
+---
+[^updated]: Last updated: `r format(Sys.time(), '%d %B, %Y')`
+
+
+
+| Page| Variable            | Label                                        |
+|----:|:--------------------|:---------------------------------------------|
+|  \hyperlink{page.2}{2}    | \hyperlink{page.2}{ssn}                |Social Security Number              |
+|  \hyperlink{page.3}{3}    | \hyperlink{page.3}{fname\_clean}              |First Name   (Cleaned)       |
+|  \hyperlink{page.4}{4}    | \hyperlink{page.4}{mname\_clean}              |Middle Name  (Cleaned)       | 
+|  \hyperlink{page.5}{5}    | \hyperlink{page.5}{lname\_clean}              |Last Name    (Cleaned)       |
+|  \hyperlink{page.6}{6}  | \hyperlink{page.6}{father\_fname\_clean}      |Father's First Name (Cleaned)          |
+|  \hyperlink{page.7}{7}  | \hyperlink{page.7}{father\_mname\_clean}      |Father's Middle Name (Cleaned)         |
+|  \hyperlink{page.8}{8}  | \hyperlink{page.8}{father\_lname\_clean}      |Father's Last Name   (Cleaned)         |
+|  \hyperlink{page.9}{9}  | \hyperlink{page.9}{mother\_fname\_clean}      |Mother's First Name (Cleaned)          |
+|  \hyperlink{page.10}{10}  | \hyperlink{page.10}{mother\_mname\_clean}      |Mother's Middle Name (Cleaned)      |
+|  \hyperlink{page.11}{11}  | \hyperlink{page.11}{mother\_lname\_clean}      |Mother's Last Name (Cleaned)        |
+
+
+\vspace{5 pt}
+
+**Summary**: The Berkeley Unified Numident Mortality Database Cleaned Names file (N = 49,337,827) is a supplementary file that provides cleaned names for individuals and their parents in the Berkeley Unified Numident Mortality Database (BUNMD). Cleaning names include such steps as removing titles, replacing some nicknames and name variants with standardized names, and removing non-alphabetic characters. Researchers may attach this file to the full BUNMD using the `ssn` (Social Security number) variable, which uniquely identifies each person in the dataset.
+
+\vspace{10 pt}
+
+**Note**: Missing values for names are usually indicated by an empty string. However, sometimes strings such as "unknown"/"unk" or "notstated"/"ns" were entered in name fields. These and other special strings indicating missing data have *not* been removed.
+
+**Note**: We also note that this process of name cleaning and standardization is primarily designed to facilitate record linkage. Decisions for how to standardize types of names are largely compliant with the original Stata implementation of automated ABE linking developed by Abramitzky, Boustan and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
+
+
+```{r echo = F, results='hide', message=FALSE, warning=FALSE, eval = F}
+## Library Packages
+library(dplyr)
+library(data.table)
+library(kableExtra)
+
+## Directory for clean names file
+## (We don't need to read the whole file to create this codebook)
+bunmd_clean_names <- fread("/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_clean_name_fields_only.csv",
+                           nrow = 10)
+
+names(bunmd_clean_names)
+```
+
+
+\newpage 
+
+**\huge ssn**
+\normalsize
+\vspace{12pt}
+
+**Label**: Social Security Number
+
+**Description**: ssn reports a person's Social Security number, as recorded in Numident death records. It uniquely identifies all records, and can be used to link this file to the complete BUNMD.
+
+\newpage 
+
+**\huge fname\_clean **
+\normalsize
+\vspace{12pt}
+
+**Label**: First Name (Cleaned)
+
+**Description**: fname reports the first 16 letters of the person's cleaned first name, as recorded in the Numident death records. This variable was cleaned from raw first names by removing titles (e.g., Dr.)
+and replacing nicknames with standard names (e.g., Billy to William). Non-alphabetical characters were also
+removed.
+
+\newpage 
+
+**\huge mname\_clean **
+\normalsize
+\vspace{12pt}
+
+**Label:** Middle Name (Cleaned)
+
+**Description**: mname reports the first 16 letters of the person's cleaned middle name, as recorded in the Numident death records. This variable was cleaned by removing non-alphabetical characters.
+
+\newpage 
+
+
+**\huge lname\_clean **
+\normalsize
+\vspace{12pt}
+
+**Label:** Last Name (Cleaned)
+
+**Description**: lname reports the first 21 letters of the person's cleaned last name, as recorded in the Numident death records. This variable was cleaned from raw last names by removing non-alphabetical characters. Multiple-word last names with prefixes were combined into one (e.g., Mc Donald to McDonald).
+
+
+
+
+\newpage
+
+**\huge father\_fname\_clean **
+\normalsize
+\vspace{12pt}
+
+**Label**: Father's First Name (Cleaned)
+
+**Description**: father_fname is a character variable reporting the first 16 letters of the person's father's cleaned first name, as recorded in the Numident application records. This variable was cleaned from the father's raw first names by removing titles (e.g., Dr.) and replacing nicknames with standard names (e.g., Billy to William). Non-alphabetical characters were also removed.
+
+\newpage 
+
+**\huge father\_mname\_clean **
+\normalsize
+\vspace{12pt}
+
+**Label**: Father's Middle Name (Cleaned)
+
+**Description**: father_mname is a character variable reporting the first 16 letters of the person's father's cleaned middle name, as recorded in the Numident application records.  This variable was cleaned from the father's raw middle names by removing non-alphabetical characters.
+
+\newpage 
+
+
+**\huge father\_lname\_clean**
+\normalsize
+\vspace{12pt}
+
+**Label**: Father's Last Name (Cleaned)
+
+**Description**: father_lname is a character variable reporting the first 21 letters of the person's father's cleaned last name, as recorded in the Numident application records.  This variable was cleaned from the father's raw last names by removing non-alphabetical characters. Last names with two words were combined into one (e.g. Mc Donald to McDonald).
+
+\newpage 
+
+
+
+
+**\huge mother\_fname\_clean **
+\normalsize
+\vspace{12pt}
+
+**Label**: Mother's First Name (Cleaned)
+
+**Description**: mother_fname is a character variable reporting the first 16 letters of the person's mother's cleaned first name, as recorded in the Numident application records.  This variable was cleaned from the mother's raw first names by removing titles (e.g., Dr.) and replacing nicknames with standard names (e.g., Lizzie to Elizabeth). Non-alphabetical characters were also removed.
+
+\newpage 
+
+**\huge mother\_mname\_clean **
+\normalsize
+\vspace{12pt}
+
+**Label**: Mother's Middle Name (Cleaned)
+
+**Description**: mother_mname is a character variable reporting the first 16 letters of the person's mother's cleaned middle name, as recorded in the Numident application records. This variable was cleaned from raw middle names by removing non-alphabetical characters.
+
+\newpage 
+
+
+**\huge mother\_lname **
+\normalsize
+\vspace{12pt}
+
+**Label**: Mother's Last Name (Cleaned)
+
+**Description**: mother_lname is a character variable reporting the first 21 letters of the person's mother's cleaned last (maiden) name, as recorded in the Numident application records. This variable was cleaned from raw last names by removing non-alphabetical characters. Last names with two words were combined into one (e.g., Mc Donald to McDonald).
+
+
+
+
+
+

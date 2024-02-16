@@ -10,7 +10,9 @@ date: "2023-10-05"
 
 ```{r}
 library(censocdev)
-library(ipumsr)
+library(here)
+library(data.table)
+library(tidyverse)
 ```
 
 
@@ -24,7 +26,7 @@ bunmd %>% group_by(sex) %>% count()
 ```
 # Read titles and nicknames
 ```{r}
-tan_path          <-  "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/titles-and-nicknames"
+tan_path          <-  here("censocdev/codebase/titles-and-nicknames/")
 titles <- fread(paste(tan_path, "titles.csv", sep="/"))
 male_nicknames <- fread(paste(tan_path, "male_nicknames.csv", sep="/"))
 female_nicknames <- fread(paste(tan_path, "female_nicknames.csv", sep="/"))
@@ -506,4 +508,20 @@ bunmd_names_cleaned <- bunmd_cleaned_m[,c("fname","mname","lname","fname_raw","m
 fwrite(bunmd_names_cleaned, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_names_cleaned.csv")
 
 ```
+
+
+
+# Extract cleaned name fields only
+```{r}
+bunmd_clean_name_fields <- bunmd_names_cleaned %>%
+  select(ssn, contains("name")) %>%
+  select(!contains("raw"))
+bunmd_clean_name_fields <- bunmd_clean_name_fields %>% 
+  rename_at(vars(-ssn), ~ paste0(., "_clean"))
+readr::write_csv(bunmd_clean_name_fields,
+          "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_clean_name_fields_only.csv")
+```
+
+
+
 

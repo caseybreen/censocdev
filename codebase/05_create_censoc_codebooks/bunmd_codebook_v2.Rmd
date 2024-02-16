@@ -10,7 +10,7 @@ header-includes:
 ---
 [^updated]: Last updated: `r format(Sys.time(), '%d %B, %Y')`
 
-
+\vspace{-5truemm}
 
 | Page| Variable            | Label                                        |
 |----:|:--------------------|:---------------------------------------------|
@@ -48,6 +48,11 @@ header-includes:
 |  \hyperlink{page.33}{33}  | \hyperlink{page.33}{weight}            |High-Coverage Sub-Sample Weight               |
 |  \hyperlink{page.34}{34}  | \hyperlink{page.34}{ccweight}          |High-Coverage "Complete Case" Sub-Sample Weight|
 
+\vspace{-3truemm}
+**Summary**: The Berkeley Unified Numident Mortality Database (BUNMD) (N = 49,337,827) is a cleaned and harmonized version of Social Security Numerical Identification System (Numident) records published by the National Archives and Records Administration. This dataset combines information from Social Security application (SS-5), claim, and death records for deceased individuals, creating a database of mortality records with demographic covariates and fine geographic detail. 
+
+**Supplementary Data Files**: For additional data, researchers can download the BUNMD Supplementary Geography File for more place of birth and death variables, or the BUNMD Cleaned Names dataset for cleaned and standardized name strings of decedents and their parents. Both supplementary files may be merged onto the BUNMD using the `ssn` variable.
+
 
 ```{r echo = F, results='hide', message=FALSE, warning=FALSE}
 ## Library Packages
@@ -61,7 +66,7 @@ library(here)
 bunmd <- fread("/data/josh/CenSoc/data_release_v2/bunmd_v2/bunmd_v2.csv")
 
 ## set path for reading figures
-knitr::opts_knit$set(root.dir = here("vignettes/codebooks/"))
+knitr::opts_knit$set(root.dir = here("codebase/05_create_censoc_codebooks/bunmd_codebook_graphics/"))
 ```
 
 
@@ -73,7 +78,7 @@ knitr::opts_knit$set(root.dir = here("vignettes/codebooks/"))
 
 **Label**: Social Security Number
 
-**Description**: ssn reports a person's Social Security number, as recorded in the Numident death records. Uniquely identifies all records in the dataset. 
+**Description**: ssn reports a person's Social Security number, as recorded in the Numident death records. It uniquely identifies all records in the dataset. 
 
 \newpage 
 
@@ -85,6 +90,10 @@ knitr::opts_knit$set(root.dir = here("vignettes/codebooks/"))
 
 **Description**: fname reports the first 16 letters of the person's first name, as recorded in the Numident death records.
 
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `fname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+
+
+
 \newpage 
 
 **\huge mname **
@@ -94,6 +103,10 @@ knitr::opts_knit$set(root.dir = here("vignettes/codebooks/"))
 **Label:** Middle Name
 
 **Description**: mname reports the first 16 letters of the person's middle name, as recorded in the Numident death records.
+
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned version of this variable.
+
+
 
 \newpage 
 
@@ -106,6 +119,10 @@ knitr::opts_knit$set(root.dir = here("vignettes/codebooks/"))
 
 **Description**: lname reports the first 21 letters of the person's last name, as recorded in the Numident death records.
 
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `lname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+
+
+
 \newpage 
 
 **\huge sex **
@@ -114,7 +131,7 @@ knitr::opts_knit$set(root.dir = here("vignettes/codebooks/"))
 
 **Label:** Sex
 
-**Description**: sex reports a person's sex, as recorded in the Numident death, application, or claims Records. 
+**Description**: sex reports a person's sex, as recorded in the Numident death, application, or claims records. 
 
 ```{r, eval = F, echo = F}
 opts_chunk$set(fig.lp = '')
@@ -141,7 +158,7 @@ knitr::kable(bunmd %>%
 
 **Label**: race first
 
-**Description**: race_first reports a person's race, as recorded on their most recent application entry. 
+**Description**: race_first is a numeric variable reporting a person's race, as recorded on their first Social Security application entry. 
 
 
 **Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. They also removed the Other category.
@@ -195,7 +212,7 @@ knitr::kable(bunmd %>%
 
 **Label**: race last
 
-**Description**: race_last reports a person's race, as recorded on their most recent application entry.
+**Description**: race_last is a numeric variable reporting a person's race, as recorded on their most recent application entry.
 
 **Note**: Before 1980, the race schema in the Social Security application form contained three categories: White, Black, and Other. In 1980, the SSA added three categories: (1) Asian, Asian American, or Pacific Islander, (2) Hispanic, and (3) North American Indian or Alaskan Native. They also removed the Other category.
 
@@ -518,6 +535,8 @@ knitr::kable(bunmd %>%
 
 **Description**: dyear is a numeric variable reporting the person's year of death, as recorded in the Numident death records.   
 
+**Note**: Death coverage for ages 65+ is best between 1988 and 2005. The graph below compares the number of age 65+ death records in the BUNMD (dashed line) and number of "complete case" records in the BUNMD (dotted line) to the number of yearly deaths reported in the Human Mortality Database (solid line). A "complete case" refers to a BUNMD record with: (1) a non-missing value for sex (2) a non-missing value for birth place and (3) a non-missing value for race.
+
 \vspace{75pt}
 \begin{center}
 \end{center}
@@ -727,7 +746,7 @@ bunmd %>%
 
 **Label**: State where Social Security Number Issued
 
-**Description**: The state in which the person's social security card was issued. Determined by first three (3) digits of Social Security number, as recorded in Numident death records. The accompanying socstate_string variable reports the state in which a person's social security card was issued as a character string. The numeric codes match the detailed IPUMS-USA Birthplace codes. 
+**Description**: socstate is a numeric variable reporting the state in which the person's social security card was issued. It is determined by first three (3) digits of Social Security number, as recorded in Numident death records. The accompanying socstate_string variable reports the state in which a person's social security card was issued as a character string. The numeric codes match the detailed IPUMS-USA Birthplace codes. 
 
 ```{r, eval = F, echo = F}
 socstate_tabulation <- bunmd %>%
@@ -845,6 +864,9 @@ NA &  & 471923 & 0.96\\
 
 **Description**: father_fname is a character variable reporting the first 16 letters of the person's father's first name, as recorded in the Numident application records.
 
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `father_fname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+
+
 \newpage 
 
 **\huge father\_mname **
@@ -854,6 +876,8 @@ NA &  & 471923 & 0.96\\
 **Label**: Father's Middle Name
 
 **Description**: father_mname is a character variable reporting the first 16 letters of the person's father's middle name, as recorded in the Numident application records.
+
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `father_mname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned version of this variable.
 
 \newpage 
 
@@ -866,6 +890,8 @@ NA &  & 471923 & 0.96\\
 
 **Description**: father_lname is a character variable reporting the first 21 letters of the person's father's last name, as recorded in the Numident application records.
 
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `father_lname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+
 \newpage 
 
 
@@ -877,6 +903,8 @@ NA &  & 471923 & 0.96\\
 
 **Description**: mother_fname is a character variable reporting the first 16 letters of the person's mother's first name, as recorded in the Numident application records.
 
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mother_fname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+
 \newpage 
 
 **\huge mother\_mname **
@@ -887,6 +915,9 @@ NA &  & 471923 & 0.96\\
 
 **Description**: mother_mname is a character variable reporting the first 16 letters of the person's mother's middle name, as recorded in the Numident application records.
 
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mother_mname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned version of this variable.
+
+
 \newpage 
 
 
@@ -896,7 +927,9 @@ NA &  & 471923 & 0.96\\
 
 **Label**: Mother's Last Name 
 
-**Description**: mother_lname is a character variable reporting the first 21 letters of the person's mother's last name, as recorded in the Numident application records.
+**Description**: mother_lname is a character variable reporting the first 21 letters of the person's mother's last (maiden) name, as recorded in the Numident application records.
+
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mother_lname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
 
 \newpage 
 
@@ -908,7 +941,7 @@ NA &  & 471923 & 0.96\\
 
 **Label**: Age at First Social Security Application 
 
-**Description**: age_first_application reports the age at which the person submitted their first Social Security Application. 
+**Description**: age_first_application reports the age at which the person submitted their first Social Security application. 
 
 ```{r, echo = F, eval = F}
 bunmd %>%
@@ -1020,7 +1053,7 @@ knitr::kable(bunmd %>%
 
 **Label**: High Coverage Sample Weight
 
-**Description**: A post-stratification person-weight to Human Mortality Database (HMD) totals for persons (1) born between 1895-1940 (2) dying between 1988-2005 and (3) dying between ages 65-100 (4) with a non-missing value for sex. Please see the CenSoc methods protocol for more details on weighting procedure. 
+**Description**: weight is a post-stratification person-weight to Human Mortality Database (HMD) totals for persons (1) born between 1895-1940 (2) dying between 1988-2005 (3) dying between ages 65-100 and (4) with a non-missing value for sex. Please see the CenSoc methods protocol for more details on weighting procedure. 
 
 ```{r, eval = F, echo = F}
 bunmd %>% 
@@ -1066,7 +1099,7 @@ bunmd %>%
 
 **Label**: High Coverage "Complete Case" Sample Weight
 
-**Description**: A post-stratification person-weight to Human Mortality Database (HMD) totals for persons (1) born between 1895-1940 (2) dying between 1988-2005 (3) dying between ages 65-100 (4) with a non-missing value for sex (5) with a non-missing value for birth place and (6) with a non-missing value for race. Please see the CenSoc methods protocol for more details on weighting procedure.
+**Description**: ccweight is a post-stratification person-weight to Human Mortality Database (HMD) totals for persons (1) born between 1895-1940 (2) dying between 1988-2005 (3) dying between ages 65-100 (4) with a non-missing value for sex (5) with a non-missing value for birth place and (6) with a non-missing value for race. Please see the CenSoc methods protocol for more details on weighting procedure.
 
 ```{r, eval = F, echo = F}
 ccweight_tab <- bunmd %>%
