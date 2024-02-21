@@ -9,7 +9,7 @@ date: "2023-10-05"
 #uncleaned name variables: fname_raw, middle_raw, lname_raw, father_fname_raw, father_middle_raw, father_lname_raw, mother_fname_raw, mother_middle_raw, mother_lname_raw
 
 ```{r}
-library(censocdev)
+#library(censocdev) source("~/censocdev/R/clean-names.R")
 library(here)
 library(data.table)
 library(tidyverse)
@@ -17,16 +17,19 @@ library(tidyverse)
 
 
 ```{r, echo = FALSE}
-#read in data
- bunmd <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv")
-sampled_data <- bunmd[sample(nrow(bunmd), 1000), ]
-fwrite(sampled_data, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_sampled.csv")
+# Look at data
+bunmd <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv")
+#set.seed(100)
+#sampled_data <- bunmd[sample(nrow(bunmd), 10000), ]
+#fwrite(sampled_data, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_sampled_temp.csv")
 
 bunmd %>% group_by(sex) %>% count()
 ```
+
+
 # Read titles and nicknames
 ```{r}
-tan_path          <-  here("censocdev/codebase/titles-and-nicknames/")
+tan_path          <-  here("codebase/02_create_censoc/titles-and-nicknames")
 titles <- fread(paste(tan_path, "titles.csv", sep="/"))
 male_nicknames <- fread(paste(tan_path, "male_nicknames.csv", sep="/"))
 female_nicknames <- fread(paste(tan_path, "female_nicknames.csv", sep="/"))
@@ -59,17 +62,19 @@ remove_titles <- function(row) {
 }
 
 
-clean_names <- function(in_path, file_name, lname_col, fname_col, sex_col, other_cols, out_path, middle) {
+clean_names <- function(in_path, file_name, lname_col, fname_col, sex_col, other_cols, out_path, middle, verbose = T) {
 
   # Read data
+  if (verbose) {print("Reading file")}
   path_to_data <- paste(in_path, file_name, sep="/")
-  data <- readr::read_csv(path_to_data)
+  data <- readr::read_csv(path_to_data, col_select = c(lname_col, fname_col, sex_col, other_cols, middle))
 
   # Copy raw names before processing
   data$lname_clean <- data[[lname_col]]
   data$fname_clean <- data[[fname_col]]
 
   # Concatenate middle name to first name if middle name exists
+  if (verbose) {print("concatenating middle names")}
   if (middle != "") {
     concat_middle_to_first <- function(row) {
       if (is.na(row["fname_clean"])) {first <- NA}
@@ -89,6 +94,7 @@ clean_names <- function(in_path, file_name, lname_col, fname_col, sex_col, other
   #    ABE turns "A J" into "A J" as first name and "J" as initial, while in BUNMD "A J"
   #    would be first name "A" and initial "J".
 
+  if (verbose) {print("initial name cleaning")}
   # Convert unicode to ascii to remove accents
   data$lname_clean <- iconv(data$lname_clean, to="ASCII//TRANSLIT")
   data$fname_clean <- iconv(data$fname_clean, to="ASCII//TRANSLIT")
@@ -110,10 +116,12 @@ clean_names <- function(in_path, file_name, lname_col, fname_col, sex_col, other
   data$fname_clean <- gsub("[^a-z ]", "", data$fname_clean)
 
   # Get rid of titles
-  #data$fname_clean <- paste0(" ", data$fname_clean)
-  #data$fname_clean <- remove_titles(data$fname_clean)
+  if (verbose) {print("removing titles")}
+  data$fname_clean <- paste0(" ", data$fname_clean)
+  data$fname_clean <- remove_titles(data$fname_clean)
 
   # Fix two-word names (e.g., mc donnell --> mcdonnell)
+  if (verbose) {print("fixing two-word names")}
   data$lname_clean <- paste0(" ", data$lname_clean)
   data$lname_clean <- gsub(" st ",    " st",    data$lname_clean)
   data$lname_clean <- gsub(" ste ",   " ste",   data$lname_clean)
@@ -134,17 +142,20 @@ clean_names <- function(in_path, file_name, lname_col, fname_col, sex_col, other
   #    la, van, du, de, del, o, pal, le, de la
 
    # Split first name (i.e., deal with middle names and initials)
+  if (verbose) {print("splitting first names")}
   res <- lapply(data$fname_clean, split_first_name) # SLOW (~60s with ~3M obs)
   data$first  <- unlist(res)[attr(unlist(res),"names") == "first"]
   data$mname <- unlist(res)[attr(unlist(res),"names") == "middle"]
   rm(res)
   
   # Merge nicknames
+  if (verbose) {print("merging nicknames")}
   data_final <- merge(data, nicknames, by.x = c("first", sex_col),
                       by.y = c("nickname", "sex"), all.x = TRUE) # SLOW (~30s with ~3M obs)
   data_final$fname_final <- apply(data_final, 1, merge_names_no_middle) # SLOW (~45s with ~3M obs)
 
   # Keep only the first multicharacter part of lname_clean
+  if (verbose) {print("splitting last names")}
   res <- lapply(data_final$lname_clean, split_first_name) # SLOW (~60s with ~3M obs)
   data_final$lname_final <- unlist(res)[attr(unlist(res),"names") == "first"]
   rm(res)
@@ -164,8 +175,9 @@ clean_names <- function(in_path, file_name, lname_col, fname_col, sex_col, other
   data_final$mname <- stringr::str_trim(data_final$mname)
 
   # Save dataset
+  if (verbose) {print("writing file")}
   dir.create(out_path, showWarnings = FALSE)
-  path_to_processed_data <- paste(out_path, gsub(".csv", "_cleaned.csv", file_name), sep="/")
+  path_to_processed_data <- paste(out_path, gsub(".csv", "_cleaned_e.csv", file_name), sep="/")
   readr::write_csv(data_final, path_to_processed_data)
 
   # Clean up after yourself
@@ -182,12 +194,13 @@ lname_col <- "lname"
 fname_col <- "fname"
 sex_col <- "sex"
 out_path      <- "/censoc/data/numident/4_berkeley_unified_mortality_database"
-other_cols <- c("ssn","zip_residence","byear","dyear","socstate","bmonth","dmonth","bday","dday",
-                "number_apps","race_first","race_last","race_last_cyear","race_first_cyear",
-                "race_last_cmonth","race_first_cmonth","race_change","number_claims","bpl",
-                "father_fname","father_mname","father_lname","mother_fname","mother_mname",
-                "mother_lname","age_first_application","death_age","weight","ccweight",
-                "bpl_string","socstate_string")
+# other_cols <- c("ssn", "zip_residence","byear","dyear","socstate","bmonth","dmonth","bday","dday",
+#                 "number_apps","race_first","race_last","race_last_cyear","race_first_cyear",
+#                 "race_last_cmonth","race_first_cmonth","race_change","number_claims","bpl",
+#                 "father_fname","father_mname","father_lname","mother_fname","mother_mname",
+#                 "mother_lname","age_first_application","death_age","weight","ccweight",
+#                 "bpl_string","socstate_string")
+other_cols <- c("ssn", "father_fname","father_mname","father_lname","mother_fname","mother_mname","mother_lname")
 middle <- "mname"
 file_name <- "bunmd.csv"
 clean_names(in_path, file_name, lname_col, fname_col,
@@ -196,7 +209,9 @@ clean_names(in_path, file_name, lname_col, fname_col,
 ```
 #Check cleaned dataset 
 ```{r}
-bunmd_cleaned <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned.csv")
+bunmd_cleaned <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned_e.csv", 
+                       nrow = 1000)
+head(bunmd_cleaned %>% arrange(ssn))
 ```
 
 
@@ -205,17 +220,22 @@ bunmd_cleaned <- fread("/censoc/data/numident/4_berkeley_unified_mortality_datab
 ```{r}
 #clean fname ABE Method https://github.com/uguryi/abeR/blob/master/R/clean-names.R
 
-clean_names_father <- function(in_path, file_name, lname_col, fname_col, sex_col, other_cols, out_path, middle) {
+clean_names_father <- function(in_path, file_name, lname_col, fname_col, other_cols, out_path, middle, verbose = T) {
 
   # Read data
+  if (verbose) {print("reading data")}
   path_to_data <- paste(in_path, file_name, sep="/")
   data <- readr::read_csv(path_to_data)
 
   # Copy raw names before processing
   data$lname_clean <- data[[lname_col]]
   data$fname_clean <- data[[fname_col]]
+  
+  data$father_sex <- 1
+  sex_col <- "father_sex"
 
   # Concatenate middle name to first name if middle name exists
+  if (verbose) {print("concantenating middle names")}
   if (middle != "") {
     concat_middle_to_first <- function(row) {
       if (is.na(row["fname_clean"])) {first <- NA}
@@ -224,7 +244,7 @@ clean_names_father <- function(in_path, file_name, lname_col, fname_col, sex_col
       return(first)
     }
     data$fname_clean <- apply(data, 1, concat_middle_to_first) # SLOW
-    data$mname_raw <- data[[middle]]
+    data$father_mname_raw <- data[[middle]]
     data[[middle]] <- NULL
   }
   # NOTES
@@ -236,6 +256,7 @@ clean_names_father <- function(in_path, file_name, lname_col, fname_col, sex_col
   #    would be first name "A" and initial "J".
 
   # Convert unicode to ascii to remove accents
+  if (verbose) {print('initial name cleaning')}
   data$lname_clean <- iconv(data$lname_clean, to="ASCII//TRANSLIT")
   data$fname_clean <- iconv(data$fname_clean, to="ASCII//TRANSLIT")
 
@@ -256,10 +277,12 @@ clean_names_father <- function(in_path, file_name, lname_col, fname_col, sex_col
   data$fname_clean <- gsub("[^a-z ]", "", data$fname_clean)
 
   # Get rid of titles
-  #data$fname_clean <- paste0(" ", data$fname_clean)
-  #data$fname_clean <- remove_titles(data$fname_clean)
+  if (verbose) {print("removing titles")}
+  data$fname_clean <- paste0(" ", data$fname_clean)
+  data$fname_clean <- remove_titles(data$fname_clean)
 
   # Fix two-word names (e.g., mc donnell --> mcdonnell)
+  if (verbose) {print("fixing two-word names")}
   data$lname_clean <- paste0(" ", data$lname_clean)
   data$lname_clean <- gsub(" st ",    " st",    data$lname_clean)
   data$lname_clean <- gsub(" ste ",   " ste",   data$lname_clean)
@@ -280,29 +303,33 @@ clean_names_father <- function(in_path, file_name, lname_col, fname_col, sex_col
   #    la, van, du, de, del, o, pal, le, de la
 
    # Split first name (i.e., deal with middle names and initials)
+  if (verbose) {print("splitting names")}
   res <- lapply(data$fname_clean, split_first_name) # SLOW (~60s with ~3M obs)
   data$first  <- unlist(res)[attr(unlist(res),"names") == "first"]
-  data$mname <- unlist(res)[attr(unlist(res),"names") == "middle"]
+  data$mid <- unlist(res)[attr(unlist(res),"names") == "middle"]
   rm(res)
   
   # Merge nicknames
+  if (verbose) {print("merging nicknames")}
   data_final <- merge(data, nicknames, by.x = c("first", sex_col),
                       by.y = c("nickname", "sex"), all.x = TRUE) # SLOW (~30s with ~3M obs)
   data_final$fname_final <- apply(data_final, 1, merge_names_no_middle) # SLOW (~45s with ~3M obs)
 
   # Keep only the first multicharacter part of lname_clean
+  if (verbose) {print("splitting last names")}
   res <- lapply(data_final$lname_clean, split_first_name) # SLOW (~60s with ~3M obs)
   data_final$lname_final <- unlist(res)[attr(unlist(res),"names") == "first"]
   rm(res)
    # Reorder columns, drop unnecessary ones (fname_clean, lname_clean, first, name)
   if (middle == "") {
-    cols_to_keep <- c("fname_final", "mname", "lname_final", sex_col, fname_col, lname_col, other_cols)
+    cols_to_keep <- c("fname_final", "mid", "lname_final", fname_col, "father_mname_raw", lname_col, other_cols)
     data_final <- data_final[,cols_to_keep]
-    colnames(data_final) <- c("fname", "mname", "lname", "sex", "fname_raw", "lname_raw", other_cols)
+    colnames(data_final) <- c("father_fname", "father_mname", "father_lname", "fname_raw", "lname_raw", other_cols)
   } else {
-    cols_to_keep <- c("fname_final", "mname", "lname_final", sex_col, fname_col, "mname_raw", lname_col, other_cols)
+    cols_to_keep <- c("fname_final", "mid", "lname_final", fname_col, "father_mname_raw", lname_col, other_cols)
     data_final <- data_final[,cols_to_keep]
-   colnames(data_final) <- c("father_fname", "father_mname", "father_lname", "father_sex", "father_fname_raw", "father_mname_raw", "father_lname_raw", other_cols)
+   colnames(data_final) <- c("father_fname", "father_mname", "father_lname", "father_fname_raw",
+                             "father_mname_raw", "father_lname_raw", other_cols)
   }
  # Do a final trim
   data_final$lname <- stringr::str_trim(data_final$lname)
@@ -310,8 +337,9 @@ clean_names_father <- function(in_path, file_name, lname_col, fname_col, sex_col
   data_final$mname <- stringr::str_trim(data_final$mname)
 
   # Save dataset
+  if (verbose) {print("writing file")}
   dir.create(out_path, showWarnings = FALSE)
-  path_to_processed_data <- paste(out_path, gsub(".csv", "_cleaned.csv", file_name), sep="/")
+  path_to_processed_data <- paste(out_path, gsub(".csv", "_f.csv", file_name), sep="/")
   readr::write_csv(data_final, path_to_processed_data)
 
   # Clean up after yourself
@@ -322,49 +350,50 @@ clean_names_father <- function(in_path, file_name, lname_col, fname_col, sex_col
 
 #apply function to clean father names
 ```{r}
-#add sex column for father 
-bunmd_cleaned$father_sex <- 1
-#write out new dataset
-fwrite(bunmd_cleaned, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_f.csv")
-
-
 in_path_f <-"/censoc/data/numident/4_berkeley_unified_mortality_database"
 lname_col_f <- "father_lname"
 fname_col_f <- "father_fname"
-sex_col_f <- "father_sex" 
 out_path_f      <- "/censoc/data/numident/4_berkeley_unified_mortality_database"
-other_cols_f <- c("fname","mname","lname","sex","fname_raw","mname_raw","lname_raw", "ssn","zip_residence","byear","dyear","socstate","bmonth","dmonth","bday","dday",
-                "number_apps","race_first","race_last","race_last_cyear","race_first_cyear",
-                "race_last_cmonth","race_first_cmonth","race_change","number_claims","bpl",
-                "mother_fname","mother_mname",
-                "mother_lname","age_first_application","death_age","weight","ccweight",
-                "bpl_string","socstate_string")
+# other_cols_f <- c("fname","mname","lname","sex","fname_raw","mname_raw","lname_raw", "ssn","zip_residence","byear","dyear","socstate","bmonth","dmonth","bday","dday",
+#                 "number_apps","race_first","race_last","race_last_cyear","race_first_cyear",
+#                 "race_last_cmonth","race_first_cmonth","race_change","number_claims","bpl",
+#                 "mother_fname","mother_mname",
+#                 "mother_lname","age_first_application","death_age","weight","ccweight",
+#                 "bpl_string","socstate_string")
+other_cols_f <- c("fname","mname","lname","sex","fname_raw","mname_raw","lname_raw", "ssn",
+                "mother_fname","mother_mname", "mother_lname")
 middle_f <- "father_mname"
-file_name_f <- "bunmd_f.csv"
+file_name_f <- "bunmd_cleaned_e.csv"
 clean_names_father(in_path_f, file_name_f, lname_col_f, fname_col_f,
-            sex_col_f, other_cols_f, out_path_f, middle_f)
+            other_cols_f, out_path_f, middle_f)
 ```
 
 #Check cleaned dataset 
 ```{r}
-bunmd_cleaned_f <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_f_cleaned.csv")
+bunmd_cleaned_f <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned_e_f.csv", nrow = 1000)
+head(bunmd_cleaned_f %>% arrange(ssn))
 ```
 
 #repeat for mothers- create clean_names_mother function
 ```{r}
 #clean fname ABE Method https://github.com/uguryi/abeR/blob/master/R/clean-names.R
 
-clean_names_mother <- function(in_path, file_name, lname_col, fname_col, sex_col, other_cols, out_path, middle) {
+clean_names_mother <- function(in_path, file_name, lname_col, fname_col, other_cols, out_path, middle, verbose = T) {
 
   # Read data
+  if(verbose) {print("reading data")}
   path_to_data <- paste(in_path, file_name, sep="/")
   data <- readr::read_csv(path_to_data)
 
   # Copy raw names before processing
   data$lname_clean <- data[[lname_col]]
   data$fname_clean <- data[[fname_col]]
+  
+  data$mother_sex <- 2
+  sex_col <- "mother_sex"
 
   # Concatenate middle name to first name if middle name exists
+  if(verbose) {print("concatenating middle names")}
   if (middle != "") {
     concat_middle_to_first <- function(row) {
       if (is.na(row["fname_clean"])) {first <- NA}
@@ -373,7 +402,7 @@ clean_names_mother <- function(in_path, file_name, lname_col, fname_col, sex_col
       return(first)
     }
     data$fname_clean <- apply(data, 1, concat_middle_to_first) # SLOW
-    data$mname_raw <- data[[middle]]
+    data$mother_mname_raw <- data[[middle]]
     data[[middle]] <- NULL
   }
   # NOTES
@@ -385,6 +414,7 @@ clean_names_mother <- function(in_path, file_name, lname_col, fname_col, sex_col
   #    would be first name "A" and initial "J".
 
   # Convert unicode to ascii to remove accents
+  if(verbose) {print("initial name cleaning")}
   data$lname_clean <- iconv(data$lname_clean, to="ASCII//TRANSLIT")
   data$fname_clean <- iconv(data$fname_clean, to="ASCII//TRANSLIT")
 
@@ -405,8 +435,9 @@ clean_names_mother <- function(in_path, file_name, lname_col, fname_col, sex_col
   data$fname_clean <- gsub("[^a-z ]", "", data$fname_clean)
 
   # Get rid of titles
-  #data$fname_clean <- paste0(" ", data$fname_clean)
-  #data$fname_clean <- remove_titles(data$fname_clean)
+  if(verbose) {print("removing titles")}
+  data$fname_clean <- paste0(" ", data$fname_clean)
+  data$fname_clean <- remove_titles(data$fname_clean)
 
   # Fix two-word names (e.g., mc donnell --> mcdonnell)
   data$lname_clean <- paste0(" ", data$lname_clean)
@@ -429,29 +460,34 @@ clean_names_mother <- function(in_path, file_name, lname_col, fname_col, sex_col
   #    la, van, du, de, del, o, pal, le, de la
 
    # Split first name (i.e., deal with middle names and initials)
+  if(verbose) {print("splitting first name")}
   res <- lapply(data$fname_clean, split_first_name) # SLOW (~60s with ~3M obs)
   data$first  <- unlist(res)[attr(unlist(res),"names") == "first"]
-  data$mname <- unlist(res)[attr(unlist(res),"names") == "middle"]
+  data$mid <- unlist(res)[attr(unlist(res),"names") == "middle"]
   rm(res)
   
   # Merge nicknames
+  if(verbose) {print("merging nicknames")}
   data_final <- merge(data, nicknames, by.x = c("first", sex_col),
                       by.y = c("nickname", "sex"), all.x = TRUE) # SLOW (~30s with ~3M obs)
   data_final$fname_final <- apply(data_final, 1, merge_names_no_middle) # SLOW (~45s with ~3M obs)
 
   # Keep only the first multicharacter part of lname_clean
+  if(verbose) {print("splitting last names")}
   res <- lapply(data_final$lname_clean, split_first_name) # SLOW (~60s with ~3M obs)
   data_final$lname_final <- unlist(res)[attr(unlist(res),"names") == "first"]
   rm(res)
    # Reorder columns, drop unnecessary ones (fname_clean, lname_clean, first, name)
   if (middle == "") {
-    cols_to_keep <- c("fname_final", "mname", "lname_final", sex_col, fname_col, lname_col, other_cols)
+    cols_to_keep <- c("fname_final", "mid", "lname_final", fname_col, "mother_mname_raw", lname_col, other_cols)
     data_final <- data_final[,cols_to_keep]
-    colnames(data_final) <- c("fname", "mname", "lname", "sex", "fname_raw", "lname_raw", other_cols)
+    colnames(data_final) <- c("mother_fname", "mother_mname", "mother_lname",
+                              "fname_raw", "lname_raw", other_cols)
   } else {
-    cols_to_keep <- c("fname_final", "mname", "lname_final", sex_col, fname_col, "mname_raw", lname_col, other_cols)
+    cols_to_keep <- c("fname_final", "mid", "lname_final", fname_col, "mother_mname_raw", lname_col, other_cols)
     data_final <- data_final[,cols_to_keep]
-   colnames(data_final) <- c("mother_fname", "mother_mname", "mother_lname", "mother_sex", "mother_fname_raw", "mother_mname_raw", "mother_lname_raw", other_cols)
+   colnames(data_final) <- c("mother_fname", "mother_mname", "mother_lname",
+                             "mother_fname_raw", "mother_mname_raw", "mother_lname_raw", other_cols)
   }
  # Do a final trim
   data_final$lname <- stringr::str_trim(data_final$lname)
@@ -459,8 +495,9 @@ clean_names_mother <- function(in_path, file_name, lname_col, fname_col, sex_col
   data_final$mname <- stringr::str_trim(data_final$mname)
 
   # Save dataset
+  if(verbose) {print("saving dataset")}
   dir.create(out_path, showWarnings = FALSE)
-  path_to_processed_data <- paste(out_path, gsub(".csv", "_cleaned.csv", file_name), sep="/")
+  path_to_processed_data <- paste(out_path, gsub(".csv", "_m.csv", file_name), sep="/")
   readr::write_csv(data_final, path_to_processed_data)
 
   # Clean up after yourself
@@ -470,56 +507,66 @@ clean_names_mother <- function(in_path, file_name, lname_col, fname_col, sex_col
 
 #apply function to mothers
 ```{r}
-#add sex column for mother 
-bunmd_cleaned_f$mother_sex <- 2
-#write out new dataset
-fwrite(bunmd_cleaned_f, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_sampled_f.csv")
-
-
 in_path_f <-"/censoc/data/numident/4_berkeley_unified_mortality_database"
 lname_col_f <- "mother_lname"
 fname_col_f <- "mother_fname"
 sex_col_f <- "mother_sex" 
 out_path_f      <- "/censoc/data/numident/4_berkeley_unified_mortality_database"
-other_cols_f <- c("fname","mname","lname","sex","fname_raw","mname_raw","lname_raw","father_fname",
-                  "father_mname","father_lname","father_sex","father_fname_raw",
-                  "father_mname_raw","father_lname_raw",
-                  "ssn","zip_residence",
-                  "byear","dyear","socstate","bmonth","dmonth","bday","dday",
-                "number_apps","race_first","race_last","race_last_cyear","race_first_cyear",
-                "race_last_cmonth","race_first_cmonth","race_change","number_claims","bpl",
-                "age_first_application","death_age","weight","ccweight",
-                "bpl_string","socstate_string")
+# other_cols_f <- c("fname","mname","lname","sex","fname_raw","mname_raw","lname_raw","father_fname",
+#                   "father_mname","father_lname", "father_fname_raw",
+#                   "father_mname_raw","father_lname_raw",
+#                   "ssn","zip_residence",
+#                   "byear","dyear","socstate","bmonth","dmonth","bday","dday",
+#                 "number_apps","race_first","race_last","race_last_cyear","race_first_cyear",
+#                 "race_last_cmonth","race_first_cmonth","race_change","number_claims","bpl",
+#                 "age_first_application","death_age","weight","ccweight",
+#                 "bpl_string","socstate_string")
+other_cols_f <- c("fname","mname","lname","sex","fname_raw","mname_raw","lname_raw",
+                  "father_fname", "father_mname","father_lname", "father_fname_raw",
+                  "father_mname_raw","father_lname_raw", "ssn")
 middle_f <- "mother_mname"
-file_name_f <- "bunmd_sampled_f.csv"
+file_name_f <- "bunmd_cleaned_e_f.csv"
 clean_names_mother(in_path_f, file_name_f, lname_col_f, fname_col_f,
-            sex_col_f, other_cols_f, out_path_f, middle_f)
+            other_cols_f, out_path_f, middle_f)
 ```
 
 #Check cleaned dataset 
 ```{r}
-bunmd_cleaned_m <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_sampled_f_cleaned.csv")
+bunmd_cleaned_m <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned_e_f_m.csv")
+head(bunmd_cleaned_m %>% arrange(ssn))
 ```
 
 #reorder columns in clean dataset and export final file
 ```{r}
-bunmd_names_cleaned <- bunmd_cleaned_m[,c("fname","mname","lname","fname_raw","mname_raw","lname_raw","sex","ssn","zip_residence","byear","dyear","socstate","bmonth","dmonth","bday","dday","number_apps","race_first","race_last","race_last_cyear","race_first_cyear","race_last_cmonth","race_first_cmonth","race_change" , "number_claims","bpl", "age_first_application","death_age","weight","ccweight","bpl_string","socstate_string",
-                   "father_fname","father_mname","father_lname","father_fname_raw","father_mname_raw","father_lname_raw","father_sex","mother_fname","mother_mname","mother_lname","mother_fname_raw","mother_mname_raw","mother_lname_raw","mother_sex")]
-fwrite(bunmd_names_cleaned, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_names_cleaned.csv")
-
+#bunmd_names_cleaned <- bunmd_cleaned_m[,c("fname","mname","lname","fname_raw","mname_raw","lname_raw","sex","ssn","zip_residence","byear","dyear","socstate","bmonth","dmonth","bday","dday","number_apps","race_first","race_last","race_last_cyear","race_first_cyear","race_last_cmonth","race_first_cmonth","race_change" , "number_claims","bpl", "age_first_application","death_age","weight","ccweight","bpl_string","socstate_string", "father_fname","father_mname","father_lname","father_fname_raw","father_mname_raw","father_lname_raw","father_sex","mother_fname","mother_mname","mother_lname","mother_fname_raw","mother_mname_raw","mother_lname_raw","mother_sex")]
+#fwrite(bunmd_names_cleaned, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_names_cleaned.csv")
 ```
-
 
 
 # Extract cleaned name fields only
 ```{r}
-bunmd_clean_name_fields <- bunmd_names_cleaned %>%
+bunmd_clean_name_fields <- bunmd_cleaned_m %>%
   select(ssn, contains("name")) %>%
   select(!contains("raw"))
 bunmd_clean_name_fields <- bunmd_clean_name_fields %>% 
   rename_at(vars(-ssn), ~ paste0(., "_clean"))
+
+bunmd_clean_name_fields <- bunmd_clean_name_fields %>% arrange(ssn)
+
+# replace <NA> with blank strings
+for(j in seq_along(bunmd_clean_name_fields)){
+  set(bunmd_clean_name_fields, i=which(is.na(bunmd_clean_name_fields[[j]])), j=j, value="")
+}
+
+# rearrange columns
+bunmd_clean_name_fields <- bunmd_clean_name_fields[,c("ssn", "fname_clean","mname_clean",
+                                                      "lname_clean","father_fname_clean",
+                                                      "father_mname_clean","father_lname_clean",
+                                                      "mother_fname_clean","mother_mname_clean",
+                                                      "mother_lname_clean")]
+
 readr::write_csv(bunmd_clean_name_fields,
-          "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_clean_name_fields_only.csv")
+          "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_clean_name_fields_only_updated.csv")
 ```
 
 

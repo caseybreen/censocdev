@@ -34,7 +34,7 @@ header-includes:
 
 **Note**: Missing values for names are usually indicated by an empty string. However, sometimes strings such as "unknown"/"unk" or "notstated"/"ns" were entered in name fields. These and other special strings indicating missing data have *not* been removed.
 
-**Note**: We also note that this process of name cleaning and standardization is primarily designed to facilitate record linkage. Decisions for how to standardize types of names are largely compliant with the original Stata implementation of automated ABE linking developed by Abramitzky, Boustan and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
+**Note**: We also note that this process of name cleaning and standardization is primarily designed to facilitate record linkage. Decisions for how to parse and standardize names are largely compliant with the original implementation of the automated ABE linking algorithm developed by Abramitzky, Boustan and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
 
 
 ```{r echo = F, results='hide', message=FALSE, warning=FALSE, eval = F}
