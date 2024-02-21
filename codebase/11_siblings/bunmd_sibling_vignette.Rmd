@@ -1,0 +1,395 @@
+---
+title: "Sibling Identification in CenSoc Data"
+output:
+  github_document:
+    html_preview: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(tidyverse)
+library(magrittr)
+library(scales)
+library(gridExtra)
+library(cowplot)
+```
+
+
+```{r, include = F}
+# BUNMD data
+bunmd_sibs <- fread("/data/censoc/censoc_data_releases/siblings/preliminary_release/bunmd_sibs_v0.csv")
+nrow(bunmd_sibs)
+bunmd_sibs %>% arrange(bunmd_sibling_group_id) %>% group_by(bunmd_sibling_group_id) %>% 
+  filter(row_number() == 1) 
+
+bunmd_full <- fread("/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv",
+                    select = c("ssn", "sex", "byear", "bmonth", "bday", "dyear",
+                               "dmonth", "dday"))
+#bunmd_full <- fread("/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv",
+#                    select = c("ssn", "sex", "byear", "bmonth", "bday", "dyear",
+#                               "dmonth", "dday", "death_age", "fname", "lname"))
+#bunmd_full <- fread("/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv",
+#                    select = c("ssn", "sex", "byear", "bmonth", "bday", "dyear",
+#                               "dmonth", "dday", "race_first", "father_mname"))
+bunmd <- inner_join(bunmd_full, bunmd_sibs, by = "ssn") %>% as.data.table()
+rm(bunmd_full)
+
+# Numident Data
+numident_sibs <- fread("/data/censoc/censoc_data_releases/siblings/preliminary_release/numident_sibs_v0.csv")
+nrow(numident_sibs)
+numident_sibs %>% arrange(numident_sibling_group_id) %>% group_by(numident_sibling_group_id) %>% 
+  filter(row_number() == 1) 
+numident_full <- fread("/data/censoc/censoc_data_releases/censoc_linked_to_census/v3/censoc_numident_v3_linked.csv",
+                       select = c("HISTID", "byear", "bmonth", "dyear", "dmonth", "death_age", "sex",
+                                  "HIGRADE", "OCCSCORE", "INCWAGE"))
+numident <- inner_join(numident_full, numident_sibs, by = "HISTID") %>% as.data.table()
+rm(numident_full)
+gc()
+```
+
+
+## Summary
+
+Social scientists use sibling comparison studies to help control for shared family confounders that are difficult to observe. However, sibling relationships are not identified in administrative mortality data. In this vignette, we describe a method for finding siblings in Social Security Numident data, and introduce sibling ID datasets that may be used with the Berkeley Unified Numident Mortality Database (BUNMD) and CenSoc-Numident data. 
+
+Since the inception of Social Security in 1935, applicants have been asked to provide the full names of their parents. This information has been preserved in National Archives Numerical Identification (Numident) Files, which are used to create the BUNMD. We identify siblings in the BUNMD by finding individuals whose parents have identical first and last names. This also allows us to identity siblings in the CenSoc-Numident, a dataset which links the BUNMD to the 1940 Census.
+
+
+## Methodology
+
+Siblings are located by finding exact matches on four variables: father's first name, father's last name, mother's first name, and mother's last (maiden) name. Other variables are then used to remove less plausible matches. A simplified overview of the process is as follows:
+
+1. Clean parental name data and remove individuals with insufficient name data. This process involves splitting first names from middle names in the original Social Security data, removing non-alphabetic characters from names, and replacing nicknames with standardized first names (e.g., Lizzie to Elizabeth). Records where one or more parent name variables is missing, consists of only a single character, or a special string such as "not stated" or "UNK", are removed from the data and not matched.
+
+2. Match siblings by identifying records where all cleaned parent first/last names are exactly equivalent.
+
+3. Refine matches by eliminating suspiciously large groups or sibling age gaps. Specifically, remove groups of more than 10 siblings, or groups of over 6 sibling where birthplace data or a parent's middle name is inconsistent among siblings. Also remove siblings whose birth year falls more than 10 years before/after the sibling next nearest in age.
+
+Siblingships were validated using parent's middle names and other non-matching variables. Though there is no way to completely eliminate false positive matches, siblingships are highly consistent among expected dimensions such as race and birthplace.
+
+```{r,include=F, eval = F}
+bunmd[, father_mint := substr(father_mname, 1,1)]
+mean(bunmd$father_mint == "")
+
+sib1 <- bunmd %>%  filter(father_mint != "") %>% 
+  group_by(bunmd_sibling_group_id) %>%
+  mutate(sibship_size = n()) %>% 
+  filter(sibship_size == 2) %>% 
+  filter(row_number() == 1) %>% ungroup()
+sib2 <- bunmd %>%  filter(father_mint != "") %>% 
+  group_by(bunmd_sibling_group_id) %>%
+  mutate(sibship_size = n()) %>% 
+  filter(sibship_size == 2) %>% 
+  filter(row_number() == 2) %>% ungroup()
+inner_join(sib1 %>% select(bunmd_sibling_group_id, father_mint),
+           sib2 %>% select(bunmd_sibling_group_id, father_mint),
+           by = 'bunmd_sibling_group_id') %>% 
+  mutate(fm_match = as.integer(father_mint.x == father_mint.y)) %>% 
+  summarize(mean(fm_match))
+
+sib1r <- bunmd %>%  filter(!is.na(race_first)) %>% 
+  group_by(bunmd_sibling_group_id) %>%
+  mutate(sibship_size = n()) %>% 
+  filter(sibship_size == 2) %>% 
+  filter(row_number() == 1) %>% ungroup()
+sib2r <- bunmd %>%  filter(!is.na(race_first)) %>% 
+  group_by(bunmd_sibling_group_id) %>%
+  mutate(sibship_size = n()) %>% 
+  filter(sibship_size == 2) %>% 
+  filter(row_number() == 2) %>% ungroup()
+inner_join(sib1r %>% select(bunmd_sibling_group_id, race_first),
+           sib2r %>% select(bunmd_sibling_group_id, race_first),
+           by = 'bunmd_sibling_group_id') %>% 
+  mutate(fm_match = as.integer(race_first.x == race_first.y)) %>% 
+  summarize(mean(fm_match))
+```
+
+
+## The Data
+
+In the BUNMD, we identify 4,697,867 individuals belonging to 2,071,468 sibling groups. In the CenSoc-Numident, 899,294 individuals belong to 420,182 sibling groups. These siblingships consist of groups of two or more persons who died at ages 65-100 in the years 1988-2005. The maximum group size in the BUNMD is 10 siblings; and the maximum groups size in the CenSoc-Numident is 7 siblings. Siblingships may be of any gender composition.
+
+
+```{r bunmd stats, include = FALSE}
+# BUNMD sibship sizes
+bunmd_sibs_sizes <- bunmd_sibs %>% group_by(bunmd_sibling_group_id) %>%
+  mutate(sibship_size = n()) %>% 
+  filter(row_number() == 1) %>% 
+  ungroup() %>% group_by(sibship_size) %>% tally()
+# BUNMD sex composition
+b_scomp <- bunmd %>% group_by(bunmd_sibling_group_id) %>%
+  mutate(sibship_size = n()) %>% 
+  ungroup() %>% 
+  filter(sibship_size == 2) %>% 
+  group_by(bunmd_sibling_group_id) %>% 
+  summarize(scomp = as.character(mean(sex)))
+```
+
+```{r numident stats, include = FALSE}
+# Numident sibship sizes
+numi_sibs_sizes <- numident_sibs %>% group_by(numident_sibling_group_id) %>%
+  mutate(sibship_size = n()) %>% 
+  filter(row_number() == 1) %>% 
+  ungroup() %>% group_by(sibship_size) %>% tally()
+# Numident sex composition
+n_scomp <- numident %>% group_by(numident_sibling_group_id) %>%
+  mutate(sibship_size = n()) %>% 
+  ungroup() %>% 
+  filter(sibship_size == 2) %>% 
+  group_by(numident_sibling_group_id) %>% 
+  summarize(scomp = as.character(mean(sex)))
+```
+
+```{r plots, echo = F, message=F, warning=F, fig.width= 8, fig.height=6}
+b_sibship_size_plot <- bunmd_sibs_sizes %>%
+  mutate(nsibs = ifelse(sibship_size<5, sibship_size, "5-10")) %>% 
+  group_by(nsibs) %>% 
+  summarize(ngrps = sum(n)) %>% 
+  ggplot() +
+  geom_col(aes(nsibs, ngrps), fill = "darkslategray") +
+  theme_classic() +
+  scale_y_continuous(label = comma, expand = c(0, 0)) +
+  labs(x = NULL, y ="Frequency", title = "Number of Siblings per of Siblingships",
+       subtitle = "(BUNMD)")
+#b_sibship_size_plot 
+
+b_sex_comp_plot <- b_scomp %>%
+  group_by(scomp) %>% 
+  tally() %>% 
+  mutate(sex = case_when(scomp == "1" ~ "Brothers Only",
+                         scomp == "1.5" ~ "Mixed Gender",
+                         scomp == "2" ~ "Sisters Only")) %>% 
+  ggplot(aes(sex, n)) +
+  geom_col(fill = "darkslategray") +
+  theme_classic() +
+  scale_y_continuous(label = comma, expand = c(0, 0)) +
+    scale_y_continuous(label = comma, expand = c(0, 0)) +
+  scale_x_discrete(labels = label_wrap(10)) +
+  labs(x = NULL, y = "Frequency",
+       title = "Gender Composition of Sibling Dyads", subtitle = "(BUNMD)")
+#b_sex_comp_plot 
+
+n_sibship_size_plot <- numi_sibs_sizes %>%
+  mutate(nsibs = ifelse(sibship_size<4, sibship_size, "4-7")) %>% 
+  group_by(nsibs) %>% 
+  summarize(ngrps = sum(n)) %>% 
+  ggplot() +
+  geom_col(aes(nsibs, ngrps), fill = "violetred4") +
+  theme_classic() +
+  scale_y_continuous(label = comma, expand = c(0, 0)) +
+  labs(x = NULL, y ="Frequency", title = "Number of Siblings per of Siblingships",
+       subtitle = "(CenSoc-Numident)")
+
+n_sex_comp_plot <- n_scomp %>%
+  group_by(scomp) %>% 
+  tally() %>% 
+  mutate(sex = case_when(scomp == "1" ~ "Brothers Only",
+                         scomp == "1.5" ~ "Mixed Gender",
+                         scomp == "2" ~ "Sisters Only")) %>% 
+  ggplot(aes(sex, n)) +
+  geom_col(fill = "violetred4") +
+  theme_classic() +
+  scale_y_continuous(label = comma, expand = c(0, 0)) +
+  scale_x_discrete(labels = label_wrap(10)) +
+  labs(y = "Frequency", x = NULL,
+       title = "Gender Composition of Sibling Dyads", subtitle = "(CenSoc-Numident)") 
+
+## Lay out Plots
+grid.arrange(b_sibship_size_plot , b_sex_comp_plot,
+             n_sibship_size_plot, n_sex_comp_plot, ncol=2)
+```
+<br><br><br><br>
+
+The birth year coverage of persons identified as belonging to a sibling groups peaks around 1915-1925. 
+
+
+```{r, echo =FALSE, fig.width=8, fig.height=4}
+b_byear_plot <- bunmd %>% group_by(byear) %>% tally() %>% 
+  ggplot(aes(byear, n)) +
+  geom_line(color = "darkslategray") +
+  geom_point(color = "darkslategray") + 
+  theme_cowplot() +
+  scale_y_continuous(label = comma) +
+  labs(x= "Birth Year", y = "Frequency", title = "Birth Year of Siblings", subtitle = "(BUNMD)")
+  
+n_byear_plot <- numident %>% group_by(byear) %>% tally() %>% 
+  ggplot(aes(byear, n)) +
+  geom_line(color = "violetred4") +
+  geom_point(color = "violetred4") + 
+  theme_cowplot() +
+  scale_y_continuous(label = comma) +
+  labs(x= "Birth Year", y = "Frequency", title = "Birth Year of Siblings", subtitle = "(CenSoc-Numident)")
+
+grid.arrange(b_byear_plot , n_byear_plot, ncol = 2)
+```
+
+
+## Twins
+
+Twins may be of particular interest to researchers. It is possible to study twins using CenSoc data, but there is no way to distinguish identical twins from like-sex fraternal twins. Twins (and triplets) may be identified using bithdate information.
+
+In the BUNMD, there are 55,651 individuals belonging to twin/triplet sets with the exact same year/month/day of birth. Twins make up the vast majority of multiple births, though it is possible that additional siblings from the same birth simply were not identified. 58,735 individuals belong to twin/triplet sets if only matching on exact year and month of birth. Siblings with same year/month of birth but discordant day of birth may be actual twins with misrecorded days of birth, twins born one calendar day apart, or unrelated individuals falsely identified as siblings.
+
+Since birth day is not available in the public CenSoc-Numident file, researchers may use year and month of birth to identify likely twins. There are 8,382 individuals who are a twin/triplet by this definition.
+
+We note that some twins/triplets in the BUNMD are very likely the same individual listed under multiple Social Security numbers; such false twins have not been removed in this preliminary release of the data. There are over 8000 individuals in the BUNMD that have identical year/month/day of *both* birth and death as a "sibling", very likely indicating a duplicate person rather a true twin. Because the CenSoc-Numident is a linked dataset, however, such false twins are likely less prevalent. This is because duplicate individuals usually have identical first names, last names, birth dates, and birthplaces listed in Social Security data. Any Social Security records with indistinguishable name/age/birthplace information are impossible to match to a single Census record and thus are not included in the linked dataset.
+
+
+```{r include=F, eval = F}
+bunmd_twins <- bunmd %>% arrange(bunmd_sibling_group_id) %>% 
+  group_by(bunmd_sibling_group_id) %>% 
+  mutate(sibs = n()) %>% 
+  ungroup() %>% 
+  group_by(bunmd_sibling_group_id, byear, bmonth, bday) %>% 
+  mutate(births_per_day = n()) %>%
+  ungroup() %>% 
+  filter(births_per_day > 1)
+
+bunmd_twins_month <- bunmd %>% arrange(bunmd_sibling_group_id) %>% 
+  group_by(bunmd_sibling_group_id) %>% 
+  mutate(sibs = n()) %>% 
+  ungroup() %>% 
+  group_by(bunmd_sibling_group_id, byear, bmonth) %>% 
+  mutate(births_same_month = n()) %>%
+  ungroup() %>% 
+  filter(births_same_month > 1)
+
+
+# siblings matched on month but not day?
+nrow(bunmd_twins)
+nrow(bunmd_twins_month)
+bunmd_twins_month %>% 
+  group_by(bunmd_sibling_group_id) %>% 
+  filter(births_same_month == 2) %>% 
+  mutate(maxday = max(bday), minday = min(bday)) %>% 
+  mutate(diffbday = maxday - minday != 0) %>% 
+  ungroup() %>% 
+  filter(diffbday == TRUE)
+```
+
+```{r include=F, eval=F}
+numident_twins <- numident %>% arrange(numident_sibling_group_id) %>% 
+  group_by(numident_sibling_group_id) %>% 
+  mutate(sibs = n()) %>% 
+  ungroup() %>% 
+  group_by(numident_sibling_group_id, byear, bmonth) %>% 
+  mutate(births_per_day = n()) %>%
+  ungroup() %>% 
+  filter(births_per_day > 1)
+
+numident_twins %>% filter(births_per_day == 2) %>% 
+  group_by(numident_sibling_group_id, byear, bmonth) %>% 
+  summarize(sex_comp = as.character(mean(sex))) %>% 
+  ggplot(aes(sex_comp)) +
+  geom_bar()
+  
+numident_twins %>% filter(numident_sibling_group_id == "99A673A6-D6F9-4537-AE0C-64B907B6E8FC")
+# higher prevalence of like-sex pairs mean false twins?
+# expected sex ratio: 1/3 of births identical. 2/3 of birth non-ID. 1/4 girls only, 1/4 boys only, 1/2 one of each.
+# of 1/2 of 2/3 will be opposite-sex twins. or about q third. So yes, this ratio is skewed no matter how you slice it.
+# I would expect it to be less skewed than the BUNMD ratios. though.
+
+bunmd_twins %>% filter(births_per_day == 2) %>% 
+  group_by(bunmd_sibling_group_id, byear, bmonth, bday) %>% 
+  summarize(sex_comp = as.character(mean(sex))) %>% 
+  ggplot(aes(sex_comp)) +
+  geom_bar()
+```
+
+```{r, include=F, eval = FALSE}
+#how many fake twins?
+bunmd_twins %>% arrange(bunmd_sibling_group_id) %>% group_by(bunmd_sibling_group_id, dyear, dmonth, dday) %>% mutate(same_death = n()) %>%  ungroup() %>% filter(same_death > 1) %>% as.data.table() %>% 
+  group_by(bunmd_sibling_group_id) %>% tally()
+# bunmd by day -- 8619
+# bunmd by month -- 15,877
+
+
+numident_twins %>% arrange(numident_sibling_group_id) %>% group_by(numident_sibling_group_id, dyear, dmonth) %>% mutate(same_death = n()) %>%  ungroup() %>% filter(same_death > 1) %>% as.data.table()
+# Numident -- 98 rows
+```
+
+
+
+## Usage
+
+Sibling identifier datasets consist of two columns: a unique identifier (either `ssn` or `HISTID`) that can be used to merge the data with the full BUNMD or CenSoc-Numident, and an identifier for each sibling group. The BUNMD sibling identification set appears as follows:
+
+```{r}
+head(bunmd_sibs)
+```
+
+
+For example, the first two individuals listed are siblings, with the shared siblingship identifier number 1010047. In fact, the siblingship identifier is just the ssn of the oldest sibling in the group.
+
+
+```{r}
+head(numident_sibs)
+```
+Similarly, each sibling group in the CenSoc-Numident will be identified using the HISTID of the oldest sibling. Although the `numident_sibling_group_id` column contains information from individual HISTID's, it can simply be thought of as a family number identifier.
+
+It is straightforward to use the sibling identifier datasets. Users can download the full BUNMD or CenSoc-Numident and join the sibling identifiers using either `ssn` or `HISTID` as appropriate. For example:
+
+```{r, eval = FALSE}
+# Read BUNMD 
+bunmd <- fread("bunmd_v2.csv")
+# Read BUNMD siblings
+bunmd_sib_id <- fread("bunmd_sibs_v0.csv")
+# Attach BUNMD variables to siblings
+bunmd_sibs <- inner_join(bunmd, bunmd_sib_id, by = "ssn")
+```
+
+```{r, eval = F}
+# Read CenSoc-Numident data
+censoc_numident <- fread("censoc_numident_v3.csv")
+# Read Numident siblings
+numident_sib_id <- fread("numident_sibs_v0.csv")
+# Read IPUMS 1940 census extract
+census <- fread("usa_00050.csv")
+# Create set of siblings with attached census variables
+numident_sibs_only <- inner_join(censoc_numident, numident_sib_id, by = "HISTID")
+numident_sibs_with_census <- left_join(numident_sibs_only, census, by = "HISTID")
+```
+
+
+```{r, include = F, eval = F}
+numident <- numident %>%
+  mutate(eduy = case_when(HIGRADE %in% 1:3 ~ 0,
+                   HIGRADE %in% 4:19 ~ HIGRADE - 3,
+                   HIGRADE %in% 20:23 ~ 17,
+                   TRUE ~ NA))
+table(numident$eduy, useNA = "always")
+income_sample <- numident %>% filter(byear %in% 1910:1920 & sex == 1 & !is.na(eduy))
+
+
+brothers_with_income <- numident %>% filter(byear %in% 1910:1920 & sex == 1 & !is.na(eduy)) %>% 
+  group_by(numident_sibling_group_id) %>% 
+  filter(n() > 1)
+
+hist(log(brothers_with_income$INCWAGE))
+
+income_men <- lm(death_age ~ eduy + as.factor(byear), 
+                      data = brothers_with_income)
+summary(income_men)
+qqnorm(resid(income_men))
+qqline(resid(income_men))
+
+
+income_with_fe <- lfe::felm(death_age ~ eduy + as.factor(byear) | numident_sibling_group_id, 
+                      data = brothers_with_income)
+
+summary(income_with_fe)
+```
+
+## Considerations for Researchers
+
+This method for linking siblings is fairly conservative. We validate the links using a number of variables, and therefore believe the data to be of high quality and consist largely of true siblings. However, we ultimately cannot verify the truth of sibling links. Also, some siblings identified may actually be adopted siblings, half siblings, or otherwise not "full" biological siblings. This conservative approach, as well as limiting siblings to those that die within a particular age and time window, precludes the linkage of many real siblings and likely results in smaller sibling groups than actually exist.
+
+While researchers may use birth year/month/day information to identify twins in the data, there is no way to distinguish identical twins from fraternal twins of the same sex. Additionally, some apparent "twins" are most likely the same individual listed under multiple Social Security numbers. While the assignment of multiple Social Security numbers (either legitimately, fraudulently, or accidentally) is quite uncommon at present, it is possible that this happened more frequently in the past when individuals re-applied for Social Security. A future release will likely attempt to remove obvious false twins. Researchers may attempt to correct this themselves by removing records with duplicated name and/or death date information. Duplicate individuals are relatively rare in the BUNMD overall, but may make up a significant portion of "twins" in that dataset. This issue is fairly negligible in the CenSoc-Numident.
+
+We note that another method of identifying siblings in CenSoc data is to use the census. Researchers can find siblings living in the same household in 1940, for example, by using information on family/household structure. A potential disadvantage of this approach is that most identifiable siblings will be children. To find adult siblings who live apart in 1940, it may be further necessary to link back to an earlier census when they cohabitated as children, which can significantly reduce sample size. This strategy may be necessary when using CenSoc-DMF data, as these mortality data has no parent names with which to find siblings. Census linkages are available from the Census Linking Project (men only) or The IPUMS Multigenerational Longitudinal Panel project.
+
+
+
+
+
