@@ -543,7 +543,31 @@ head(bunmd_cleaned_m %>% arrange(ssn))
 ```
 
 
-# Extract cleaned name fields only
+# Remove bad strings
+```{r}
+invalid_name_strings <- c("UNK", "UNKNOWN", "UNKNWON","UNKOWN", "WITHHELD", "MISSING", "NS",
+                          "NOTSTATED", "NOT STATED", "NOT KNOWN", "NOT LISTED", "NOT RECORD", "NOT RECORDED", 
+                      "NOT SHOWN", "NOT GIVEN", "NOT PROVIDED", "NOT NAMED", "NOT AVAILABLE",
+                      "NOT VERIFIED", "NOT AVAIL", "NOT ESTABLISHED", "NOT SHOWN", 
+                      "NOT", "STATED", "KNOWN", "LISTED", "RECORD", "RECORDED", "SHOWN",
+                      "GIVEN", "PROVIDED", "NAMED", "AVAILABLE", "VERIFIED", "AVAIL", "ESTABLISHED",
+                      "SHOWN", "AVAIL", "APPL", "FURNISHED", "SHOWN ON")
+
+bunmd_cleaned_m[father_fname_raw %in% invalid_name_strings, father_fname := ""]
+bunmd_cleaned_m[father_mname_raw %in% invalid_name_strings, father_mname := ""]
+bunmd_cleaned_m[father_lname_raw %in% invalid_name_strings, father_lname := ""]
+bunmd_cleaned_m[mother_fname_raw %in% invalid_name_strings, mother_fname := ""]
+bunmd_cleaned_m[mother_mname_raw %in% invalid_name_strings, mother_mname := ""]
+bunmd_cleaned_m[mother_lname_raw %in% invalid_name_strings, mother_lname := ""]
+bunmd_cleaned_m[fname_raw %in% invalid_name_strings, fname := ""]
+bunmd_cleaned_m[mname_raw %in% invalid_name_strings, mname := ""]
+bunmd_cleaned_m[lname_raw %in% invalid_name_strings, lname := ""]
+
+```
+
+
+
+# Extract cleaned name fields only and order columns
 ```{r}
 bunmd_clean_name_fields <- bunmd_cleaned_m %>%
   select(ssn, contains("name")) %>%
@@ -564,11 +588,13 @@ bunmd_clean_name_fields <- bunmd_clean_name_fields[,c("ssn", "fname_clean","mnam
                                                       "father_mname_clean","father_lname_clean",
                                                       "mother_fname_clean","mother_mname_clean",
                                                       "mother_lname_clean")]
-
-readr::write_csv(bunmd_clean_name_fields,
-          "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_clean_name_fields_only_updated.csv")
 ```
 
 
+# write file
+```{r}
+readr::write_csv(bunmd_clean_name_fields,
+          "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_clean_name_fields_only_updated.csv")
+```
 
 

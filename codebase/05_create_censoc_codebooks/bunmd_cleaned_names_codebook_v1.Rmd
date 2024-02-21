@@ -32,9 +32,9 @@ header-includes:
 
 \vspace{10 pt}
 
-**Note**: Missing values for names are usually indicated by an empty string. However, sometimes strings such as "unknown"/"unk" or "notstated"/"ns" were entered in name fields. These and other special strings indicating missing data have *not* been removed.
+**Note**: NA values for names are usually represented with an empty string. However, sometimes strings such as "unknown", "unk", "missing" or "not stated" were present in the name fields of Social Security records, usually for parents' names. Many common words indicated missing data have been removed, but some such invalid strings may remain in the cleaned data.
 
-**Note**: We also note that this process of name cleaning and standardization is primarily designed to facilitate record linkage. Decisions for how to parse and standardize names are largely compliant with the original implementation of the automated ABE linking algorithm developed by Abramitzky, Boustan and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
+**Note**: We also note that this process of name cleaning and standardization is primarily designed to facilitate record linkage. Decisions for how to parse names, standardize names, and convert nicknames to full names are largely compliant with the original implementation of the automated ABE linking algorithm developed by Abramitzky, Boustan and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
 
 
 ```{r echo = F, results='hide', message=FALSE, warning=FALSE, eval = F}
