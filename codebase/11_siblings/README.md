@@ -61,13 +61,12 @@ group size in the BUNMD is 10 siblings; and the maximum groups size in
 the CenSoc-Numident is 7 siblings. Siblingships may be of any gender
 composition.
 
-![](bunmd_sibling_vignette_files/figure-gfm/plots-1.png)<!-- -->
-<br><br><br><br>
+![](README_files/figure-gfm/plots-1.png)<!-- --> <br><br><br><br>
 
 The birth year coverage of persons identified as belonging to a sibling
 groups peaks around 1915-1925.
 
-![](bunmd_sibling_vignette_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ## Twins
 

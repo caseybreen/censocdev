@@ -352,34 +352,6 @@ numident_sibs_with_census <- left_join(numident_sibs_only, census, by = "HISTID"
 ```
 
 
-```{r, include = F, eval = F}
-numident <- numident %>%
-  mutate(eduy = case_when(HIGRADE %in% 1:3 ~ 0,
-                   HIGRADE %in% 4:19 ~ HIGRADE - 3,
-                   HIGRADE %in% 20:23 ~ 17,
-                   TRUE ~ NA))
-table(numident$eduy, useNA = "always")
-income_sample <- numident %>% filter(byear %in% 1910:1920 & sex == 1 & !is.na(eduy))
-
-
-brothers_with_income <- numident %>% filter(byear %in% 1910:1920 & sex == 1 & !is.na(eduy)) %>% 
-  group_by(numident_sibling_group_id) %>% 
-  filter(n() > 1)
-
-hist(log(brothers_with_income$INCWAGE))
-
-income_men <- lm(death_age ~ eduy + as.factor(byear), 
-                      data = brothers_with_income)
-summary(income_men)
-qqnorm(resid(income_men))
-qqline(resid(income_men))
-
-
-income_with_fe <- lfe::felm(death_age ~ eduy + as.factor(byear) | numident_sibling_group_id, 
-                      data = brothers_with_income)
-
-summary(income_with_fe)
-```
 
 ## Considerations for Researchers
 
