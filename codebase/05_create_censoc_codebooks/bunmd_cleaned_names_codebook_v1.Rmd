@@ -28,7 +28,7 @@ header-includes:
 
 \vspace{5 pt}
 
-**Summary**: The Berkeley Unified Numident Mortality Database Cleaned Names file (N = 49,337,827) is a supplementary file that provides cleaned names for individuals and their parents in the Berkeley Unified Numident Mortality Database (BUNMD). Cleaning names include such steps as removing titles, replacing some nicknames and name variants with standardized names, and removing non-alphabetic characters. Researchers may attach this file to the full BUNMD using the `ssn` (Social Security number) variable, which uniquely identifies each person in the dataset.
+**Summary**: The Berkeley Unified Numident Mortality Database Cleaned Names file (N = 49,337,827) is a supplementary file that provides cleaned names for individuals and their parents in the Berkeley Unified Numident Mortality Database (BUNMD). Cleaning names includes removing non-alphabetic characters, standardizing NA values, and replacing some nicknames and name variants with standardized names. Researchers may attach this file to the full BUNMD using the `ssn` (Social Security number) variable, which uniquely identifies each person in the dataset.
 
 \vspace{10 pt}
 
