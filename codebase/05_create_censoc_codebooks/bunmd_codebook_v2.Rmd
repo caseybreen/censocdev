@@ -49,9 +49,9 @@ header-includes:
 |  \hyperlink{page.34}{34}  | \hyperlink{page.34}{ccweight}          |High-Coverage "Complete Case" Sub-Sample Weight|
 
 \vspace{-3truemm}
-**Summary**: The Berkeley Unified Numident Mortality Database (BUNMD) (N = 49,337,827) is a cleaned and harmonized version of Social Security Numerical Identification System (Numident) records published by the National Archives and Records Administration. This dataset combines information from Social Security application (SS-5), claim, and death records for deceased individuals, creating a database of mortality records with demographic covariates and fine geographic detail. 
+**Summary**: The Berkeley Unified Numident Mortality Database (BUNMD) (N = 49,337,827) is a cleaned and harmonized version of Social Security Numerical Identification System (Numident) records published by the National Archives and Records Administration. This dataset combines information from Social Security application (SS-5), claim, and death records for deceased individuals, creating a database of mortality records with demographic covariates and fine geographic detail. See [\textcolor{blue}{Breen and Goldstein (2022)}](https://doi.org/10.4054/DemRes.2022.47.5) for additional details.
 
-**Supplementary Data Files**: For additional data, researchers can download the BUNMD Supplementary Geography File for more place of birth and death variables, or the BUNMD Cleaned Names dataset for cleaned and standardized name strings of decedents and their parents. Both supplementary files may be merged onto the BUNMD using the `ssn` variable.
+**Supplementary Data Files**: For additional data, researchers can download the BUNMD Supplementary Geography File for more place of birth and death variables, or the BUNMD Cleaned Names File for cleaned and standardized name strings of decedents and their parents. Both supplementary files may be merged onto the BUNMD using the `ssn` variable.
 
 
 ```{r echo = F, results='hide', message=FALSE, warning=FALSE}
@@ -90,7 +90,7 @@ knitr::opts_knit$set(root.dir = here("codebase/05_create_censoc_codebooks/bunmd_
 
 **Description**: fname reports the first 16 letters of the person's first name, as recorded in the Numident death records.
 
-**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `fname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `fname_clean` variable in the supplementary BUNMD Cleaned Names File for a cleaned and standardized version of this variable.
 
 
 
@@ -104,7 +104,7 @@ knitr::opts_knit$set(root.dir = here("codebase/05_create_censoc_codebooks/bunmd_
 
 **Description**: mname reports the first 16 letters of the person's middle name, as recorded in the Numident death records.
 
-**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned version of this variable.
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mname_clean` variable in the supplementary BUNMD Cleaned Names File for a cleaned version of this variable.
 
 
 
@@ -119,7 +119,7 @@ knitr::opts_knit$set(root.dir = here("codebase/05_create_censoc_codebooks/bunmd_
 
 **Description**: lname reports the first 21 letters of the person's last name, as recorded in the Numident death records.
 
-**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `lname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `lname_clean` variable in the supplementary BUNMD Cleaned Names File for a cleaned and standardized version of this variable.
 
 
 
@@ -243,7 +243,7 @@ knitr::kable(bunmd %>%
 
 **Label:** First Race: Application Year
 
-**Description**: race_last_cyear reports the year of the application on which a person reported their last race. 
+**Description**: race_last_cyear is a numeric variable reporting the year of the application on which a person reported their last race. 
 
 \newpage 
 
@@ -864,7 +864,7 @@ NA &  & 471923 & 0.96\\
 
 **Description**: father_fname is a character variable reporting the first 16 letters of the person's father's first name, as recorded in the Numident application records.
 
-**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `father_fname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `father_fname_clean` variable in the supplementary BUNMD Cleaned Names File for a cleaned and standardized version of this variable.
 
 
 \newpage 
@@ -877,7 +877,7 @@ NA &  & 471923 & 0.96\\
 
 **Description**: father_mname is a character variable reporting the first 16 letters of the person's father's middle name, as recorded in the Numident application records.
 
-**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `father_mname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned version of this variable.
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `father_mname_clean` variable in the supplementary BUNMD Cleaned Names File for a cleaned version of this variable.
 
 \newpage 
 
@@ -890,7 +890,7 @@ NA &  & 471923 & 0.96\\
 
 **Description**: father_lname is a character variable reporting the first 21 letters of the person's father's last name, as recorded in the Numident application records.
 
-**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `father_lname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `father_lname_clean` variable in the supplementary BUNMD Cleaned Names File for a cleaned and standardized version of this variable.
 
 \newpage 
 
@@ -903,7 +903,7 @@ NA &  & 471923 & 0.96\\
 
 **Description**: mother_fname is a character variable reporting the first 16 letters of the person's mother's first name, as recorded in the Numident application records.
 
-**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mother_fname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mother_fname_clean` variable in the supplementary BUNMD Cleaned Names File for a cleaned and standardized version of this variable.
 
 \newpage 
 
@@ -915,7 +915,7 @@ NA &  & 471923 & 0.96\\
 
 **Description**: mother_mname is a character variable reporting the first 16 letters of the person's mother's middle name, as recorded in the Numident application records.
 
-**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mother_mname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned version of this variable.
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mother_mname_clean` variable in the supplementary BUNMD Cleaned Names File for a cleaned version of this variable.
 
 
 \newpage 
@@ -929,7 +929,7 @@ NA &  & 471923 & 0.96\\
 
 **Description**: mother_lname is a character variable reporting the first 21 letters of the person's mother's last (maiden) name, as recorded in the Numident application records.
 
-**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mother_lname_clean` variable in the BUNMD Supplementary Cleaned Names File for a cleaned and standardized version of this variable.
+**Note**: This string is taken directly from the Social Security Numident records. Users can refer to the `mother_lname_clean` variable in the supplementary BUNMD Cleaned Names File for a cleaned and standardized version of this variable.
 
 \newpage 
 
