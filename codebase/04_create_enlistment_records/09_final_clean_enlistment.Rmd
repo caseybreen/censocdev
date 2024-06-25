@@ -46,7 +46,7 @@ colnames(data_combined)
 ```
 
 ```{r}
-enlistment_records_final_v1 <- subset(data_combined, select = c( "serial_number",  "yob_precise", "fname_clean", "fname_clean_std" , "mname_clean" ,"lname_clean", "sex_r", "date_enlistment_recode", "nativity_recode$nativity_recode" , "residence_county", "res_state_recode$state_recode", "place_of_enlistment","education_recode$education_recode","grade_recode$grade_code_recode",  "branch_recode$branch_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode", "civ_occupation_recode$civ_occupation_recode" ,"marital_status_recode$marital_status_recode", "height_recode", "weight_before_1943","weight_or_AGCT", "component_recode$component_recode","source_recode$source_recode"))
+enlistment_records_final_v1 <- subset(data_combined, select = c( "serial_number",  "yob_precise", "fname_clean", "fname_clean_std" , "mname_clean" ,"lname_clean", "sex_r", "date_enlistment_recode", "nativity_recode$nativity_recode" , "residence_county", "res_state_recode$state_recode", "place_of_enlistment","education_recode$education_recode","grade_recode$grade_code_recode",  "branch_recode$branch_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode", "civ_occupation_recode" ,"marital_status_recode$marital_status_recode", "height_recode", "weight_before_1943","weight_or_AGCT", "component_recode$component_recode","source_recode$source_recode"))
 
 ```
 
@@ -77,7 +77,7 @@ enlistment_records_final <- enlistment_records_final_v1 %>%
                "marital_status" = "marital_status_recode$marital_status_recode" , 
                "height" = "height_recode",
                "weight_before_march_1943" = "weight_before_1943",
-               "civilian_occupation" = "civ_occupation_recode$civ_occupation_recode" )
+               "civilian_occupation" = "civ_occupation_recode" )
 ```
 
 ```{r}

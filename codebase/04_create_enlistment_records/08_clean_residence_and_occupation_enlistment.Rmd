@@ -1,0 +1,457 @@
+---
+title: "8-clean-civ-occupation-enlistment"
+output: html_document
+date: "2023-01-19"
+---
+
+```{r}
+library(dplyr)   # %>%, group_by, tally, print
+library(ipumsr)  # read_ipums_ddi, ipums_val_labels
+library(readr)   # read_csv, write_csv
+library(stringr) # str_trim, str_split
+```
+
+# Read data
+```{r}
+path_to_temp_data   <-  "/data/censoc/workspace/enlistment_records/temp7.csv"
+out_path <- "/data/censoc/workspace/enlistment_records/"
+civ_path <- "/data/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_3323.csv" # to update
+```
+
+#Read in temp7
+```{r}
+
+data_combined <- read_csv(path_to_temp_data, 
+                          col_types = cols(
+                            empty_field = col_character(),
+                            term_or_enlistment = col_character(),
+                            longevity = col_character(),
+                            education = col_character(),
+                            marital_status = col_character(),
+                            component = col_character(),
+                            educ_spec = col_character(),
+                            defer_date_mmyy = col_character(),
+                            mname_clean = col_character(),
+                            sex = col_integer(),
+                            sex_r = col_integer(),
+                            fname_std = col_character()
+                            )
+                          )
+```
+
+
+# Recode state of residence
+```{r}
+data_combined %>% 
+  count(residence_state) 
+```
+
+Original state of residence
+notes: this recoding used state codes present in original NARA documentation. These codes appear to be unique and not correspond to FIPS or IPUMS coding, for example.
+```{r}
+recode_res_state_enlistment <- function(df){
+  
+  ## recode source variable
+  df <- df %>% 
+    mutate(state_recode = case_when(
+      residence_state == "41" ~ 41, #ALABAMA	100
+      residence_state == "D1" ~ 41, #ALABAMA*	
+      residence_state == "M1" ~ 41, #ALABAMA**	
+      residence_state == "02" ~ 81,#Alaska 200
+      residence_state == "R0" ~ 81, #Alaska*
+      residence_state == "N9" ~ 81, #Alaska**
+      residence_state == "98" ~ 61, #ARIZONA 400
+      residence_state == "I8" ~ 61, #ARIZONA*
+      residence_state == "R8" ~ 61, #ARIZONA**
+      residence_state == "87" ~ 42, #ARKANSAS 500
+      residence_state == "H7" ~ 42, #ARKANSAS
+      residence_state == "Q7" ~ 42, #ARKANSAS
+            residence_state == "91" ~ 71, #CALIFORNIA 600
+      residence_state == "I1" ~ 71, #CALIFORNIA*
+      residence_state == "R1" ~ 71, #CALIFORNIA**
+      residence_state == "70" ~ 62, #COLORADO 800
+      residence_state == "G0" ~ 62, #COLORADO
+      residence_state == "P0" ~ 62, #COLORADO
+            residence_state == "11" ~ 01, #CONNECTICUT 900
+      residence_state == "A1" ~ 01, #CONNECTICUT
+      residence_state == "J1" ~ 01, #CONNECTICUT
+      residence_state == "21" ~ 11, #DELAWARE 1000
+      residence_state == "B1" ~ 11, #DELAWARE
+      residence_state == "K1" ~ 11, #DELAWARE
+            residence_state == "34" ~ 98, #DISTRICT OF COLUMBIA	 1100
+      residence_state == "C4" ~ 98, #DISTRICT OF COLUMBIA	
+      residence_state == "L4" ~ 98, #DISTRICT OF COLUMBIA	
+      residence_state == "42" ~ 43, #FLORIDA 1200
+      residence_state == "D2" ~ 43, #FLORIDA
+      residence_state == "M2" ~ 43, #FLORIDA
+            residence_state == "43" ~ 44, #GEORGIA 1300
+      residence_state == "D3" ~ 44, #GEORGIA
+      residence_state == "R8" ~ 44, #GEORGIA
+      residence_state == "03" ~ 82, #HAWAII 1500
+      residence_state == "92" ~ 63, #IDAHO 1600
+      residence_state == "I2" ~ 63, #IDAHO
+            residence_state == "R2" ~ 63, #IDAHO
+      residence_state == "61" ~ 21, #ILLINOIS 1700
+      residence_state == "F1" ~ 21, #ILLINOIS
+      residence_state == "O1" ~ 21, #ILLINOIS
+      residence_state == "51" ~ 22, #INDIANA	1800
+      residence_state == "E1" ~ 22, #INDIANA	
+            residence_state == "N1" ~ 22, #INDIANA**	
+      residence_state == "72" ~ 31, #IOWA 1900
+      residence_state == "G2" ~ 31, #IOWA
+      residence_state == "P2" ~ 31, #IOWA
+      residence_state == "73" ~ 32, #KANSAS 2000
+      residence_state == "G3" ~ 32, #KANSAS*
+            residence_state == "P3" ~ 32, #KANSAS**
+      residence_state == "52" ~ 51, #KENTUCKY 2100
+      residence_state == "E2" ~ 51, #KENTUCKY
+      residence_state == "N2" ~ 51, #KENTUCKY
+      residence_state == "88" ~ 45, #LOUISIANA 2200
+      residence_state == "H8" ~ 45, #LOUISIANA
+            residence_state == "Q8" ~ 45, #LOUISIANA
+      residence_state == "12" ~ 02, #MAINE 2300
+      residence_state == "A2" ~ 02, #MAINE
+      residence_state == "J2" ~ 02, #MAINE
+      residence_state == "31" ~ 52, #MARYLAND 2400
+      residence_state == "C1" ~ 52, #MARYLAND
+            residence_state == "L1" ~ 52, #MARYLAND
+      residence_state == "13" ~ 03, #MASSACHUSETTS 2500
+      residence_state == "A3" ~ 03, #MASSACHUSETTS
+      residence_state == "J3" ~ 03, #MASSACHUSETTS
+      residence_state == "62" ~ 23, #MICHIGAN 2600
+      residence_state == "F2" ~ 23, #MICHIGAN
+            residence_state == "O2" ~ 23, #MICHIGAN
+      residence_state == "74" ~ 33, #MINNESOTA 2700
+      residence_state == "G4" ~ 33, #MINNESOTA
+      residence_state == "P4" ~ 33, #MINNESOTA
+      residence_state == "45" ~ 46, #MISSISSIPPI 2800
+            residence_state == "D5" ~ 46, #MISSISSIPPI
+      residence_state == "M5" ~ 46, #MISSISSIPPI
+      residence_state == "75" ~ 34, #MISSOURI 2900
+      residence_state == "G5" ~ 34, #MISSOURI
+      residence_state == "P5" ~ 34, #MISSOURI
+      residence_state == "93" ~ 64, #MONTANA 3000
+            residence_state == "I3" ~ 64, #MONTANA
+      residence_state == "38" ~ 64, #MONTANA
+      residence_state == "76" ~ 35, #NEBRASKA 3100
+      residence_state == "G6" ~ 35, #NEBRASKA
+      residence_state == "P6" ~ 35, #NEBRASKA
+            residence_state == "94" ~ 65, #NEVADA 3200
+      residence_state == "I4" ~ 65, #NEVADA
+      residence_state == "R4" ~ 65, #NEVADA
+      residence_state == "14" ~ 04, #NEW HAMPSHIRE	3300
+      residence_state == "A4" ~ 04, #NEW HAMPSHIRE	
+      residence_state == "J4" ~ 04, #NEW HAMPSHIRE	
+            residence_state == "22" ~ 12, #NEW JERSEY 3400
+      residence_state == "B2" ~ 12, #NEW JERSEY
+      residence_state == "K2" ~ 12, #NEW JERSEY
+      residence_state == "83" ~ 66, #NEW MEXICO	 3500
+      residence_state == "H3" ~ 66, #NEW MEXICO	
+            residence_state == "Q3" ~ 66, #NEW MEXICO	
+      residence_state == "23" ~ 13,  #NEW YORK	3600
+      residence_state == "B3" ~ 13, #NEW YORK	
+      residence_state == "K3" ~ 13, #NEW YORK	
+      residence_state == "46" ~ 47, #NORTH CAROLINA	3700
+      residence_state == "D6" ~ 47, #NORTH CAROLINA	
+            residence_state == "M6" ~ 47, #NORTH CAROLINA	
+      residence_state == "77" ~ 36, #NORTH DAKOTA	3800
+      residence_state == "G7" ~ 36, #NORTH DAKOTA	
+      residence_state == "P7" ~ 36, #NORTH DAKOTA	
+      residence_state == "53" ~ 24, #OHIO   3900
+            residence_state == "E3" ~ 24, #OHIO
+      residence_state == "N3" ~ 24, #OHIO
+      residence_state == "84" ~ 53, #OKLAHOMA 4000
+      residence_state == "H4" ~ 53, #OKLAHOMA
+      residence_state == "Q4" ~ 53, #OKLAHOMA
+      residence_state == "95" ~ 72, #OREGON  4100
+            residence_state == "I5" ~ 72, #OREGON
+      residence_state == "R5" ~ 72, #OREGON
+      residence_state == "32" ~ 14, #PENNSYLVANIA  4200
+      residence_state == "C2" ~ 14, #PENNSYLVANIA
+      residence_state == "L2" ~ 14, #PENNSYLVANIA
+            residence_state == "08" ~ 83, #PUERTO RICO  ****
+      residence_state == "15" ~ 05, #RHODE ISLAND	4400
+      residence_state == "A5" ~ 05, #RHODE ISLAND	
+      residence_state == "J5" ~ 05, #RHODE ISLAND	
+      residence_state == "47" ~ 48, #SOUTH CAROLINA	 4500
+      residence_state == "D7" ~ 48, #SOUTH CAROLINA	
+            residence_state == "M7" ~ 48, #SOUTH CAROLINA	
+      residence_state == "78" ~ 37, #SOUTH DAKOTA	 4600
+      residence_state == "G8" ~ 37, #SOUTH DAKOTA	
+      residence_state == "P8" ~ 37, #SOUTH DAKOTA	
+      residence_state == "48" ~ 54, #TENNESSEE	4700
+            residence_state == "D8" ~ 54, #TENNESSEE	
+      residence_state == "M8" ~ 54, #TENNESSEE	
+      residence_state == "85" ~ 49, #TEXAS 4800
+      residence_state == "H5" ~ 49, #TEXAS
+      residence_state == "Q5" ~ 49, #TEXAS
+      residence_state == "96" ~ 67, #UTAH 4900
+            residence_state == "I6" ~ 67, #UTAH
+      residence_state == "R6" ~ 67, #UTAH
+      residence_state == "16" ~ 06, #VERMONT 5000
+      residence_state == "A6" ~ 06, #VERMONT
+      residence_state == "J6" ~ 06, #VERMONT
+            residence_state == "33" ~ 4, #VIRGINIA 5100 error in original recoding
+      residence_state == "C3" ~ 40, #VIRGINIA
+      residence_state == "L3" ~ 40, #VIRGINIA
+      residence_state == "97" ~ 40, #WASHINGTON 5300 note mistake in WA/VA classification here
+      residence_state == "I7" ~ 73, #WASHINGTON
+      residence_state == "R7" ~ 73, #WASHINGTON
+            residence_state == "54" ~ 56, #WEST VIRGINIA	5400
+      residence_state == "E4" ~ 56, #WEST VIRGINIA	
+      residence_state == "N4" ~ 56, #WEST VIRGINIA	
+      residence_state == "63" ~ 25, #WISCONSIN   5500
+      residence_state == "F3" ~ 25, #WISCONSIN
+            residence_state == "O3" ~ 25, #WISCONSIN
+      residence_state == "79" ~ 8, #WYOMING 5600
+      residence_state == "G9" ~ 9,#WYOMING 
+      residence_state == "P9" ~ 3, #WYOMING
+      residence_state == "&" ~ 12, #WYOMING #none with this code, can remove.
+      TRUE ~ NA_real_     
+      ))
+  
+  ## return data.frame   
+  return(df)
+}
+```
+
+
+Function for recoding residence states to IPUMS detailed bpl codes
+note: some birthplaces are ambiguous, we assume the US bpl is correct.
+```{r}
+recode_res_state_enlistment_to_ipums <- function(df){
+  df <- df %>% 
+    mutate(state_recode = case_when(
+      residence_state == "41" ~ 100, #ALABAMA	100
+      residence_state == "D1" ~ 100, #ALABAMA*	
+      residence_state == "M1" ~ 100, #ALABAMA**	
+      residence_state == "02" ~ 200, #Alaska 200
+      residence_state == "R0" ~ 200, #Alaska*
+      residence_state == "N9" ~ 200, #Alaska**
+      residence_state == "98" ~ 400, #ARIZONA 400
+      residence_state == "I8" ~ 400, #ARIZONA*
+      residence_state == "R8" ~ 400, #ARIZONA**
+      residence_state == "87" ~ 500, #ARKANSAS 500
+      residence_state == "H7" ~ 500, #ARKANSAS
+      residence_state == "Q7" ~ 500, #ARKANSAS
+      residence_state == "91" ~ 600, #CALIFORNIA 600
+      residence_state == "I1" ~ 600, #CALIFORNIA*
+      residence_state == "R1" ~ 600, #CALIFORNIA**
+      residence_state == "70" ~ 800, #COLORADO 800
+      residence_state == "G0" ~ 800, #COLORADO
+      residence_state == "P0" ~ 800, #COLORADO
+      residence_state == "11" ~ 900, #CONNECTICUT 900
+      residence_state == "A1" ~ 900, #CONNECTICUT
+      residence_state == "J1" ~ 900, #CONNECTICUT
+      residence_state == "21" ~ 1000, #DELAWARE 1000
+      residence_state == "B1" ~ 1000, #DELAWARE
+      residence_state == "K1" ~ 1000, #DELAWARE
+      residence_state == "34" ~ 1100, #DISTRICT OF COLUMBIA	 1100
+      residence_state == "C4" ~ 1100, #DISTRICT OF COLUMBIA	
+      residence_state == "L4" ~ 1100, #DISTRICT OF COLUMBIA	
+      residence_state == "42" ~ 1200, #FLORIDA 1200
+      residence_state == "D2" ~ 1200, #FLORIDA
+      residence_state == "M2" ~ 1200, #FLORIDA
+      residence_state == "43" ~ 1300, #GEORGIA 1300
+      residence_state == "D3" ~ 1300, #GEORGIA
+      residence_state == "R8" ~ 1300, #GEORGIA
+      residence_state == "03" ~ 1500, #HAWAII 1500
+      residence_state == "R2" ~ 1500, #HAWAII
+         # R2 = Idaho or Hawaiian Islands. Most people w/ code R2 are born in HI,
+         # so we choose HI as place of residence
+      residence_state == "92" ~ 1600, #IDAHO 1600
+      residence_state == "I2" ~ 1600, #IDAHO
+      residence_state == "61" ~ 1700, #ILLINOIS 1700
+      residence_state == "F1" ~ 1700, #ILLINOIS
+      residence_state == "O1" ~ 1700, #ILLINOIS
+      residence_state == "51" ~ 1800, #INDIANA	1800
+      residence_state == "E1" ~ 1800, #INDIANA	
+      residence_state == "N1" ~ 1800, #INDIANA**	
+      residence_state == "72" ~ 1900, #IOWA 1900
+      residence_state == "G2" ~ 1900, #IOWA
+      residence_state == "P2" ~ 1900, #IOWA
+      residence_state == "73" ~ 2000, #KANSAS 2000
+      residence_state == "G3" ~ 2000, #KANSAS*
+            residence_state == "P3" ~ 2000, #KANSAS**
+      residence_state == "52" ~ 2100, #KENTUCKY 2100
+      residence_state == "E2" ~ 2100, #KENTUCKY
+      residence_state == "N2" ~ 2100, #KENTUCKY
+      residence_state == "88" ~ 2200, #LOUISIANA 2200
+      residence_state == "H8" ~ 2200, #LOUISIANA
+            residence_state == "Q8" ~ 2200, #LOUISIANA
+      residence_state == "12" ~ 2300, #MAINE 2300
+      residence_state == "A2" ~ 2300, #MAINE
+      residence_state == "J2" ~ 2300, #MAINE
+      residence_state == "31" ~ 2400, #MARYLAND 2400
+      residence_state == "C1" ~ 2400, #MARYLAND
+            residence_state == "L1" ~ 2400, #MARYLAND
+      residence_state == "13" ~ 2500, #MASSACHUSETTS 2500
+      residence_state == "A3" ~ 2500, #MASSACHUSETTS
+      residence_state == "J3" ~ 2500, #MASSACHUSETTS
+      residence_state == "62" ~ 2600, #MICHIGAN 2600
+      residence_state == "F2" ~ 2600, #MICHIGAN
+            residence_state == "O2" ~ 2600, #MICHIGAN
+      residence_state == "74" ~ 2700, #MINNESOTA 2700
+      residence_state == "G4" ~ 2700, #MINNESOTA
+      residence_state == "P4" ~ 2700, #MINNESOTA
+      residence_state == "45" ~ 2800, #MISSISSIPPI 2800
+            residence_state == "D5" ~ 2800, #MISSISSIPPI
+      residence_state == "M5" ~ 2800, #MISSISSIPPI
+      residence_state == "75" ~ 2900, #MISSOURI 2900
+      residence_state == "G5" ~ 2900, #MISSOURI
+      residence_state == "P5" ~ 2900, #MISSOURI
+      residence_state == "93" ~ 3000, #MONTANA 3000
+            residence_state == "I3" ~ 3000, #MONTANA
+      residence_state == "38" ~ 3000, #MONTANA
+      residence_state == "76" ~ 3100, #NEBRASKA 3100
+      residence_state == "G6" ~ 3100, #NEBRASKA
+      residence_state == "P6" ~ 3100, #NEBRASKA
+            residence_state == "94" ~ 3200, #NEVADA 3200
+      residence_state == "I4" ~ 3200, #NEVADA
+      residence_state == "R4" ~ 3200, #NEVADA
+      residence_state == "14" ~ 3300, #NEW HAMPSHIRE	3300
+      residence_state == "A4" ~ 3300, #NEW HAMPSHIRE	
+      residence_state == "J4" ~ 3300, #NEW HAMPSHIRE	
+            residence_state == "22" ~ 3400, #NEW JERSEY 3400
+      residence_state == "B2" ~ 3400, #NEW JERSEY
+      residence_state == "K2" ~ 3400, #NEW JERSEY
+      residence_state == "83" ~ 3500, #NEW MEXICO	 3500
+      residence_state == "H3" ~ 3500, #NEW MEXICO	
+            residence_state == "Q3" ~ 3500, #NEW MEXICO	
+      residence_state == "23" ~ 3600,  #NEW YORK	3600
+      residence_state == "B3" ~ 3600, #NEW YORK	
+      residence_state == "K3" ~ 3600, #NEW YORK	
+      residence_state == "46" ~ 3700, #NORTH CAROLINA	3700
+      residence_state == "D6" ~ 3700, #NORTH CAROLINA	
+            residence_state == "M6" ~ 3700, #NORTH CAROLINA	
+      residence_state == "77" ~ 3800, #NORTH DAKOTA	3800
+      residence_state == "G7" ~ 3800, #NORTH DAKOTA	
+      residence_state == "P7" ~ 3800, #NORTH DAKOTA	
+      residence_state == "53" ~ 3900, #OHIO   3900
+            residence_state == "E3" ~ 3900, #OHIO
+      residence_state == "N3" ~ 3900, #OHIO
+      residence_state == "84" ~ 4000, #OKLAHOMA 4000
+      residence_state == "H4" ~ 4000, #OKLAHOMA
+      residence_state == "Q4" ~ 4000, #OKLAHOMA
+      residence_state == "95" ~ 4100, #OREGON  4100
+            residence_state == "I5" ~ 4100, #OREGON
+      residence_state == "R5" ~ 4100, #OREGON
+      residence_state == "32" ~ 4200, #PENNSYLVANIA  4200
+      residence_state == "C2" ~ 4200, #PENNSYLVANIA
+      residence_state == "L2" ~ 4200, #PENNSYLVANIA
+            residence_state == "08" ~ 11000, #PUERTO RICO  **** 11000
+      residence_state == "15" ~ 4400, #RHODE ISLAND	4400
+      residence_state == "A5" ~ 4400, #RHODE ISLAND	
+      residence_state == "J5" ~ 4400, #RHODE ISLAND	
+      residence_state == "47" ~ 4500, #SOUTH CAROLINA	 4500
+      residence_state == "D7" ~ 4500, #SOUTH CAROLINA	
+            residence_state == "M7" ~ 4500, #SOUTH CAROLINA	
+      residence_state == "78" ~ 4600, #SOUTH DAKOTA	 4600
+      residence_state == "G8" ~ 4600, #SOUTH DAKOTA	
+      residence_state == "P8" ~ 4600, #SOUTH DAKOTA	
+      residence_state == "48" ~ 4700, #TENNESSEE	4700
+            residence_state == "D8" ~ 4700, #TENNESSEE	
+      residence_state == "M8" ~ 4700, #TENNESSEE	
+      residence_state == "85" ~ 4800, #TEXAS 4800
+      residence_state == "H5" ~ 4800, #TEXAS
+      residence_state == "Q5" ~ 4800, #TEXAS
+      residence_state == "96" ~ 4900, #UTAH 4900
+            residence_state == "I6" ~ 4900, #UTAH
+      residence_state == "R6" ~ 4900, #UTAH
+      residence_state == "16" ~ 5000, #VERMONT 5000
+      residence_state == "A6" ~ 5000, #VERMONT
+      residence_state == "J6" ~ 5000, #VERMONT
+            residence_state == "33" ~ 5100, #VIRGINIA 5100
+      residence_state == "C3" ~ 5100, #VIRGINIA
+      residence_state == "L3" ~ 5100, #VIRGINIA
+      residence_state == "97" ~ 5300, #WASHINGTON 5300
+      residence_state == "I7" ~ 5300, #WASHINGTON
+      residence_state == "R7" ~ 5300, #WASHINGTON
+            residence_state == "54" ~ 5400, #WEST VIRGINIA	5400
+      residence_state == "E4" ~ 5400, #WEST VIRGINIA	
+      residence_state == "N4" ~ 5400, #WEST VIRGINIA	
+      residence_state == "63" ~ 5500, #WISCONSIN   5500
+      residence_state == "F3" ~ 5500, #WISCONSIN
+            residence_state == "O3" ~ 5500, #WISCONSIN
+      residence_state == "79" ~ 5600, #WYOMING 5600
+      residence_state == "G9" ~ 5600, #WYOMING 
+      residence_state == "P9" ~ 5600, #WYOMING
+      TRUE ~ NA_real_     
+      ))
+  ## return data.frame   
+  return(df)
+}
+
+```
+
+
+recode states
+```{r}
+res_state_recode <- recode_res_state_enlistment_to_ipums(df = data_combined) %>% 
+  select(residence_state, state_recode)
+```
+
+
+
+
+
+#view civ_occupation fields
+```{r}
+data_combined %>% 
+  count(civ_occupation) 
+```
+
+
+#Load csv with NARA AAD codes
+```{r}
+civ_occupation_codes <- read_csv(civ_path)
+```
+
+
+#Recode civ_occupation by removing bad values
+```{r}
+# is civ occ currently a string or integer?
+str(data_combined$civ_occupation)  #character
+
+civ_occupation_codes <- civ_occupation_codes %>% rename(civ_occupation = Code) %>% 
+  rename(civ_occ_meaning = Meaning) %>% 
+  select(-c("Comments"))
+
+data_combined <- left_join(data_combined, civ_occupation_codes, by = "civ_occupation")
+
+data_combined <- data_combined %>% 
+  mutate(civ_occupation_recode = ifelse(!is.na(civ_occ_meaning), civ_occupation, NA_character_))
+
+# clean up
+data_combined$civ_occ_meaning <- NULL
+```
+
+
+#add civ_occupation_recode and res_state_recode to data_combined
+```{r}
+data_combined <- cbind(data_combined, res_state_recode$state_recode)
+
+```
+
+
+Remove county info for anyone w/o valid state and Hawaii (1500), Alaska (200), Puerto Rico (11000)
+```{r}
+data_combined <- data_combined %>% mutate(residence_county =
+                                            case_when(`res_state_recode$state_recode` == 1500 ~ NA_character_,
+                                                      `res_state_recode$state_recode` == 200 ~ NA_character_,
+                                                      `res_state_recode$state_recode` == 11000 ~ NA_character_,
+                                                      is.na(`res_state_recode$state_recode`) ~ NA_character_,
+                                                      TRUE ~ residence_county))
+```
+
+
+
+#save dataset as temp8
+```{r}
+write_csv(data_combined, paste0(out_path, "/temp8.csv"))
+```
+
+clean up
+```{r}
+rm(list = ls())
+```

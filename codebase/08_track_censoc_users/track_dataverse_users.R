@@ -3,6 +3,8 @@
 #' All downloaders of CenSoc data from Harvard Dataverse must sign a "guestbook"
 #' where name, email, institution, and position are collected.
 #' The guestbook can only be downloaded by admins of the dataverse.
+#' To acccess: log in to HDV, go to Berkeley CenSoc page, and select
+#' 'Dataverse Guestbooks' from dropdown edit menu in upper right
 #'
 #' NOTE: From mid July to Mid October 2023, users were not required to provide information
 #' when downloading the  CenSoc-DMF and CenSoc-Numident. This was so that reviewers of our
@@ -17,14 +19,14 @@ library(ggsci)
 library(ggthemes)
 
 # Read guestbook (note: read permissions limited)
-gb <- fread("~/censoc/UC_Berkeley_CenSoc__GuestbookReponses012524.csv")
+gb <- fread("~/censoc/hdv_guestbooks/UC_Berkeley_CenSoc__GuestbookReponses_apr_29_2024.csv")
 head(gb)
 
 # Format date
 gb[, c("mo", "day", "yr") := tstrsplit(Date, "/", fixed = TRUE)]
 gb <- gb %>% mutate_at(c("mo", "day", "yr"), as.integer)
 
-# Remove downloads prior to 2023 (these were internal tests)
+# Remove downloads prior to 2023 (earlier were internal tests)
 gb <- gb %>% filter(yr >= 2023)
 
 
@@ -43,7 +45,8 @@ gb <- gb %>%
 table(gb$`File Name`)
 gb <- gb %>%
   mutate(dataset_downloaded = case_when(
-    str_detect(`File Name`, pattern = "bunmd") & !(str_detect(`File Name`, pattern = "supplement")) ~ "BUNMD",
+    str_detect(`File Name`, pattern = "bunmd") & !(str_detect(`File Name`, pattern = "supplement")) &
+      !(str_detect(`File Name`, pattern = "names")) ~ "BUNMD",
     str_detect(`File Name`, pattern = "numident") & !(str_detect(`File Name`, pattern = "demo")) &
                                                       !(str_detect(`File Name`, pattern = "enlistment")) &
                                                       !(str_detect(`File Name`, pattern = "supplement")) ~ "CenSoc-Numident",
@@ -58,6 +61,7 @@ gb <- gb %>%
     str_detect(`File Name`, pattern = "numident_enlistment") ~ "CenSoc-Numident WWII Enlistment",
     str_detect(`File Name`, pattern = "dmf_enlistment") ~ "CenSoc-DMF WWII Enlistment",
     str_detect(`File Name`, pattern = "supplement") ~ "Supplementary Files",
+    str_detect(`File Name`, pattern = "names") ~ "Supplementary Files",
     TRUE ~ NA_character_))
 gb %>% group_by(dataset_downloaded) %>% tally() %>% arrange(desc(n))
 
@@ -106,9 +110,9 @@ gb_metrics %>% filter(year_mo >= "2023-06") %>%
   geom_bar(position="stack", stat="count") +
   theme_classic() +
   ggsci::scale_fill_locuszoom() +
-  ggtitle("Dataset Downloads June 1 2023 - January 2024") # change end date if needed
+  ggtitle("Dataset Downloads June 1 2023 - April 29, 2024") # change end date if needed
 
-# Note: demo downloads in 10/2023 are likely from a teaching demonstration
+# Note: spike in demo downloads in 10/2023 are likely from a teaching demonstration
 # Note: No user info for Numident & DMF downloads from about July - October 2023
 
 # Let's plot downloads by dataset
