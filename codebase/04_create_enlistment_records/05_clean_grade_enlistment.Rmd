@@ -262,7 +262,13 @@ recode_component_enlistment <- function(df){
       component == "7" ~ 7, # Selectees
       component == "9" ~ 9, # Women's Army Corps
       TRUE ~ NA_real_     ## this recodes anything remaining to NA (this is better than blank)
-      ))
+      )) %>%
+    # Create separate variable that further recodes as either voluntary service or draftee
+    mutate(enlistment_status = case_when(
+      component_recode < 7 | component_recode == 9 ~ 0, # Voluntary service
+      component_recode == 7 ~ 1, # Drafted by Selective Service
+      TRUE ~ NA_real_
+    ))
   
   ## return data.frame   
   return(df)
@@ -272,12 +278,12 @@ recode_component_enlistment <- function(df){
 #Apply function to df
 ```{r}
 component_recode <- recode_component_enlistment(df = data_combined) %>% 
-  select(component, component_recode)
+  select(component, component_recode, enlistment_status)
 ```
 
 #Add columns with recoded data to data_combined
 ```{r}
-data_combined <- cbind(data_combined, source_recode$source_recode, grade_recode$grade_code_recode,term_or_enlistment_recode$term_or_enlistment_recode, branch_recode$branch_code_recode, component_recode$component_recode)
+data_combined <- cbind(data_combined, source_recode$source_recode, grade_recode$grade_code_recode,term_or_enlistment_recode$term_or_enlistment_recode, branch_recode$branch_code_recode, component_recode$component_recode, component_recode$enlistment_status)
 ```
 
 
