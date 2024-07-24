@@ -385,10 +385,77 @@ recode_res_state_enlistment_to_ipums <- function(df){
 ```
 
 
-recode states
+Function for adding residence state FIPS codes in addition to the IPUMS recodes.
 ```{r}
-res_state_recode <- recode_res_state_enlistment_to_ipums(df = data_combined) %>% 
-  select(residence_state, state_recode)
+res_state_fips_code <- function(df) {
+  df <- recode_res_state_enlistment_to_ipums(df) %>% 
+  select(residence_state, state_recode) %>%
+    mutate(residence_state_fips = case_when(
+      state_recode == 100 ~ 01, #Alabama
+      state_recode == 200 ~ 02, #Alaska
+      state_recode == 400 ~ 04, #Arizona
+      state_recode == 500 ~ 05, #Arkansas
+      state_recode == 600 ~ 06, #California
+      state_recode == 800 ~ 08, #Colorado
+      state_recode == 900 ~ 09, #Connecticut
+      state_recode == 1000 ~ 10, #Delaware
+      state_recode == 1100 ~ 11, #District of Columbia
+      state_recode == 1200 ~ 12, #Florida
+      state_recode == 1300 ~ 13, #Georgia
+      state_recode == 1500 ~ 15, #Hawaii
+      state_recode == 1600 ~ 16, #Idaho
+      state_recode == 1700 ~ 17, #Illinois
+      state_recode == 1800 ~ 18, #Indiana
+      state_recode == 1900 ~ 19, #Iowa
+      state_recode == 2000 ~ 20, #Kansas
+      state_recode == 2100 ~ 21, #Kentucky
+      state_recode == 2200 ~ 22, #Louisiana
+      state_recode == 2300 ~ 23, #Maine
+      state_recode == 2400 ~ 24, #Maryland
+      state_recode == 2500 ~ 25, #Massachusetts
+      state_recode == 2600 ~ 26, #Michigan
+      state_recode == 2700 ~ 27, #Minnesota
+      state_recode == 2800 ~ 28, #Mississippi
+      state_recode == 2900 ~ 29, #Missouri
+      state_recode == 3000 ~ 30, #Montana
+      state_recode == 3100 ~ 31, #Nebraska
+      state_recode == 3200 ~ 32, #Nevada
+      state_recode == 3300 ~ 33, #New Hampshire
+      state_recode == 3400 ~ 34, #New Jersey
+      state_recode == 3500 ~ 35, #New Mexico
+      state_recode == 3600 ~ 36, #New York
+      state_recode == 3700 ~ 37, #North Carolina
+      state_recode == 3800 ~ 38, #North Dakota
+      state_recode == 3900 ~ 39, #Ohio
+      state_recode == 4000 ~ 40, #Oklahoma
+      state_recode == 4100 ~ 41, #Oregon
+      state_recode == 4200 ~ 42, #Pennsylvania
+      state_recode == 4400 ~ 44, #Rhode Island
+      state_recode == 4500 ~ 45, #South Carolina
+      state_recode == 4600 ~ 46, #South Dakota
+      state_recode == 4700 ~ 47, #Tennessee
+      state_recode == 4800 ~ 48, #Texas
+      state_recode == 4900 ~ 49, #Utah
+      state_recode == 5000 ~ 50, #Vermont
+      state_recode == 5100 ~ 51, #Virginia
+      state_recode == 5300 ~ 53, #Washington
+      state_recode == 5400 ~ 54, #West Virginia
+      state_recode == 5500 ~ 55, #Wisconsin
+      state_recode == 5600 ~ 56, #Wyoming
+      state_recode == 11000 ~ 72, #Puerto Rico
+      TRUE ~ NA_real_
+    ))
+  
+  return(df)
+}
+
+```
+
+
+recode states and add state FIPS codes
+```{r}
+res_state_recode <- res_state_fips_code(df = data_combined) %>% 
+  select(residence_state, state_recode, residence_state_fips)
 ```
 
 
@@ -427,9 +494,11 @@ data_combined$civ_occ_meaning <- NULL
 ```
 
 
-#add civ_occupation_recode and res_state_recode to data_combined
+#add civ_occupation_recode, res_state_recode, and residence_state_fips to data_combined
 ```{r}
-data_combined <- cbind(data_combined, res_state_recode$state_recode)
+data_combined <- cbind(data_combined, 
+                       res_state_recode$state_recode,
+                       res_state_recode$residence_state_fips)
 
 ```
 
