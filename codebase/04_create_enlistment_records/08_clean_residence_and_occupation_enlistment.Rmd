@@ -486,8 +486,14 @@ civ_occupation_codes <- civ_occupation_codes %>% rename(civ_occupation = Code) %
 
 data_combined <- left_join(data_combined, civ_occupation_codes, by = "civ_occupation")
 
+# make NA if the code does not correspond to anything
 data_combined <- data_combined %>% 
   mutate(civ_occupation_recode = ifelse(!is.na(civ_occ_meaning), civ_occupation, NA_character_))
+
+# Add codes for students (992), not in full code list
+# (https://aad.archives.gov/aad/popup-column-detail.jsp?c_id=24986&dt=893&cl_id=3323)
+data_combined <- data_combined %>% 
+  mutate(civ_occupation_recode = ifelse(civ_occupation == "992", "992", civ_occupation_recode))
 
 # clean up
 data_combined$civ_occ_meaning <- NULL

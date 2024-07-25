@@ -55,7 +55,7 @@ library(lubridate)
 library(kableExtra)
 library(here)
 
-data_path <- '/data/censoc/censoc_data_releases/army_enlistment_standalone/enlistment_v1/censoc_wwii_army_enlistment_v1.csv'
+data_path <- '/data/censoc/censoc_data_releases/army_enlistment_standalone/enlistment_v1.1/censoc_wwii_army_enlistment_v1.1.csv'
 resource_file_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode'
 path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp3.csv"
 #out_path          <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
@@ -160,7 +160,7 @@ byear_plot
 
 **Description**: sex is a numeric variable that reports a person's sex, as inferred by army branch in World War II Army Enlistment Records.
 
-**Note**: Sex was not listed on enlistee punch cards. If an individual's numeric branch code or alphabetic branch code in the raw enlistment data corresponds to the Women's Army Corps, we declare that person to be female. All other persons are assigned male. There is potential for error in this designation due to missing branch information or disagreements between army branch numeric codes, branch alphabetic codes (which we do not publish), and army component information. Thus, sex may not always correspond exactly to army branch and component information in the published dataset.
+**Note**: Sex was not listed on enlistee punch cards. If an individual's numeric branch code or alphabetic branch code in the raw enlistment data corresponds to the Women's Army Corps, we declare that person to be female. All other persons are assigned male. There is potential for error in this designation due to missing branch information or disagreements between army branch numeric codes, branch alphabetic codes (not published), and army component information. Thus, sex may not always correspond exactly to army branch and component information in the published dataset.
 
 ```{r, include = F}
 sex_tabulated <- knitr::kable(enlistment_records_final %>%
@@ -243,7 +243,7 @@ enlistment_records_final %>%
 
 **Label**: State FIPS Code of Residence
 
-**Description**: residence_state_fips is a numeric variable that reports the FIPS code of a person's state of residence at time of enlistment. This variable is only available for enlistees residing in the United States, Hawaii, Alaska, and Puerto Rico. For a complete list of FIPS codes, please see: https://transition.fcc.gov/oet/info/maps/census/fips/fips.txt
+**Description**: residence_state_fips is a character variable (2 digits, including leading zeros) that reports the FIPS code of a person's state of residence at time of enlistment. This variable is only available for enlistees residing in the United States, Hawaii, Alaska, and Puerto Rico. For a complete list of FIPS codes, please see: https://transition.fcc.gov/oet/info/maps/census/fips/fips.txt
 
 \newpage 
 
@@ -253,9 +253,11 @@ enlistment_records_final %>%
 
 **Label**: County FIPS Code of Residence
 
-**Description**: residence_county_fips is a character variable that reports a person's county of residence at time of enlistment, as reported in the World War II Army Enlistment Records. These codes are generally equivalent to FIPS county codes. This variable is only available for enlistees residing in the United States. County is not available for residents of Hawaii and Alaska, which were not yet states. For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2057&dt=893&c_id=24998. Or, for county codes organized by state, see page 1-65 of [\textcolor{blue}{Nara Compiled Technical Documention.}](https://s3.amazonaws.com/NARAprodstorage/opastorage/live/23/2639/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1CL_SD.pdf) (Note that state codes in NARA Compiled Technical Documentation are *not* equivalent to either state FIPS codes or IPUMS state codes published in this dataset.)
+**Description**: residence_county_fips is a character variable (3 digits, including leading zeros) that reports a person's FIPS code of county of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the United States. County is not available for residents of Hawaii and Alaska, which were not yet states. 
 
-**Note:** County codes are only unique within states. For example, code 111 refers to Ventura County for residents of California, but refers to Jefferson County for residents of Kentucky. These codes may not align exactly with modern FIPS codes due to county splits, merges, name changes, etc. since the 1940s. County codes within individual states have not been cleaned, and invalid codes may be present.
+These are historical codes that may not always align with modern FIPS codes due to county splits, merges, name changes, etc. since the 1940s. For a complete list of these codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2057&dt=893&c_id=24998. Or, for county codes organized by state, see page 1-65 of [\textcolor{blue}{Nara Compiled Technical Documention.}](https://s3.amazonaws.com/NARAprodstorage/opastorage/live/23/2639/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1CL_SD.pdf) (Note that state codes in NARA Compiled Technical Documentation are *not* equivalent to either state FIPS codes or IPUMS state codes published in this dataset.)
+
+**Note**: County codes are only unique within states. For example, code 111 refers to Ventura County for residents of California, but refers to Jefferson County for residents of Kentucky. Users may combine 2-digit **residence\_state\_fips** codes with the 3-digit county FIPS codes to obtain unique 5-digit county codes. County codes within individual states have not been cleaned, and invalid codes may be present.
 
 
 
@@ -267,7 +269,7 @@ enlistment_records_final %>%
 
 **Label**: Place of Enlistment
 
-**Description**: place_of_enlistment is a character variable that reports the place a person was enlisted, as reported in the World War II Army Enlistment Records. Place of enlistment may record a state, town, military post, or other ad hoc station of enlistment. For example, places of enlistment in the state of Florida include Florida, Tallahassee, Orlando Air Base, and Municipal Fair Grounds Tampa.
+**Description**: place_of_enlistment is a character variable that reports the place a person was enlisted, as reported in the World War II Army Enlistment Records. Place of enlistment may record a state, town, military post, or other ad hoc station of enlistment. For example, places of enlistment for the state of Florida include Florida, Tallahassee, Orlando Air Base, and Municipal Fair Grounds Tampa.
 
 For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=4123&dt=893&c_id=24997
 
@@ -338,7 +340,7 @@ grade_tabulated
 
 **Label**: Army Branch 
 
-**Description**: branch_code is a numeric variable that records the army branch in which the enlistee served, as reported in the World War II Army Enlistment Records. 
+**Description**: branch_code is a numeric variable that records the army branch in which the enlistee served, as reported in the World War II Army Enlistment Records. Codes are also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2075&dt=893&c_id=25000 
 
 ```{r, include = F}
 branches <- fread('cl_2075.csv')
@@ -457,9 +459,12 @@ cit_tabulated
 
 **Label**: Civilian Occupation
 
-**Description**: civilian_occupation is a numeric variable that reports a person's occupation at time of enlistment, as reported in the World War II Army Enlistment Records. 
+**Description**: civilian_occupation is a character variable (3 digits, including leading zeros) that reports a person's occupation at time of enlistment, as reported in the World War II Army Enlistment Records. 
 
-For complete codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=3323&dt=893&c_id=24986
+For complete codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=3323&dt=893&c_id=24986. Only meaningful occupational codes from this code list have been retained in this dataset, plus the addition of code "992", which corresponds to "Student". 
+
+**Note**: Original 3-digit occupation codes (including leading zeros) are organized by occupational group/classification. For more information, see pages 164-165 of [\textcolor{blue}{Nara Compiled Technical Documention.}](https://s3.amazonaws.com/NARAprodstorage/opastorage/live/23/2639/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1CL_SD.pdf). 
+
 
 \newpage 
 
@@ -471,7 +476,8 @@ For complete codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?
 
 **Description**: marital_status is a numeric variable that reports a person's marital status at time of enlistment, as reported in the World War II Army Enlistment Records. 
 
-Codes are also available at: https://usa.ipums.org/usa-action/variables/MARST#codes_section
+Codes are available at: https://usa.ipums.org/usa-action/variables/MARST#codes_section
+
 
 
 ```{r, include = F}
@@ -636,7 +642,7 @@ source_tabulated
 
 **Label**: Status of Enlistment
 
-**Description**: enlistment_status is a numeric variable that reports whether the enlisted person was drafted by Selective Service or voluntarily enlisted.
+**Description**: enlistment_status is a numeric variable that reports whether the enlisted person was drafted by Selective Service or voluntarily enlisted. This variable was constructed using information from the **component** variable.
 
 
 \vspace{75 pt}

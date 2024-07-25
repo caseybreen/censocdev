@@ -35,7 +35,8 @@ data_combined <- read_csv(path_to_temp_data,
                             mname_clean = col_character(),
                             sex = col_integer(),
                             sex_r = col_integer(),
-                            fname_std = col_character()
+                            fname_std = col_character(),
+                            `res_state_recode$residence_state_fips` = col_character()
                             )
                           )
 ```
@@ -46,7 +47,7 @@ colnames(data_combined)
 ```
 
 ```{r}
-enlistment_records_final_v1 <- subset(data_combined, select = c( "serial_number",  "yob_precise", "fname_clean", "fname_clean_std" , "mname_clean" ,"lname_clean", "sex_r", "date_enlistment_recode", "nativity_recode$nativity_recode" , "residence_county", "res_state_recode$state_recode", "res_state_recode$residence_state_fips", "place_of_enlistment","education_recode$education_recode","grade_recode$grade_code_recode",  "branch_recode$branch_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode", "civ_occupation_recode" ,"marital_status_recode$marital_status_recode", "height_recode", "weight_before_1943","weight_or_AGCT", "component_recode$component_recode","source_recode$source_recode", "component_recode$enlistment_status"))
+enlistment_records_final_v1 <- subset(data_combined, select = c( "serial_number",  "yob_precise", "fname_clean", "fname_clean_std" , "mname_clean" ,"lname_clean", "sex_r", "date_enlistment_recode", "nativity_recode$nativity_recode" ,  "res_state_recode$state_recode", "res_state_recode$residence_state_fips", "residence_county", "place_of_enlistment","education_recode$education_recode","grade_recode$grade_code_recode",  "branch_recode$branch_code_recode", "term_or_enlistment_recode$term_or_enlistment_recode", "race_recode$race_recode", "citizenship_recode$citizenship_recode", "civ_occupation_recode" ,"marital_status_recode$marital_status_recode", "height_recode", "weight_before_1943","weight_or_AGCT", "component_recode$component_recode","source_recode$source_recode", "component_recode$enlistment_status"))
 
 ```
 
@@ -121,13 +122,12 @@ enlistment_records_final <- enlistment_records_final %>%
 table(lubridate::year(enlistment_records_final$date_of_enlistment), useNA = "always")
 ```
 
-rearrange cols slightly so residence state is before state and county FIPS
+# pad state fips codes with leading zeros
 ```{r}
-enlistment_records_final <- enlistment_records_final %>%
-  relocate(residence_state, .before = residence_county_fips) %>%
-  relocate(residence_state_fips, .after = residence_state)
-
+enlistment_records_final$residence_state_fips <- str_pad(enlistment_records_final$residence_state_fips,
+                                                         2, "left", pad = "0")
 ```
+
 
 
 ```{r}
