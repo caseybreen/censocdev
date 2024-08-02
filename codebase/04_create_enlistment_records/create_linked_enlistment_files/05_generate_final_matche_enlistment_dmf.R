@@ -1,6 +1,6 @@
 # generate DMF/enlistment final matches
 # Author: Maria Osborne
-# Updated: July 2, 2023
+# Updated: July 29, 2024
 
 library(data.table)
 library(dplyr)
@@ -14,17 +14,20 @@ path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistme
 path_enlistment_dmf_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_dmf/matched_enlistment_dmf.csv"
 
 # Enlistment-census matches
-path_census_enlistment_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets/internal_census_enlistment_links.csv"
+path_census_enlistment_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/internal_census_enlistment_links.csv"
 
 # Final matched datasets out path
-path_final <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets/"
+path_final <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/"
 
 
 # Read in files
-enlistment <- fread(path_full_enlistment)
+enlistment <- fread(path_full_enlistment,
+                    colClasses = c("civilian_occupation" = "character",
+                                   "residence_state_fips" = "character",
+                                   "residence_county_fips" = "character"))
 dmf_matches <- fread(path_enlistment_dmf_matched)
 census_to_enlistment_matches <- fread(path_census_enlistment_matched,
-                                      select = c("id_A", "id_B", "fname_clean_std", "lname.y")) #all conservative matches
+                                      select = c("id_A", "id_B", "fname.y", "lname.y")) #all conservative matches
 setnames(census_to_enlistment_matches, c("HISTID", "id_B", "fname_census_clean", "lname_census_clean"))
 
 # Add unique row number identifier to enlistment records
@@ -50,7 +53,7 @@ dmf_matches_with_enlist_vars_and_histid <-
   left_join(dmf_matches_with_enlist_vars, census_to_enlistment_matches, by = "id_B")
 
 # how many matches did we get?
-sum(!is.na(dmf_matches_with_enlist_vars_and_histid$HISTID)) # 779,389, about 42%
+sum(!is.na(dmf_matches_with_enlist_vars_and_histid$HISTID)) # 779,414 about 42%
 
 # save this for internal use
 write_csv(dmf_matches_with_enlist_vars_and_histid,
@@ -63,13 +66,14 @@ write_csv(dmf_matches_with_enlist_vars_and_histid,
 # (note: birth year is present in both datasets)
 dmf_with_links_public <- dmf_matches_with_enlist_vars_and_histid %>%
   select(byear_A, sex_A, bmonth_A, dyear_A, dmonth_A, death_age_A,
-         byear, date_of_enlistment, bpl, residence_county, residence_state,
+         byear, date_of_enlistment, bpl, residence_state, residence_state_fips, residence_county_fips,
          place_of_enlistment, education, grade_code, branch_code, term_of_enlistment,
          race, citizenship, civilian_occupation, marital_status, height, weight_before_march_1943,
-         weight_or_AGCT, component, source, HISTID)
+         weight_or_AGCT, component, source, enlistment_status, HISTID)
 
-# make a unique identifier for each row
-set.seed(4486)
+# generate unique identifier for each row
+#set.seed(4486)
+set.seed(100)
 linked_dmfs_id <- stri_paste(
   stri_rand_strings(n=nrow(dmf_with_links_public), 4, '[A-Za-z0-9]'),
   "-",
@@ -82,7 +86,7 @@ dmf_with_links_public$id <- linked_dmfs_id
 # 1) replace _A with _DMF
 colnames(dmf_with_links_public) = str_replace(colnames(dmf_with_links_public), "_A$", "_DMF")
 # 2) add_enlistment_suffix to enlistment vars that don't have that already
-colnames(dmf_with_links_public)[7:25] <- paste0(colnames(dmf_with_links_public)[7:25], "_enlistment")
+colnames(dmf_with_links_public)[7:27] <- paste0(colnames(dmf_with_links_public)[7:27], "_enlistment")
 # 3) special cases
 dmf_with_links_public <- dmf_with_links_public %>% rename(sex = "sex_DMF")
 #dmf_with_links_public <- dmf_with_links_public %>% rename(HISTID = "HISTID_census_1940")
@@ -93,6 +97,7 @@ dmf_with_links_public <- dmf_with_links_public %>% relocate(id)
 
 # check
 head(dmf_with_links_public)
+names(dmf_with_links_public)
 
 # write
 write_csv(dmf_with_links_public,

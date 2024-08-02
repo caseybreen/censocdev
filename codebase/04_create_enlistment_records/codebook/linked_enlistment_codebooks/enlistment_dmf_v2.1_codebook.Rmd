@@ -1,0 +1,881 @@
+---
+title: "CenSoc Enlistment-DMF V2.1 Codebook[^updated]"
+output: pdf_document
+---
+
+[^updated]: Last updated: `r format(Sys.time(), '%d %B, %Y')`
+
+
+| Page| Variable     | Label                                        |
+|------:|:---------------------------------|:---------------------------------------------|
+|  \hyperlink{page.2}{2}  | \hyperlink{page.2}{id}         | Unique Identifier  |
+|   \hyperlink{page.3}{3}  |\hyperlink{page.3}{sex}             |Sex              |
+|   \hyperlink{page.4}{4}  | \hyperlink{page.4}{byear\_DMF}      |Year of Birth (DMF)   |
+|   \hyperlink{page.5}{5}  | \hyperlink{page.5}{bmonth\_DMF}      |Month of Birth   |
+|   \hyperlink{page.6}{6}  |\hyperlink{page.6}{dyear\_DMF}            |Year of Death        |
+|   \hyperlink{page.7}{7}  | \hyperlink{page.7}{dmonth\_DMF}          |Month of Death     |
+|   \hyperlink{page.8}{8}  |\hyperlink{page.8}{death\_age\_DMF}          |Age at Death (Years)    |
+|   \hyperlink{page.9}{9}  | \hyperlink{page.9}{byear\_enlistment}           |Year of Birth (Enlistment)    |
+|   \hyperlink{page.10}{10}  | \hyperlink{page.10}{date\_of\_enlistment\_enlistment}  |Date of Enlistment     |
+|   \hyperlink{page.11}{11}  | \hyperlink{page.11}{bpl\_enlistment}  |Birthplace   |
+|  \hyperlink{page.12}{12} |\hyperlink{page.12}{residence\_state\_enlistment}   |State of Residence at Enlistment|
+|  \hyperlink{page.13}{13} |\hyperlink{page.13}{residence\_state\_fips\_enlistment}   |State FIPS Code of Residence at Enlistment|
+|  \hyperlink{page.14}{14} |\hyperlink{page.14}{residence\_county\_fips\_enlistment}   |County FIPS Code of Residence at Enlistment|
+|  \hyperlink{page.15}{15} |\hyperlink{page.15}{place\_of\_enlistment\_enlistment}   |Place of Enlistment|
+|  \hyperlink{page.16}{16} |\hyperlink{page.16}{education\_enlistment}     |Education |
+|  \hyperlink{page.17}{17} |\hyperlink{page.17}{grade\_code\_enlistment}    |Army Grade (Rank)|
+|  \hyperlink{page.18}{18} |\hyperlink{page.18}{branch\_code\_enlistment}       |Army Branch |
+|  \hyperlink{page.20}{20} |\hyperlink{page.20}{term\_of\_enlistment\_enlistment}    |Term of Enlistment |
+|  \hyperlink{page.21}{21} |\hyperlink{page.21}{race\_enlistment}    |Race  |
+|  \hyperlink{page.22}{22} |\hyperlink{page.22}{citizenship\_enlistment}     |Citizenship  |
+|  \hyperlink{page.23}{23} |\hyperlink{page.23}{civilian\_occupation\_enlistment}    |Civilian Occupation |
+|  \hyperlink{page.24}{24} |\hyperlink{page.24}{marital\_status\_enlistment}     |Marital Status at Enlistment |
+|  \hyperlink{page.25}{25} |\hyperlink{page.25}{height\_enlistment}       |Height at Enlistment (Inches) |
+|  \hyperlink{page.26}{26} |\hyperlink{page.26}{weight\_before\_march\_1943\_enlistment}   |Weight (Pounds)|
+|  \hyperlink{page.27}{27} |\hyperlink{page.27}{weight\_or\_AGCT\_enlistment}      |Weight (Pounds) or AGCT Score|
+|  \hyperlink{page.28}{28} |\hyperlink{page.28}{component\_enlistment}  |Army Component |
+|  \hyperlink{page.29}{29} |\hyperlink{page.29}{source\_enlistment}      |Source of Army Personnel |
+|  \hyperlink{page.30}{30} |\hyperlink{page.30}{enlistment\_status\_enlistment}           |Status of Enlistment|
+| \hyperlink{page.31}{31}  | \hyperlink{page.31}{HISTID}         |HISTID (1940 Census)  |
+
+**Summary:** The CenSoc Enlistment-DMF file links 1,854,783 men from World War II era army enlistment records (circa 1938-1947) to the Social Security Death Master File (DMF). The suffix on each variable indicates whether the variable comes from DMF mortality records or from army enlistment records. For enlistment records that have been independently and additionally linked to the 1940 Census, we include the HISTID identifier variable that researchers may use to merge this dataset with IPUMS 1940 Census data. Matches between datasets were established using a conservative variant of the ABE method developed by Abramitzky, Boustan, and Eriksson ([2012](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_ageofmassmigration.pdf), [2014](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/abe_assimilation_1.pdf), [2017](https://ranabr.people.stanford.edu/sites/g/files/sbiybj26066/files/media/file/return-migrants.pdf)).
+
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+options(kableExtra.auto_format = FALSE, scipen=999)
+```
+
+```{r echo = F, results='hide', message=FALSE, warning=FALSE}
+## Library Packages
+library(tidyverse)
+library(data.table)
+library(stringi)
+library(lubridate)
+library(kableExtra)
+library(here)
+
+data_path <- '~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/public_dmf_enlistment_links.csv'
+resource_file_path <- here("codebase/04_create_enlistment_records/codebook")
+
+data_records <- fread(data_path,
+                      colClasses = c("civilian_occupation_enlistment" = "character",
+                                     "residence_state_fips_enlistment" = "character",
+                                     "residence_county_fips_enlistment"  = "character"))
+setwd(resource_file_path)
+```
+
+\newpage
+**\huge id**
+\normalsize
+\vspace{12pt}
+
+**Label**: CenSoc DMF-Enlistment Unique Identifier
+
+**Description**: id is a generated 9-digit string that uniquely identifies each record in the dataset.
+
+**Note**: new ids are generated for each version of this dataset, and are not compatible with previous releases.
+
+
+
+\newpage
+**\huge sex **
+\normalsize
+\vspace{12pt}
+
+**Label:** Sex
+
+**Description**: sex reports a person's sex.
+
+```{r, include = F}
+sex_tabulated <- data_records %>%
+    group_by(sex) %>%
+     tally() %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
+     mutate(label = c("Men")) %>%
+     select(sex, label, n, `freq %` = freq) %>% 
+  knitr::kable(format = "pipe")
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+sex_tabulated
+```
+
+\newpage
+
+**\huge byear\_DMF **
+\normalsize
+\vspace{12pt}
+
+**Label**: Year of Birth (DMF)
+
+**Description**: byear_DMF is a numeric variable reporting a person’s year of birth, as recorded in the DMF.
+
+**Note**: The matching algorithm used allows for up to two years of flexibility on birth year, so birth year in the DMF may disagree with birth year in enlistment records. Birth years are discordant by one year in 7.8\% of records, and discordant by two years in 4.3\% of records. Both birth year variables are published in this dataset.
+
+```{r, include = F}
+byear_DMF_plot <- data_records %>%
+    group_by(byear_DMF) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = byear_DMF, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) + #replace with a different theme (theme_bw()) if the bbplot package isn't downloaded 
+  ggtitle("Year of Birth") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Year", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+byear_DMF_plot
+```
+
+\newpage 
+**\huge bmonth\_DMF **
+\normalsize
+\vspace{12pt}
+
+**Label:** Birth Month
+
+**Description:** bmonth_DMF reports a person's month of birth, as recorded in the DMF.  
+
+```{r, include = F}
+## run in the console and copy and paste into documentation
+bmonth_tabulated <- data_records %>% 
+    group_by(bmonth_DMF) %>%
+    tally() %>%
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
+    mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
+    select(bmonth_DMF, label, n, `freq %` = freq) %>% 
+  knitr::kable(format = "pipe")
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+bmonth_tabulated
+```
+
+
+\newpage 
+
+**\huge dyear\_DMF **
+\normalsize
+\vspace{12pt}
+
+**Label**: Death Year
+
+**Description**: dyear_DMF reports a person's year of death, as recorded in the DMF.    
+
+```{r, include = F, message = F}
+dyear_plot <- data_records %>%
+    group_by(dyear_DMF) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = dyear_DMF, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) +  
+  ggtitle("Year of Death") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Year", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_y_continuous(labels = scales::comma, limits = c(0, 100000)) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+dyear_plot
+```
+
+
+
+\newpage 
+
+**\huge dmonth\_DMF **
+\normalsize
+\vspace{12pt}
+
+**Label**: Death Month
+
+**Description**: dmonth_DMF reports a person's month of death, as recorded in the DMF.  
+
+```{r, include = F}
+dmonth_tabulated <- data_records %>%
+    group_by(dmonth_DMF) %>%
+    tally() %>%
+    mutate(freq = round(n*100 / sum(n), 2)) %>%
+    mutate(label = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) %>%
+    select(dmonth_DMF, label, n, `freq %` = freq) %>% 
+  knitr::kable(format = "pipe")
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+dmonth_tabulated
+```
+
+
+
+\newpage
+**\huge death\_age\_DMF **
+\normalsize
+\vspace{12pt}
+
+**Label**: Age at Death (Years)
+
+**Description**: death_age_DMF reports a person's age at death in years, calculated using the birth and death information recorded in the DMF.  
+
+```{r, include = F}
+death_age_plot <- data_records %>%
+    group_by(death_age_DMF) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = death_age_DMF, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) + 
+  ggtitle("Age at Death") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Age at Death", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+death_age_plot
+```
+
+
+
+\newpage
+
+**\huge byear\_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: Year of Birth (Enlistment)
+
+**Description**: byear is a numeric variable reporting a person’s year of birth, as recorded in the World War II Army Enlistment Records.
+
+**Note**: The matching algorithm used allows for up to two years of flexibility on birth year, so birth year in the DMF may disagree with birth year in enlistment records. Birth years are discordant by one year in 7.8\% of records, and discordant by two years in 4.3\% of records. Both birth year variables are published in the dataset.
+
+```{r, include = F}
+byear_plot_en <- data_records %>%
+    group_by(byear_enlistment) %>%
+    summarise(n = n()) %>%
+    ggplot(aes(x = byear_enlistment, y = n)) + 
+    geom_line() + 
+    geom_point() +
+    theme_minimal(base_size = 15) + #replace with a different theme (theme_bw()) if the bbplot package isn't downloaded 
+  ggtitle("Year of Birth") + 
+  theme(legend.position="bottom") +
+  xlab("title") + 
+  labs(x = "Year", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n=5)) 
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+byear_plot_en
+```
+
+
+
+
+
+
+
+\newpage
+**\huge date\_of\_enlistment\_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label:** Date of Enlistment 
+
+**Description**: date_of_enlistment_enlistment is a date variable that reports a person's date of enlistment in dd-mm-yyyy format, as reported in the World War II Army Enlistment Records. 
+
+\vspace{30pt}
+
+```{r}
+#min(data_combined$year_of_birth, na.rm=T) # "00"
+#max(data_combined$year_of_birth, na.rm=T) # "99"
+
+#data_combined %>%
+  #group_by(year_of_birth) %>%
+ # tally() %>%
+#  print(n=101)
+
+#split_date_of_enlistment_ddmmyy <- function(row) {
+ # dd <- substr(row, 1, 2)
+#  mm <- substr(row, 3, 4)
+#  yy <- substr(row, 5, 6)
+#  return(list(dd=dd, mm=mm, yy=yy))}
+#res <- lapply(data_combined$date_of_enlistment_ddmmyy, split_date_of_enlistment_ddmmyy) # SLOW
+#data_combined$date_of_enlistment_dd <- unlist(res)[attr(unlist(res), "names") == "dd"]
+#data_combined$date_of_enlistment_mm <- unlist(res)[attr(unlist(res), "names") == "mm"]
+#data_combined$date_of_enlistment_yy <- unlist(res)[attr(unlist(res), "names") == "yy"]
+#rm(res)
+
+#min(data_combined$date_of_enlistment_yy, na.rm=T) # "00"
+#max(data_combined$date_of_enlistment_yy, na.rm=T) # "99"
+
+#data_combined %>%
+  #group_by(date_of_enlistment_yy) %>%
+  #tally() %>%
+ # print(n=100)
+
+#nrow(subset(data_combined, date_of_enlistment_yy < "38" | date_of_enlistment_yy > "46")) # 41896
+
+## create new date variable 
+#data_combined <- data_combined %>% 
+ # mutate(date_of_enlistment_yy = as.numeric(date_of_enlistment_yy) + 1900) %>% 
+  #mutate(date_enlistment_recode = make_date(date_of_enlistment_yy, date_of_enlistment_mm, date_of_enlistment_dd))
+
+## check dates look reasonable and are in yyyy-mm-dd format (match v1 release)
+
+
+## visualize distribution (loooks reasonable - identical pattern to v1 release)
+data_records %>%
+  filter(lubridate::year(date_of_enlistment_enlistment) %in% c(1938:1947)) %>% ## restrict to years around WWII 
+  mutate(date_short = format(as.Date(date_of_enlistment_enlistment), "%Y-%m")) %>% 
+    group_by(date_short) %>% 
+    tally() %>% 
+    filter(!is.na(date_short)) %>%
+  ggplot(aes(x=date_short, y=n, group=1)) +
+  geom_line() +
+  geom_point() +
+  scale_x_discrete(breaks = paste0(seq(1938, 1947, 1), "-01")) +
+  theme_minimal(base_size = 15) +
+  ggtitle("Enlistment Date (Month and Year Only)") +
+  labs(x = "Date (yyyy-mm)", 
+       y = "Count") + 
+  scale_y_continuous(labels = scales::comma) +
+  theme(axis.text.x = element_text(angle = 45))
+
+
+```
+
+
+
+\newpage
+
+**\huge bpl\_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: Place of Birth 
+
+**Description**: bpl_enlistment is a numeric variable that reports a person's place of birth, as reported in the World War II Army Enlistment Records. The coding schema matches the **detailed** IPUMS-USA Birthplace coding schema. For a complete list of codes, please see: https://usa.ipums.org/usa-action/variables/BPL#codes_section
+
+
+
+\newpage 
+
+**\huge residence\_state\_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: State of residence
+
+**Description**: residence_state_enlistment is a numeric variable that reports a person's state of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the United States, Hawaii, Alaska, and Puerto Rico. The coding schema matches the **detailed** IPUMS-USA birthplace coding schema. For a complete list of IPUMS codes, please see: https://usa.ipums.org/usa-action/variables/BPL#codes_section. 
+
+
+
+
+\newpage 
+
+**\huge residence\_state\_fips\_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: State FIPS Code of Residence
+
+**Description**: residence_state_fips is a character variable (2 digits, including leading zeros) that reports the FIPS code of a person's state of residence at time of enlistment. This variable is only available for enlistees residing in the United States, Hawaii, Alaska, and Puerto Rico. For a complete list of FIPS codes, please see: https://transition.fcc.gov/oet/info/maps/census/fips/fips.txt
+
+
+
+\newpage 
+
+**\huge residence\_county\_fips\_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: County FIPS Code of Residence
+
+**Description**: residence_county_fips is a character variable (3 digits, including leading zeros) that reports a person's FIPS code of county of residence at time of enlistment, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees residing in the United States. County is not available for residents of Hawaii and Alaska, which were not yet states. 
+
+These are historical codes that may not always align with modern FIPS codes due to county splits, merges, name changes, etc. since the 1940s. For a complete list of these codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2057&dt=893&c_id=24998. Or, for county codes organized by state, see page 1-65 of [\textcolor{blue}{Nara Compiled Technical Documention.}](https://s3.amazonaws.com/NARAprodstorage/opastorage/live/23/2639/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1CL_SD.pdf) (Note that state codes in NARA Compiled Technical Documentation are *not* equivalent to either state FIPS codes or IPUMS state codes published in this dataset.)
+
+**Note**: County codes are only unique within states. For example, code 111 refers to Ventura County for residents of California, but refers to Jefferson County for residents of Kentucky. Users may combine 2-digit **residence\_state\_fips\_enlistment** codes with the 3-digit county FIPS codes to obtain unique 5-digit county codes. County codes within individual states have not been cleaned, and invalid codes may be present.
+
+
+\newpage 
+
+**\huge place\_of\_enlistment\_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: Place of Enlistment
+
+**Description**: place_of_enlistment_enlistment is a character variable that reports where a person was enlisted, as reported in the World War II Army Enlistment Records. Place of enlistment may record a state, town, military post, or other ad hoc station of enlistment. For example, places of enlistment in the state of Florida include Florida, Tallahassee, Orlando Air Base, and Municipal Fair Grounds Tampa.
+
+For a complete list of codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=4123&dt=893&c_id=24997
+
+
+
+
+\newpage 
+
+**\huge education\_enlistment **
+\normalsize
+\vspace{12pt}
+
+**Label**: Education
+
+**Description**: education_enlistment is a numeric variable that reports an individual's educational attainment at time of enlistment, as reported in the World War II Army Enlistment Records.
+Codes are also available at: https://usa.ipums.org/usa-action/variables/EDUC#codes_section
+
+**Note**: Exact number of years of schooling is unknown for enlistees who did not complete at least one year of high school. Such enlistees were given originally given a code meaning "grammar school", though it is unknown if this corresponds to the modern equivalent of a 5th, 6th, or 8th grade education. Some enlistees with this code may have had little to no actual education. Before the attack on Pearl Harbor, literacy was required of army inductees, but this requirement relaxed as the war effort increased ([\textcolor{blue}{Brandt, 2004}](https://doi.org/10.2307/4140731)). By 1942, the Army accepted illiterate men if they were deemed trainable, though academic standards for admission increased again in 1944 and 1945.
+
+
+```{r, include = F}
+education_tabulated <- knitr::kable(data_records %>%
+    group_by(education_enlistment) %>%
+     tally() %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
+     mutate(label = c( "Nursery school to grade 4" , "Grade 9", "Grade 10", "Grade 11", "Grade 12", "1 year of college	", "2 years of college", "3 years of college" ,"	4 years of college", "5+ years of college")) %>%
+     select(education_enlistment, label, n, `freq %` = freq))
+```
+
+\vspace{75pt}
+```{r, echo = F}
+education_tabulated
+```
+\newpage 
+
+**\huge grade\_code\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Army Grade 
+
+**Description**: grade_code_enlistment is a numeric variable that records a person's army grade (rank), as reported in the World War II Army Enlistment Records. 
+
+
+```{r, include = F}
+grades <- fread(paste0(resource_file_path,'/cl_2072.csv'))
+grades <- grades %>% mutate(Code = ifelse(Code %in% c("M", "N", "O"), NA_integer_, as.integer(Code))) %>% 
+  drop_na(Code)
+grade_tabulated <- knitr::kable(data_records %>%
+  group_by(grade_code_enlistment) %>% 
+  tally() %>%
+  left_join(grades, by = c('grade_code_enlistment' = 'Code')) %>%
+  mutate(freq = round(n * 100 / sum(n), 2)) %>%
+  select(grade_code_enlistment, label = Meaning, n, `freq %`=freq))
+
+```
+
+
+\vspace{30pt}
+
+```{r, echo = F}
+grade_tabulated
+```
+
+
+
+
+\newpage 
+
+**\huge branch\_code\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Army Branch 
+
+**Description**: branch_code_enlistment is a numeric variable that records the army branch in which the enlistee served, as reported in the World War II Army Enlistment Records. 
+
+```{r, include = F}
+setwd(resource_file_path)
+branches <- fread(paste0(resource_file_path,'/cl_2075.csv'))
+branches_abb <- branches
+branches_abb[Meaning == "Veterinary Corps or Service - For Officers of the Veterinary Corps and for Enlisted Men of the Veterinary Service",
+             Meaning := "Veterinary Corps or Service"]
+branches_abb[Meaning == "Medical Department  - For Enlisted Men of the Medical Department (includes Enlisted Men of the Medical Department on Duty with the Dental Corps) or Army Nurse Corps",
+             Meaning := "Medical Department or Army Nurse Corps"]
+branches_abb[Meaning == "Veterinary Corps or Service - For Officers of the Veterinary Corps and for Enlisted Men of the Veterinary Service",
+             Meaning := "Veterinary Corps or Service"]
+branch_tabulated <- knitr::kable(data_records %>%
+                          group_by(branch_code_enlistment) %>% 
+                          tally() %>% 
+                          left_join(branches_abb, by=c('branch_code_enlistment' = 'Code')) %>%
+                          mutate(freq = round(n*100 / sum(n), 3)) %>% 
+                          select('branch_code_enlistment'= branch_code_enlistment, 'label' = Meaning, n, `freq %` = freq),
+                          format='latex', booktabs=T) %>% 
+  kable_styling(position = "center") %>% 
+  column_spec(column=2, width = '9cm')
+```
+
+\vspace{1 pt}
+
+```{r, echo = F}
+# check type of codes vs. enlistment data -- may be mismatched
+branch_tabulated
+```
+
+
+\newpage 
+
+**\huge term\_of\_enlistment\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Term of Enlistment
+
+**Description**: term_of_enlistment_enlistment is a numeric variable that reports the length of a person's enlistment or their department of enlistment, as reported in the World War II Army Enlistment Records. 
+Codes are also available at: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2076&dt=893&c_id=24979
+
+
+```{r, include = F}
+toe_tabulated <- knitr::kable(data_records %>%
+    group_by(term_of_enlistment_enlistment) %>%
+     tally() %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
+     mutate(label = c("One year enlistment", "Enlistment for Alaska" , "Enlistment for Hawaiian Department", "Enlistment for assignment to another corps area", "Enlistment for the duration of the War or other emergency", "Enlistment for the Panama Canal Department", "Enlistment for the Philippine Department", "Enlistment for the Puerto Rican Department", "Three year enlistment", "NA")) %>%
+     select(`term_of_enlistment_ enlistment` = term_of_enlistment_enlistment, label, n, `freq %` = freq))
+```
+
+\vspace{30 pt}
+
+```{r, echo = F}
+toe_tabulated
+```
+
+
+
+
+
+
+
+
+\newpage 
+
+**\huge race\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Race
+
+**Description**: race_enlistment is a numeric variable that reports an individual's race, as reported in the World War II Army Enlistment Records.
+
+Codes are also available at: https://usa.ipums.org/usa-action/variables/RACE#codes_section
+```{r, include = F}
+race_tabulated <- knitr::kable(data_records %>%
+    group_by(race_enlistment) %>%
+     tally() %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
+     mutate(label = c("White", "Puerto Rican" , "Black", "Native American", "Chinese", "Japanese", "Filipino", "Native Hawaiian", "Other", "NA")) %>%
+     select(race_enlistment, label, n, `freq %` = freq))
+```
+
+\vspace{75pt}
+```{r, echo = F}
+race_tabulated
+```
+
+
+\newpage 
+
+**\huge citizenship\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Citizenship
+
+**Description**: citizenship_enlistment is a numeric variable that reports an individual's citizenship, as reported in the World War II Army Enlistment Records.
+
+
+```{r, include = F}
+cit_tabulated <- knitr::kable(data_records %>%
+    group_by(citizenship_enlistment) %>%
+     tally() %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
+     mutate(label = c("Non-Citizen", "Citizen", "NA")) %>%
+     select(citizenship_enlistment, label, n, `freq %` = freq))
+```
+
+\vspace{75pt}
+```{r, echo = F}
+cit_tabulated
+```
+
+
+
+
+\newpage 
+
+**\huge civilian\_occupation\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Civilian Occupation
+
+**Description**: civilian_occupation is a character variable (3 digits, including leading zeros) that reports a person's occupation at time of enlistment, as reported in the World War II Army Enlistment Records. 
+
+For complete codes, please see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=3323&dt=893&c_id=24986. Only meaningful occupational codes from this code list have been retained in this dataset, plus the addition of code "992", which corresponds to "Student". 
+
+**Note**: Original 3-digit occupation codes (including leading zeros) are organized by occupational group/classification. For more information, see pages 164-165 of [\textcolor{blue}{Nara Compiled Technical Documention.}](https://s3.amazonaws.com/NARAprodstorage/opastorage/live/23/2639/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1CL_SD.pdf). 
+
+
+
+
+
+\newpage 
+
+**\huge marital\_status\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Marital Status
+
+**Description**: marital_status_enlistment is a numeric variable that reports a person's marital status at time of enlistment, as reported in the World War II Army Enlistment Records. 
+
+Codes are also available at: https://usa.ipums.org/usa-action/variables/MARST#codes_section
+
+
+```{r, include = F}
+marital_tabulated <- knitr::kable(data_records %>%
+    group_by(marital_status_enlistment) %>%
+     tally() %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
+     mutate(label = c("Married", "Separated", "Divorced", "Widowed", "Single","NA")) %>%
+     select(marital_status_enlistment, label, n, `freq %` = freq))
+```
+
+\vspace{75pt}
+```{r, echo = F}
+marital_tabulated
+```
+
+
+
+
+
+\newpage
+**\huge height\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Height
+
+**Description**: height_enlistment is a numeric variable that reports a person's height in inches at time of enlistment, as reported in the World War II Army Enlistment Records. Height was filtered based on the range of permissible heights for enlistment in the military, 60 - 78 inches ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). 
+
+**Note**: Please be aware that instructions on how to use this field on enlistment punch cards varied over time. This field may encode military occupation or other information depending on time and site of enlistment. We have removed height data for persons who enlisted in March of 1943 or later, as the distribution of this variable changes significantly at that point. However, it is possible that erroneous data remains in this field. See the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information.
+
+```{r, include = F}
+height_plot <- data_records %>%
+  ggplot(aes(x = height_enlistment)) +
+  geom_bar(stat = "count") +
+  #geom_histogram(breaks = seq(60,78,1)) +
+  theme_minimal(base_size = 15) +
+  ggtitle("Height in inches") +
+  scale_y_continuous(labels = scales::comma)
+  
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+height_plot
+```
+
+\newpage
+**\huge weight\_before\_march\_1943\_enlistment**
+\normalsize
+\vspace{12pt}
+
+
+**Description**: weight_before_march_1943_enlistment is a numeric variable that reports a person's weight in pounds at time of enlistment as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted before March of 1943. Weight is filtered to a minimum of 105 pounds, the minimum permissible weight for a 60-inch-tall enlistee ([\textcolor{blue}{Foster et al, 1967}](https://apps.dtic.mil/sti/pdfs/ADA291761.pdf)). While there was no clear maximum allowable body weight for army enlistees, we have removed values of over 500.
+
+**Note**: On enlistment punchcards, the field used to record weight was also used for Army General Classification Test (AGCT) scores, and may also encode military occupation or other information. Weight may have been recorded through 1943 at some enlistment sites, but the recording of AGCT score instead of weight at many enlistment sites likely began in March 1943. Because of this ambiguity, we only make this variable available for enlistees who enlisted before March 1943. 
+Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/id/1263923) for further information. For enlistees who enlisted in March 1943 and later, we have created an additional variable called **weight_or_AGCT_enlistment**.
+
+```{r, include = F}
+weight_plot <- data_records %>%
+  ggplot(aes(x = weight_before_march_1943_enlistment)) +
+  geom_histogram(breaks = seq(100,500,5)) +
+  theme_minimal(base_size = 15) +
+  ggtitle("Weight") +
+  scale_y_continuous(labels = scales::comma)
+  
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+weight_plot
+```
+
+
+
+
+
+\newpage
+
+**\huge weight\_or\_AGCT\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Weight (Pounds) at Enlistment or AGCT Score
+
+**Description**: weight_or_AGCT_enlistment is a numeric variable that reports a person's weight in pounds at time of enlistment or their Army General Classification Test (AGCT) score, as reported in the World War II Army Enlistment Records. This variable is only available for enlistees who enlisted in March 1943 or later.  We have removed zeros and values above 500, which likely exceed the maximum realistic body weights and AGCT scores, but otherwise leave the data in this field unfiltered and unsorted.
+
+**Note**: On enlistment punch cards, the field used to record weight was also used for Army General Classification Test (AGCT) scores, and may also encode military occupation or other information. Weight may have been recorded through 1943 at some enlistment sites, but the recording of AGCT score instead of weight at many enlistment sites likely began in March 1943. Because of this ambiguity, we created this variable for persons enlisted in March 1943 or later, which may contain weight or AGCT or other information.  
+Refer to the [\textcolor{blue}{National Archives' technical documentation on the Amy Serial Number Electronic File}](https://catalog.archives.gov/OpaAPI/media/1263923/content/arcmedia/electronic-records/rg-064/asnf/100.1ND_NC.pdf?download=false) for further information. For enlistees prior to March 1943, we used the information recorded in this field to create the **weight_before_march_1943_enlistment** variable.
+
+```{r, include = F}
+weight_agct_plot <- data_records %>%
+  ggplot(aes(x = weight_or_AGCT_enlistment)) +
+  geom_histogram(breaks = seq(0,500,5)) +
+  theme_minimal(base_size = 15) +
+  ggtitle("Weight or AGCT Score") +
+  scale_y_continuous(labels = scales::comma)
+  
+```
+
+\vspace{75pt}
+
+```{r, echo = F}
+weight_agct_plot
+```
+
+
+\newpage
+
+**\huge component_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Army Component
+
+**Description**:  component_enlistment is a numeric variable that records the component of the army in which an individual served, as recorded in the World War II Army Enlistment Records. 
+
+For more detailed variable labels, see: https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2078&dt=929&c_id=25014
+
+\vspace{75 pt}
+
+```{r}
+component_tabulated <- knitr::kable(data_records %>%
+    group_by(component_enlistment) %>%
+     tally() %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
+     mutate(label = c("Regular Army", "Regular Army Reserve","Reserves", "National Guard ", "Philippine Scouts", "Army of the United States", "Selectees", "Women’s Army Corps","NA")) %>%
+     select(component_enlistment, `label (abbreviated)` = label, n, `freq %` = freq))
+
+```
+
+```{r}
+component_tabulated
+```
+
+
+
+\newpage
+**\huge source\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Source of Army Personnel
+
+**Description**: source_enlistment is a numeric variable that reports the source of the enlisted person, as reported in the World War II Army Enlistment Records. This denotes if an enlistee was a civilian prior to enlistment, or if they were already enlisted in the National Guard or another faction of the military.
+
+\vspace{75 pt}
+```{r}
+source_tabulated <- kableExtra::kable(data_records %>%
+    group_by(source_enlistment) %>%
+     tally() %>%
+     mutate(freq = round(n*100 / sum(n), 3)) %>%
+     mutate(label = c("Civil Life", "Enlisted Man, Regular Army, within 3 months of Discharge or former WAAC Auxiliary","National Guard in Federal Service, within 3 months of Discharge", "Enlisted Man, Regular Army, after 3 months of Discharge", "National Guard in Federal Service, after 3 months of Discharge ", "Enlisted Reserve or Medical Administrative Corps (MAC) Officer", "Enlisted Man, Philippine Scout or recall to AD of an enlisted man who had been transferred to the ERC", "National Guard	", "Returned to Military Control, Surrendered", "Returned to Military Control Apprehended", "Selective Service within 3 months of Discharge", "Selective Service after 3 months of Discharge","NA")) %>%
+     select(`source_ enlistment` = source_enlistment, label, n, `freq %` = freq))
+
+```
+
+
+```{r, echo = F}
+source_tabulated
+```
+
+
+
+\newpage
+**\huge enlistment\_status\_enlistment**
+\normalsize
+\vspace{12pt}
+
+**Label**: Status of Enlistment
+
+**Description**: enlistment_status_enlistment is a numeric variable that reports whether the enlisted person was drafted by Selective Service or voluntarily enlisted. This variable was constructed using information from the **component** variable.
+
+
+\vspace{75 pt}
+```{r}
+enlistment_status_tabulated <- knitr::kable(data_records %>%
+    group_by(enlistment_status_enlistment) %>%
+     tally() %>%
+     mutate(freq = round(n*100 / sum(n), 3)) %>%
+     mutate(label = c("Voluntary Service", "Draftee","NA")) %>%
+     select(enlistment_status_enlistment, label, n, `freq %` = freq))
+```
+
+
+```{r, echo = F}
+enlistment_status_tabulated
+```
+
+
+
+
+\newpage
+**\huge HISTID**
+\normalsize
+\vspace{12pt}
+
+**Label**: Historical Unique Identifier (1940 Census)
+
+**Description**: HISTID is a unique individual-level identifier assigned to individuals in IPUMS-USA 1940 Census data. This variable is available for individuals where a link directly between army enlistment records and the 1940 Census has been established.
+
+```{r, include = F}
+hist_tab <- data_records %>%
+    group_by(is.na(HISTID)) %>%
+     tally() %>%
+     mutate(freq = round(n*100 / sum(n), 2)) %>%
+     mutate(HISTID = c("non-missing", "NA")) %>%
+     select(HISTID, n, `freq %` = freq) %>% 
+  knitr::kable(format = "pipe")
+```
+
+\vspace{30pt}
+
+```{r, echo = F}
+hist_tab
+```
+

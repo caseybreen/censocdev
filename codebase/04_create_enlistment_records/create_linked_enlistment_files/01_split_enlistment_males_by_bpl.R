@@ -1,6 +1,6 @@
 # Split WWII Enlistment File by birthplace
 # Author: Maria Osborne
-# Updated: June 17 2023
+# Updated: July 26 2024
 
 # source split function
 source("~/censocdev/R/split-by-bpl.R")
@@ -12,18 +12,19 @@ library(dplyr)
 
 # paths
 in_path_to_split <- "/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
-out_path_split <- "~mariaosborne-ipums/enlistment_records_linking/enlistment-males-by-bpl/"
+out_path_split <- "~mariaosborne-ipums/enlistment_records_linking/enlistment-males-by-bpl-v1.1/"
 split_var <- "bpl"
-cols_to_keep <- c("fname", "lname", "sex", "byear", "bpl", "unique_ID")
+cols_to_keep <- c("fname_clean_std", "lname", "sex", "byear", "bpl", "unique_ID")
 
 # read in full enlistment file
 enlistment_full <- fread(in_path_to_split)
 
-# give each row a unique identifier (as serial numbers are not always unique)
+# give each row a unique identifier using rownumbers (as serial numbers are not always unique)
 enlistment_full <- enlistment_full %>% mutate(unique_ID = row_number())
 
 # restrict to columns needed for matching
 data_small <- enlistment_full[ , ..cols_to_keep]
+data_small <- data_small %>% rename(fname = fname_clean_std)
 
 rm(enlistment_full)
 

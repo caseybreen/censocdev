@@ -1,6 +1,6 @@
 # Generate BUNMD/enlistment final matched data set
 # Author: Maria Osborne
-# Updated: July 11, 2023
+# Updated: July 29, 2024
 
 library(data.table)
 library(dplyr)
@@ -12,20 +12,23 @@ library(stringr)
 path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
 
 # Enlistment-Numident matches
-path_enlistment_numident_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched-enlistment-numident-males/matched_numident_enlistment_male.csv"
+path_enlistment_numident_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched-enlistment-numident-males-v1.1/matched_numident_enlistment_male.csv"
 
 # Enlistment-census matches
-path_census_enlistment_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets/internal_census_enlistment_links.csv"
+path_census_enlistment_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/internal_census_enlistment_links.csv"
 
 # Final matched datasets out path
-path_final <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets/"
+path_final <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/"
 
 
 # Read in files
-enlistment <- fread(path_full_enlistment)
+enlistment <- fread(path_full_enlistment,
+                    colClasses = c("civilian_occupation" = "character",
+                                   "residence_state_fips" = "character",
+                                   "residence_county_fips" = "character"))
 numident_matches <- fread(path_enlistment_numident_matched)
 census_to_enlistment_matches <- fread(path_census_enlistment_matched,
-                                      select = c("id_A", "id_B", "fname_clean_std", "lname.y")) #all conservative matches
+                                      select = c("id_A", "id_B", "fname.y", "lname.y")) #all conservative matches
 setnames(census_to_enlistment_matches, c("HISTID", "id_B", "fname_census_clean", "lname_census_clean"))
 
 # Add unique row number identifier to enlistment records
@@ -51,7 +54,7 @@ numident_matches_with_enlist_vars_and_histid <-
   left_join(numident_matches_with_enlist_vars, census_to_enlistment_matches, by = "id_B")
 
 # how many census matches did we get?
-sum(!is.na(numident_matches_with_enlist_vars_and_histid$HISTID)) # 943,723, about 45% of records
+sum(!is.na(numident_matches_with_enlist_vars_and_histid$HISTID)) # 943,771 about 45% of records
 
 # save this for internal use
 write_csv(numident_matches_with_enlist_vars_and_histid,
@@ -66,10 +69,10 @@ numident_with_links_public <- numident_matches_with_enlist_vars_and_histid %>%
   select(bpl, byear_A, sex_A, bmonth_A, dyear_A, dmonth_A, death_age_A,
          race_first_A, race_first_cyear_A, race_first_cmonth_A, race_last_A,
          race_last_cyear_A, race_last_cmonth_A, zip_residence_A, socstate_A, age_first_application_A,
-         byear_B, date_of_enlistment, residence_county, residence_state,
+         byear_B, date_of_enlistment, residence_state, residence_state_fips, residence_county_fips,
          place_of_enlistment, education, grade_code, branch_code, term_of_enlistment,
          race, citizenship, civilian_occupation, marital_status, height, weight_before_march_1943,
-         weight_or_AGCT, component, source, HISTID)
+         weight_or_AGCT, component, source, enlistment_status, HISTID)
 
 
 # Limit to death years 1988-2005
@@ -77,7 +80,8 @@ numident_with_links_public <- numident_with_links_public %>%
   filter(dyear_A %in% 1988:2005) #2.1 million --> 1.69 million
 
 # make a unique identifier for each row
-set.seed(4886)
+#set.seed(4886)
+set.seed(100)
 linked_numident_id <- stri_paste(
   stri_rand_strings(n=nrow(numident_with_links_public), 3, '[A-Za-z0-9]'),
   "-",
@@ -92,7 +96,7 @@ numident_with_links_public$id <- linked_numident_id
 # 1) replace _A with _numident
 colnames(numident_with_links_public) = str_replace(colnames(numident_with_links_public), "_A$", "_numident")
 # 2) add_enlistment_suffix to enlistment vars that don't have that already
-colnames(numident_with_links_public)[17:34] <- paste0(colnames(numident_with_links_public)[17:34], "_enlistment")
+colnames(numident_with_links_public)[17:36] <- paste0(colnames(numident_with_links_public)[17:36], "_enlistment")
 # 3) special cases
 numident_with_links_public <- numident_with_links_public %>% rename(sex = "sex_numident")
 #numident_with_links_public <- numident_with_links_public %>% rename(bpl = "bpl_B")

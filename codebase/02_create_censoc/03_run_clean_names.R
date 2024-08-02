@@ -4,7 +4,8 @@
 #########################################
 
 # Source functions
-source("/censocdev/R/clean-names.R")
+library(here)
+source(here("R/clean-names.R"))
 
 # Load libraries
 library(stringi)

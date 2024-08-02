@@ -1,23 +1,26 @@
 # Generate final matches to census
 # Author: Maria Osborne
-# Updated: June 24, 2023
+# Updated: Jul 29 2024
 
 library(dplyr)
 library(readr)
 library(data.table)
 
 # Cleaned enlistment data
-path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
+path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment.csv"
 
 # Enlistment-Census matches
-path_enlistment_census_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched-enlistment-census/matched_census_enlistment_male.csv"
+path_enlistment_census_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched-enlistment-census-v1.1/matched_census_enlistment_male.csv"
 
 # Out path Final matched datasets
-path_final <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets/"
+path_final <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/"
 
 
 # Read in files
-enlistment <- fread(path_full_enlistment)
+enlistment <- fread(path_full_enlistment,
+                    colClasses = c("civilian_occupation" = "character",
+                                   "residence_state_fips" = "character",
+                                   "residence_county_fips" = "character"))
 census_matches <- fread(path_enlistment_census_matched)
 
 # Add unique row number identifier to enlistment records

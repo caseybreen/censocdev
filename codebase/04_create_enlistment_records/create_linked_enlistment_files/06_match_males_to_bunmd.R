@@ -1,6 +1,6 @@
 # Match enlistment males to BUNMD
 # Author: Maria Osborne, after Wok-tak Joo and Uger Yildirim
-# Updated: July 2, 2023
+# Updated: July 26, 2024
 
 # Library packages, source functions, set paths
 library(dplyr)
@@ -13,13 +13,13 @@ library(tidyverse)
 source("~/censocdev/R/match-records.R")
 
 # file_A: BUNMD by bpl
-in_path_bunmd <- "/home/ipums/wontak.joo-ipums/project/abe/data/cleaned-bunmd-by-bpl"
+in_path_bunmd <- "~mariaosborne-ipums/cleaned-bunmd-by-bpl"
 
 # file_B: Enlistment by bpl
-in_path_enlistment <- "~mariaosborne-ipums/enlistment_records_linking/enlistment-males-by-bpl"
+in_path_enlistment <- "~mariaosborne-ipums/enlistment_records_linking/enlistment-males-by-bpl-v1.1"
 
 # Out path:
-out_path <- "/home/ipums/mariaosborne-ipums/enlistment_records_linking/matched-enlistment-numident-males"
+out_path <- "/home/ipums/mariaosborne-ipums/enlistment_records_linking/matched-enlistment-numident-males-v1.1"
 
 # Prepare file names for matching
 bunmd_files <- list.files(in_path_bunmd)
