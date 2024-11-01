@@ -1,0 +1,112 @@
+---
+title: "BUNMD Sibships User Guide[^updated]"
+output:
+  pdf_document: null
+  html_document:
+    df_print: paged
+urlcolor: blue
+header-includes:
+- \usepackage{hyperref}
+- \usepackage{float}
+- \restylefloat{table}
+- \usepackage{caption}
+---
+[^updated]: Last updated: `r format(Sys.time(), '%d %B, %Y')`
+
+
+<!-- Since we do not have a full codebook for this dataset, this document serves a mini users guide that users will download at the same time they download the package. -->
+
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(include=FALSE)
+
+```
+
+
+```{r, include=FALSE, echo = FALSE}
+library(tidyverse)
+library(data.table)
+library(kableExtra)
+```
+
+# Description
+
+The purpose of the BUNMD sibling datasets is to allow researchers to identify siblings in the Berkeley Unified Numident Mortality Database (BUNMD).
+
+We locate sibships (sibling groups) in the BUNMD by matching individuals on their parents' first and last names as recorded in Social Security Numident records. Two matching methods are used:
+
+1) The **exact** match method identifies siblings only with exactly identical parent names (after parents' names have undergone cleaning and standardization). This is the most match stringent method.
+
+2) The **flexible** match method allows for parents' names to be slightly different, within a threshold using Jaro–Winkler string distance, in addition to exact matches. This allows siblings to be matched even in cases of minor misspellings, mistranscriptions, or spelling variations in parents' names (e.g., mother's maiden name recorded as "Brannum" and "Branum"). This increases the number of siblings found, but has higher potential to falsely match unrelated individuals.
+
+Sibships are identified among individuals in the BUNMD who died at age 65+ in the years 1988-2005. They may be of any gender composition and contain from 2 to 9 siblings. An overview of the size of resulting sibships created by each method is presented below:
+
+
+```{r, include=FALSE, echo = FALSE}
+# Read BUNMD data
+bunmd_sibs_exact <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/BUNMD_siblings_v1/BUNMD_sibs_exact_match.csv")
+bunmd_sibs_flex <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/BUNMD_siblings_v1/BUNMD_sibs_flexible_match.csv")
+```
+
+```{r, eval = FALSE, include=FALSE, echo = FALSE}
+# get basic metrics to make table below
+nrow(bunmd_sibs_exact) # total size
+bunmd_sibs_exact %>% group_by(sib_group_id_exact) %>% filter(row_number() == 1) %>% nrow() # number of groups
+bunmd_sibs_exact %>% group_by(sib_group_id_exact) %>% mutate(n_sibs=n()) %>% ungroup() %>% 
+  group_by(n_sibs) %>% tally() # group sizes
+
+
+nrow(bunmd_sibs_flex) # total size
+bunmd_sibs_flex %>% group_by(sib_group_id_flexible) %>% filter(row_number() == 1) %>% nrow() # number of groups
+bunmd_sibs_flex %>% group_by(sib_group_id_flexible) %>% mutate(n_sibs=n()) %>% ungroup() %>% 
+  group_by(n_sibs) %>% tally() # group sizes
+
+```
+
+
+```{r, include=FALSE, echo = FALSE}
+df <- tibble(
+             "Match method" = c("Exact match", "Flexble match"),
+             "Number of individuals" = c("4,767,193", "6,158,636"),
+             "Number of sibling groups" = c("2,130,398 ", "2,706,858"),
+             "Mean sibling group size" = c("2.24", "2.28")
+             ) %>% 
+  knitr::kable(format = "pipe")
+```
+
+```{r,echo =F}
+df %>% kable_styling(full_width = F)
+```
+
+
+For a detailed description of sibling identification methodologies and characteristics of sibships, please see the paper: *Methods for Identifying Siblings in Administrative Mortality Data* available at [https://censoc.berkeley.edu/documentation/](https://censoc.berkeley.edu/documentation/).
+
+
+# Usage
+
+Each sibling dataset consists of two columns: a unique individual identifier `ssn` (social security number), and an identifier for each sibling group. The ssn of one sibling within each sibship is used as the group identifier.
+
+\vspace{15pt}
+
+
+```{r, include=TRUE, eval=FALSE}
+# Read and show first rows the exact match
+bunmd_sibs_exact <- data.table::fread("BUNMD_sibs_exact_match.csv")
+head(bunmd_sibs_exact, 5)
+```
+
+```{r, echo = FALSE}
+head(bunmd_sibs_exact, 5)
+```
+
+\vspace{15pt}
+
+These files must be used in conjunction with the BUNMD. Users will need to merge the datasets using the unique identifier `ssn`, as in the example code below:
+```{r, include = TRUE, eval = FALSE, echo=TRUE}
+# Read full BUNMD 
+bunmd <- fread("bunmd_v2.csv")
+# Read BUNMD siblings
+bunmd_sib_id <- fread("BUNMD_sibs_flexible_match.csv")
+# Attach BUNMD variables and siblings, keeping only people in sibships
+bunmd_sibs <- inner_join(bunmd, bunmd_sib_id, by = "ssn")
+```

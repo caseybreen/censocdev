@@ -1,0 +1,103 @@
+---
+title: "CenSoc-Numident Sibships User Guide[^updated]"
+output:
+  pdf_document: null
+  html_document:
+    df_print: paged
+urlcolor: blue
+header-includes:
+- \usepackage{hyperref}
+- \usepackage{float}
+- \restylefloat{table}
+- \usepackage{caption}
+---
+[^updated]: Last updated: `r format(Sys.time(), '%d %B, %Y')`
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(include=FALSE)
+
+```
+
+
+```{r, include=FALSE, echo = FALSE}
+library(tidyverse)
+library(data.table)
+library(kableExtra)
+```
+
+# Description
+
+The purpose of the CenSoc-Numident sibling datasets is to allow researchers to identify siblings in CenSoc-Numident data. 
+
+The CenSoc-Numident links Social Security Numident records (the Berkeley Unified Numident Mortality Database) with the 1940 Census. Siblings in in CenSoc-Numident are located by finding individuals with shared parent names as recorded in Social Security Numident records. No information from the 1940 Census is used to identify siblings. We use two methods to locate siblings from Numident records:
+
+1) The **exact** match method identifies siblings only with exactly identical parent first and last names (after parents' names have undergone cleaning and standardization). This is the most match stringent method.
+
+2) The **flexible** match method allows for parents' names to be slightly different, within a threshold using Jaro–Winkler string distance, in addition to exact matches. This allows siblings to be matched even in cases of minor misspellings, mistranscriptions, or spelling variations in parents' names (e.g., mother's maiden name recorded as "Brannum" and "Branum"). This increases the number of siblings found, but has higher potential to falsely match unrelated individuals. 
+
+Sibling groups are identified among individuals in the CenSoc-Numident who died at age 65+ in the years 1988-2005. They may be of any gender composition and contain 2-8 siblings. An overview of the resulting datasets created by each method is presented below:
+
+```{r, include=FALSE, echo = FALSE}
+# Read numident data
+numident_sibs_exact <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/censoc_numident_siblings_v1/censoc_numident_siblings_exact_match.csv")
+numident_sibs_flex <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/censoc_numident_siblings_v1/censoc_numident_siblings_flexible_match.csv")
+```
+
+```{r, eval = FALSE, include=FALSE, echo = FALSE}
+# get basic metrics to make table below
+
+nrow(numident_sibs_exact) # total size
+numident_sibs_exact %>% group_by(sib_group_id_exact) %>% filter(row_number() == 1) %>% nrow() # number of groups
+numident_sibs_exact %>% group_by(sib_group_id_exact) %>% mutate(n_sibs=n()) %>% ungroup() %>% 
+  group_by(n_sibs) %>% tally() # group sizes
+
+
+nrow(numident_sibs_flex) # total size
+numident_sibs_flex %>% group_by(sib_group_id_flexible) %>% filter(row_number() == 1) %>% nrow() # number of groups
+numident_sibs_flex %>% group_by(sib_group_id_flexible) %>% mutate(n_sibs=n()) %>% ungroup() %>% 
+  group_by(n_sibs) %>% tally() # group sizes
+
+```
+
+
+```{r, include=FALSE, echo = FALSE}
+df <- tibble(
+             "Match method" = c("Exact match", "Flexble match"),
+             "Number of individuals" = c("908,472", "1,185,055"),
+             "Number of sibling groups" = c("426,952", "551,641"),
+             "Mean sibling group size" = c("2.13", "2.15")
+             ) %>% 
+  knitr::kable(format = "pipe")
+```
+
+```{r,echo =F}
+df %>% kable_styling(full_width = F)
+```
+
+
+For a detailed description of sibling identification methodologies and characteristics of sibships, please see the paper: *Methods for Identifying Siblings in Administrative Mortality Data* available at [https://censoc.berkeley.edu/documentation/](https://censoc.berkeley.edu/documentation/).
+
+
+
+# Usage
+
+Each sibling identifier dataset consist of two columns: a unique individual identifier `HISTID` that can be used to merge the data with the full numident, and an identifier for each sibling group. The group identifier corresponds to the HISTID of one sibling.
+
+\vspace{15pt}
+
+```{r, include=TRUE, echo=TRUE}
+# Show first 6 rows the exact match
+head(numident_sibs_exact)
+```
+
+\vspace{15pt}
+
+To get the subset of the CenSoc-Numident consisting of only identified siblings, a join on `HISTID` may be used, as in the example code below
+```{r, include = TRUE, eval = FALSE, echo=TRUE}
+# Read CenSoc-Numident 
+numi <- fread("censoc_numident_v3.csv")
+# Read CenSoc-Numident siblings 
+numi_sib_id <- fread("censoc_numident_siblings_exact_match.csv")
+# Attach numident variables to siblings, keeping only people in sibships
+numi_sibs <- inner_join(numi, numi_sib_id, by = "HISTID")
+```
