@@ -103,10 +103,14 @@ head(bunmd_sibs_exact, 5)
 
 These files must be used in conjunction with the BUNMD. Users will need to merge the datasets using the unique identifier `ssn`, as in the example code below:
 ```{r, include = TRUE, eval = FALSE, echo=TRUE}
+require(data.table)
 # Read full BUNMD 
-bunmd <- fread("bunmd_v2.csv")
-# Read BUNMD siblings IDs
-bunmd_sib_id <- fread("bunmd_sibs_flexible_match_v1.csv")
-# Attach BUNMD variables and siblings, keeping only people in sibships
-bunmd_sibs <- inner_join(bunmd, bunmd_sib_id, by = "ssn")
+bunmd <- data.table::fread("bunmd_v2.csv")
+# Read BUNMD sibships IDs
+bunmd_sib_id <- data.table::fread("bunmd_sibs_flexible_match_v1.csv")
+# Attach sibling IDs to the BUNMD, keeping all records in the BUNMD
+bunmd_with_sibs <- merge(bunmd, bunmd_sibs_id, by = "ssn", all.x = TRUE)
 ```
+We note that there are no person-weights specifically for the subsets of the BUNMD belonging to sibships.
+
+

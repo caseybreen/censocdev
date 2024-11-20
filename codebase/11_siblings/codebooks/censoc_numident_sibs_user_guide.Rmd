@@ -45,8 +45,8 @@ Sibling groups are identified among individuals in the CenSoc-Numident who died 
 
 ```{r, include=FALSE, echo = FALSE}
 # Read numident data
-numident_sibs_exact <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/censoc_numident_sibs_v1/censoc_numident_siblings_exact_match_v1.csv")
-numident_sibs_flex <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/censoc_numident_sibs_v1/censoc_numident_siblings_flexible_match_v1.csv")
+numident_sibs_exact <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/censoc_numident_siblings_v1/censoc_numident_sibs_exact_match_v1.csv")
+numident_sibs_flex <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/censoc_numident_siblings_v1/censoc_numident_sibs_flexible_match_v1.csv")
 ```
 
 ```{r, eval = FALSE, include=FALSE, echo = FALSE}
@@ -102,10 +102,15 @@ These files must be used in conjunction with the CenSoc-Numident dataset. Users 
 
 \vspace{2truemm}
 ```{r, include = TRUE, eval = FALSE, echo=TRUE}
+require(data.table)
 # Read CenSoc-Numident 
-numident <- fread("censoc_numident_v3.csv")
+numident <- data.table::fread("censoc_numident_v3.csv")
 # Read CenSoc-Numident siblings IDs
-numident_sib_id <- fread("censoc_numident_sibs_exact_match_v1.csv")
-# Attach numident variables to siblings, keeping only people in sibships
-numident_sibs <- inner_join(numident, numident_sib_id, by = "HISTID")
+numident_sib_id <- data.table::fread("censoc_numident_sibs_exact_match_v1.csv")
+# Attach sibling IDs to CenSoc-Numident, keeping all records in the CenSoc-Numident
+numident_with_sibs <- merge(numident, numident_sib_id, by = "HISTID", all.x = TRUE)
 ```
+
+
+We note that there are no person-weights specifically for the subsets of the CenSoc-Numident dataset belonging to sibships.
+
