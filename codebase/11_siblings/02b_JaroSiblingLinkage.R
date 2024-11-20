@@ -34,7 +34,7 @@ sibs_jaro <- sibs_jaro %>% filter(ssn.x != ssn.y)
 sibs_jaro <- sibs_jaro %>% filter(jarowinkler(mother_lname.x, mother_lname.y) > 0.9)
 sibs_jaro <- sibs_jaro %>% filter(jarowinkler(mother_fname.x, mother_fname.y) > 0.9)
 sibs_jaro <- sibs_jaro %>% filter(jarowinkler(father_fname.x, father_fname.y) > 0.9)
-sibs_jaro <- sibs_jaro %>% filter(jarowinkler(father_fname.x, father_fname.y) > 0.9)
+sibs_jaro <- sibs_jaro %>% filter(jarowinkler(father_lname.x, father_lname.y) > 0.9)
 
 #Use a graph to find connected segments from the graph of sibling
 #linkages.
