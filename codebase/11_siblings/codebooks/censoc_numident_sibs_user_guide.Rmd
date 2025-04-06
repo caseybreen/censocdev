@@ -45,8 +45,8 @@ Sibling groups are identified among individuals in the CenSoc-Numident who died 
 
 ```{r, include=FALSE, echo = FALSE}
 # Read numident data
-numident_sibs_exact <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/censoc_numident_siblings_v1/censoc_numident_sibs_exact_match_v1.csv")
-numident_sibs_flex <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/censoc_numident_siblings_v1/censoc_numident_sibs_flexible_match_v1.csv")
+numident_sibs_exact <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v2/censoc_numident_siblings_v2/censoc_numident_sibs_exact_match_v2.csv")
+numident_sibs_flex <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v2/censoc_numident_siblings_v2/censoc_numident_sibs_flexible_match_v2.csv")
 ```
 
 ```{r, eval = FALSE, include=FALSE, echo = FALSE}
@@ -55,13 +55,13 @@ numident_sibs_flex <- fread("/data/censoc/censoc_data_releases/siblings/siblings
 nrow(numident_sibs_exact) # total size
 numident_sibs_exact %>% group_by(sib_group_id_exact) %>% filter(row_number() == 1) %>% nrow() # number of groups
 numident_sibs_exact %>% group_by(sib_group_id_exact) %>% mutate(n_sibs=n()) %>% ungroup() %>% 
-  group_by(n_sibs) %>% tally() # group sizes
+  group_by(n_sibs) %>% tally() %>% mutate(groups_this_size = n/n_sibs) # group sizes
 
 
 nrow(numident_sibs_flex) # total size
 numident_sibs_flex %>% group_by(sib_group_id_flexible) %>% filter(row_number() == 1) %>% nrow() # number of groups
 numident_sibs_flex %>% group_by(sib_group_id_flexible) %>% mutate(n_sibs=n()) %>% ungroup() %>% 
-  group_by(n_sibs) %>% tally() # group sizes
+  group_by(n_sibs) %>% tally() %>% mutate(groups_this_size = n/n_sibs) %>% janitor::adorn_totals("row") # group sizes
 
 ```
 
@@ -69,8 +69,8 @@ numident_sibs_flex %>% group_by(sib_group_id_flexible) %>% mutate(n_sibs=n()) %>
 ```{r, include=FALSE, echo = FALSE}
 df <- tibble(
              "Match method" = c("Exact match", "Flexble match"),
-             "Number of individuals" = c("908,472", "1,185,055"),
-             "Number of sibships" = c("426,952", "551,641"),
+             "Number of individuals" = c("908,472", "1,089,947"),
+             "Number of sibships" = c("426,952", "507,050"),
              "Mean sibship size" = c("2.13", "2.15")
              ) %>% 
   knitr::kable(format = "pipe")
@@ -106,7 +106,7 @@ require(data.table)
 # Read CenSoc-Numident 
 numident <- data.table::fread("censoc_numident_v3.csv")
 # Read CenSoc-Numident siblings IDs
-numident_sib_id <- data.table::fread("censoc_numident_sibs_exact_match_v1.csv")
+numident_sib_id <- data.table::fread("censoc_numident_sibs_flexible_match_v2.csv")
 # Attach sibling IDs to CenSoc-Numident, keeping all records in the CenSoc-Numident
 numident_with_sibs <- merge(numident, numident_sib_id, by = "HISTID", all.x = TRUE)
 ```

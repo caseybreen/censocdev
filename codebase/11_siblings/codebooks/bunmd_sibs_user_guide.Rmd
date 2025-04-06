@@ -45,8 +45,8 @@ Sibships are identified among individuals in the BUNMD who died at age 65+ in th
 
 ```{r, include=FALSE, echo = FALSE}
 # Read BUNMD data
-bunmd_sibs_exact <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/bunmd_siblings_v1/bunmd_sibs_exact_match_v1.csv")
-bunmd_sibs_flex <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v1/bunmd_siblings_v1/bunmd_sibs_flexible_match_v1.csv")
+bunmd_sibs_exact <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v2/bunmd_siblings_v2/bunmd_sibs_exact_match_v2.csv")
+bunmd_sibs_flex <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v2/bunmd_siblings_v2/bunmd_sibs_flexible_match_v2.csv")
 ```
 
 ```{r, eval = FALSE, include=FALSE, echo = FALSE}
@@ -68,8 +68,8 @@ bunmd_sibs_flex %>% group_by(sib_group_id_flexible) %>% mutate(n_sibs=n()) %>% u
 ```{r, include=FALSE, echo = FALSE}
 df <- tibble(
              "Match method" = c("Exact match", "Flexble match"),
-             "Number of individuals" = c("4,767,193", "6,158,636"),
-             "Number of sibships" = c("2,130,398 ", "2,706,858"),
+             "Number of individuals" = c("4,767,193", "6,252,614"),
+             "Number of sibships" = c("2,130,398 ", "2,745,707"),
              "Mean sibship size" = c("2.24", "2.28")
              ) %>% 
   knitr::kable(format = "pipe")
@@ -107,7 +107,7 @@ require(data.table)
 # Read full BUNMD 
 bunmd <- data.table::fread("bunmd_v2.csv")
 # Read BUNMD sibships IDs
-bunmd_sib_id <- data.table::fread("bunmd_sibs_flexible_match_v1.csv")
+bunmd_sib_id <- data.table::fread("bunmd_sibs_flexible_match_v2.csv")
 # Attach sibling IDs to the BUNMD, keeping all records in the BUNMD
 bunmd_with_sibs <- merge(bunmd, bunmd_sibs_id, by = "ssn", all.x = TRUE)
 ```
