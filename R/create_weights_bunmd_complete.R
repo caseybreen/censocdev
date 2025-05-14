@@ -12,7 +12,7 @@
 create_weights_bunmd_complete <- function(bunmd.file, dyears = c(1988:2005), cohorts = c(1895:1940), death_ages = c(65:100), complete_cases_vars = c("race_last", "bpl")) {
 
   ## deaths from HMD
-  hmd_deaths <-  fread("/data/censoc/input_data/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
+  hmd_deaths <-  fread("/global/scratch/p2p3/pl1_demography/censoc/input_data/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   ## filter to complete case

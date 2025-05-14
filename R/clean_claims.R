@@ -7,7 +7,7 @@
 #' @export
 
 
-clean_claims <- function(numclaim.file.path = "/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv") {
+clean_claims <- function(numclaim.file.path = "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/1_numident_files_with_original_varnames/claims_original.csv") {
 
   columns.to.keep <- c("NUMI_SSN", "NUMI_CYCLE_DATE", "NUMI_ENTRY_CODE", "NUMI_SEX", "NUMI_DOB",
                        "NUMI_POB_STATE_COUNTRY", "NUMI_POB_FOREIGN_IND", "NUMI_NH_NAME_FIRST",

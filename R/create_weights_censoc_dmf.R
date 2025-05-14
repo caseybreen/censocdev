@@ -13,7 +13,7 @@
 #'
 
 create_weights_censoc_dmf <- function(censoc.dmf, cohorts = c(1895:1939), death_ages = c(65:100),
-                                      hmd_path = "/data/censoc/input_data/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") {
+                                      hmd_path = "/global/scratch/p2p3/pl1_demography/censoc/input_data/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") {
 
   ## deaths from HMD
   hmd_deaths <-  fread(hmd_path) %>%

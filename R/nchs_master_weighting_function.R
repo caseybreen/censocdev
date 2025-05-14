@@ -9,7 +9,7 @@
 
 
 # Source smaller functions
-source("~/CenSoc Weights/code/nchs_weighting_functions.R")
+source("~/censocdev/R/nchs_weighting_functions.R")
 
 
 # Function for weighting Numident records

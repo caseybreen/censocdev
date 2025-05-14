@@ -12,7 +12,7 @@
 create_weights_bunmd <- function(file, death_years = c(1988:2005), death_ages = c(65:100), cohorts = c(1895:1940)) {
 
   ## read deaths from HMD
-  hmd_deaths <-  fread("/data/censoc/input_data/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
+  hmd_deaths <-  fread("/global/scratch/p2p3/pl1_demography/censoc/input_data/hmd/hmd_statistics/deaths/Deaths_lexis/USA.Deaths_lexis.txt") %>%
     mutate(linking_key = paste(Year, Cohort, Age, sep = "_" ))
 
   ## Filter cases (not complete count cases)
