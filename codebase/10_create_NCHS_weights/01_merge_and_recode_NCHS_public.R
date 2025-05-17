@@ -2,9 +2,9 @@
 # Last revised by Maria Osborne (Mar 21, 2023)   #
 ##################################################
 #' Read and Harmonize NCHS mortality microdata
-#' 
+#'
 #' This script read NCHS mortality data from individual years
-#' and combines them in one file with variables recoded and 
+#' and combines them in one file with variables recoded and
 #' harmonized as appropriate.
 #' 1979-2004 only
 
@@ -15,14 +15,14 @@ library(dplyr)
 library(rlist)
 
 # Input paths
-path_nchs_single_year_dat <- "~mariaosborne-ipums/censoc_weights/data/NCHS/nber_single_yr_data"
+path_nchs_single_year_dat <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc_weights/data/NCHS/nber_single_yr_data"
 
 # Output paths
-path_merged_nchs_output <- "~mariaosborne-ipums/censoc_weights/data/NCHS"
+path_merged_nchs_output <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc_weights/data/NCHS"
 
 # list single-year files
 # make sure they are listed in chronological order
-files <- list.files(path_nchs_single_year_dat, 
+files <- list.files(path_nchs_single_year_dat,
                     pattern = ".csv$", recursive = TRUE, full.names = TRUE)
 
 # Place of birth available from 1979 - 2004 inclusive
@@ -59,7 +59,7 @@ nber3 <- list.rbind(nber3)
 nber3[, state_birth := statbthr]
 nber3$statbthr <- NULL
 
-# merge all years of data                        
+# merge all years of data
 nber_merged <- rbind(nber1, nber2, nber3)
 
 # remove the intermediate files
@@ -68,7 +68,7 @@ rm(nber2)
 rm(nber3)
 
 # recode two digit years (79-95) to four digit (1979-1995)
-nber_merged[year < 100, year := year + 1900] 
+nber_merged[year < 100, year := year + 1900]
 table(nber_merged$year)
 
 # deal with ages
@@ -90,7 +90,7 @@ nber_merged[racer3 == 2, race_string := "other"]
 nber_merged[racer3 == 3, race_string := "black"]
 
 
-# process birthplace 
+# process birthplace
 # 2003 onward: alphabetic codes
 states_convert <- data.frame("state_name" = state.name, "state_abb" = state.abb)
 nber_merged <- merge(x= nber_merged, y=states_convert, by.x="state_birth", by.y="state_abb", all.x=T)
@@ -149,7 +149,7 @@ nber_merged[, bpl_flag_missing := as.integer(is.na(bpl))]
 # make sure these add up to 1
 mean(nber_merged$bpl_flag_AKHI==1) + mean(nber_merged$bpl_flag_usa==1) +
   mean(nber_merged$bpl_flag_territory==1) + mean(nber_merged$bpl_flag_foreign==1) +
-  mean(nber_merged$bpl_flag_missing==1) 
+  mean(nber_merged$bpl_flag_missing==1)
 
 # create keys
 nber_merged[, key := paste(paste0("a", death_age_years),

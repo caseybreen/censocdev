@@ -64,12 +64,12 @@ library(cowplot)
 library(readxl)
 library(kableExtra)
 
-Numident_Geography_File <- fread("/data/censoc/workspace/geography_variables/numident_geography_file_v2.1_conservative.csv",
+Numident_Geography_File <- fread("/global/scratch/p2p3/pl1_demography/censoc/workspace/geography_variables/numident_geography_file_v2.1_conservative.csv",
                               colClasses = c("death_fips" = "character", "death_zip" = "character",
                                              "birth_fips" = "character"))
 
 
-numident <- fread("/data/censoc/censoc_data_releases/censoc_numident/censoc_numident_v2.1/censoc_numident_v2.1.csv")
+numident <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_numident/censoc_numident_v2.1/censoc_numident_v2.1.csv")
 numident <- numident[link_abe_exact_conservative == 1]
 
 numident_merged <- merge(numident, Numident_Geography_File, by = "HISTID", all.x = TRUE)
@@ -112,9 +112,9 @@ Missing values occur if birth city is absent from Numident records, or if the or
 \vspace{40 pt}
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center"}
-unclean_birthplace_stings_path <- "/data/censoc/workspace/geography_variables/bunmd_city_string.csv" 
+unclean_birthplace_stings_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/geography_variables/bunmd_city_string.csv" 
 birth_city_raw_strings <- fread(unclean_birthplace_stings_path, select = c("ssn", "bpl_city"))
-ssn_crosswalk_path <- "/data/censoc/crosswalks/numident_ssn_histid_v2_1_crosswalk.csv"
+ssn_crosswalk_path <- "/global/scratch/p2p3/pl1_demography/censoc/crosswalks/numident_ssn_histid_v2_1_crosswalk.csv"
 ssn_to_histid <- fread(ssn_crosswalk_path)
 histid_with_raw_city_strings <- left_join(ssn_to_histid, birth_city_raw_strings, by = "ssn") %>% 
   select(-c(ssn)) %>% rename(HISTID = histid)

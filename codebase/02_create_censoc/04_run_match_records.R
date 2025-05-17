@@ -12,10 +12,11 @@ library(readr)
 library(stringi)
 library(stringr)
 library(tidyverse)
+library(here)
 
 ### Match census to BUNMD
-in_path_A      <- "/abe/data/cleaned-1940-census-by-bpl"
-in_path_B      <- "/abe/data/cleaned-bunmd-by-bpl"
+in_path_A      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-1940-census-by-bpl"
+in_path_B      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-bunmd-by-bpl"
 fname_var_A    <- "fname"
 fname_var_B    <- "fname"
 lname_var_A    <- "lname"
@@ -31,15 +32,15 @@ vars_to_keep_B <- c("fname_raw", "lname_raw", "middle", "middle_raw", "sex", "bp
                     "race_last", "race_last_cyear", "race_last_cmonth",
                     "zip_residence", "socstate", "age_first_application", "weight",
                     "father_lname_raw", "father_lname")
-out_path       <- "/abe/data/matched-1940-census-bunmd"
-log_path       <- "/abe/log/"
+out_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/matched-1940-census-bunmd"
+log_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/log/"
 
 path_to_out_file <- paste0(log_path, "/4-run-match-records_1.log")
 log <- file(path_to_out_file, open="wt")
 sink(log, type="message")
 
-source("/censocdev/R/clean-names.R")
-source("/censocdev/R/match-records.R")
+source(here("R/clean-names.R"))
+source(here("R/match-records.R"))
 
 #file_name_A    <- "bpl_1000_cleaned.csv" # JUST AS AN EXAMPLE
 #file_name_B    <- "bpl_1000_cleaned.csv" # JUST AS AN EXAMPLE
@@ -66,12 +67,12 @@ error_female_everm  <- c()
 error_female_neverm <- c()
 
 for (file_name in intersection) {
-  
+
   file_A <- fread(paste(in_path_A, file_name, sep="/"))
   file_B <- fread(paste(in_path_B, file_name, sep="/"))
   file_B$father_lname_raw <- file_B$father_lname
   file_B$father_lname <- ""
-  
+
   # Drop if names are missing
   file_A <- file_A[file_A[[fname_var_A]]!="" & file_A[[lname_var_A]]!=""]
   file_B <- file_B[file_B[[fname_var_B]]!="" & file_B[[lname_var_B]]!=""]
@@ -79,7 +80,7 @@ for (file_name in intersection) {
   # Process males
   file_A_male <- subset(file_A, sex == 1)
   file_B_male <- subset(file_B, sex == 1)
-  
+
   if (nrow(file_A_male) > 0 & nrow(file_B_male) > 0) {
     out_file_name <- gsub("_cleaned", "_matched_male", file_name)
     res <- try(match_records(file_A_male, fname_var_A, lname_var_A, time_var_A, id_var_A, vars_to_keep_A,
@@ -89,11 +90,11 @@ for (file_name in intersection) {
       error_male <- c(error_male, file_name)
     }
   }
-  
+
   # Process females
   file_A_female <- subset(file_A, sex == 2)
   file_B_female <- subset(file_B, sex == 2)
-  
+
   # Ever-married females
   file_A_female_everm <- subset(file_A_female, MARST < 6)
   if (nrow(file_A_female_everm) > 0 & nrow(file_B_female) > 0) {
@@ -102,7 +103,7 @@ for (file_name in intersection) {
                              file_B_female,       fname_var_B, lname_var_B, time_var_B, id_var_B, vars_to_keep_B,
                              out_path, out_file_name), silent=TRUE)
     if (class(res) != "try-error") {
-      matched_female_everm <- read_csv(paste(out_path, out_file_name, sep="/"), 
+      matched_female_everm <- read_csv(paste(out_path, out_file_name, sep="/"),
                                        col_types = cols(timediff_B = col_double(),
                                                         middle_A = col_character(),
                                                         middle_B = col_character(),
@@ -113,7 +114,7 @@ for (file_name in intersection) {
       ids <- c()
     }
   }
-  
+
   # Never-married females
   file_A_female_neverm <- subset(file_A_female, MARST == 6)
   file_B_female_unmatched <- subset(file_B_female, !ssn %in% ids)
@@ -146,12 +147,12 @@ for (file_name in intersection) {
       error_female_neverm <- c(error_female_neverm, file_name)
     }
   }
-  
+
   # NOTES
   # 1. When matching females, maybe we shouldn't pre-split ever/never married.
   #    Maybe what's better is to first try to match all females using their
   #    last name, and then try to match the remaining using father's last name.
-  
+
 }
 
 # Now, match the remaining records in Census and BUNMD
@@ -190,7 +191,7 @@ out_file_name <- "rest_matched_female_everm.csv"
 match_records(file_A_female_everm, fname_var_A, lname_var_A, time_var_A, id_var_A, vars_to_keep_A,
               file_B_female,       fname_var_B, lname_var_B, time_var_B, id_var_B, vars_to_keep_B,
               out_path, out_file_name)
-matched_female_everm <- read_csv(paste(out_path, out_file_name, sep="/"), 
+matched_female_everm <- read_csv(paste(out_path, out_file_name, sep="/"),
                                  col_types = cols(timediff_B = col_double(),
                                                   middle_A = col_character(),
                                                   middle_B = col_character(),
@@ -239,8 +240,8 @@ close(log)
 rm(list = ls())
 
 ### Match census to DMF
-in_path_A      <- "/abe/data/cleaned-1940-census-by-bpl"
-in_path_B      <- "/abe/data/cleaned-dmf"
+in_path_A      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-1940-census-by-bpl"
+in_path_B      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-dmf"
 fname_var_A    <- "fname"
 fname_var_B    <- "fname"
 lname_var_A    <- "lname"
@@ -252,15 +253,15 @@ id_var_B       <- "ssn"
 vars_to_keep_A <- c("fname_raw", "lname_raw", "middle", "sex", "BIRTHYR", "BPL", "SERIALP", "PERNUM", "MARST", "RACE")
 vars_to_keep_B <- c("fname_raw", "lname_raw", "middle", "middle_raw", "sex",
                     "byear", "bmonth", "dyear", "dmonth", "death_age", "weight")
-out_path       <- "/abe/data/matched-1940-census-dmf"
-log_path       <- "/abe/log/"
+out_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/matched-1940-census-dmf"
+log_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/log/"
 
 path_to_out_file <- paste0(log_path, "/4-run-match-records_2.log")
 log <- file(path_to_out_file, open="wt")
 sink(log, type="message")
 
-source("/censocdev/R/clean-names.R")
-source("/censocdev/R/match-records.R")
+source(here("R/clean-names.R"))
+source(here("R/match-records.R"))
 
 dir.create(out_path)
 

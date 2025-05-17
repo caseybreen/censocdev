@@ -4,8 +4,9 @@
 #########################################
 
 # Source functions
-source("/censocdev/R/create_weights_censoc_numident.R")
-source("/censocdev/R/create_weights_censoc_dmf.R")
+library(here)
+source(here("R/create_weights_censoc_numident.R"))
+source(here("R/create_weights_censoc_dmf.R"))
 
 # Load libraries
 library(data.table)
@@ -13,8 +14,8 @@ library(dplyr)
 library(readr)
 
 # Paths
-matched_bunmd <- "/abe/data/matched-census-bunmd/matched_census_bunmd.csv"
-matched_dmf   <- "/abe/data/matched-census-dmf/matched_census_dmf.csv"
+matched_bunmd <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/matched-census-bunmd/matched_census_bunmd.csv"
+matched_dmf   <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/matched-census-dmf/matched_census_dmf.csv"
 out_path      <- "/abe/data/final-v2-2-matched-datasets"
 dir.create(out_path)
 
@@ -27,7 +28,7 @@ matched_census_bunmd <- subset(matched_census_bunmd, byear_B <= 1940)
 
 # Generate link_abe_exact_standard and link_abe_exact_conservative columns
 matched_census_bunmd$link_abe_exact_standard <- 1
-matched_census_bunmd$link_abe_exact_conservative <- ifelse(matched_census_bunmd$uniquestub_match2 == 1 & 
+matched_census_bunmd$link_abe_exact_conservative <- ifelse(matched_census_bunmd$uniquestub_match2 == 1 &
                                                              matched_census_bunmd$uniquestub_file2  == 1, 1, 0)
 
 # Keep necessary variables only, rename
@@ -72,8 +73,8 @@ censoc_numident <- censoc_numident[,c("HISTID",
                                       "race_first", "race_first_cyear", "race_first_cmonth",
                                       "race_last",  "race_last_cyear",  "race_last_cmonth",
                                       "bpl", "zip_residence", "socstate", "age_first_application",
-                                      "link_abe_exact_standard", "link_abe_exact_conservative", 
-                                      "byeardiff_census_minus_numident", 
+                                      "link_abe_exact_standard", "link_abe_exact_conservative",
+                                      "byeardiff_census_minus_numident",
                                       "flag_bpl_only_in_census", "flag_bpl_only_in_numident", "flag_bpl_NA_in_numident",
                                       "weight", "weight_conservative")]
 
@@ -91,7 +92,7 @@ matched_census_dmf <- subset(matched_census_dmf, byear_B <= 1940)
 
 # Generate link_abe_exact_standard and link_abe_exact_conservative columns
 matched_census_dmf$link_abe_exact_standard <- 1
-matched_census_dmf$link_abe_exact_conservative <- ifelse(matched_census_dmf$uniquestub_match2 == 1 & 
+matched_census_dmf$link_abe_exact_conservative <- ifelse(matched_census_dmf$uniquestub_match2 == 1 &
                                                            matched_census_dmf$uniquestub_file2  == 1, 1, 0)
 
 # Keep necessary variables only, rename

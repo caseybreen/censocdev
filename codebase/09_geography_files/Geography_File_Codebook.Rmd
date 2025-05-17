@@ -67,12 +67,12 @@ library(cowplot)
 library(readxl)
 library(kableExtra)
 
-BUNMD_Geography_File <- fread("/data/censoc/workspace/geography_variables/BUNMD_Geography_File.csv",
+BUNMD_Geography_File <- fread("/global/scratch/p2p3/pl1_demography/censoc/workspace/geography_variables/BUNMD_Geography_File.csv",
                               colClasses = c("death_fips" = "character", "death_zip" = "character",
                                              "birth_fips" = "character"))
 
 
-bunmd <- fread("/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv",
+bunmd <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv",
                select=c("ssn","byear","dyear","death_age","race_first","sex","bpl_string","zip_residence")) 
 
 bunmd_merged <- merge(bunmd, BUNMD_Geography_File, by = "ssn", all.x = TRUE)
@@ -115,7 +115,7 @@ Missing values occur if birth city is absent from Numident records, or if the or
 \vspace{75 pt}
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE, fig.align = "center"}
-unclean_birthplace_stings_path <- "/data/censoc/workspace/geography_variables/bunmd_city_string.csv" 
+unclean_birthplace_stings_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/geography_variables/bunmd_city_string.csv" 
 birth_city_raw_strings <- fread(unclean_birthplace_stings_path, select = c("ssn", "bpl_city"))
 bunmd_merged <- merge(bunmd_merged, birth_city_raw_strings, by = "ssn", all.x = TRUE,sort = FALSE)
 
@@ -371,7 +371,7 @@ Missing values may occur if ZIP code was entered incorrectly in Numident records
 #Although it is rare, FIPS codes can change when county boundaries are redefined or names changed. One major change occurred after Dade County, FL became Miami-Dade and a new FIPS code (12086) was assigned. If using FIPS code data produced after 1997, users may wish to manually change Dade County's FIPS code in order for it to match. Below is an example of how to harmionize FIPS codes if you wanted to incorporate county-level education attainment (data from <https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls>).
 
 #Hypothetical education data
-education <- read_excel("/data/censoc/workspace/geography_variables/Education.xlsx") 
+education <- read_excel("/global/scratch/p2p3/pl1_demography/censoc/workspace/geography_variables/Education.xlsx") 
 
 #we rename FIPS to death_fips so that it can match
 colnames(education)[1] <- "death_fips" 

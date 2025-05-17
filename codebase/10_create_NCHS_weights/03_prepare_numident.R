@@ -2,27 +2,27 @@
 # Last revised by Maria Osborne (August 14 2023)   #
 ####################################################
 #' Prepare Numident Data for weighting
-#' 
+#'
 #' Harmonize and tabulate data for all years
-#' 
+#'
 #' To weight:
 #' 1) conservative links
 #' 2) deaths age 65-100
 #' 3) years 1988-2005
-#' 
+#'
 #' Save individuals records and tabulated records by strata
-#' 
+#'
 
 # libraries
 library(data.table)
 library(tidyverse)
 
 # Input paths
-path_numident <- "/data/censoc/censoc_data_releases/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv"
-path_us_bpl_codes <- "~mariaosborne-ipums/censoc_weights/data/IPUMS_detailed_BPL.txt"
+path_numident <- "/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv"
+path_us_bpl_codes <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc_weights/data/IPUMS_detailed_BPL.txt"
 
 # Output paths
-path_out <- "~mariaosborne-ipums/censoc_weights/data/numident/"
+path_out <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc_weights/data/numident/"
 
 # Read data
 numident_vars <- c("HISTID", "death_age", "byear", "dyear", "sex", "bpl", "bpl_string",
@@ -31,7 +31,7 @@ censoc_numident <- fread(path_numident, select = numident_vars)
 
 # select conservative only, appropriate years and ages
 censoc_numident_toweight <- censoc_numident[link_abe_exact_conservative == 1 &
-                                              death_age %in% 65:100 & dyear %in% 1988:2005] 
+                                              death_age %in% 65:100 & dyear %in% 1988:2005]
 
 # harmonize variables to match processed NCHS data
 # sex string
@@ -43,7 +43,7 @@ censoc_numident_toweight[RACED == 100, census_race := "white"]
 censoc_numident_toweight[RACED == 200, census_race := "black"]
 censoc_numident_toweight[RACED != 100 & RACED != 200, census_race := "other"]
 
-# Translate Birthplaces into categories 
+# Translate Birthplaces into categories
 # Use Census BPL, not numident bpl : numident bpl has a lot of "missing" bpls
 # that are actually valid countries. For instance, over 39k people
 # are born in English Canada, but have "missing" bpl in the Numident
@@ -77,7 +77,7 @@ censoc_numident_toweight[BPLD > 15083 & BPLD != 20000 & BPLD != 25000 &
 censoc_numident_toweight[BPLD >= 90000, bpl_temp := "Unknown Abroad"]
 
 # Check that these look okay
-table(censoc_numident_toweight$bpl_temp, useNA = "always") 
+table(censoc_numident_toweight$bpl_temp, useNA = "always")
 
 
 # Set these as keys and modify strings so we can match them across data sets
@@ -96,7 +96,7 @@ censoc_numident_toweight[, bpl_flag_missing :=  as.integer(bpl_temp %in% c("Unkn
 # (this should add up to one)
 mean(censoc_numident_toweight$bpl_flag_AKHI==1) + mean(censoc_numident_toweight$bpl_flag_usa==1) +
   mean(censoc_numident_toweight$bpl_flag_territory==1) + mean(censoc_numident_toweight$bpl_flag_foreign==1) +
-  mean(censoc_numident_toweight$bpl_flag_missing==1) 
+  mean(censoc_numident_toweight$bpl_flag_missing==1)
 
 # create keys
 censoc_numident_toweight[, key := paste(paste0("a", death_age),
@@ -116,7 +116,7 @@ censoc_numident_tab <- censoc_numident_toweight %>%
   group_by(death_age, dyear, sex_string, census_race, bpl_key,
            bpl_flag_usa, bpl_flag_territory, bpl_flag_AKHI, bpl_flag_foreign,
            bpl_flag_missing, key) %>%
-  summarize(sample_n = n()) 
+  summarize(sample_n = n())
 
 length(unique(censoc_numident_tab$key)) == nrow(censoc_numident_tab) # no repeat keys
 length(unique(censoc_numident_tab$key)) == length(unique(censoc_numident_toweight$key)) # all keys captured

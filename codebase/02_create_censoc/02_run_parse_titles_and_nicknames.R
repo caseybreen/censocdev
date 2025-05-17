@@ -9,9 +9,10 @@
 # Load libraries
 library(readr)
 library(tidyverse)
+library(here) #set project to censocdev
 
 # Paths
-in_path <- "/abe/code_2_2_public/titles-and-nicknames"
+in_path <- here("codebase/02_create_censoc/titles-and-nicknames")
 
 # Parse titles file
 #temp1 <- read_file(paste(in_path, "titles.txt", sep="/"))

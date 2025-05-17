@@ -11,10 +11,10 @@ library(dplyr)
 library(readr)
 
 # Input path
-path_NCHS_harmonized_data <- "~mariaosborne-ipums/censoc_weights/data/NCHS/NCHS_data_harmonized.csv"
+path_NCHS_harmonized_data <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc_weights/data/NCHS/NCHS_data_harmonized.csv"
 
 # Output paths
-path_merged_nchs_output <- "~mariaosborne-ipums/censoc_weights/data/NCHS/"
+path_merged_nchs_output <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc_weights/data/NCHS"
 
 # read in data
 nchs_data <- fread(path_NCHS_harmonized_data)

@@ -21,28 +21,28 @@ library(dplyr)
 file paths
 ```{r}
 # zip features data (ZIP to state, county, region, etc)
-zip_features_path <- "/data/censoc/workspace/geography_variables/Zip_Features.csv"   
+zip_features_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/geography_variables/Zip_Features.csv"   
 
 # string to GNIS feature by ssn, using Black et al.
-bunmd_birthplace_crosswalk_path <- "/data/censoc/workspace/geography_variables/bunmd_Birthplace.csv"  
+bunmd_birthplace_crosswalk_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/geography_variables/bunmd_Birthplace.csv"  
 
 # raw unclean birthplace strings
-unclean_birthplace_stings_path <- "/data/censoc/workspace/geography_variables/bunmd_city_string.csv" 
+unclean_birthplace_stings_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/geography_variables/bunmd_city_string.csv" 
 
 # full BUNMD V2.0
-bunmd_path <- "/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv" 
+bunmd_path <- "/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv" 
 
 # path to published Numident 2.1
-numident_path <- "/data/censoc/censoc_data_releases/censoc_numident/censoc_numident_v2.1/censoc_numident_v2.1.csv"
+numident_path <- "/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_numident/censoc_numident_v2.1/censoc_numident_v2.1.csv"
 
 # bunmd to numident ID variable crosswalk
-ssn_crosswalk_path <- "/data/censoc/crosswalks/numident_ssn_histid_v2_1_crosswalk.csv"
+ssn_crosswalk_path <- "/global/scratch/p2p3/pl1_demography/censoc/crosswalks/numident_ssn_histid_v2_1_crosswalk.csv"
 
 # state FIPS codes
-state_fips_path <- "/data/censoc/workspace/geography_variables/state_fips_codes.csv"
+state_fips_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/geography_variables/state_fips_codes.csv"
 
 # path to write files
-geo_files_out_path <- "/data/censoc/workspace/geography_variables/"
+geo_files_out_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/geography_variables/"
 ```
 
 

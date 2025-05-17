@@ -7,7 +7,7 @@
 #' @export
 
 select_birthplace <- function(data = numapp,
-                       crosswalk = "/censoc/data/crosswalks/bpl_crosswalk.csv") {
+                       crosswalk = "/global/scratch/p2p3/pl1_demography/censoc_internal/data/crosswalks/bpl_crosswalk.csv") {
 
 
   data <- data[, c("ssn", "pob_state_country","pob_foreign_ind", "year_cycle", "month_cycle"), with=FALSE]

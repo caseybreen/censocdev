@@ -4,11 +4,12 @@
 #########################################
 
 # Source functions
-source("/censocdev/R/load_dmf_deaths.R")
-source("/censocdev/R/helpers.R")
-source("/censocdev/R/calculate_age_at_death.R")
-source("/censocdev/R/split-by-bpl.R")
-source("/censocdev/R/create_weights_censoc_dmf.R")
+library(here) #set project to censocdev directory
+source(here("R/load_dmf_deaths.R"))
+source(here("R/helpers.R"))
+source(here("R/calculate_age_at_death.R"))
+source(here("R/split-by-bpl.R"))
+source(here("R/create_weights_censoc_dmf.R"))
 
 # Load libraries
 library(data.table)
@@ -16,15 +17,15 @@ library(dplyr)
 library(readr)
 
 # Paths
-census_raw      <- "/ipums-repo2022/1940/TSV/P.tsv"
-bunmd_raw       <- "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv"
-dmf_raw1        <- "/home/ipums/josh-ipums/progs/ssdm/ssdm1"
-dmf_raw2        <- "/home/ipums/josh-ipums/progs/ssdm/ssdm2"
-dmf_raw3        <- "/home/ipums/josh-ipums/progs/ssdm/ssdm3"
-out_path_census <- "/abe/data/1940-census-by-bpl"
-out_path_bunmd  <- "/abe/data/bunmd-by-bpl"
-out_path_dmf    <- "/abe/data/dmf"
-log_path        <- "/abe/log"
+census_raw      <- "/global/scratch/p2p3/pl1_demography/ipums/ipums-repo2022/1940/TSV/P.tsv"
+bunmd_raw       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database/bunmd.csv"
+dmf_raw1        <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/dmf/ssdm1"
+dmf_raw2        <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/dmf/ssdm2"
+dmf_raw3        <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/dmf/ssdm3"
+out_path_census <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/1940-census-by-bpl"
+out_path_bunmd  <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/bunmd-by-bpl"
+out_path_dmf    <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/dmf"
+log_path        <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/log"
 
 path_to_out_file <- paste0(log_path, "/1-run-split-by-bpl.log")
 log <- file(path_to_out_file, open="wt")

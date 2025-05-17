@@ -2,28 +2,28 @@
 # Last revised by Maria Osborne (August 15 2023)   #
 ####################################################
 #' Prepare DMF Data for weighting
-#' 
+#'
 #' Harmonize and tabulate data for all years
-#' 
+#'
 #' To weight:
 #' 1) conservative links
 #' 2) deaths age 65-100
 #' 3) years 1975-2005
-#' 
+#'
 #' Save individuals records and tabulated records by strata
-#' 
+#'
 
 # libraries
 library(data.table)
 library(tidyverse)
 
 # Input paths
-path_dmf <- "/data/josh/CenSoc/censoc_data/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv"
-path_us_bpl_codes <- "~mariaosborne-ipums/censoc_weights/data/IPUMS_detailed_BPL.txt"
-path_NCHS_data <- "~mariaosborne-ipums/censoc_weights/data/NCHS/NCHS_data_harmonized.csv"
+path_dmf <- "/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv"
+path_us_bpl_codes <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc_weights/data/IPUMS_detailed_BPL.txt"
+path_NCHS_data <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc_weights/data/NCHS/NCHS_data_harmonized.csv"
 
 # Output paths
-path_out <- "~mariaosborne-ipums/censoc_weights/data/DMF/"
+path_out <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc_weights/data/DMF/"
 
 # Read DMF
 dmf_vars <- c("HISTID", "death_age", "byear", "dyear", "SEX", "BPLD", "RACED",
@@ -52,7 +52,7 @@ us_bpls <- fread(path_us_bpl_codes)
 us_bpls <- us_bpls[code <= 05610]
 colnames(us_bpls) = c("BPLD", "usa_bpl_string")
 dmf_to_weight <- left_join(dmf_to_weight, us_bpls, by = "BPLD")
-dmf_to_weight[BPLD <= 05610, bpl_temp := usa_bpl_string] 
+dmf_to_weight[BPLD <= 05610, bpl_temp := usa_bpl_string]
 
 # unspecified US birthplaces
 dmf_to_weight[BPLD %in% c(9000,9900), bpl_temp := "Unspecified United States"] # us states
@@ -95,7 +95,7 @@ dmf_to_weight[, bpl_flag_missing :=  as.integer(bpl_temp %in% c("Unknown Abroad"
 # (this should add up to one)
 mean(dmf_to_weight$bpl_flag_AKHI==1) + mean(dmf_to_weight$bpl_flag_usa==1) +
   mean(dmf_to_weight$bpl_flag_territory==1) + mean(dmf_to_weight$bpl_flag_foreign==1) +
-  mean(dmf_to_weight$bpl_flag_missing==1) 
+  mean(dmf_to_weight$bpl_flag_missing==1)
 
 # create keys
 dmf_to_weight[, key := paste(paste0("a", death_age),
@@ -115,7 +115,7 @@ dmf_tab <-dmf_to_weight %>%
   group_by(death_age, dyear, sex_string, census_race, bpl_key,
            bpl_flag_usa, bpl_flag_territory, bpl_flag_AKHI, bpl_flag_foreign,
            bpl_flag_missing, key) %>%
-  summarize(sample_n = n()) 
+  summarize(sample_n = n())
 
 # check this is ok
 length(unique(dmf_tab$key)) == nrow(dmf_tab) # no repeat keys in the tabulated data

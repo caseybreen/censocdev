@@ -5,7 +5,10 @@
 #'
 #'
 #' This Script Parses and Harmonized NCHS
-#' MCOD data from the year 2005
+#' MCOD data from the year 2005 and later
+#'
+#' Can only be run on SRDC platform where restricted NCHS
+#' data files are stored
 
 
 # Packages
@@ -47,7 +50,7 @@ pos_starts <- fwf_metadata$location_start
 pos_ends <- fwf_metadata$location_end
 
 vars_to_select <- c("data_year", "sex", "state_occurrence_FIPS", "birthplace_recode",
-                    "detail_age", "race_recode_3") 
+                    "detail_age", "race_recode_3")
 
 mcod_dat <- lapply(data_file_paths,
                   function(i) {read_fwf(file = i,
@@ -56,7 +59,7 @@ mcod_dat <- lapply(data_file_paths,
 
 mcod_dat <- data.table::rbindlist(mcod_dat)
 
-# Filter out any deaths occurring outside the US and DC 
+# Filter out any deaths occurring outside the US and DC
 # (should not drop anything but just in case)
 nrow(mcod_dat)
 mcod_dat <- mcod_dat[state_occurrence_FIPS %in% c(state.abb, "DC")]
