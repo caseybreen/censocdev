@@ -47,7 +47,7 @@ library(kableExtra)
 
 ## Directory for clean names file
 ## (We don't need to read the whole file to create this codebook)
-bunmd_clean_names <- fread("/data/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_clean_names_v1.csv",
+bunmd_clean_names <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_clean_names_v1.csv",
                            nrow = 10)
 
 names(bunmd_clean_names)

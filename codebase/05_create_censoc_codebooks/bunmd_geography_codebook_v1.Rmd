@@ -59,7 +59,7 @@ library(tidyverse)
 library(knitr)
 library(forcats)
 
-BUNMD_Geography_File <- fread("/hdir/0/chrissoria/Birth_Places/BUNMD_Geography_File.csv")
+BUNMD_Geography_File <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/geography_files/BUNMD_geography_file/bunmd_geography_supplement_v1.csv")
 ```
 
 \newpage 

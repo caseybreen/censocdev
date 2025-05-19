@@ -47,7 +47,7 @@ library(tidyverse)
 library(data.table)
 
 ## input path (to update)
-input_path <- "/data/censoc/censoc_data_releases/censoc_dmf/censoc_dmf_v3/censoc_dmf_v3.csv"
+input_path <- "/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_dmf/censoc_dmf_v3/censoc_dmf_v3.csv"
 
 ## read in censoc_dmf_v3 data file
 censoc_dmf_v3 <- read_csv(input_path)

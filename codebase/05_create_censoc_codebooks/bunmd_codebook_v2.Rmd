@@ -63,7 +63,7 @@ library(kableExtra)
 library(here)
 
 ## read in the BUNMD
-bunmd <- fread("/data/josh/CenSoc/data_release_v2/bunmd_v2/bunmd_v2.csv")
+bunmd <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/bunmd/bunmd_v2/bunmd_v2.csv")
 
 ## set path for reading figures
 knitr::opts_knit$set(root.dir = here("codebase/05_create_censoc_codebooks/bunmd_codebook_graphics/"))
