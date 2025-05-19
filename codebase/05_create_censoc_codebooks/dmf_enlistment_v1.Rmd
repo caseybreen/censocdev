@@ -54,8 +54,9 @@ library(data.table)
 library(stringi)
 library(kableExtra)
 
-data_path <- '/data/josh/CenSoc/data_release_military_records'
-resource_file_path <- '/hdir/0/mariaosborne/censoc/army enlistment files/'
+#data_path <- '/data/josh/CenSoc/data_release_military_records'
+data_path <- '/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/army_enlistment_dmf/enlistment_dmf_v1/censoc_dmf_ww2_army_enlistment_v1.csv'
+resource_file_path <- '/global/home/users/mariaosborne/from_reg_server/censoc/army enlistment files/'
 
 ## read in data file
 #setwd(data_path)
@@ -63,10 +64,9 @@ resource_file_path <- '/hdir/0/mariaosborne/censoc/army enlistment files/'
 
 
 setwd(resource_file_path)
-test_file_path <- '/hdir/0/mariaosborne/censoc/army enlistment files/'
-enlistment_dmf <- fread('censoc_dmf_enlistment_v1_copy.csv')
-
-
+test_file_path <- '/global/home/users/mariaosborne/from_reg_server/censoc/army enlistment files/'
+#enlistment_dmf <- fread('censoc_dmf_enlistment_v1_copy.csv')
+enlistment_dmf <- fread(data_path)
 
 ```
 

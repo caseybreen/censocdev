@@ -55,9 +55,9 @@ library(lubridate)
 library(kableExtra)
 library(here)
 
-data_path <- '/data/censoc/censoc_data_releases/army_enlistment_standalone/enlistment_v1.1/censoc_wwii_army_enlistment_v1.1.csv'
-resource_file_path <- '/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode'
-path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp3.csv"
+data_path <- '/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/army_enlistment_standalone/enlistment_v1.1/censoc_wwii_army_enlistment_v1.1.csv'
+resource_file_path <- '/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/code/awenlistmentcode'
+#path_to_temp_data <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/temp3.csv"
 #out_path          <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode"
 codebook_path <- here("04_create_enlistment_records/codebook")
 

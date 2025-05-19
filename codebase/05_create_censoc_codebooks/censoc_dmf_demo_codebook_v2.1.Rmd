@@ -73,7 +73,7 @@ library(data.table)
 
 ## read in censoc_dmf_v2.1 data file
 
-censoc_dmf_v2.1<-read_csv("/data/censoc/censoc_data_releases/censoc_dmf_demo/censoc_dmf_demo_v2.1/censoc_dmf_demo_v2.1.csv")
+censoc_dmf_v2.1<-read_csv("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_dmf_demo/censoc_dmf_demo_v2.1/censoc_dmf_demo_v2.1.csv")
 ```
 
 ```{r, include = F}

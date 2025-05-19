@@ -63,7 +63,7 @@ library(data.table)
 library(kableExtra)
 
 ## input path (to update)
-input_path <- "/data/censoc/censoc_data_releases/censoc_numident/censoc_numident_v3/censoc_numident_v3.csv"
+input_path <- "/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_numident/censoc_numident_v3/censoc_numident_v3.csv"
 
 ## read in censoc_numident_v3 data file
 censoc_numident_v3 <- fread(input_path)

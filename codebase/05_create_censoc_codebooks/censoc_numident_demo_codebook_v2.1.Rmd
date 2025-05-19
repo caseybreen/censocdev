@@ -67,7 +67,7 @@ library(data.table)
 library(kableExtra)
 
 ## read in censoc_numident_v2.1 data file
-censoc_numident_v2.1<-read_csv("/data/censoc/censoc_data_releases/censoc_numident_demo/censoc_numident_demo_v2.1/censoc_numident_demo_v2.1.csv")
+censoc_numident_v2.1<-read_csv("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_numident_demo/censoc_numident_demo_v2.1/censoc_numident_demo_v2.1.csv")
 ```
 
 ```{r, include = F}
