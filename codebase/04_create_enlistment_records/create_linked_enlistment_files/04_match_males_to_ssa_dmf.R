@@ -9,16 +9,17 @@ library(stringi)
 library(stringr)
 library(tidyverse)
 library(data.table)
+library(here)
 
 # source for matching code
-source("~/censocdev/R/match-records.R")
+source(here("R/match-records.R"))
 
 # File B: DMF (whole DMF, not the matched censoc-DMF, N = 54.6 million, sex=1 only)
 in_path_dmf <- "/home/ipums/wontak.joo-ipums/project/abe/data/cleaned-dmf/dmf_cleaned.csv"
 # file_B: Enlistment (N = 9 million)
-in_path_clean_enlistment <-"/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
+in_path_clean_enlistment <-"/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
 # Out path:
-out_path <- "/home/ipums/mariaosborne-ipums/enlistment_records_linking/matched_enlistment_dmf/"
+out_path <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/matched_enlistment_dmf/"
 
 dmf <- fread(in_path_dmf)
 enlistment <- fread(in_path_clean_enlistment)

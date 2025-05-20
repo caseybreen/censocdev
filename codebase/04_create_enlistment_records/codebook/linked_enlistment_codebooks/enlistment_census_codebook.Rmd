@@ -50,7 +50,7 @@ library(lubridate)
 library(kableExtra)
 library(here)
 
-data_path <- '/data/censoc/censoc_data_releases/army_enlistment_census/enlistment_census_v1/army_enlistment_census_1940_v1.csv'
+data_path <- '/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/army_enlistment_census/enlistment_census_v1/censoc_enlistment_census_1940_v1.csv'
 resource_file_path <- here("codebase/04_create_enlistment_records/codebook")
 
 data_records <- fread(data_path)

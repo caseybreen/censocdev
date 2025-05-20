@@ -7,13 +7,13 @@ library(readr)
 library(data.table)
 
 # Cleaned enlistment data
-path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment.csv"
+path_full_enlistment <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/finalenlistment.csv"
 
 # Enlistment-Census matches
-path_enlistment_census_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched-enlistment-census-v1.1/matched_census_enlistment_male.csv"
+path_enlistment_census_matched <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/matched-enlistment-census-v1.1/matched_census_enlistment_male.csv"
 
 # Out path Final matched datasets
-path_final <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/"
+path_final <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/matched_enlistment_datasets_v1.1/"
 
 
 # Read in files

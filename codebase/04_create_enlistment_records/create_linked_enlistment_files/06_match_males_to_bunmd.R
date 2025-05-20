@@ -8,18 +8,19 @@ library(readr)
 library(stringi)
 library(stringr)
 library(tidyverse)
+library(here)
 
 # source for matching code
-source("~/censocdev/R/match-records.R")
+source(here("R/match-records.R"))
 
 # file_A: BUNMD by bpl
-in_path_bunmd <- "~mariaosborne-ipums/cleaned-bunmd-by-bpl"
+in_path_bunmd <- "/global/scratch/p2p3/pl1_demography/censoc_internal/data/cleaned-bunmd-by-bpl"
 
 # file_B: Enlistment by bpl
-in_path_enlistment <- "~mariaosborne-ipums/enlistment_records_linking/enlistment-males-by-bpl-v1.1"
+in_path_enlistment <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/enlistment-males-by-bpl-v1.1"
 
 # Out path:
-out_path <- "/home/ipums/mariaosborne-ipums/enlistment_records_linking/matched-enlistment-numident-males-v1.1"
+out_path <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/matched-enlistment-numident-males-v1.1"
 
 # Prepare file names for matching
 bunmd_files <- list.files(in_path_bunmd)

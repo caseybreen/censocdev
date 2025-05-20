@@ -9,16 +9,16 @@ library(stringi)
 library(stringr)
 
 # Cleaned enlistment data
-path_full_enlistment <- "/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
+path_full_enlistment <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
 
 # Enlistment-Numident matches
-path_enlistment_numident_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched-enlistment-numident-males-v1.1/matched_numident_enlistment_male.csv"
+path_enlistment_numident_matched <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/matched-enlistment-numident-males-v1.1/matched_numident_enlistment_male.csv"
 
 # Enlistment-census matches
-path_census_enlistment_matched <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/internal_census_enlistment_links.csv"
+path_census_enlistment_matched <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/matched_enlistment_datasets_v1.1/internal_census_enlistment_links.csv"
 
 # Final matched datasets out path
-path_final <- "~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/"
+path_final <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/matched_enlistment_datasets_v1.1/"
 
 
 # Read in files

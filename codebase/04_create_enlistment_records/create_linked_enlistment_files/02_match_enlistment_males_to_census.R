@@ -17,7 +17,7 @@ source("~/censocdev/R/match-records.R")
 # File A = census
 # File B = enlistment
 in_path_A      <- "/home/ipums/wontak.joo-ipums/project/abe/data/cleaned-1940-census-by-bpl/" # note: files contain both sexes
-in_path_B      <- "/home/ipums/mariaosborne-ipums/enlistment_records_linking/enlistment-males-by-bpl-v1.1/"
+in_path_B      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/enlistment-males-by-bpl-v1.1/"
 fname_var_A    <- "fname"
 fname_var_B    <- "fname"
 lname_var_A    <- "lname"
@@ -32,8 +32,8 @@ id_var_A       <- "HISTID"
 id_var_B       <- "unique_ID"
 vars_to_keep_A <- c("fname_raw", "lname_raw", "middle", "sex", "AGE", "BPL", "SERIALP", "PERNUM", "MARST", "RACE")
 vars_to_keep_B <- c("bpl")
-out_path       <- "/home/ipums/mariaosborne-ipums/enlistment_records_linking/matched-enlistment-census-v1.1/"
-log_path       <- "/home/ipums/mariaosborne-ipums/enlistment_records_linking/log"
+out_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/matched-enlistment-census-v1.1"
+log_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/log"
 
 path_to_out_file <- paste0(log_path, "/run-match-records_2.log")
 log <- file(path_to_out_file, open="wt")

@@ -11,8 +11,8 @@ library(readr)
 library(dplyr)
 
 # paths
-in_path_to_split <- "/data/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
-out_path_split <- "~mariaosborne-ipums/enlistment_records_linking/enlistment-males-by-bpl-v1.1/"
+in_path_to_split <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/finalenlistment_for_linking.csv"
+out_path_split <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/enlistment-males-by-bpl-v1.1/"
 split_var <- "bpl"
 cols_to_keep <- c("fname_clean_std", "lname", "sex", "byear", "bpl", "unique_ID")
 

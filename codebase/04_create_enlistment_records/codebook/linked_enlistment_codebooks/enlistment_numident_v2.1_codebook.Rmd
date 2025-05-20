@@ -67,7 +67,8 @@ library(lubridate)
 library(kableExtra)
 library(here)
 
-data_path <- '~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/public_numident_enlistment_links_males.csv'
+#data_path <- '~mariaosborne-ipums/enlistment_records_linking/matched_enlistment_datasets_v1.1/public_numident_enlistment_links_males.csv'
+data_path <-"/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/army_enlistment_numident/enlistment_numident_v2.1/public_numident_enlistment_links_males.csv.gz"
 resource_file_path <- here("codebase/04_create_enlistment_records/codebook")
 
 data_records <- fread(data_path,
