@@ -13,11 +13,11 @@ library(stringr) # str_trim, str_split
 ```
 
 ```{r}
-path_to_temp_data   <-  "//data/censoc/workspace/enlistment_records/temp3.csv"
-out_path <- "//data/censoc/workspace/enlistment_records/"
+path_to_temp_data   <-  "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/temp3.csv"
+out_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/"
 # This file can be downloaded from #https://aad.archives.gov/aad/popup-codelist.jsp?cl_id=2079&dt=893&c_id=24982
-nativity_codes_path <-"/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/cl_2079.csv" # should move, update
-path_to_ipums_ddi   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/fullcount.ddi.xml"
+nativity_codes_path <-"/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/data/codes/cl_2079.csv"
+path_to_ipums_ddi   <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/data/codes/fullcount.ddi.xml"
 ```
 
 

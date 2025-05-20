@@ -14,15 +14,16 @@ library(data.table)
 
 #Set paths to data & csvs of NARA AAD codes
 ```{r}
-path_to_temp_data   <-  "//data/censoc/workspace/enlistment_records/temp4.csv"
-out_path <- "/data/censoc/workspace/enlistment_records"
-grade_codes_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2072.csv" # to update
-branch_codes_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2075.csv"
-source_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2077.csv"
-branch_alpha_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2074 (1).csv"
-grade_alpha_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2073.csv"
-term_or_enlistment_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/aw enlistment code/titlesnicknames/cl_2076.csv"
-component_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/aw enlistment code/titlesnicknames/cl_2078.csv"
+path_to_temp_data   <-  "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/temp4.csv"
+out_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records"
+
+grade_codes_path <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_2072.csv" 
+branch_codes_path <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_2075.csv"
+source_path <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_2077.csv"
+branch_alpha_path <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_2074 (1).csv"
+grade_alpha_path <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_2073.csv"
+term_or_enlistment_path <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_2076.csv"
+component_path <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_2078.csv"
 
 ```
 

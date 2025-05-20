@@ -13,9 +13,9 @@ library(stringr) # str_trim, str_split
 
 # Read data
 ```{r}
-path_to_temp_data   <-  "/data/censoc/workspace/enlistment_records/temp7.csv"
-out_path <- "/data/censoc/workspace/enlistment_records/"
-civ_path <- "/data/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_3323.csv" # to update
+path_to_temp_data   <-  "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/temp7.csv"
+out_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/"
+civ_path <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_3323.csv" # to update
 ```
 
 #Read in temp7

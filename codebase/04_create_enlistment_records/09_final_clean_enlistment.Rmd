@@ -17,8 +17,8 @@ library(stringr) # str_trim, str_split
 
 #update path
 ```{r}
-path_to_temp_data   <-  "/data/censoc/workspace/enlistment_records/temp8.csv"
-out_path <- "/data/censoc/workspace/enlistment_records/"
+path_to_temp_data   <-  "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/temp8.csv"
+out_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/"
 ```
 
 ```{r}

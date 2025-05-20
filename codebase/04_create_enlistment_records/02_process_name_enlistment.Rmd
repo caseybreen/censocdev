@@ -17,14 +17,16 @@ packageurl <- "https://cran.r-project.org/src/contrib/Archive/gender/gender_0.5.
 #r software so must use different method to install gender & gender data packages
 library(gender)
 library(genderdata)
+library(here)
 
 ```
 #Set paths to temp data, outpath, and tan path to titles
 
 ```{r}
-path_to_temp_data <- "/data/censoc/workspace/enlistment_records/temp1.csv"
-outpath <- "/data/censoc/workspace/enlistment_records/"
-tan_path   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/titles-and-nicknames" # should update at some point
+path_to_temp_data <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/temp1.csv"
+outpath <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records"
+tan_path <- here("codebase/02_create_censoc/titles-and-nicknames")
+#tan_path   <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/data/codes/titles-and-nicknames"
 ```
 
 

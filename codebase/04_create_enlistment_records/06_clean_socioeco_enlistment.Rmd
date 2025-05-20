@@ -16,9 +16,9 @@ library(stringr) # str_trim, str_split
 
 
 ```{r }
-path_to_temp_data   <-  "//data/censoc/workspace/enlistment_records/temp5.csv"
-out_path <- "/data/censoc/workspace/enlistment_records"
-race_path <- "/data/josh/CenSoc/censoc_data/enlistment-records-public/code/awenlistmentcode/titlesnicknames/cl_2059.csv"
+path_to_temp_data   <-  "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/temp5.csv"
+out_path <- "/global/scratch/p2p3/pl1_demography/censoc/workspace/enlistment_records/"
+race_path <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/enlistment_records_public/code/awenlistmentcode/cl_2059.csv"
 ```
 
 #READ IN TEMP 5
