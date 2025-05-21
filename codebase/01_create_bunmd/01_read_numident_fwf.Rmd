@@ -32,30 +32,34 @@ Variable names are consistent with the original "field names" with two exception
 
 Library Packages
 ```{r}
-library(censocdev)
+library(here)
 library(tidyverse)
 library(data.table)
+
+source(here("R/read_death_fwf.R"))
+source(here("R/read_app_fwf.R"))
+source(here("R/read_claim_fwf.R"))
 ```
 
 
 ```{r}
 ## read in fixed-width death records
-deaths <- read_death_fwf(path = "/data/josh/CenSoc/NUMDEATH/")
+deaths <- read_death_fwf(path = "/global/scratch/p2p3/pl1_demography/censoc/input_data/nara_numident/death_records/records/")
 
 ## write out death records
-fwrite(x = deaths, file = "/censoc/data/numident/1_numident_files_with_original_varnames/deaths_original.csv")
+fwrite(x = deaths, file = "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/1_numident_files_with_original_varnames/deaths_original.csv")
 
 ## read in fixed-width appliation records
-apps <- read_app_fwf(path = "/data/josh/CenSoc/NUMIAPPLIC/Records/")
+apps <- read_app_fwf(path = "/global/scratch/p2p3/pl1_demography/censoc/input_data/nara_numident/application_records/records/")
 
 ## write out application records
-fwrite(apps, "/censoc/data/numident/1_numident_files_with_original_varnames/applications_original.csv")
+fwrite(apps, "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/1_numident_files_with_original_varnames/applications_original.csv")
 
 ## read in claims fixed-width application records 
-claims <- read_claim_fwf(path = "/data/josh/CenSoc/NUMICLAIM/Records/")
+claims <- read_claim_fwf(path = "/global/scratch/p2p3/pl1_demography/censoc/input_data/nara_numident/claim_records/records/")
 
 ## write out application records
-fwrite(claims, "/censoc/data/numident/1_numident_files_with_original_varnames/claims_original.csv")
+fwrite(claims, "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/1_numident_files_with_original_varnames/claims_original.csv")
 ```
 
 

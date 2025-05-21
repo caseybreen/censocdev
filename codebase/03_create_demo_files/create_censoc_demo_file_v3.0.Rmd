@@ -62,10 +62,10 @@ recode_education <- function(df, educ_var) {
 ## Read in the 1 percent file and the crosswalk from IPUMS
 ```{r}
 # Read in 1% IPUMS 1940 Census Extract
-ipums1pct <- fread("/data/censoc/workspace/demo_input/ipums1940_1p_sample_2024.csv.gz") %>% rename_all(tolower)
+ipums1pct <- fread("/global/scratch/p2p3/pl1_demography/censoc/workspace/demo_input/sampleIPUMS.csv") %>% rename_all(tolower)
 
 # Read crosswalk (Histid)
-xwalk <- fread("/data/censoc/crosswalks/1940_histid_cc_1p_xwalk.txt")
+xwalk <- fread("/global/scratch/p2p3/pl1_demography/censoc/workspace/demo_input/1940_histid_cc_1p_xwalk.txt")
 
 # Join histid to ipums1pct
 ipums1pct <- ipums1pct %>%
@@ -78,7 +78,7 @@ ipums1pct <- ipums1pct %>%
 ```{r}
 ## Read in linked Numident 
 #numidentdata <- fread("/data/censoc/censoc_data_releases/censoc_numident/censoc_numident_v3/censoc_numident_v3.csv")
-numidentdata <- fread("/data/censoc/censoc_data_releases/censoc_linked_to_census/v3/censoc_numident_v3_linked.csv")
+numidentdata <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_linked_to_census/v3/censoc_numident_v3_linked.csv")
 
 # Join numident to demo by histid
 numidentdemo <- ipums1pct %>%
@@ -114,7 +114,7 @@ demo_file_numident <- numidentdemo %>%
 ```{r}
 ## Read in linked demo file 
 #dmfdata <- fread("/data/censoc/censoc_data_releases/censoc_dmf/censoc_dmf_v3/censoc_dmf_v3.csv")
-dmfdata <- fread("/data/censoc/censoc_data_releases/censoc_linked_to_census/v3/censoc_dmf_v3_linked.csv")
+dmfdata <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_linked_to_census/v3/censoc_dmf_v3_linked.csv")
 
 # Join dmf to demo by histid
 dmfdata_demo <- ipums1pct %>%

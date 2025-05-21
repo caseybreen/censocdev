@@ -18,7 +18,7 @@ library(tidyverse)
 
 ```{r, echo = FALSE}
 # Look at data
-bunmd <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv")
+bunmd <- fread("/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database/bunmd.csv")
 #set.seed(100)
 #sampled_data <- bunmd[sample(nrow(bunmd), 10000), ]
 #fwrite(sampled_data, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_sampled_temp.csv")
@@ -189,11 +189,11 @@ clean_names <- function(in_path, file_name, lname_col, fname_col, sex_col, other
 
 #Apply code to BUNMD fname lname mname
 ```{r}
-in_path <-"/censoc/data/numident/4_berkeley_unified_mortality_database"
+in_path <-"/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database"
 lname_col <- "lname"
 fname_col <- "fname"
 sex_col <- "sex"
-out_path      <- "/censoc/data/numident/4_berkeley_unified_mortality_database"
+out_path      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database"
 # other_cols <- c("ssn", "zip_residence","byear","dyear","socstate","bmonth","dmonth","bday","dday",
 #                 "number_apps","race_first","race_last","race_last_cyear","race_first_cyear",
 #                 "race_last_cmonth","race_first_cmonth","race_change","number_claims","bpl",
@@ -209,7 +209,7 @@ clean_names(in_path, file_name, lname_col, fname_col,
 ```
 #Check cleaned dataset 
 ```{r}
-bunmd_cleaned <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned_e.csv", 
+bunmd_cleaned <- fread("/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned_e.csv", 
                        nrow = 1000)
 head(bunmd_cleaned %>% arrange(ssn))
 ```
@@ -350,10 +350,10 @@ clean_names_father <- function(in_path, file_name, lname_col, fname_col, other_c
 
 #apply function to clean father names
 ```{r}
-in_path_f <-"/censoc/data/numident/4_berkeley_unified_mortality_database"
+in_path_f <-"/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database"
 lname_col_f <- "father_lname"
 fname_col_f <- "father_fname"
-out_path_f      <- "/censoc/data/numident/4_berkeley_unified_mortality_database"
+out_path_f      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database"
 # other_cols_f <- c("fname","mname","lname","sex","fname_raw","mname_raw","lname_raw", "ssn","zip_residence","byear","dyear","socstate","bmonth","dmonth","bday","dday",
 #                 "number_apps","race_first","race_last","race_last_cyear","race_first_cyear",
 #                 "race_last_cmonth","race_first_cmonth","race_change","number_claims","bpl",
@@ -370,7 +370,7 @@ clean_names_father(in_path_f, file_name_f, lname_col_f, fname_col_f,
 
 #Check cleaned dataset 
 ```{r}
-bunmd_cleaned_f <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned_e_f.csv", nrow = 1000)
+bunmd_cleaned_f <- fread("/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned_e_f.csv", nrow = 1000)
 head(bunmd_cleaned_f %>% arrange(ssn))
 ```
 
@@ -507,11 +507,11 @@ clean_names_mother <- function(in_path, file_name, lname_col, fname_col, other_c
 
 #apply function to mothers
 ```{r}
-in_path_f <-"/censoc/data/numident/4_berkeley_unified_mortality_database"
+in_path_f <-"/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database"
 lname_col_f <- "mother_lname"
 fname_col_f <- "mother_fname"
 sex_col_f <- "mother_sex" 
-out_path_f      <- "/censoc/data/numident/4_berkeley_unified_mortality_database"
+out_path_f      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database"
 # other_cols_f <- c("fname","mname","lname","sex","fname_raw","mname_raw","lname_raw","father_fname",
 #                   "father_mname","father_lname", "father_fname_raw",
 #                   "father_mname_raw","father_lname_raw",
@@ -532,7 +532,7 @@ clean_names_mother(in_path_f, file_name_f, lname_col_f, fname_col_f,
 
 #Check cleaned dataset 
 ```{r}
-bunmd_cleaned_m <- fread("/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned_e_f_m.csv")
+bunmd_cleaned_m <- fread("/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database/bunmd_cleaned_e_f_m.csv")
 head(bunmd_cleaned_m %>% arrange(ssn))
 ```
 
@@ -594,7 +594,7 @@ bunmd_clean_name_fields <- bunmd_clean_name_fields[,c("ssn", "fname_clean","mnam
 # write file
 ```{r}
 readr::write_csv(bunmd_clean_name_fields,
-          "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd_clean_name_fields_only_updated.csv")
+          "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database/bunmd_clean_name_fields_only_updated.csv")
 ```
 
 

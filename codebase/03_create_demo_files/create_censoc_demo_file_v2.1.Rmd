@@ -27,10 +27,10 @@ library(censocdev)
 ## Read in the 1 percent file and the crosswalk from IPUMS
 ```{r}
 # Read in 1% IPUMS 1940 Census Extract
-ipums1pct <- fread("/data/censoc/workspace/sampleIPUMS.csv") %>% rename_all(tolower)
+ipums1pct <- fread("/global/scratch/p2p3/pl1_demography/censoc/workspace/demo_input/sampleIPUMS.csv") %>% rename_all(tolower)
 
 # Read crosswalk (Histid)
-xwalk <- fread("/data/censoc/crosswalks/1940_histid_cc_1p_xwalk.txt")
+xwalk <- fread("/global/scratch/p2p3/pl1_demography/censoc/workspace/demo_input/1940_histid_cc_1p_xwalk.txt")
 
 # Join histid to ipums1pct
 ipums1pct <- ipums1pct %>%
@@ -41,7 +41,7 @@ ipums1pct <- ipums1pct %>%
 ## Construct Censoc-Numident Demo
 ```{r}
 ## Read in linked Numident 
-numidentdata <- fread("/data/censoc/censoc_data_releases/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
+numidentdata <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_linked_to_census/v2.1/censoc_numident_v2.1_linked.csv")
 
 # Join numident to demo by histid
 numidentdemo <- ipums1pct %>%
@@ -72,7 +72,7 @@ demo_file_numident <- numident2.1 %>%
 ## Construct CenSoc-DMF Demo
 ```{r}
 ## Read in linked demo file 
-dmfdata <- fread("/data/censoc/censoc_data_releases/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
+dmfdata <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/censoc_linked_to_census/v2.1/censoc_dmf_v2.1_linked.csv")
 
 # Join dmf to demo by histid
 dmfdata_demo <- ipums1pct %>%

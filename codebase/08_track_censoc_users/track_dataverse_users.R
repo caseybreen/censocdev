@@ -18,8 +18,8 @@ library(data.table)
 library(ggsci)
 library(ggthemes)
 
-# Read guestbook (note: read permissions limited)
-gb <- fread("~/censoc/hdv_guestbooks/UC_Berkeley_CenSoc__GuestbookReponses_apr_29_2024.csv")
+# Read guestbook
+gb <- fread("/global/scratch/p2p3/pl1_demography/censoc_internal/users/dataverse_guestbooks/UC_Berkeley_CenSoc__GuestbookReponses_apr_29_2024.csv")
 head(gb)
 
 # Format date

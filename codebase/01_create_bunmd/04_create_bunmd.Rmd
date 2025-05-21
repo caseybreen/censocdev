@@ -10,16 +10,20 @@ The function `unify_numident` combines the information from the deaths, applicat
 The functions "create_weights" create post-stratification weights to the HMD for the BUNMD Sample 1 and Sample 2. 
 
 ```{r}
-library(censocdev)
+library(here)
 library(ipumsr)
+
+source(here("R/create_bunmd.R"))
+source(here("R/create_weights_bunmd.R"))
+source(here("R/create_weights_bunmd_complete.R"))
 ```
 
 
 ```{r}
 ## read in cleaned and "condensed" numident files
-claims <- fread("/censoc/data/numident/3_numident_files_cleaned_and_condensed/claims_condensed.csv")
-deaths <- fread("/censoc/data/numident/3_numident_files_cleaned_and_condensed/deaths_cleaned.csv")
-applications <- fread("/censoc/data/numident/3_numident_files_cleaned_and_condensed/apps_condensed.csv")
+claims <- fread("/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/3_numident_files_cleaned_and_condensed/claims_condensed.csv")
+deaths <- fread("/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/3_numident_files_cleaned_and_condensed/deaths_cleaned.csv")
+applications <- fread("/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/3_numident_files_cleaned_and_condensed/apps_condensed.csv")
 
 ## combine records into one file
 bunmd <- create_bunmd(claims = claims, applications = applications, deaths = deaths)
@@ -31,7 +35,7 @@ bunmd <- create_weights_bunmd_complete(bunmd)
 
 ```{r}
 ## create string variables 
-ddi_extract <- read_ipums_ddi("/data/josh/CenSoc/censoc_data/ipums_1940_extract/fullcount.ddi.xml")
+ddi_extract <- read_ipums_ddi("/global/scratch/p2p3/pl1_demography/censoc/miscellaneous/ipums_1940_extract")
 
 ## extract geo codes
 geo_codes <- ipums_val_labels(ddi_extract, BPLD) 
@@ -44,7 +48,7 @@ bunmd <- bunmd %>%
                select(socstate = val, socstate_string = lbl))
   
 ## write out BUNMD file
-fwrite(bunmd, "/censoc/data/numident/4_berkeley_unified_mortality_database/bunmd.csv")
+fwrite(bunmd, "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/4_berkeley_unified_mortality_database/bunmd.csv")
 ```
 
 Recap of the decision rules we used to create the BUNMD: 
