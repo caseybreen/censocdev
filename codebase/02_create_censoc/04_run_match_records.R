@@ -15,8 +15,8 @@ library(tidyverse)
 library(here)
 
 ### Match census to BUNMD
-in_path_A      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-1940-census-by-bpl"
-in_path_B      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-bunmd-by-bpl"
+in_path_A      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/cleaned-1940-census-by-bpl"
+in_path_B      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/2.1_data/cleaned-bunmd-by-bpl"
 fname_var_A    <- "fname"
 fname_var_B    <- "fname"
 lname_var_A    <- "lname"
@@ -32,8 +32,8 @@ vars_to_keep_B <- c("fname_raw", "lname_raw", "middle", "middle_raw", "sex", "bp
                     "race_last", "race_last_cyear", "race_last_cmonth",
                     "zip_residence", "socstate", "age_first_application", "weight",
                     "father_lname_raw", "father_lname")
-out_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/matched-1940-census-bunmd"
-log_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/log/"
+out_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/2.1_data/matched-census-bunmd"
+log_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/log"
 
 path_to_out_file <- paste0(log_path, "/4-run-match-records_1.log")
 log <- file(path_to_out_file, open="wt")
@@ -240,8 +240,8 @@ close(log)
 rm(list = ls())
 
 ### Match census to DMF
-in_path_A      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-1940-census-by-bpl"
-in_path_B      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-dmf"
+in_path_A      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/cleaned-1940-census-by-bpl"
+in_path_B      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/2.1_data/cleaned-dmf"
 fname_var_A    <- "fname"
 fname_var_B    <- "fname"
 lname_var_A    <- "lname"
@@ -253,8 +253,8 @@ id_var_B       <- "ssn"
 vars_to_keep_A <- c("fname_raw", "lname_raw", "middle", "sex", "BIRTHYR", "BPL", "SERIALP", "PERNUM", "MARST", "RACE")
 vars_to_keep_B <- c("fname_raw", "lname_raw", "middle", "middle_raw", "sex",
                     "byear", "bmonth", "dyear", "dmonth", "death_age", "weight")
-out_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/matched-1940-census-dmf"
-log_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/log/"
+out_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/2.1_data/matched-census-dmf"
+log_path       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/log"
 
 path_to_out_file <- paste0(log_path, "/4-run-match-records_2.log")
 log <- file(path_to_out_file, open="wt")

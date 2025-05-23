@@ -14,9 +14,9 @@ library(dplyr)
 library(readr)
 
 # Paths
-matched_bunmd <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/matched-census-bunmd/matched_census_bunmd.csv"
-matched_dmf   <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/matched-census-dmf/matched_census_dmf.csv"
-out_path      <- "/abe/data/final-v2-2-matched-datasets"
+matched_bunmd <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/2.1_data/matched-census-bunmd/matched_census_bunmd.csv"
+matched_dmf   <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/2.1_data/matched-census-dmf/matched_census_dmf.csv"
+out_path      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/final-v2-2-matched-datasets"
 dir.create(out_path)
 
 # Read in Census - BUNMD matches

@@ -22,10 +22,10 @@ bunmd_raw       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/data/num
 dmf_raw1        <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/dmf/ssdm1"
 dmf_raw2        <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/dmf/ssdm2"
 dmf_raw3        <- "/global/scratch/p2p3/pl1_demography/censoc/input_data/dmf/ssdm3"
-out_path_census <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/1940-census-by-bpl"
-out_path_bunmd  <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/bunmd-by-bpl"
-out_path_dmf    <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/dmf"
-log_path        <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/log"
+out_path_census <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/1940-census-by-bpl"
+out_path_bunmd  <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/bunmd-by-bpl"
+out_path_dmf    <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/dmf"
+log_path        <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/log"
 
 path_to_out_file <- paste0(log_path, "/1-run-split-by-bpl.log")
 log <- file(path_to_out_file, open="wt")

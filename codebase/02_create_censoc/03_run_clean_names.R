@@ -14,13 +14,13 @@ library(data.table)
 
 # Paths
 tan_path          <- here("codebase/02_create_censoc/titles-and-nicknames")
-in_path_census    <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/1940-census-by-bpl"
-out_path_census   <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-1940-census-by-bpl"
-in_path_bunmd     <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/bunmd-by-bpl"
-out_path_bunmd    <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-bunmd-by-bpl"
-in_path_dmf       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/dmf"
-out_path_dmf      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/cleaned-dmf"
-log_path          <- "/global/scratch/p2p3/pl1_demography/censoc_internal/censoc-abe-implementation/data/log/"
+in_path_census    <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/1940-census-by-bpl"
+out_path_census   <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/cleaned-1940-census-by-bpl"
+in_path_bunmd     <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/bunmd-by-bpl"
+out_path_bunmd    <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/2.1_data/cleaned-bunmd-by-bpl"
+in_path_dmf       <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/dmf"
+out_path_dmf      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/2.1_data/cleaned-dmf"
+log_path          <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/log"
 
 path_to_out_file <- paste0(log_path, "/3-run-clean-names.log")
 log <- file(path_to_out_file, open="wt")
