@@ -16,7 +16,7 @@ source("~/censocdev/R/match-records.R")
 ### Match census to enlistment
 # File A = census
 # File B = enlistment
-in_path_A      <- "/home/ipums/wontak.joo-ipums/project/abe/data/cleaned-1940-census-by-bpl/" # note: files contain both sexes
+in_path_A      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/abe/data/cleaned-1940-census-by-bpl" # note: files contain both sexes
 in_path_B      <- "/global/scratch/p2p3/pl1_demography/censoc_internal/enlistment_records_linking/enlistment-males-by-bpl-v1.1/"
 fname_var_A    <- "fname"
 fname_var_B    <- "fname"

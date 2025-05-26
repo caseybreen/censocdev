@@ -23,7 +23,7 @@ Clean and write out death files
 ```{r}
 ## clean deaths AND add socstate BPL variable
 deaths <- clean_deaths(numdeath.file.path = "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/1_numident_files_with_original_varnames/deaths_original.csv",
-                       ssn_state_crosswalk_path = "/90days/caseybreen/ssn_to_state_crosswalk.csv")
+                       ssn_state_crosswalk_path = "/global/scratch/p2p3/pl1_demography/censoc/crosswalks/ssn_to_state_crosswalk.csv")
 
 ## write out cleaned death records
 fwrite(deaths, "/global/scratch/p2p3/pl1_demography/censoc_internal/data/numident/2_numident_files_cleaned/deaths_cleaned.csv")

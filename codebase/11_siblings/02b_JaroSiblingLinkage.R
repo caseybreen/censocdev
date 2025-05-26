@@ -4,7 +4,7 @@ library(RecordLinkage)
 library(igraph)
 
 #Read in pruned file
-bunmd_pruned <- fread("~/SiblingsCreationClean/01_bunmd_pruned.csv")
+bunmd_pruned <- fread("/global/scratch/p2p3/pl1_demography/censoc/workspace/SiblingsCreationClean/01_bunmd_pruned.csv")
 
 #Make a dummy variable for the first two characters of parents' names
 #This cuts down the grouping to allow the later steps to run quick
@@ -46,4 +46,4 @@ jaro_sibs <- data.frame(ssn, group_id) %>%
   group_by(group_id) %>%
   filter(n() > 1)
 
-fwrite(jaro_sibs, "~/SiblingsCreationClean/02b_JaroSiblings_90.csv")
+fwrite(jaro_sibs, "/global/scratch/p2p3/pl1_demography/censoc/workspace/SiblingsCreationClean/02b_JaroSiblings_90.csv")

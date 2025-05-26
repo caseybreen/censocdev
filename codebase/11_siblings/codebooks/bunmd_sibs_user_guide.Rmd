@@ -45,8 +45,8 @@ Sibships are identified among individuals in the BUNMD who died at age 65+ in th
 
 ```{r, include=FALSE, echo = FALSE}
 # Read BUNMD data
-bunmd_sibs_exact <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v2/bunmd_siblings_v2/bunmd_sibs_exact_match_v2.csv")
-bunmd_sibs_flex <- fread("/data/censoc/censoc_data_releases/siblings/siblings_v2/bunmd_siblings_v2/bunmd_sibs_flexible_match_v2.csv")
+bunmd_sibs_exact <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/siblings/siblings_v2/bunmd_siblings_v2/bunmd_sibs_exact_match_v2.csv")
+bunmd_sibs_flex <- fread("/global/scratch/p2p3/pl1_demography/censoc/censoc_data_releases/siblings/siblings_v2/bunmd_siblings_v2/bunmd_sibs_flexible_match_v2.csv")
 ```
 
 ```{r, eval = FALSE, include=FALSE, echo = FALSE}
