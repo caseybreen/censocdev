@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 
-read_death_fwf <- function(path = "/data/josh/CenSoc/NUMDEATH/") {
+read_death_fwf <- function(path = "/global/scratch/p2p3/pl1_demography/censoc/input_data/nara_numident/death_records/records") {
 
   death_record_column_positions <- fwf_cols(
     NUMI_REFERENCE_NUM = c(1, 11),

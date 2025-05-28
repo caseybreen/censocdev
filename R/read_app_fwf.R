@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 
-read_app_fwf <- function(path = "/data/josh/CenSoc/NUMIAPPLIC/Records/") {
+read_app_fwf <- function(path = "/global/scratch/p2p3/pl1_demography/censoc/input_data/nara_numident/application_records/records") {
 
   application_record_column_positions <- fwf_cols(
     NUMI_REFERENCE_NUM = c(1, 11),

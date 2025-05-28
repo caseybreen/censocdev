@@ -6,7 +6,7 @@
 #' @import data.table
 #' @export
 
-read_claim_fwf <- function(path = "/data/josh/CenSoc/NUMICLAIM/Records/") {
+read_claim_fwf <- function(path = "/global/scratch/p2p3/pl1_demography/censoc/input_data/nara_numident/claim_records/records") {
 
   claims_file_column_widths <- fwf_cols(
     NUMI_REFERENCE_NUM = c(1, 11),
