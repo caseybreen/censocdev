@@ -6,8 +6,9 @@ __Contributors:__ [Casey Breen](https://caseybreen.com),
 [Monica Alexander](https://www.monicaalexander.com/),
 [Won-tak Joo](https://1takjoo.github.io/),
 [Joshua R. Goldstein](https://vcresearch.berkeley.edu/faculty/joshua-goldstein),
-[Ugur Yildrim](https://uguryildirim.org/), and
-Maria Osborne
+[Ugur Yildrim](https://uguryildirim.org/), 
+Maria Osborne, and
+[Chris Soria](https://christophersoria.com/) 
 
 ---
 
@@ -25,5 +26,6 @@ In the `codebase/` directory, each subfolder contains code to:
 - `06_website_vignettes`— all CenSoc website vignettes (.Rmd files and 
 - `07_replication_assess_match_quality` — replication code for the assess match quality 
 - `08_track_censoc_users` — code to keep track of the number of new and total CenSoc users
+- `09_geography_files` - BUNMD and CenSoc-Numident supplemental geography files
 
 
